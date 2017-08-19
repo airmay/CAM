@@ -48,7 +48,7 @@
             this.tabControl1.Location = new System.Drawing.Point(0, 0);
             this.tabControl1.Name = "tabControl1";
             this.tabControl1.SelectedIndex = 0;
-            this.tabControl1.Size = new System.Drawing.Size(284, 509);
+            this.tabControl1.Size = new System.Drawing.Size(484, 509);
             this.tabControl1.TabIndex = 0;
             // 
             // tabPage1
@@ -57,7 +57,7 @@
             this.tabPage1.Location = new System.Drawing.Point(4, 22);
             this.tabPage1.Name = "tabPage1";
             this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage1.Size = new System.Drawing.Size(276, 483);
+            this.tabPage1.Size = new System.Drawing.Size(476, 483);
             this.tabPage1.TabIndex = 0;
             this.tabPage1.Text = "ProductView";
             this.tabPage1.UseVisualStyleBackColor = true;
@@ -67,7 +67,7 @@
             this.productView.Dock = System.Windows.Forms.DockStyle.Fill;
             this.productView.Location = new System.Drawing.Point(3, 3);
             this.productView.Name = "productView";
-            this.productView.Size = new System.Drawing.Size(270, 477);
+            this.productView.Size = new System.Drawing.Size(470, 477);
             this.productView.TabIndex = 0;
             // 
             // tabPage2
@@ -104,7 +104,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(284, 509);
+            this.ClientSize = new System.Drawing.Size(484, 509);
             this.Controls.Add(this.tabControl1);
             this.Name = "TestForm";
             this.Text = "TestForm";

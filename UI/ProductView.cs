@@ -18,13 +18,28 @@ namespace CAM.UI
             InitializeComponent();
         }
 
-        public void SetData(List<Segment> segments)
+        public void SetData(List<Product> products)
         {
-            segmentBindingSource.DataSource = segments;
+            productBindingSource.DataSource = products;
         }
 
         private void bAddProdict_Click(object sender, EventArgs e)
         {
+        }
+
+        private void dataGridView_DataError(object sender, DataGridViewDataErrorEventArgs e)
+        {
+            MessageBox.Show("Введите число");
+        }
+
+        private void cbProduct_Validating(object sender, CancelEventArgs e)
+        {
+            MessageBox.Show("cbProduct_Validating");
+        }
+
+        private void cbProduct_Validated(object sender, EventArgs e)
+        {
+            MessageBox.Show("cbProduct_Validated");
         }
     }
 }

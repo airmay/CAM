@@ -33,20 +33,20 @@
             this.toolStrip1 = new System.Windows.Forms.ToolStrip();
             this.toolStripButton1 = new System.Windows.Forms.ToolStripButton();
             this.dataGridView = new System.Windows.Forms.DataGridView();
-            this.pProduct = new System.Windows.Forms.Panel();
-            this.bAddProdict = new System.Windows.Forms.Button();
-            this.cbProduct = new System.Windows.Forms.ComboBox();
+            this.nameDataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Depth = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.DepthStep = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Speed = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.nameDataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.isExactlyBeginDataGridViewCheckBoxColumn = new System.Windows.Forms.DataGridViewCheckBoxColumn();
-            this.isExactlyEndDataGridViewCheckBoxColumn = new System.Windows.Forms.DataGridViewCheckBoxColumn();
+            this.productBindingSource = new System.Windows.Forms.BindingSource(this.components);
             this.segmentBindingSource = new System.Windows.Forms.BindingSource(this.components);
+            this.pProduct = new System.Windows.Forms.Panel();
+            this.bAddProdict = new System.Windows.Forms.Button();
+            this.cbProduct = new System.Windows.Forms.ComboBox();
             this.toolStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView)).BeginInit();
-            this.pProduct.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.productBindingSource)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.segmentBindingSource)).BeginInit();
+            this.pProduct.SuspendLayout();
             this.SuspendLayout();
             // 
             // toolStrip1
@@ -77,18 +77,53 @@
             this.dataGridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.DisableResizing;
             this.dataGridView.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.nameDataGridViewTextBoxColumn,
-            this.isExactlyBeginDataGridViewCheckBoxColumn,
-            this.isExactlyEndDataGridViewCheckBoxColumn,
             this.Depth,
             this.DepthStep,
             this.Speed});
-            this.dataGridView.DataSource = this.segmentBindingSource;
+            this.dataGridView.DataMember = "Segments";
+            this.dataGridView.DataSource = this.productBindingSource;
             this.dataGridView.Dock = System.Windows.Forms.DockStyle.Fill;
             this.dataGridView.Location = new System.Drawing.Point(0, 48);
             this.dataGridView.Name = "dataGridView";
-            this.dataGridView.ShowEditingIcon = false;
             this.dataGridView.Size = new System.Drawing.Size(325, 395);
             this.dataGridView.TabIndex = 2;
+            this.dataGridView.DataError += new System.Windows.Forms.DataGridViewDataErrorEventHandler(this.dataGridView_DataError);
+            // 
+            // nameDataGridViewTextBoxColumn
+            // 
+            this.nameDataGridViewTextBoxColumn.DataPropertyName = "Name";
+            this.nameDataGridViewTextBoxColumn.HeaderText = "Наименование";
+            this.nameDataGridViewTextBoxColumn.Name = "nameDataGridViewTextBoxColumn";
+            this.nameDataGridViewTextBoxColumn.Width = 108;
+            // 
+            // Depth
+            // 
+            this.Depth.DataPropertyName = "Depth";
+            this.Depth.HeaderText = "Глубина";
+            this.Depth.Name = "Depth";
+            this.Depth.Width = 73;
+            // 
+            // DepthStep
+            // 
+            this.DepthStep.DataPropertyName = "DepthStep";
+            this.DepthStep.HeaderText = "Шаг по Z";
+            this.DepthStep.Name = "DepthStep";
+            this.DepthStep.Width = 77;
+            // 
+            // Speed
+            // 
+            this.Speed.DataPropertyName = "Speed";
+            this.Speed.HeaderText = "Подача";
+            this.Speed.Name = "Speed";
+            this.Speed.Width = 69;
+            // 
+            // productBindingSource
+            // 
+            this.productBindingSource.DataSource = typeof(CAM.Domain.Product);
+            // 
+            // segmentBindingSource
+            // 
+            this.segmentBindingSource.DataSource = typeof(CAM.Domain.Segment);
             // 
             // pProduct
             // 
@@ -117,60 +152,15 @@
             // 
             this.cbProduct.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.cbProduct.DataSource = this.productBindingSource;
+            this.cbProduct.DisplayMember = "Name";
             this.cbProduct.FormattingEnabled = true;
             this.cbProduct.Location = new System.Drawing.Point(0, 0);
             this.cbProduct.Name = "cbProduct";
             this.cbProduct.Size = new System.Drawing.Size(275, 21);
             this.cbProduct.TabIndex = 0;
-            // 
-            // Depth
-            // 
-            this.Depth.DataPropertyName = "Depth";
-            this.Depth.HeaderText = "Глубина";
-            this.Depth.Name = "Depth";
-            this.Depth.Width = 73;
-            // 
-            // DepthStep
-            // 
-            this.DepthStep.DataPropertyName = "DepthStep";
-            this.DepthStep.HeaderText = "Шаг по Z";
-            this.DepthStep.Name = "DepthStep";
-            this.DepthStep.Width = 77;
-            // 
-            // Speed
-            // 
-            this.Speed.DataPropertyName = "Speed";
-            this.Speed.HeaderText = "Подача";
-            this.Speed.Name = "Speed";
-            this.Speed.Width = 69;
-            // 
-            // nameDataGridViewTextBoxColumn
-            // 
-            this.nameDataGridViewTextBoxColumn.DataPropertyName = "Name";
-            this.nameDataGridViewTextBoxColumn.HeaderText = "Наименование";
-            this.nameDataGridViewTextBoxColumn.Name = "nameDataGridViewTextBoxColumn";
-            this.nameDataGridViewTextBoxColumn.Width = 108;
-            // 
-            // isExactlyBeginDataGridViewCheckBoxColumn
-            // 
-            this.isExactlyBeginDataGridViewCheckBoxColumn.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells;
-            this.isExactlyBeginDataGridViewCheckBoxColumn.DataPropertyName = "IsExactlyBegin";
-            this.isExactlyBeginDataGridViewCheckBoxColumn.HeaderText = "Н";
-            this.isExactlyBeginDataGridViewCheckBoxColumn.Name = "isExactlyBeginDataGridViewCheckBoxColumn";
-            this.isExactlyBeginDataGridViewCheckBoxColumn.ToolTipText = "Точно начало";
-            this.isExactlyBeginDataGridViewCheckBoxColumn.Width = 21;
-            // 
-            // isExactlyEndDataGridViewCheckBoxColumn
-            // 
-            this.isExactlyEndDataGridViewCheckBoxColumn.DataPropertyName = "IsExactlyEnd";
-            this.isExactlyEndDataGridViewCheckBoxColumn.HeaderText = "К";
-            this.isExactlyEndDataGridViewCheckBoxColumn.Name = "isExactlyEndDataGridViewCheckBoxColumn";
-            this.isExactlyEndDataGridViewCheckBoxColumn.ToolTipText = "Точно конец";
-            this.isExactlyEndDataGridViewCheckBoxColumn.Width = 20;
-            // 
-            // segmentBindingSource
-            // 
-            this.segmentBindingSource.DataSource = typeof(CAM.Domain.Segment);
+            this.cbProduct.Validating += new System.ComponentModel.CancelEventHandler(this.cbProduct_Validating);
+            this.cbProduct.Validated += new System.EventHandler(this.cbProduct_Validated);
             // 
             // ProductView
             // 
@@ -184,8 +174,9 @@
             this.toolStrip1.ResumeLayout(false);
             this.toolStrip1.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView)).EndInit();
-            this.pProduct.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.productBindingSource)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.segmentBindingSource)).EndInit();
+            this.pProduct.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -201,10 +192,9 @@
         private System.Windows.Forms.ComboBox cbProduct;
         private System.Windows.Forms.BindingSource segmentBindingSource;
         private System.Windows.Forms.DataGridViewTextBoxColumn nameDataGridViewTextBoxColumn;
-        private System.Windows.Forms.DataGridViewCheckBoxColumn isExactlyBeginDataGridViewCheckBoxColumn;
-        private System.Windows.Forms.DataGridViewCheckBoxColumn isExactlyEndDataGridViewCheckBoxColumn;
         private System.Windows.Forms.DataGridViewTextBoxColumn Depth;
         private System.Windows.Forms.DataGridViewTextBoxColumn DepthStep;
         private System.Windows.Forms.DataGridViewTextBoxColumn Speed;
+        private System.Windows.Forms.BindingSource productBindingSource;
     }
 }

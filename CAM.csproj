@@ -65,7 +65,11 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Properties\DataSources\CAM.Domain.ProcessingParams.datasource" />
+    <None Include="Properties\DataSources\CAM.Domain.Product.datasource" />
     <None Include="Properties\DataSources\CAM.Domain.Segment.datasource" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Commands\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

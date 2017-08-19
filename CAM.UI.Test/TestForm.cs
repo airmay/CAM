@@ -36,7 +36,20 @@ namespace CAM.UI.Test
                     Speed = 50
                 }
             };
-            productView.SetData(segments);
+            var products = new List<Product>
+                {
+                new Product
+                {
+                    Name = "Изделие 1",
+                    Segments = segments
+                },
+                new Product
+                {
+                    Name = "Изделие 2",
+                    Segments = segments.FindAll(p => p.Name == "Дуга1")
+                }
+            };
+            productView.SetData(products);
         }
     }
 }
