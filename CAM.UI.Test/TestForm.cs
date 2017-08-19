@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CAM.Domain;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -15,6 +16,27 @@ namespace CAM.UI.Test
         public TestForm()
         {
             InitializeComponent();
+
+            var segments = new List<Segment>
+            {
+                new Segment
+                {
+                    Name = "Отрезок1",
+                    IsExactlyBegin = true,
+                    Depth = 30,
+                    DepthStep = 3,
+                    Speed = 50
+                },
+                new Segment
+                {
+                    Name = "Дуга1",
+                    IsExactlyEnd = true,
+                    Depth = 30,
+                    DepthStep = 3,
+                    Speed = 50
+                }
+            };
+            productView.SetData(segments);
         }
     }
 }

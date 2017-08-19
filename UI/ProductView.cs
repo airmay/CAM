@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using CAM.Domain;
 
 namespace CAM.UI
 {
@@ -15,6 +16,15 @@ namespace CAM.UI
         public ProductView()
         {
             InitializeComponent();
+        }
+
+        public void SetData(List<Segment> segments)
+        {
+            segmentBindingSource.DataSource = segments;
+        }
+
+        private void bAddProdict_Click(object sender, EventArgs e)
+        {
         }
     }
 }

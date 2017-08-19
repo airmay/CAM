@@ -21,6 +21,8 @@ namespace CAM.Domain
         /// </summary>
         public SegmentType Type { get; set; }
 
+        #region Параметры обработки
+
         /// <summary>
         /// Точно начало
         /// </summary>
@@ -32,8 +34,20 @@ namespace CAM.Domain
         public bool IsExactlyEnd { get; set; }
 
         /// <summary>
-        /// Параметры обработки
+        /// Глубина
         /// </summary>
-        ProcessingParams[] Params { get; set; }
+        public int Depth { get; set; }
+
+        /// <summary>
+        /// Шаг по глубине
+        /// </summary>
+        public int DepthStep { get; set; }
+
+        /// <summary>
+        /// Скорость подачи
+        /// </summary>
+        public int Speed { get; set; }
+
+        #endregion
     }
 }
