@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace CAM
+namespace CAM.Domain
 {
     /// <summary>
     /// Технологический процесс обработки
@@ -10,6 +10,6 @@ namespace CAM
         /// <summary>
         /// Управляющие команды техпроцесса
         /// </summary>
-        List<Command> Commands;
+        List<TechProcessCommand> Commands;
     }
 }

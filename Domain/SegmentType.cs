@@ -1,4 +1,4 @@
-﻿namespace CAM
+﻿namespace CAM.Domain
 {
     /// <summary>
     /// Тип обрабатываемого участка

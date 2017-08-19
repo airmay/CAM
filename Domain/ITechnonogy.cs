@@ -1,4 +1,4 @@
-﻿namespace CAM
+﻿namespace CAM.Domain
 {
     /// <summary>
     /// Технология обработки изделия

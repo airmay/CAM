@@ -45,6 +45,7 @@
     <Compile Include="Domain\CuttingDiscTechnonogy.cs" />
     <Compile Include="Domain\Command.cs" />
     <Compile Include="Domain\ITechnonogy.cs" />
+    <Compile Include="Domain\ProcessingParams.cs" />
     <Compile Include="Domain\Product.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Domain\Segment.cs" />

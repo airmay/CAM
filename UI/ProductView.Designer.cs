@@ -31,19 +31,12 @@
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ProductView));
             this.toolStrip1 = new System.Windows.Forms.ToolStrip();
             this.toolStripButton1 = new System.Windows.Forms.ToolStripButton();
-            this.splitContainer1 = new System.Windows.Forms.SplitContainer();
-            this.dataGridView1 = new System.Windows.Forms.DataGridView();
+            this.dataGridView = new System.Windows.Forms.DataGridView();
             this.pProduct = new System.Windows.Forms.Panel();
             this.bAddProdict = new System.Windows.Forms.Button();
             this.cbProduct = new System.Windows.Forms.ComboBox();
-            this.propertyGrid1 = new System.Windows.Forms.PropertyGrid();
-            this.backgroundWorker1 = new System.ComponentModel.BackgroundWorker();
             this.toolStrip1.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
-            this.splitContainer1.Panel1.SuspendLayout();
-            this.splitContainer1.Panel2.SuspendLayout();
-            this.splitContainer1.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.dataGridView)).BeginInit();
             this.pProduct.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -66,40 +59,21 @@
             this.toolStripButton1.Size = new System.Drawing.Size(23, 22);
             this.toolStripButton1.Text = "toolStripButton1";
             // 
-            // splitContainer1
+            // dataGridView
             // 
-            this.splitContainer1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.splitContainer1.Location = new System.Drawing.Point(0, 25);
-            this.splitContainer1.Name = "splitContainer1";
-            this.splitContainer1.Orientation = System.Windows.Forms.Orientation.Horizontal;
-            // 
-            // splitContainer1.Panel1
-            // 
-            this.splitContainer1.Panel1.Controls.Add(this.dataGridView1);
-            this.splitContainer1.Panel1.Controls.Add(this.pProduct);
-            // 
-            // splitContainer1.Panel2
-            // 
-            this.splitContainer1.Panel2.Controls.Add(this.propertyGrid1);
-            this.splitContainer1.Size = new System.Drawing.Size(325, 418);
-            this.splitContainer1.SplitterDistance = 167;
-            this.splitContainer1.TabIndex = 1;
-            // 
-            // dataGridView1
-            // 
-            this.dataGridView1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dataGridView1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.dataGridView1.Location = new System.Drawing.Point(0, 23);
-            this.dataGridView1.Name = "dataGridView1";
-            this.dataGridView1.Size = new System.Drawing.Size(325, 144);
-            this.dataGridView1.TabIndex = 2;
+            this.dataGridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.dataGridView.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.dataGridView.Location = new System.Drawing.Point(0, 48);
+            this.dataGridView.Name = "dataGridView";
+            this.dataGridView.Size = new System.Drawing.Size(325, 395);
+            this.dataGridView.TabIndex = 2;
             // 
             // pProduct
             // 
             this.pProduct.Controls.Add(this.bAddProdict);
             this.pProduct.Controls.Add(this.cbProduct);
             this.pProduct.Dock = System.Windows.Forms.DockStyle.Top;
-            this.pProduct.Location = new System.Drawing.Point(0, 0);
+            this.pProduct.Location = new System.Drawing.Point(0, 25);
             this.pProduct.Name = "pProduct";
             this.pProduct.Padding = new System.Windows.Forms.Padding(0, 0, 0, 1);
             this.pProduct.Size = new System.Drawing.Size(325, 23);
@@ -108,6 +82,7 @@
             // bAddProdict
             // 
             this.bAddProdict.Dock = System.Windows.Forms.DockStyle.Right;
+            this.bAddProdict.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.bAddProdict.Location = new System.Drawing.Point(275, 0);
             this.bAddProdict.Name = "bAddProdict";
             this.bAddProdict.Size = new System.Drawing.Size(50, 22);
@@ -125,30 +100,18 @@
             this.cbProduct.Size = new System.Drawing.Size(275, 21);
             this.cbProduct.TabIndex = 0;
             // 
-            // propertyGrid1
-            // 
-            this.propertyGrid1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.propertyGrid1.LineColor = System.Drawing.SystemColors.ControlDark;
-            this.propertyGrid1.Location = new System.Drawing.Point(0, 0);
-            this.propertyGrid1.Name = "propertyGrid1";
-            this.propertyGrid1.Size = new System.Drawing.Size(325, 247);
-            this.propertyGrid1.TabIndex = 0;
-            // 
             // ProductView
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.Controls.Add(this.splitContainer1);
+            this.Controls.Add(this.dataGridView);
+            this.Controls.Add(this.pProduct);
             this.Controls.Add(this.toolStrip1);
             this.Name = "ProductView";
             this.Size = new System.Drawing.Size(325, 443);
             this.toolStrip1.ResumeLayout(false);
             this.toolStrip1.PerformLayout();
-            this.splitContainer1.Panel1.ResumeLayout(false);
-            this.splitContainer1.Panel2.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).EndInit();
-            this.splitContainer1.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.dataGridView)).EndInit();
             this.pProduct.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
@@ -159,12 +122,9 @@
 
         private System.Windows.Forms.ToolStrip toolStrip1;
         private System.Windows.Forms.ToolStripButton toolStripButton1;
-        private System.Windows.Forms.SplitContainer splitContainer1;
-        private System.Windows.Forms.DataGridView dataGridView1;
+        private System.Windows.Forms.DataGridView dataGridView;
         private System.Windows.Forms.Panel pProduct;
         private System.Windows.Forms.Button bAddProdict;
         private System.Windows.Forms.ComboBox cbProduct;
-        private System.Windows.Forms.PropertyGrid propertyGrid1;
-        private System.ComponentModel.BackgroundWorker backgroundWorker1;
     }
 }
