@@ -8,8 +8,8 @@ namespace CAM.Domain
     public class TechProcess
     {
         /// <summary>
-        /// Управляющие команды техпроцесса
+        /// Технологические операции
         /// </summary>
-        List<TechProcessCommand> Commands;
+        List<ITechOperation> TechOperations { get; } = new List<ITechOperation>();
     }
 }

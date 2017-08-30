@@ -7,22 +7,10 @@ using System.Threading.Tasks;
 namespace CAM.Domain
 {
     /// <summary>
-    /// Обрабатываемый участок изделия
+    /// Технологическая операция "Распиловка"
     /// </summary>
-    public class Segment
+    public class SawingTechOperation : TechOperationBase
     {
-        /// <summary>
-        /// Наименование
-        /// </summary>
-        public string Name { get; set; }
-
-        /// <summary>
-        /// Тип обрабатываемого участка
-        /// </summary>
-        public SegmentType Type { get; set; }
-
-        #region Параметры обработки
-
         /// <summary>
         /// Точно начало
         /// </summary>
@@ -34,20 +22,13 @@ namespace CAM.Domain
         public bool IsExactlyEnd { get; set; }
 
         /// <summary>
-        /// Глубина
+        /// Расчет параметра "Точно начало"
         /// </summary>
-        public int Depth { get; set; }
+        public bool CalcExactlyBegin { get; set; }
 
         /// <summary>
-        /// Шаг по глубине
+        /// Расчет параметра "Точно конец"
         /// </summary>
-        public int DepthStep { get; set; }
-
-        /// <summary>
-        /// Скорость подачи
-        /// </summary>
-        public int Speed { get; set; }
-
-        #endregion
+        public bool CalcExactlyEnd { get; set; }
     }
 }

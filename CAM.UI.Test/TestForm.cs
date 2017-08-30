@@ -17,39 +17,39 @@ namespace CAM.UI.Test
         {
             InitializeComponent();
 
-            var segments = new List<Segment>
-            {
-                new Segment
-                {
-                    Name = "Отрезок1",
-                    IsExactlyBegin = true,
-                    Depth = 30,
-                    DepthStep = 3,
-                    Speed = 50
-                },
-                new Segment
-                {
-                    Name = "Дуга1",
-                    IsExactlyEnd = true,
-                    Depth = 30,
-                    DepthStep = 3,
-                    Speed = 50
-                }
-            };
-            var products = new List<Product>
-                {
-                new Product
-                {
-                    Name = "Изделие 1",
-                    Segments = segments
-                },
-                new Product
-                {
-                    Name = "Изделие 2",
-                    Segments = segments.FindAll(p => p.Name == "Дуга1")
-                }
-            };
-            productView.SetData(products);
+            //var segments = new List<Segment>
+            //{
+            //    new Segment
+            //    {
+            //        Name = "Отрезок1",
+            //        IsExactlyBegin = true,
+            //        Depth = 30,
+            //        DepthStep = 3,
+            //        Speed = 50
+            //    },
+            //    new Segment
+            //    {
+            //        Name = "Дуга1",
+            //        IsExactlyEnd = true,
+            //        Depth = 30,
+            //        DepthStep = 3,
+            //        Speed = 50
+            //    }
+            //};
+            //var products = new List<Product>
+            //    {
+            //    new Product
+            //    {
+            //        Name = "Изделие 1",
+            //        Segments = segments
+            //    },
+            //    new Product
+            //    {
+            //        Name = "Изделие 2",
+            //        Segments = segments.FindAll(p => p.Name == "Дуга1")
+            //    }
+            //};
+            //productView.SetData(products);
         }
     }
 }
