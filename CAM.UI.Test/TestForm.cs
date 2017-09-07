@@ -17,6 +17,11 @@ namespace CAM.UI.Test
         {
             InitializeComponent();
 
+            TreeNode[] nodes = new TreeNode[1];
+            nodes[0] = new TreeNode("Изделие1", new TreeNode[2] { new TreeNode("Распил по прямой"), new TreeNode("Распил по дуге") });
+
+            techProcessView.treeView.Nodes.AddRange(nodes);
+
             //var segments = new List<Segment>
             //{
             //    new Segment

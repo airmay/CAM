@@ -9,11 +9,16 @@ namespace CAM.Domain
     /// <summary>
     /// Распиловка по прямой
     /// </summary>
-    public class SawingStraightTechOperation : SawingTechOperation
+    public class SawingLineTechOperation : SawingTechOperation
     {
         /// <summary>
         /// Режим обработки
         /// </summary>
         SawingMode Mode { get; } = new SawingMode();
+
+        /// <summary>
+        /// Обрабатываемая область
+        /// </summary>
+        LineProcessingArea processingArea { get; }
     }
 }

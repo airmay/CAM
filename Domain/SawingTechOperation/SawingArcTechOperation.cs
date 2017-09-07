@@ -15,5 +15,11 @@ namespace CAM.Domain
         /// Режимы обработки
         /// </summary>
         List<SawingMode> Modes { get; } = new List<SawingMode>();
+
+
+        /// <summary>
+        /// Обрабатываемая область
+        /// </summary>
+        ArcProcessingArea processingArea { get; }
     }
 }

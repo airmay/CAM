@@ -1,0 +1,42 @@
+﻿using Autodesk.AutoCAD.DatabaseServices;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace CAM.Domain
+{
+    /// <summary>
+    /// Фабрика для создания обрабатываемых областей
+    /// </summary>
+    public class ProcessingAreaFactory
+    {
+        /// <summary>
+        /// Создает обрабатываемую область
+        /// </summary>
+        /// <param name="entity">Объект автокада представляющий графическую кривую</param>
+        /// <returns></returns>
+        public ProcessingArea Create(Curve curve)
+        {
+            //if ((entity.Layer != "0" && ((Entity)dbObject).Layer != "Êàìåíü")
+            //{
+            //    AutocadUtils.ShowError("Îáúåêò íå â ñëîå \"0\" èëè \"Êàìåíü\"");
+            //    continue;
+            //}
+            // TODO Проверка слоя при добавлении
+
+            ProcessingArea area = null;
+            if (curve is Line)
+                area = new LineProcessingArea(curve as Line);
+            if (curve is Arc)
+                area = new ArcProcessingArea(curve as Arc);
+            //Polyline Polyline2d Circle
+
+            if (area == null)
+                throw new ArgumentException($"Неподдерживаемый тип кривой {curve.GetType()}");
+
+            return area;
+        }
+    }
+}

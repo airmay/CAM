@@ -30,6 +30,12 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="AcDbMgd">
+      <HintPath>AcadAssembly\AcDbMgd.dll</HintPath>
+    </Reference>
+    <Reference Include="AcMgd">
+      <HintPath>AcadAssembly\AcMgd.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
@@ -42,19 +48,33 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AssemblyLoader.cs" />
+    <Compile Include="Commands\AddTechOperationCommand.cs" />
+    <Compile Include="Domain\ProcessingArea\ArcProcessingArea.cs" />
     <Compile Include="Domain\CuttingDiscTechnonogy.cs" />
     <Compile Include="Domain\Command.cs" />
     <Compile Include="Domain\ITechnonogy.cs" />
     <Compile Include="Domain\ITechOperation.cs" />
+    <Compile Include="Domain\ProcessingArea\LineProcessingArea.cs" />
+    <Compile Include="Domain\ProcessingArea\ProcessingArea.cs" />
+    <Compile Include="Domain\ProcessingArea\ProcessingAreaFactory.cs" />
+    <Compile Include="Domain\ProcessingArea\ProcessingAreaType.cs" />
     <Compile Include="Domain\ProcessingParams.cs" />
-    <Compile Include="Domain\SawingArcTechOperation.cs" />
-    <Compile Include="Domain\SawingMode.cs" />
-    <Compile Include="Domain\SawingStraightTechOperation.cs" />
+    <Compile Include="Domain\SawingTechOperation\SawingArcTechOperation.cs" />
+    <Compile Include="Domain\SawingTechOperation\SawingMode.cs" />
+    <Compile Include="Domain\SawingTechOperation\SawingLineTechOperation.cs" />
+    <Compile Include="Domain\SawingTechOperation\SawingTechOperationFactory.cs" />
     <Compile Include="Domain\TechOperation.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Domain\Segment.cs" />
-    <Compile Include="Domain\SegmentType.cs" />
+    <Compile Include="Domain\SawingTechOperation\SawingTechOperation.cs" />
     <Compile Include="Domain\TechProcess.cs" />
+    <Compile Include="UI\TechProcessView.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="UI\TechProcessView.Designer.cs">
+      <DependentUpon>TechProcessView.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UI\TechProcessViewModel.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Properties\DataSources\CAM.Domain.ProcessingParams.datasource" />
@@ -62,9 +82,11 @@
     <None Include="Properties\DataSources\CAM.Domain.Segment.datasource" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Commands\" />
-    <Folder Include="UI\" />
+    <EmbeddedResource Include="UI\TechProcessView.resx">
+      <DependentUpon>TechProcessView.cs</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
