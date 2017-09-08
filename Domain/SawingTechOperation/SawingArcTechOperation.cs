@@ -17,10 +17,13 @@ namespace CAM.Domain
         /// </summary>
         public ArcProcessingArea processingArea { get; }
 
+        public override ProcessingArea GetProcessingArea() => processingArea;
+
         public SawingArcTechOperation(TechProcessParams techProcessParams, SawingTechOperationParams techOperationParams, Arc arc)
              : base(techProcessParams, techOperationParams)
         {
             processingArea = new ArcProcessingArea(arc);
+            Name = "Распил по дуге";
         }
     }
 }

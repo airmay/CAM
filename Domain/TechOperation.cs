@@ -17,6 +17,12 @@ namespace CAM.Domain
         public TechProcessParams TechProcessParams { get; }
 
         /// <summary>
+        /// Получает обрабатываемую область
+        /// </summary>
+        /// <returns></returns>
+        public abstract ProcessingArea GetProcessingArea();
+
+        /// <summary>
         /// Наименование
         /// </summary>
         public string Name { get; set; }
