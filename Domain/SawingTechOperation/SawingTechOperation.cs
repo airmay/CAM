@@ -9,7 +9,7 @@ namespace CAM.Domain
     /// <summary>
     /// Технологическая операция "Распиловка"
     /// </summary>
-    public abstract class SawingTechOperation : TechOperationBase
+    public abstract class SawingTechOperation : TechOperation
     {
         /// <summary>
         /// Параметры технологической операции

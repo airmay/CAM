@@ -9,7 +9,7 @@ namespace CAM.Domain
     /// <summary>
     /// Базовая технологическая операция
     /// </summary>
-    public abstract class TechOperationBase : ITechOperation
+    public abstract class TechOperation : ITechOperation
     {
         /// <summary>
         /// Параметры технологического процесса обработки
@@ -27,7 +27,7 @@ namespace CAM.Domain
         /// </summary>
         public string Name { get; set; }
 
-        protected TechOperationBase(TechProcessParams techProcessParams)
+        protected TechOperation(TechProcessParams techProcessParams)
         {
             TechProcessParams = techProcessParams;
         }
