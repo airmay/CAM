@@ -29,6 +29,7 @@ namespace CAM.Domain
         public ArcProcessingArea(Arc arc)
             : base(arc)
         {
+            Type = ProcessingAreaType.Arc;
             Set(arc);
         }
 

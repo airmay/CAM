@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Autodesk.AutoCAD.DatabaseServices;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -12,14 +13,14 @@ namespace CAM.Domain
     public class SawingArcTechOperation : SawingTechOperation
     {
         /// <summary>
-        /// Режимы обработки
-        /// </summary>
-        List<SawingMode> Modes { get; } = new List<SawingMode>();
-
-
-        /// <summary>
         /// Обрабатываемая область
         /// </summary>
-        ArcProcessingArea processingArea { get; }
+        public ArcProcessingArea processingArea { get; }
+
+        public SawingArcTechOperation(TechProcessParams techProcessParams, SawingTechOperationParams techOperationParams, Arc arc)
+             : base(techProcessParams, techOperationParams)
+        {
+            processingArea = new ArcProcessingArea(arc);
+        }
     }
 }

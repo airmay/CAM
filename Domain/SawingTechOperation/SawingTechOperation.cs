@@ -9,26 +9,17 @@ namespace CAM.Domain
     /// <summary>
     /// Технологическая операция "Распиловка"
     /// </summary>
-    public class SawingTechOperation : TechOperationBase
+    public abstract class SawingTechOperation : TechOperationBase
     {
         /// <summary>
-        /// Точно начало
+        /// Параметры технологической операции
         /// </summary>
-        public bool IsExactlyBegin { get; set; }
+        public SawingTechOperationParams TechOperationParams { get; }
 
-        /// <summary>
-        /// Точно конец
-        /// </summary>
-        public bool IsExactlyEnd { get; set; }
-
-        /// <summary>
-        /// Расчет параметра "Точно начало"
-        /// </summary>
-        public bool CalcExactlyBegin { get; set; }
-
-        /// <summary>
-        /// Расчет параметра "Точно конец"
-        /// </summary>
-        public bool CalcExactlyEnd { get; set; }
+        protected SawingTechOperation(TechProcessParams techProcessParams, SawingTechOperationParams techOperationParams)
+            : base(techProcessParams)
+        {
+            TechOperationParams = techOperationParams;
+        }
     }
 }

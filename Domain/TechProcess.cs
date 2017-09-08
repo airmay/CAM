@@ -8,7 +8,7 @@ namespace CAM.Domain
     public class TechProcess
     {
         /// <summary>
-        /// Технологические операции
+        /// Список технологических операций процесса
         /// </summary>
         List<ITechOperation> TechOperations { get; } = new List<ITechOperation>();
     }

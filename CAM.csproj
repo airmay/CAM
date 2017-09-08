@@ -20,6 +20,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <PlatformTarget>x86</PlatformTarget>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -59,12 +60,13 @@
     <Compile Include="Domain\ProcessingArea\ProcessingArea.cs" />
     <Compile Include="Domain\ProcessingArea\ProcessingAreaFactory.cs" />
     <Compile Include="Domain\ProcessingArea\ProcessingAreaType.cs" />
-    <Compile Include="Domain\ProcessingParams.cs" />
     <Compile Include="Domain\SawingTechOperation\SawingArcTechOperation.cs" />
     <Compile Include="Domain\SawingTechOperation\SawingMode.cs" />
     <Compile Include="Domain\SawingTechOperation\SawingLineTechOperation.cs" />
     <Compile Include="Domain\SawingTechOperation\SawingTechOperationFactory.cs" />
+    <Compile Include="Domain\SawingTechOperation\SawingTechOperationParams.cs" />
     <Compile Include="Domain\TechOperation.cs" />
+    <Compile Include="Domain\TechProcessParams.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Domain\SawingTechOperation\SawingTechOperation.cs" />
     <Compile Include="Domain\TechProcess.cs" />
