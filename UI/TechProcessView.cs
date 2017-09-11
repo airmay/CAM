@@ -12,6 +12,14 @@ namespace CAM.UI
 {
     public partial class TechProcessView : UserControl
     {
+        public TreeNodeCollection TreeNodeCollection
+        { 
+            get 
+            {
+                return treeView.Nodes;
+            }
+        }   
+
         public TechProcessView()
         {
             InitializeComponent();

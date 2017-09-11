@@ -8,8 +8,18 @@ namespace CAM.Domain
     public class TechProcess
     {
         /// <summary>
+        /// Наименование
+        /// </summary>
+        public string Name { get; set; }
+
+        /// <summary>
         /// Список технологических операций процесса
         /// </summary>
-        List<ITechOperation> TechOperations { get; } = new List<ITechOperation>();
+        public List<SawingTechOperation> TechOperations { get; } = new List<SawingTechOperation>();
+
+        public TechProcess(string name)
+        {
+            Name = name;
+        }
     }
 }

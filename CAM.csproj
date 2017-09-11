@@ -33,9 +33,11 @@
   <ItemGroup>
     <Reference Include="AcDbMgd">
       <HintPath>AcadAssembly\AcDbMgd.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="AcMgd">
       <HintPath>AcadAssembly\AcMgd.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -51,6 +53,8 @@
   <ItemGroup>
     <Compile Include="AssemblyLoader.cs" />
     <Compile Include="Commands\CreateTechOperationCommand.cs" />
+    <Compile Include="Commands\CreateTechProcessCommand.cs" />
+    <Compile Include="Context.cs" />
     <Compile Include="Domain\ProcessingArea\ArcProcessingArea.cs" />
     <Compile Include="Domain\CuttingDiscTechnonogy.cs" />
     <Compile Include="Domain\Command.cs" />
