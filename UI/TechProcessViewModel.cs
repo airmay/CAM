@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CAM.Domain;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -9,5 +10,6 @@ namespace CAM.UI
 {
     public class TechProcessViewModel : TreeNode
     {
+        public SawingTechOperation TechOperation { get; }
     }
 }

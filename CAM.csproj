@@ -50,7 +50,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AssemblyLoader.cs" />
-    <Compile Include="Commands\AddTechOperationCommand.cs" />
+    <Compile Include="Commands\CreateTechOperationCommand.cs" />
     <Compile Include="Domain\ProcessingArea\ArcProcessingArea.cs" />
     <Compile Include="Domain\CuttingDiscTechnonogy.cs" />
     <Compile Include="Domain\Command.cs" />
