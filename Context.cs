@@ -17,6 +17,6 @@ namespace CAM
         /// <summary>
         /// Текущая техоперация
         /// </summary>
-        public TechOperation TechOperation { get; set; }
+        public SawingTechOperation TechOperation { get; set; }
     }
 }

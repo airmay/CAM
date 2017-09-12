@@ -11,6 +11,8 @@ namespace CAM.Domain
     /// </summary>
     public abstract class TechOperation : ITechOperation
     {
+        public string Id { get; } = Guid.NewGuid().ToString();
+
         /// <summary>
         /// Параметры технологического процесса обработки
         /// </summary>

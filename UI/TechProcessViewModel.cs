@@ -10,6 +10,8 @@ namespace CAM.UI
 {
     public class TechProcessViewModel : TreeNode
     {
+        public TechProcess TechProcess { get; }
+
         public SawingTechOperation TechOperation { get; }
     }
 }

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace CAM.Domain
 {
@@ -7,6 +8,8 @@ namespace CAM.Domain
     /// </summary>
     public class TechProcess
     {
+        public string Id { get; } = Guid.NewGuid().ToString();
+
         /// <summary>
         /// Наименование
         /// </summary>

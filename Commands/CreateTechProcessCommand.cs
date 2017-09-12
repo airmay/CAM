@@ -1,4 +1,4 @@
-﻿using Autodesk.AutoCAD.DatabaseServices;
+﻿//using Autodesk.AutoCAD.DatabaseServices;
 using CAM.Domain;
 using System;
 using System.Collections.Generic;
@@ -9,7 +9,7 @@ using System.Windows.Forms;
 
 namespace CAM.Commands
 {
-    public class CreateTechProcessCommand
+    public class CreateTechProcessCommand : CommandBase
     {
         private Context _context;
         private CreateTechOperationCommand _сreateTechOperationCommand;
@@ -24,13 +24,13 @@ namespace CAM.Commands
             _сreateTechOperationCommand = сreateTechOperationCommand;
         }
 
-        public void Execute(Curve curve)
+        public override void Execute()
         {
             var techProcess = new TechProcess($"Изделие{_techProcessList.Count + 1}");
             _techProcessList.Add(techProcess);
-            _treeNodeCollection.Add(techProcess.Name);
+            _treeNodeCollection.Add(techProcess.Id, techProcess.Name);
             _context.TechProcess = techProcess;
-            _сreateTechOperationCommand.Execute(curve);
+            _сreateTechOperationCommand.Execute();
         }
     }
 }
