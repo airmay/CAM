@@ -18,6 +18,8 @@ namespace CAM.Commands
 
         public CreateTechProcessCommand(Context context, List<TechProcess> techProcessList, TreeNodeCollection treeNodeCollection, CreateTechOperationCommand сreateTechOperationCommand)
         {
+            Name = CommandNames.CreateTechProcessCommand;
+
             _context = context;
             _techProcessList = techProcessList;
             _treeNodeCollection = treeNodeCollection;
@@ -28,7 +30,8 @@ namespace CAM.Commands
         {
             var techProcess = new TechProcess($"Изделие{_techProcessList.Count + 1}");
             _techProcessList.Add(techProcess);
-            _treeNodeCollection.Add(techProcess.Id, techProcess.Name);
+            var node = _treeNodeCollection.Add(techProcess.Id, techProcess.Name);
+            node.Expand();
             _context.TechProcess = techProcess;
             _сreateTechOperationCommand.Execute();
         }

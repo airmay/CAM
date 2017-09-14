@@ -37,6 +37,15 @@ namespace CAM.UI.Test
             createTechProcessCommand.Execute();
             createTechOperationCommand.Execute();
 
+            var removeTechOperationCommand = new RemoveTechOperationCommand(context, techProcessList, treeNodeCollection);
+            var moveUpTechOperationCommand = new MoveUpTechOperationCommand(context, treeNodeCollection);
+            var moveDownTechOperationCommand = new MoveDownTechOperationCommand(context, treeNodeCollection);
+            var selectTechOperationCommand = new SelectTechOperationCommand(context, techProcessView.treeView);
+            var setTechOperationCommand = new SetTechOperationCommand(context, techProcessList, techProcessView.treeView);
+
+            techProcessView.RegisterCommands(createTechProcessCommand, createTechOperationCommand, removeTechOperationCommand, moveUpTechOperationCommand, moveDownTechOperationCommand,
+                selectTechOperationCommand, setTechOperationCommand);
+
             //TreeNode[] nodes = new TreeNode[1];
             //nodes[0] = new TreeNode("Изделие1", new TreeNode[2] { new TreeNode("Распил по прямой"), new TreeNode("Распил по дуге") });
 

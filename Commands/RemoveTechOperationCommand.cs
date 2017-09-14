@@ -16,6 +16,8 @@ namespace CAM.Commands
 
         public RemoveTechOperationCommand(Context context, List<TechProcess> techProcessList, TreeNodeCollection treeNodeCollection)
         {
+            Name = CommandNames.RemoveTechOperationCommand;
+
             _context = context;
             _techProcessList = techProcessList;
             _treeNodeCollection = treeNodeCollection;

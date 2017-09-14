@@ -14,6 +14,8 @@ namespace CAM.Commands
 
         public MoveDownTechOperationCommand(Context context, TreeNodeCollection treeNodeCollection)
         {
+            Name = CommandNames.MoveDownTechOperationCommand;
+
             _context = context;
             _treeNodeCollection = treeNodeCollection;
         }
@@ -26,7 +28,7 @@ namespace CAM.Commands
 
         public override bool CanExecute()
         {
-            return _context.TechProcess.TechOperations.IndexOf(_context.TechOperation) < _context.TechProcess.TechOperations.Count - 1;
+            return _context.TechOperation != null && _context.TechProcess.TechOperations.IndexOf(_context.TechOperation) < _context.TechProcess.TechOperations.Count - 1;
         }
     }
 }

@@ -18,6 +18,8 @@ namespace CAM.Commands
 
         public CreateTechOperationCommand(Context context, SawingTechOperationFactory techOperationFactory, TreeNodeCollection treeNodeCollection, Func<Curve[]> curveProvider)
         {
+            Name = CommandNames.CreateTechOperationCommand;
+
             _context = context;
             _techOperationFactory = techOperationFactory;
             _treeNodeCollection = treeNodeCollection;

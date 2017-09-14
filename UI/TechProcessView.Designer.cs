@@ -33,10 +33,19 @@
             this.treeView = new System.Windows.Forms.TreeView();
             this.panel1 = new System.Windows.Forms.Panel();
             this.toolStrip1 = new System.Windows.Forms.ToolStrip();
+            this.bCreateTechOperation = new System.Windows.Forms.ToolStripButton();
             this.panel2 = new System.Windows.Forms.Panel();
-            this.toolStripButton1 = new System.Windows.Forms.ToolStripButton();
+            this.bRemove = new System.Windows.Forms.ToolStripButton();
+            this.bMoveUpTechOperation = new System.Windows.Forms.ToolStripButton();
+            this.bMoveDownTechOperation = new System.Windows.Forms.ToolStripButton();
+            this.bCreateTechProcess = new System.Windows.Forms.ToolStripButton();
+            this.textBox1 = new System.Windows.Forms.TextBox();
+            this.textBox2 = new System.Windows.Forms.TextBox();
+            this.textBox3 = new System.Windows.Forms.TextBox();
+            this.button1 = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
+            this.splitContainer1.Panel2.SuspendLayout();
             this.splitContainer1.SuspendLayout();
             this.panel1.SuspendLayout();
             this.toolStrip1.SuspendLayout();
@@ -53,17 +62,27 @@
             // splitContainer1.Panel1
             // 
             this.splitContainer1.Panel1.Controls.Add(this.treeView);
+            // 
+            // splitContainer1.Panel2
+            // 
+            this.splitContainer1.Panel2.Controls.Add(this.button1);
+            this.splitContainer1.Panel2.Controls.Add(this.textBox3);
+            this.splitContainer1.Panel2.Controls.Add(this.textBox2);
+            this.splitContainer1.Panel2.Controls.Add(this.textBox1);
             this.splitContainer1.Size = new System.Drawing.Size(312, 711);
-            this.splitContainer1.SplitterDistance = 347;
+            this.splitContainer1.SplitterDistance = 346;
             this.splitContainer1.TabIndex = 0;
             // 
             // treeView
             // 
             this.treeView.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.treeView.LabelEdit = true;
             this.treeView.Location = new System.Drawing.Point(0, 0);
             this.treeView.Name = "treeView";
-            this.treeView.Size = new System.Drawing.Size(312, 347);
+            this.treeView.Size = new System.Drawing.Size(312, 346);
             this.treeView.TabIndex = 0;
+            this.treeView.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.treeView_AfterSelect);
+            this.treeView.NodeMouseDoubleClick += new System.Windows.Forms.TreeNodeMouseClickEventHandler(this.treeView_NodeMouseDoubleClick);
             // 
             // panel1
             // 
@@ -78,12 +97,26 @@
             // toolStrip1
             // 
             this.toolStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.toolStripButton1});
+            this.bCreateTechOperation,
+            this.bRemove,
+            this.bMoveUpTechOperation,
+            this.bMoveDownTechOperation,
+            this.bCreateTechProcess});
             this.toolStrip1.Location = new System.Drawing.Point(0, 0);
             this.toolStrip1.Name = "toolStrip1";
             this.toolStrip1.Size = new System.Drawing.Size(312, 25);
             this.toolStrip1.TabIndex = 0;
             this.toolStrip1.Text = "toolStrip1";
+            this.toolStrip1.ItemClicked += new System.Windows.Forms.ToolStripItemClickedEventHandler(this.toolStrip1_ItemClicked);
+            // 
+            // bCreateTechOperation
+            // 
+            this.bCreateTechOperation.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.bCreateTechOperation.Image = ((System.Drawing.Image)(resources.GetObject("bCreateTechOperation.Image")));
+            this.bCreateTechOperation.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.bCreateTechOperation.Name = "bCreateTechOperation";
+            this.bCreateTechOperation.Size = new System.Drawing.Size(23, 22);
+            this.bCreateTechOperation.Text = "Добавить операцию";
             // 
             // panel2
             // 
@@ -94,14 +127,72 @@
             this.panel2.Size = new System.Drawing.Size(312, 711);
             this.panel2.TabIndex = 3;
             // 
-            // toolStripButton1
+            // bRemove
             // 
-            this.toolStripButton1.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.toolStripButton1.Image = ((System.Drawing.Image)(resources.GetObject("toolStripButton1.Image")));
-            this.toolStripButton1.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.toolStripButton1.Name = "toolStripButton1";
-            this.toolStripButton1.Size = new System.Drawing.Size(23, 22);
-            this.toolStripButton1.Text = "toolStripButton1";
+            this.bRemove.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.bRemove.Image = ((System.Drawing.Image)(resources.GetObject("bRemove.Image")));
+            this.bRemove.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.bRemove.Name = "bRemove";
+            this.bRemove.Size = new System.Drawing.Size(23, 22);
+            this.bRemove.Text = "Удалить";
+            // 
+            // bMoveUpTechOperation
+            // 
+            this.bMoveUpTechOperation.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.bMoveUpTechOperation.Image = ((System.Drawing.Image)(resources.GetObject("bMoveUpTechOperation.Image")));
+            this.bMoveUpTechOperation.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.bMoveUpTechOperation.Name = "bMoveUpTechOperation";
+            this.bMoveUpTechOperation.Size = new System.Drawing.Size(23, 22);
+            this.bMoveUpTechOperation.Text = "Пререместить выше";
+            // 
+            // bMoveDownTechOperation
+            // 
+            this.bMoveDownTechOperation.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.bMoveDownTechOperation.Image = ((System.Drawing.Image)(resources.GetObject("bMoveDownTechOperation.Image")));
+            this.bMoveDownTechOperation.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.bMoveDownTechOperation.Name = "bMoveDownTechOperation";
+            this.bMoveDownTechOperation.Size = new System.Drawing.Size(23, 22);
+            this.bMoveDownTechOperation.Text = "Переместить ниже";
+            // 
+            // bCreateTechProcess
+            // 
+            this.bCreateTechProcess.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.bCreateTechProcess.Image = ((System.Drawing.Image)(resources.GetObject("bCreateTechProcess.Image")));
+            this.bCreateTechProcess.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.bCreateTechProcess.Name = "bCreateTechProcess";
+            this.bCreateTechProcess.Size = new System.Drawing.Size(23, 22);
+            this.bCreateTechProcess.Text = "Добавить изделие";
+            // 
+            // textBox1
+            // 
+            this.textBox1.Location = new System.Drawing.Point(65, 39);
+            this.textBox1.Name = "textBox1";
+            this.textBox1.Size = new System.Drawing.Size(100, 20);
+            this.textBox1.TabIndex = 0;
+            // 
+            // textBox2
+            // 
+            this.textBox2.Location = new System.Drawing.Point(65, 120);
+            this.textBox2.Name = "textBox2";
+            this.textBox2.Size = new System.Drawing.Size(100, 20);
+            this.textBox2.TabIndex = 1;
+            // 
+            // textBox3
+            // 
+            this.textBox3.Location = new System.Drawing.Point(65, 81);
+            this.textBox3.Name = "textBox3";
+            this.textBox3.Size = new System.Drawing.Size(100, 20);
+            this.textBox3.TabIndex = 2;
+            // 
+            // button1
+            // 
+            this.button1.Location = new System.Drawing.Point(99, 167);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(75, 23);
+            this.button1.TabIndex = 3;
+            this.button1.Text = "button1";
+            this.button1.UseVisualStyleBackColor = true;
+            this.button1.Click += new System.EventHandler(this.button1_Click);
             // 
             // TechProcessView
             // 
@@ -112,6 +203,8 @@
             this.Name = "TechProcessView";
             this.Size = new System.Drawing.Size(312, 736);
             this.splitContainer1.Panel1.ResumeLayout(false);
+            this.splitContainer1.Panel2.ResumeLayout(false);
+            this.splitContainer1.Panel2.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).EndInit();
             this.splitContainer1.ResumeLayout(false);
             this.panel1.ResumeLayout(false);
@@ -130,7 +223,15 @@
         public System.Windows.Forms.TreeView treeView;
         private System.Windows.Forms.Panel panel1;
         private System.Windows.Forms.ToolStrip toolStrip1;
-        private System.Windows.Forms.ToolStripButton toolStripButton1;
+        private System.Windows.Forms.ToolStripButton bCreateTechOperation;
         private System.Windows.Forms.Panel panel2;
+        private System.Windows.Forms.ToolStripButton bRemove;
+        private System.Windows.Forms.ToolStripButton bMoveUpTechOperation;
+        private System.Windows.Forms.ToolStripButton bMoveDownTechOperation;
+        private System.Windows.Forms.ToolStripButton bCreateTechProcess;
+        private System.Windows.Forms.TextBox textBox3;
+        private System.Windows.Forms.TextBox textBox2;
+        private System.Windows.Forms.TextBox textBox1;
+        private System.Windows.Forms.Button button1;
     }
 }
