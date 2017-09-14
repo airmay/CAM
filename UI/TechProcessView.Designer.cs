@@ -117,6 +117,7 @@
             this.bCreateTechOperation.Name = "bCreateTechOperation";
             this.bCreateTechOperation.Size = new System.Drawing.Size(23, 22);
             this.bCreateTechOperation.Text = "Добавить операцию";
+            this.bCreateTechOperation.Click += new System.EventHandler(this.bCreateTechOperation_Click);
             // 
             // panel2
             // 
@@ -135,6 +136,7 @@
             this.bRemove.Name = "bRemove";
             this.bRemove.Size = new System.Drawing.Size(23, 22);
             this.bRemove.Text = "Удалить";
+            this.bRemove.Click += new System.EventHandler(this.bRemove_Click);
             // 
             // bMoveUpTechOperation
             // 
@@ -144,6 +146,7 @@
             this.bMoveUpTechOperation.Name = "bMoveUpTechOperation";
             this.bMoveUpTechOperation.Size = new System.Drawing.Size(23, 22);
             this.bMoveUpTechOperation.Text = "Пререместить выше";
+            this.bMoveUpTechOperation.Click += new System.EventHandler(this.bMoveUpTechOperation_Click);
             // 
             // bMoveDownTechOperation
             // 
@@ -153,6 +156,7 @@
             this.bMoveDownTechOperation.Name = "bMoveDownTechOperation";
             this.bMoveDownTechOperation.Size = new System.Drawing.Size(23, 22);
             this.bMoveDownTechOperation.Text = "Переместить ниже";
+            this.bMoveDownTechOperation.Click += new System.EventHandler(this.bMoveDownTechOperation_Click);
             // 
             // bCreateTechProcess
             // 
@@ -162,6 +166,7 @@
             this.bCreateTechProcess.Name = "bCreateTechProcess";
             this.bCreateTechProcess.Size = new System.Drawing.Size(23, 22);
             this.bCreateTechProcess.Text = "Добавить изделие";
+            this.bCreateTechProcess.Click += new System.EventHandler(this.bCreateTechProcess_Click);
             // 
             // textBox1
             // 
