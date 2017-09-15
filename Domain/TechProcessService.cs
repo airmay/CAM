@@ -31,7 +31,6 @@ namespace CAM.Domain
         public TechProcessService()
         {
             _techOperationFactory = new SawingTechOperationFactory(_techProcessParams, _sawingLineTechOperationParamsDefault, _sawingArcTechOperationParamsDefault);
-
         }
 
         public TechProcess CreateTechProcess()
@@ -83,12 +82,23 @@ namespace CAM.Domain
         public void SetCurrentTechProcess(string techProcessId)
         {
             CurrentTechProcess = _techProcessList.Single(p => p.Id == techProcessId);
+            CurrentTechOperation = null;
         }
 
         public void SetCurrentTechOperation(string techProcessId, string techOperationId)
         {
             SetCurrentTechProcess(techProcessId);
             CurrentTechOperation = CurrentTechProcess.TechOperations.Single(p => p.Id == techOperationId);
+        }
+
+        public void RenameTechProcess(string name)
+        {
+            CurrentTechProcess.Name = name;
+        }
+
+        public void RenameTechOperation(string name)
+        {
+            CurrentTechOperation.Name = name;
         }
     }
 }

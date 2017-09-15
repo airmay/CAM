@@ -53,15 +53,6 @@
   <ItemGroup>
     <Compile Include="AcadGateway.cs" />
     <Compile Include="AssemblyLoader.cs" />
-    <Compile Include="Commands\CommandBase.cs" />
-    <Compile Include="Commands\CommandNames.cs" />
-    <Compile Include="Commands\CreateTechOperationCommand.cs" />
-    <Compile Include="Commands\CreateTechProcessCommand.cs" />
-    <Compile Include="Commands\MoveDownTechOperationCommand.cs" />
-    <Compile Include="Commands\MoveUpTechOperationCommand.cs" />
-    <Compile Include="Commands\RemoveTechOperationCommand.cs" />
-    <Compile Include="Commands\SetTechOperationCommand.cs" />
-    <Compile Include="Commands\SelectTechOperationCommand.cs" />
     <Compile Include="Context.cs" />
     <Compile Include="Domain\FakePrimitive.cs" />
     <Compile Include="Domain\ProcessingArea\ArcProcessingArea.cs" />
