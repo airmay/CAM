@@ -76,6 +76,11 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Domain\SawingTechOperation\SawingTechOperation.cs" />
     <Compile Include="Domain\TechProcess.cs" />
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
     <Compile Include="UI\TechProcessView.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -90,11 +95,50 @@
     <None Include="Properties\DataSources\CAM.Domain.Segment.datasource" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
     <EmbeddedResource Include="UI\TechProcessView.resx">
       <DependentUpon>TechProcessView.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <None Include="Resources\DownArrow.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\icons8-Стрелка вниз в круге 2_64.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\icons8-Scroll Down.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\icons8-Down Arrow.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\icons8-Expand Arrow.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\icons8-Плюс-16.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\arrow-090.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\arrow-090_.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\arrow-270.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\minus.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\plus.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\folder--plus.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

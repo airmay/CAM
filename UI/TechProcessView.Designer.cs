@@ -28,17 +28,16 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(TechProcessView));
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
             this.treeView = new System.Windows.Forms.TreeView();
             this.panel1 = new System.Windows.Forms.Panel();
             this.toolStrip1 = new System.Windows.Forms.ToolStrip();
             this.bCreateTechOperation = new System.Windows.Forms.ToolStripButton();
-            this.panel2 = new System.Windows.Forms.Panel();
             this.bRemove = new System.Windows.Forms.ToolStripButton();
             this.bMoveUpTechOperation = new System.Windows.Forms.ToolStripButton();
             this.bMoveDownTechOperation = new System.Windows.Forms.ToolStripButton();
             this.bCreateTechProcess = new System.Windows.Forms.ToolStripButton();
+            this.panel2 = new System.Windows.Forms.Panel();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.SuspendLayout();
@@ -99,26 +98,17 @@
             // bCreateTechOperation
             // 
             this.bCreateTechOperation.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.bCreateTechOperation.Image = ((System.Drawing.Image)(resources.GetObject("bCreateTechOperation.Image")));
+            this.bCreateTechOperation.Image = global::CAM.Properties.Resources.plus;
             this.bCreateTechOperation.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.bCreateTechOperation.Name = "bCreateTechOperation";
             this.bCreateTechOperation.Size = new System.Drawing.Size(23, 22);
             this.bCreateTechOperation.Text = "Добавить операцию";
             this.bCreateTechOperation.Click += new System.EventHandler(this.bCreateTechOperation_Click);
             // 
-            // panel2
-            // 
-            this.panel2.Controls.Add(this.splitContainer1);
-            this.panel2.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.panel2.Location = new System.Drawing.Point(0, 25);
-            this.panel2.Name = "panel2";
-            this.panel2.Size = new System.Drawing.Size(312, 711);
-            this.panel2.TabIndex = 3;
-            // 
             // bRemove
             // 
             this.bRemove.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.bRemove.Image = ((System.Drawing.Image)(resources.GetObject("bRemove.Image")));
+            this.bRemove.Image = global::CAM.Properties.Resources.minus;
             this.bRemove.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.bRemove.Name = "bRemove";
             this.bRemove.Size = new System.Drawing.Size(23, 22);
@@ -128,7 +118,7 @@
             // bMoveUpTechOperation
             // 
             this.bMoveUpTechOperation.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.bMoveUpTechOperation.Image = ((System.Drawing.Image)(resources.GetObject("bMoveUpTechOperation.Image")));
+            this.bMoveUpTechOperation.Image = global::CAM.Properties.Resources.arrow_up;
             this.bMoveUpTechOperation.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.bMoveUpTechOperation.Name = "bMoveUpTechOperation";
             this.bMoveUpTechOperation.Size = new System.Drawing.Size(23, 22);
@@ -138,7 +128,7 @@
             // bMoveDownTechOperation
             // 
             this.bMoveDownTechOperation.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.bMoveDownTechOperation.Image = ((System.Drawing.Image)(resources.GetObject("bMoveDownTechOperation.Image")));
+            this.bMoveDownTechOperation.Image = global::CAM.Properties.Resources.arrow_down;
             this.bMoveDownTechOperation.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.bMoveDownTechOperation.Name = "bMoveDownTechOperation";
             this.bMoveDownTechOperation.Size = new System.Drawing.Size(23, 22);
@@ -148,12 +138,21 @@
             // bCreateTechProcess
             // 
             this.bCreateTechProcess.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.bCreateTechProcess.Image = ((System.Drawing.Image)(resources.GetObject("bCreateTechProcess.Image")));
+            this.bCreateTechProcess.Image = global::CAM.Properties.Resources.folder__plus;
             this.bCreateTechProcess.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.bCreateTechProcess.Name = "bCreateTechProcess";
             this.bCreateTechProcess.Size = new System.Drawing.Size(23, 22);
             this.bCreateTechProcess.Text = "Добавить изделие";
             this.bCreateTechProcess.Click += new System.EventHandler(this.bCreateTechProcess_Click);
+            // 
+            // panel2
+            // 
+            this.panel2.Controls.Add(this.splitContainer1);
+            this.panel2.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.panel2.Location = new System.Drawing.Point(0, 25);
+            this.panel2.Name = "panel2";
+            this.panel2.Size = new System.Drawing.Size(312, 711);
+            this.panel2.TabIndex = 3;
             // 
             // TechProcessView
             // 
