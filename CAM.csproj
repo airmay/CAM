@@ -104,27 +104,6 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\DownArrow.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\icons8-Стрелка вниз в круге 2_64.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\icons8-Scroll Down.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\icons8-Down Arrow.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\icons8-Expand Arrow.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\icons8-Плюс-16.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\arrow-090.png" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="Resources\arrow-090_.png" />
   </ItemGroup>
   <ItemGroup>
@@ -138,6 +117,12 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\folder--plus.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\folder.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\layer-shape-line.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

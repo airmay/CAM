@@ -18,6 +18,8 @@ namespace CAM.UI
         public TechProcessView()
         {
             InitializeComponent();
+            imageList.Images.Add(Properties.Resources.folder);
+            imageList.Images.Add(Properties.Resources.layer_shape_line);
         }
 
         public void SetTechProcessService(TechProcessService techProcessService)
@@ -37,7 +39,7 @@ namespace CAM.UI
         {
             var techProcessNode = treeView.SelectedNode.Parent ?? treeView.SelectedNode;
             treeView.BeginUpdate();
-            operations.ForEach(p => treeView.SelectedNode = techProcessNode.Nodes.Add(p.Id, p.Name));
+            operations.ForEach(p => treeView.SelectedNode = techProcessNode.Nodes.Add(p.Id, p.Name, 1, 1));
             treeView.EndUpdate();
         }
 
@@ -60,6 +62,7 @@ namespace CAM.UI
 
         private void SwapNodes(TreeNode src, TreeNode dst)
         {
+            treeView.BeginUpdate();
             var name = src.Name;
             var text = src.Text;
             src.Name = dst.Name;
@@ -67,6 +70,7 @@ namespace CAM.UI
             dst.Name = name;
             dst.Text = text;
             treeView.SelectedNode = dst;
+            treeView.EndUpdate();
         }
 
         private void bMoveUpTechOperation_Click(object sender, EventArgs e)
@@ -84,7 +88,7 @@ namespace CAM.UI
         private void bCreateTechProcess_Click(object sender, EventArgs e)
         {
             var techProcess = _techProcessService.CreateTechProcess();
-            treeView.SelectedNode = treeView.Nodes.Add(techProcess.Id, techProcess.Name);
+            treeView.SelectedNode = treeView.Nodes.Add(techProcess.Id, techProcess.Name, 0, 0);
             CreateNodes(techProcess.TechOperations);
             treeView.SelectedNode.Expand();
         }

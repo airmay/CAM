@@ -28,16 +28,18 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
             this.treeView = new System.Windows.Forms.TreeView();
             this.panel1 = new System.Windows.Forms.Panel();
             this.toolStrip1 = new System.Windows.Forms.ToolStrip();
+            this.panel2 = new System.Windows.Forms.Panel();
             this.bCreateTechOperation = new System.Windows.Forms.ToolStripButton();
             this.bRemove = new System.Windows.Forms.ToolStripButton();
             this.bMoveUpTechOperation = new System.Windows.Forms.ToolStripButton();
             this.bMoveDownTechOperation = new System.Windows.Forms.ToolStripButton();
             this.bCreateTechProcess = new System.Windows.Forms.ToolStripButton();
-            this.panel2 = new System.Windows.Forms.Panel();
+            this.imageList = new System.Windows.Forms.ImageList(this.components);
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.SuspendLayout();
@@ -63,9 +65,12 @@
             // treeView
             // 
             this.treeView.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.treeView.ImageIndex = 0;
+            this.treeView.ImageList = this.imageList;
             this.treeView.LabelEdit = true;
             this.treeView.Location = new System.Drawing.Point(0, 0);
             this.treeView.Name = "treeView";
+            this.treeView.SelectedImageIndex = 0;
             this.treeView.Size = new System.Drawing.Size(312, 346);
             this.treeView.TabIndex = 0;
             this.treeView.AfterLabelEdit += new System.Windows.Forms.NodeLabelEditEventHandler(this.treeView_AfterLabelEdit);
@@ -94,6 +99,15 @@
             this.toolStrip1.Size = new System.Drawing.Size(312, 25);
             this.toolStrip1.TabIndex = 0;
             this.toolStrip1.Text = "toolStrip1";
+            // 
+            // panel2
+            // 
+            this.panel2.Controls.Add(this.splitContainer1);
+            this.panel2.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.panel2.Location = new System.Drawing.Point(0, 25);
+            this.panel2.Name = "panel2";
+            this.panel2.Size = new System.Drawing.Size(312, 711);
+            this.panel2.TabIndex = 3;
             // 
             // bCreateTechOperation
             // 
@@ -145,14 +159,11 @@
             this.bCreateTechProcess.Text = "Добавить изделие";
             this.bCreateTechProcess.Click += new System.EventHandler(this.bCreateTechProcess_Click);
             // 
-            // panel2
+            // imageList
             // 
-            this.panel2.Controls.Add(this.splitContainer1);
-            this.panel2.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.panel2.Location = new System.Drawing.Point(0, 25);
-            this.panel2.Name = "panel2";
-            this.panel2.Size = new System.Drawing.Size(312, 711);
-            this.panel2.TabIndex = 3;
+            this.imageList.ColorDepth = System.Windows.Forms.ColorDepth.Depth8Bit;
+            this.imageList.ImageSize = new System.Drawing.Size(16, 16);
+            this.imageList.TransparentColor = System.Drawing.Color.Transparent;
             // 
             // TechProcessView
             // 
@@ -187,5 +198,6 @@
         private System.Windows.Forms.ToolStripButton bMoveUpTechOperation;
         private System.Windows.Forms.ToolStripButton bMoveDownTechOperation;
         private System.Windows.Forms.ToolStripButton bCreateTechProcess;
+        private System.Windows.Forms.ImageList imageList;
     }
 }
