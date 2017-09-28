@@ -30,6 +30,11 @@ namespace CAM.Domain
 
         public TechProcessService()
         {
+            _sawingLineTechOperationParamsDefault.Modes.Add(new SawingMode { Depth = 30, DepthStep = 5, Feed = 2000 });
+            _sawingArcTechOperationParamsDefault.Modes.AddRange(new SawingMode[3] {
+                new SawingMode { Depth = 10, DepthStep = 5, Feed = 2000 },
+                new SawingMode { Depth = 20, DepthStep = 2, Feed = 1000 },
+                new SawingMode { Depth = 30, DepthStep = 1, Feed = 500 } });
             _techOperationFactory = new SawingTechOperationFactory(_techProcessParams, _sawingLineTechOperationParamsDefault, _sawingArcTechOperationParamsDefault);
         }
 
@@ -85,10 +90,10 @@ namespace CAM.Domain
             CurrentTechOperation = null;
         }
 
-        public void SetCurrentTechOperation(string techProcessId, string techOperationId)
+        public SawingTechOperation SetCurrentTechOperation(string techProcessId, string techOperationId)
         {
             SetCurrentTechProcess(techProcessId);
-            CurrentTechOperation = CurrentTechProcess.TechOperations.Single(p => p.Id == techOperationId);
+            return CurrentTechOperation = CurrentTechProcess.TechOperations.Single(p => p.Id == techOperationId);
         }
 
         public void RenameTechProcess(string name)

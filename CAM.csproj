@@ -81,6 +81,12 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <Compile Include="UI\SawingParamsView.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="UI\SawingParamsView.Designer.cs">
+      <DependentUpon>SawingParamsView.cs</DependentUpon>
+    </Compile>
     <Compile Include="UI\TechProcessView.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -92,12 +98,16 @@
   <ItemGroup>
     <None Include="Properties\DataSources\CAM.Domain.ProcessingParams.datasource" />
     <None Include="Properties\DataSources\CAM.Domain.Product.datasource" />
+    <None Include="Properties\DataSources\CAM.Domain.SawingTechOperationParams.datasource" />
     <None Include="Properties\DataSources\CAM.Domain.Segment.datasource" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UI\SawingParamsView.resx">
+      <DependentUpon>SawingParamsView.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="UI\TechProcessView.resx">
       <DependentUpon>TechProcessView.cs</DependentUpon>

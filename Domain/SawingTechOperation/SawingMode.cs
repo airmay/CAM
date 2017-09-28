@@ -25,5 +25,15 @@ namespace CAM.Domain
         /// Подача
         /// </summary>
         public int Feed { get; set; }
+
+        public SawingMode Clone()
+        {
+            return new SawingMode
+            {
+                Depth = this.Depth,
+                DepthStep = this.DepthStep,
+                Feed = this.Feed
+            };
+        }
     }
 }

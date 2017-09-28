@@ -40,12 +40,7 @@ namespace CAM.Domain
         public SawingTechOperationParams Clone()
         {
             var sawingTechOperationParams = new SawingTechOperationParams();
-            sawingTechOperationParams.Modes.AddRange(Modes.ConvertAll(p => new SawingMode
-            {
-                Depth = p.Depth,
-                DepthStep = p.DepthStep,
-                Feed = p.Feed
-            }));
+            sawingTechOperationParams.Modes.AddRange(Modes.ConvertAll(p => p.Clone()));
             return sawingTechOperationParams;
         }
     }

@@ -14,12 +14,19 @@ namespace CAM.UI
     public partial class TechProcessView : UserControl
     {
         private TechProcessService _techProcessService;
+        private SawingParamsView _paramsView;
+        private SawingTechOperationParams _emptyParams = new SawingTechOperationParams();
 
         public TechProcessView()
         {
             InitializeComponent();
             imageList.Images.Add(Properties.Resources.folder);
             imageList.Images.Add(Properties.Resources.layer_shape_line);
+
+            _paramsView = new SawingParamsView();
+            _paramsView.Dock = DockStyle.Fill;
+            _paramsView.Enabled = false;
+            splitContainer1.Panel2.Controls.Add(_paramsView);
         }
 
         public void SetTechProcessService(TechProcessService techProcessService)
@@ -30,9 +37,17 @@ namespace CAM.UI
         private void treeView_AfterSelect(object sender, TreeViewEventArgs e)
         {
             if (treeView.SelectedNode.Level == 0)
+            {
                 _techProcessService.SetCurrentTechProcess(treeView.SelectedNode.Name);
+                _paramsView.Enabled = false;
+                _paramsView.sawingParamsBindingSource.DataSource = _emptyParams;
+            }
             else
-                _techProcessService.SetCurrentTechOperation(treeView.SelectedNode.Parent.Name, treeView.SelectedNode.Name);
+            {
+                var techOperaton = _techProcessService.SetCurrentTechOperation(treeView.SelectedNode.Parent.Name, treeView.SelectedNode.Name);
+                _paramsView.Enabled = true;
+                _paramsView.sawingParamsBindingSource.DataSource = techOperaton.TechOperationParams;
+            }
         }
 
         private void CreateNodes(List<SawingTechOperation> operations)
