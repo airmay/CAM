@@ -28,9 +28,9 @@ namespace CAM.Domain
 
             ProcessingArea area = null;
             if (curve is Line)
-                area = new LineProcessingArea(curve as Line);
+                area = new LineProcessingArea(curve);
             if (curve is Arc)
-                area = new ArcProcessingArea(curve as Arc);
+                area = new ArcProcessingArea(curve);
             //Polyline Polyline2d Circle
 
             if (area == null)

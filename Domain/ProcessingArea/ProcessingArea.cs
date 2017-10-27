@@ -2,6 +2,7 @@
 using Autodesk.AutoCAD.Geometry;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -21,7 +22,7 @@ namespace CAM.Domain
         /// <summary>
         /// Тип обрабатываемой области
         /// </summary>
-        public ProcessingAreaType Type { get; protected set; }
+        public abstract ProcessingAreaType Type { get; }
 
         /// <summary>
         /// Начальная точка кривой
@@ -34,12 +35,18 @@ namespace CAM.Domain
         public Point3d EndPoint { get; protected set; }
 
         /// <summary>
+        /// Длина
+        /// </summary>
+        public double Length { get; protected set; }
+
+        /// <summary>
         /// Конструктор
         /// </summary>
         /// <param name="curve">Графический примитива автокада представляющий область</param>
         protected ProcessingArea(Curve curve)
         {
             AcadObjectId = curve.ObjectId;
+            Set(curve);
         }
 
         /// <summary>
@@ -48,6 +55,7 @@ namespace CAM.Domain
         /// <param name="curve">Графический примитива автокада представляющий область</param>
         public void Modify(Curve curve)
         {
+            //Contract.
             if (curve.ObjectId != AcadObjectId)
                 throw new ArgumentException("Обрабатываемая область не соответствует полученной кривой");
 
@@ -62,6 +70,7 @@ namespace CAM.Domain
         {
             StartPoint = curve.StartPoint;
             EndPoint = curve.EndPoint;
+            Length = curve.Length;
         }
     }
 }

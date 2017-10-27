@@ -15,15 +15,12 @@ namespace CAM.Domain
         /// <summary>
         /// Обрабатываемая область
         /// </summary>
-        public ArcProcessingArea processingArea { get; }
+        //public ArcProcessingArea processingArea { get; }
 
-        public override ProcessingArea GetProcessingArea() => processingArea;
-
-        public SawingArcTechOperation(TechProcessParams techProcessParams, SawingTechOperationParams techOperationParams, Arc arc)
-             : base(techProcessParams, techOperationParams)
+       
+        public SawingArcTechOperation(TechProcessParams techProcessParams, SawingTechOperationParams techOperationParams, ProcessingArea processingArea)
+             : base(techProcessParams, techOperationParams, processingArea)
         {
-            processingArea = new ArcProcessingArea(arc);
-            Name = "Распил по дуге";
         }
     }
 }

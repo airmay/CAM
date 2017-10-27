@@ -15,6 +15,7 @@ namespace CAM.Domain
         private TechProcessParams _techProcessParams;
         private SawingTechOperationParams _sawingLineTechOperationParamsDefault;
         private SawingTechOperationParams _sawingArcTechOperationParamsDefault;
+        private ProcessingAreaFactory _processingAreaFactory = new ProcessingAreaFactory();
 
         /// <summary>
         /// Конструктор фабрики
@@ -44,11 +45,12 @@ namespace CAM.Domain
             //}
             // TODO Проверка слоя при добавлении
 
+            var processingArea = _processingAreaFactory.Create(curve);
             SawingTechOperation techOperation = null;
             if (curve is Line)
-                techOperation = new SawingLineTechOperation(_techProcessParams, _sawingLineTechOperationParamsDefault.Clone(), curve as Line);
+                techOperation = new SawingLineTechOperation(_techProcessParams, _sawingLineTechOperationParamsDefault.Clone(), processingArea);
             if (curve is Arc)
-                techOperation = new SawingArcTechOperation(_techProcessParams, _sawingArcTechOperationParamsDefault.Clone(), curve as Arc);
+                techOperation = new SawingArcTechOperation(_techProcessParams, _sawingArcTechOperationParamsDefault.Clone(), processingArea);
             //Polyline Polyline2d Circle
 
             if (techOperation == null)

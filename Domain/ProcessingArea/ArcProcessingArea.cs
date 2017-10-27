@@ -13,6 +13,11 @@ namespace CAM.Domain
     public class ArcProcessingArea : ProcessingArea
     {
         /// <summary>
+        /// Тип обрабатываемой области
+        /// </summary>
+        public override ProcessingAreaType Type { get; } = ProcessingAreaType.Arc;
+
+        /// <summary>
         /// Начальный угол дуги
         /// </summary>
         public double StartAngle { get; protected set; }
@@ -26,11 +31,9 @@ namespace CAM.Domain
         /// Конструктор
         /// </summary>
         /// <param name="curve">Дуга</param>
-        public ArcProcessingArea(Arc arc)
-            : base(arc)
+        public ArcProcessingArea(Curve curve) : base(curve)
         {
-            Type = ProcessingAreaType.Arc;
-            Set(arc);
+            Set(curve);
         }
 
         /// <summary>
@@ -43,6 +46,11 @@ namespace CAM.Domain
             var arc = curve as Arc;
             StartAngle = Math.Round(arc.StartAngle, 6);
             EndAngle = Math.Round(arc.EndAngle, 6);
+        }
+
+        public override string ToString()
+        {
+            return $"Дуга[{ Math.Round(Length) }]";
         }
     }
 }

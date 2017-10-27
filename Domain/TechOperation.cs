@@ -19,19 +19,19 @@ namespace CAM.Domain
         public TechProcessParams TechProcessParams { get; }
 
         /// <summary>
-        /// Получает обрабатываемую область
+        /// Обрабатываемая область
         /// </summary>
-        /// <returns></returns>
-        public abstract ProcessingArea GetProcessingArea();
+        public ProcessingArea ProcessingArea { get; }
 
         /// <summary>
         /// Наименование
         /// </summary>
         public string Name { get; set; }
 
-        protected TechOperation(TechProcessParams techProcessParams)
+        protected TechOperation(TechProcessParams techProcessParams, ProcessingArea processingArea)
         {
             TechProcessParams = techProcessParams;
+            ProcessingArea = processingArea;
         }
     }
 }

@@ -15,15 +15,11 @@ namespace CAM.Domain
         /// <summary>
         /// Обрабатываемая область
         /// </summary>
-        public LineProcessingArea processingArea { get; }
+        //public LineProcessingArea processingArea { get; }
 
-        public override ProcessingArea GetProcessingArea() => processingArea;
-
-        public SawingLineTechOperation(TechProcessParams techProcessParams, SawingTechOperationParams techOperationParams, Line line)
-             : base(techProcessParams, techOperationParams)
+        public SawingLineTechOperation(TechProcessParams techProcessParams, SawingTechOperationParams techOperationParams, ProcessingArea processingArea)
+             : base(techProcessParams, techOperationParams, processingArea)
         {
-            processingArea = new LineProcessingArea(line);
-            Name = "Распил по прямой";
         }
     }
 }

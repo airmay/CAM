@@ -16,10 +16,11 @@ namespace CAM.Domain
         /// </summary>
         public SawingTechOperationParams TechOperationParams { get; }
 
-        protected SawingTechOperation(TechProcessParams techProcessParams, SawingTechOperationParams techOperationParams)
-            : base(techProcessParams)
+        protected SawingTechOperation(TechProcessParams techProcessParams, SawingTechOperationParams techOperationParams, ProcessingArea processingArea)
+            : base(techProcessParams, processingArea)
         {
             TechOperationParams = techOperationParams;
+            Name = $"Распил-{ processingArea }";
         }
     }
 }

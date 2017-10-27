@@ -12,11 +12,18 @@ namespace CAM.Domain
     /// </summary>
     public class LineProcessingArea : ProcessingArea
     {
-        public LineProcessingArea(Line line) 
-            : base(line)
+        /// <summary>
+        /// Тип обрабатываемой области
+        /// </summary>
+        public override ProcessingAreaType Type { get; } = ProcessingAreaType.Line;
+
+        public LineProcessingArea(Curve curve) : base(curve)
         {
-            Type = ProcessingAreaType.Line;
-            Set(line);
+        }
+
+        public override string ToString()
+        {
+            return $"Прямая[{ Math.Round(Length) }]";
         }
     }
 }

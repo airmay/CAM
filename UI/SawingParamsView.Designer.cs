@@ -109,6 +109,7 @@
             this.gvSawingModes.AutoGenerateColumns = false;
             this.gvSawingModes.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.ColumnHeader;
             this.gvSawingModes.BackgroundColor = System.Drawing.SystemColors.Window;
+            this.gvSawingModes.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
             this.gvSawingModes.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.DisableResizing;
             this.gvSawingModes.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.depthDataGridViewTextBoxColumn,
