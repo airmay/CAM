@@ -10,8 +10,11 @@ namespace CAM.Domain
     /// <summary>
     /// Обрабатываемая область типа дуга
     /// </summary>
+    [CurveType(typeof(Arc))]
     public class ArcProcessingArea : ProcessingArea
     {
+        //public override Type CurveType { get; } = typeof(Arc);
+
         /// <summary>
         /// Тип обрабатываемой области
         /// </summary>

@@ -60,6 +60,7 @@
     <Compile Include="Domain\Command.cs" />
     <Compile Include="Domain\ITechnonogy.cs" />
     <Compile Include="Domain\ITechOperation.cs" />
+    <Compile Include="Domain\ProcessingArea\CurveTypeAttribute.cs" />
     <Compile Include="Domain\ProcessingArea\LineProcessingArea.cs" />
     <Compile Include="Domain\ProcessingArea\ProcessingArea.cs" />
     <Compile Include="Domain\ProcessingArea\ProcessingAreaFactory.cs" />

@@ -15,6 +15,11 @@ namespace CAM.Domain
     public abstract class ProcessingArea
     {
         /// <summary>
+        /// Тип примитива автокада представляющий область
+        /// </summary>
+        //public abstract Type CurveType { get; }
+
+        /// <summary>
         /// Идентификатор графического примитива автокада
         /// </summary>
         public readonly ObjectId AcadObjectId;

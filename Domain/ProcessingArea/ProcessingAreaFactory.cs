@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -12,6 +13,17 @@ namespace CAM.Domain
     /// </summary>
     public class ProcessingAreaFactory
     {
+        private Dictionary<Type, Type> _processingAreaTypes;
+
+        public ProcessingAreaFactory()
+        {
+            var types = Assembly.GetAssembly(typeof(ProcessingArea)).GetTypes().Where(type => type.IsSubclassOf(typeof(ProcessingArea))).ToList();
+            var typesNoAttr = types.FindAll(p => !p.IsDefined(typeof(CurveTypeAttribute)));
+            if (typesNoAttr.Any())
+                throw new Exception($"Найдены наследники типа ProcessingArea не помеченные атрибутом CurveTypeAttribute: {string.Join(", ", typesNoAttr)}");
+            _processingAreaTypes = types.ToDictionary(t => t.GetCustomAttribute<CurveTypeAttribute>().Type);
+        }
+
         /// <summary>
         /// Создает обрабатываемую область
         /// </summary>
@@ -26,15 +38,11 @@ namespace CAM.Domain
             //}
             // TODO Проверка слоя при добавлении
 
-            ProcessingArea area = null;
-            if (curve is Line)
-                area = new LineProcessingArea(curve);
-            if (curve is Arc)
-                area = new ArcProcessingArea(curve);
-            //Polyline Polyline2d Circle
-
-            if (area == null)
+            Type processingAreaType;
+            if (!_processingAreaTypes.TryGetValue(curve.GetType(), out processingAreaType))
                 throw new ArgumentException($"Неподдерживаемый тип кривой {curve.GetType()}");
+
+            ProcessingArea area = processingAreaType.GetConstructor(new Type[] { typeof(Curve) }).Invoke(new object[] { curve }) as ProcessingArea;
 
             return area;
         }
