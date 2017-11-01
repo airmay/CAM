@@ -57,9 +57,15 @@ namespace CAM.UI
             operations.ForEach(p => treeView.SelectedNode = techProcessNode.Nodes.Add(p.Id, p.Name, 1, 1));
             treeView.EndUpdate();
         }
+         private void EndEdit()
+        {
+            if (treeView.SelectedNode != null && treeView.SelectedNode.IsEditing)
+                treeView.SelectedNode.EndEdit(false);
+        }
 
         private void bCreateTechOperation_Click(object sender, EventArgs e)
         {
+            EndEdit();
             if (treeView.Nodes.Count == 0)
                 bCreateTechProcess_Click(sender, e);
             else
@@ -102,6 +108,7 @@ namespace CAM.UI
 
         private void bCreateTechProcess_Click(object sender, EventArgs e)
         {
+            EndEdit();
             var techProcess = _techProcessService.CreateTechProcess();
             treeView.SelectedNode = treeView.Nodes.Add(techProcess.Id, techProcess.Name, 0, 0);
             CreateNodes(techProcess.TechOperations);
