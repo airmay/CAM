@@ -17,7 +17,7 @@ namespace CAM.Domain
         /// </summary>
         //public LineProcessingArea processingArea { get; }
 
-        public SawingLineTechOperation(TechProcessParams techProcessParams, SawingTechOperationParams techOperationParams, ProcessingArea processingArea)
+        public SawingLineTechOperation(TechProcessParams techProcessParams, SawingTechOperationParams techOperationParams, LineProcessingArea processingArea)
              : base(techProcessParams, techOperationParams, processingArea)
         {
         }

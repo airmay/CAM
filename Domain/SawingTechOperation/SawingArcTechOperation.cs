@@ -18,7 +18,7 @@ namespace CAM.Domain
         //public ArcProcessingArea processingArea { get; }
 
        
-        public SawingArcTechOperation(TechProcessParams techProcessParams, SawingTechOperationParams techOperationParams, ProcessingArea processingArea)
+        public SawingArcTechOperation(TechProcessParams techProcessParams, SawingTechOperationParams techOperationParams, ArcProcessingArea processingArea)
              : base(techProcessParams, techOperationParams, processingArea)
         {
         }

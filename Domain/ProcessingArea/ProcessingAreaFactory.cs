@@ -10,6 +10,7 @@ namespace CAM.Domain
     /// <summary>
     /// Фабрика для создания обрабатываемых областей
     /// </summary>
+    [Obsolete]
     public class ProcessingAreaFactory
     {
         /// <summary>

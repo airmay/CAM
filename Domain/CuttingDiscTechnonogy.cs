@@ -9,6 +9,7 @@ namespace CAM.Domain
     /// <summary>
     /// Технология обработки изделия отрезным диском
     /// </summary>
+    [Obsolete]
     public class CuttingDiscTechnonogy : ITechnonogy
     {
         /// <summary>

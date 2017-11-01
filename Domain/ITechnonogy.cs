@@ -1,8 +1,11 @@
-﻿namespace CAM.Domain
+﻿using System;
+
+namespace CAM.Domain
 {
     /// <summary>
     /// Технология обработки изделия
     /// </summary>
+    [Obsolete]
     public interface ITechnonogy
     {
         /// <summary>
