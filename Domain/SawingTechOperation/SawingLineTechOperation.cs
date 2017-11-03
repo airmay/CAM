@@ -21,5 +21,11 @@ namespace CAM.Domain
              : base(techProcessParams, techOperationParams, processingArea)
         {
         }
+
+        public override List<TechProcessCommand> GetProcessing()
+        {
+            var commands = new List<TechProcessCommand>();
+            return commands;
+        }
     }
 }

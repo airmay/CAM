@@ -24,5 +24,15 @@ namespace CAM.Domain
         {
             Name = name;
         }
+
+        /// <summary>
+        /// Получает программу обработки по техпроцессу
+        /// </summary>
+        /// <returns></returns>
+        public List<TechProcessCommand> GetProcessing()
+        {
+            var commands = new List<TechProcessCommand>();
+            return commands;
+        }
     }
 }

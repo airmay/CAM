@@ -33,5 +33,7 @@ namespace CAM.Domain
             TechProcessParams = techProcessParams;
             ProcessingArea = processingArea;
         }
+
+        public abstract List<TechProcessCommand> GetProcessing();
     }
 }

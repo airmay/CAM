@@ -1,4 +1,6 @@
-﻿namespace CAM.Domain
+﻿using System.Collections.Generic;
+
+namespace CAM.Domain
 {
     /// <summary>
     /// Интрефейс технологической операции
@@ -9,5 +11,11 @@
         /// Наименование
         /// </summary>
         string Name { get; set; }
+
+        /// <summary>
+        /// Получает программу обработки по технологической операции
+        /// </summary>
+        /// <returns></returns>
+        List<TechProcessCommand> GetProcessing();
     }
 }
