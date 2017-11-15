@@ -13,9 +13,9 @@ namespace CAM.Domain
         string Name { get; set; }
 
         /// <summary>
-        /// Получает программу обработки по технологической операции
+        /// Создает обработку по технологической операции
         /// </summary>
         /// <returns></returns>
-        List<TechProcessCommand> GetProcessing();
+        void BuildProcessing();
     }
 }

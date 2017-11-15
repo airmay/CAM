@@ -5,5 +5,14 @@
     /// </summary>
     public class TechProcessCommand
     {
+        public string Name { get; }
+
+        public string GroupName { get; }
+
+        public TechProcessCommand(string name, string groupName = null)
+        {
+            Name = name;
+            GroupName = groupName;
+        }
     }
 }

@@ -23,10 +23,8 @@ namespace CAM.Domain
         {
         }
 
-        public override List<TechProcessCommand> GetProcessing()
+        public override void BuildProcessing()
         {
-            var commands = new List<TechProcessCommand>();
-            return commands;
         }
     }
 }

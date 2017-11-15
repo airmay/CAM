@@ -28,12 +28,17 @@ namespace CAM.Domain
         /// </summary>
         public string Name { get; set; }
 
+        /// <summary>
+        /// Команды для выполнения операции
+        /// </summary>
+        public List<TechProcessCommand> ProcessCommands { get; } = new List<TechProcessCommand>();
+
         protected TechOperation(TechProcessParams techProcessParams, ProcessingArea processingArea)
         {
             TechProcessParams = techProcessParams;
             ProcessingArea = processingArea;
         }
 
-        public abstract List<TechProcessCommand> GetProcessing();
+        public abstract void BuildProcessing();
     }
 }

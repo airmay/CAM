@@ -15,24 +15,41 @@ namespace CAM.Domain
         /// </summary>
         public string Name { get; set; }
 
+        public TechProcessParams TechProcessParams { get; set; }
+
         /// <summary>
         /// Список технологических операций процесса
         /// </summary>
         public List<SawingTechOperation> TechOperations { get; } = new List<SawingTechOperation>();
 
-        public TechProcess(string name)
+        /// <summary>
+        /// Команды установки
+        /// </summary>
+        public List<TechProcessCommand> SetupCommands { get; } = new List<TechProcessCommand>();
+
+        /// <summary>
+        /// Команды завершения
+        /// </summary>
+        public List<TechProcessCommand> TeardownCommands { get; } = new List<TechProcessCommand>();
+
+        public TechProcess(string name, TechProcessParams techProcessParams)
         {
             Name = name;
+            TechProcessParams = techProcessParams;
         }
 
         /// <summary>
-        /// Получает программу обработки по техпроцессу
+        /// Создает программу обработки по техпроцессу
         /// </summary>
         /// <returns></returns>
-        public List<TechProcessCommand> GetProcessing()
+        public void BuildProcessing()
         {
-            var commands = new List<TechProcessCommand>();
-            return commands;
+            SetupCommands.Clear();
+            SetupCommands.Add(new TechProcessCommand("G98", "Установка"));
+            SetupCommands.Add(new TechProcessCommand("G97 M2 1", "Установка"));
+            SetupCommands.Add(new TechProcessCommand("17 XYCZ", "Установка"));
+            SetupCommands.Add(new TechProcessCommand("28 XYCZ", "Установка"));
+            SetupCommands.Add(new TechProcessCommand($"G97 M6 {TechProcessParams.Tool.Number}", "Установка"));
         }
     }
 }

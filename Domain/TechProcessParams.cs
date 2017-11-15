@@ -27,5 +27,10 @@ namespace CAM.Domain
         /// Частота вращения шпинделя
         /// </summary>
         public int Frequency { get; set; }
+
+        /// <summary>
+        /// Инструмент
+        /// </summary>
+        public Tool Tool { get; set; }
     }
 }

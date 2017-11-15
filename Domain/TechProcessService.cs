@@ -40,7 +40,7 @@ namespace CAM.Domain
 
         public TechProcess CreateTechProcess()
         {
-            CurrentTechProcess = new TechProcess($"Изделие{_techProcessList.Count + 1}");
+            CurrentTechProcess = new TechProcess($"Изделие{_techProcessList.Count + 1}", _techProcessParams);
             _techProcessList.Add(CurrentTechProcess);
             CreateTechOperation();
             return CurrentTechProcess;

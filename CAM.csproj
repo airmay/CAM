@@ -72,6 +72,7 @@
     <Compile Include="Domain\TechOperation.cs" />
     <Compile Include="Domain\TechProcessParams.cs" />
     <Compile Include="Domain\TechProcessService.cs" />
+    <Compile Include="Domain\Tool.cs" />
     <Compile Include="IListExtensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Domain\SawingTechOperation\SawingTechOperation.cs" />
