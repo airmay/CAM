@@ -29,9 +29,9 @@ namespace CAM.Domain
         public string Name { get; set; }
 
         /// <summary>
-        /// Команды для выполнения операции
+        /// Действия для выполнения операции
         /// </summary>
-        public List<TechProcessCommand> ProcessCommands { get; } = new List<TechProcessCommand>();
+        public List<ProcessAction> ProcessActions { get; } = new List<ProcessAction>();
 
         protected TechOperation(TechProcessParams techProcessParams, ProcessingArea processingArea)
         {

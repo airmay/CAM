@@ -55,6 +55,7 @@
     <Compile Include="AssemblyLoader.cs" />
     <Compile Include="Context.cs" />
     <Compile Include="Domain\FakePrimitive.cs" />
+    <Compile Include="Domain\ProcessAction.cs" />
     <Compile Include="Domain\ProcessingArea\ArcProcessingArea.cs" />
     <Compile Include="Domain\CuttingDiscTechnonogy.cs" />
     <Compile Include="Domain\TechProcessCommand.cs" />

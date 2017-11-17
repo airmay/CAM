@@ -1,16 +1,11 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Diagnostics.Contracts;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CAM
 {
     static class IListExtensions
     {
-        public static void Swap(this IList list, int firstIndex, int secondIndex)
+        public static void Swap<T>(this List<T> list, int firstIndex, int secondIndex)
         {
             Contract.Requires(list != null);
             Contract.Requires(firstIndex >= 0 && firstIndex < list.Count);
@@ -18,18 +13,18 @@ namespace CAM
             if (firstIndex == secondIndex)
                 return;
 
-            object temp = list[firstIndex];
+            T temp = list[firstIndex];
             list[firstIndex] = list[secondIndex];
             list[secondIndex] = temp;
         }
 
-        public static void SwapNext(this IList list, object item)
+        public static void SwapNext<T>(this List<T> list, T item)
         {
             var index = list.IndexOf(item);
             list.Swap(index, index + 1);
         }
 
-        public static void SwapPrev(this IList list, object item)
+        public static void SwapPrev<T>(this List<T> list, T item)
         {
             var index = list.IndexOf(item);
             list.Swap(index, index - 1);
