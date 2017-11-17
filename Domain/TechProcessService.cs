@@ -86,7 +86,7 @@ namespace CAM.Domain
 
         public void SetCurrentTechProcess(string techProcessId)
         {
-            CurrentTechProcess = _techProcessList.Single(p => p.Id == techProcessId);
+            CurrentTechProcess = _techProcessList.Single(p => p.GetHashCode().ToString() == techProcessId);
             CurrentTechOperation = null;
         }
 

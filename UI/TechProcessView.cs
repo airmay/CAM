@@ -36,31 +36,32 @@ namespace CAM.UI
 
         private void treeView_AfterSelect(object sender, TreeViewEventArgs e)
         {
-            if (treeView.SelectedNode.Level == 0)
-            {
-                _techProcessService.SetCurrentTechProcess(treeView.SelectedNode.Name);
-                _paramsView.Enabled = false;
-                _paramsView.sawingParamsBindingSource.DataSource = _emptyParams;
-            }
-            else
-            {
-                var techOperaton = _techProcessService.SetCurrentTechOperation(treeView.SelectedNode.Parent.Name, treeView.SelectedNode.Name);
-                _paramsView.Enabled = true;
-                _paramsView.sawingParamsBindingSource.DataSource = techOperaton.TechOperationParams;
-            }
+            var node = treeView.SelectedNode as TechProcessViewModel;
+            _techProcessService.CurrentTechProcess = node.TechProcess;
+            _techProcessService.CurrentTechOperation = node.TechOperation;
+            _paramsView.Enabled = node.TechOperation != null;
+            _paramsView.sawingParamsBindingSource.DataSource = node.TechOperation?.TechOperationParams ?? _emptyParams;
         }
 
         private void CreateNodes(List<SawingTechOperation> operations)
         {
-            var techProcessNode = treeView.SelectedNode.Parent ?? treeView.SelectedNode;
+            var techProcessNode = (treeView.SelectedNode.Parent ?? treeView.SelectedNode) as TechProcessViewModel;
             treeView.BeginUpdate();
-            operations.ForEach(p => treeView.SelectedNode = techProcessNode.Nodes.Add(p.Id, p.Name, 1, 1));
+            int index = 0;
+            operations.ForEach(p => index = techProcessNode.Nodes.Add(new TechProcessViewModel(p, techProcessNode.TechProcess)));
+            treeView.SelectedNode = techProcessNode.Nodes[index];
             treeView.EndUpdate();
         }
-         private void EndEdit()
+
+        private void bCreateTechProcess_Click(object sender, EventArgs e)
         {
-            if (treeView.SelectedNode != null && treeView.SelectedNode.IsEditing)
-                treeView.SelectedNode.EndEdit(false);
+            EndEdit();
+            var techProcess = _techProcessService.CreateTechProcess();
+            var techProcessNode = new TechProcessViewModel(techProcess);
+            treeView.Nodes.Add(techProcessNode);
+            treeView.SelectedNode = techProcessNode;
+            CreateNodes(techProcess.TechOperations);
+            treeView.SelectedNode.Expand();
         }
 
         private void bCreateTechOperation_Click(object sender, EventArgs e)
@@ -70,6 +71,12 @@ namespace CAM.UI
                 bCreateTechProcess_Click(sender, e);
             else
                 CreateNodes(_techProcessService.CreateTechOperation());
+        }
+
+        private void EndEdit()
+        {
+            if (treeView.SelectedNode != null && treeView.SelectedNode.IsEditing)
+                treeView.SelectedNode.EndEdit(false);
         }
 
         private void bRemove_Click(object sender, EventArgs e)
@@ -96,23 +103,16 @@ namespace CAM.UI
 
         private void bMoveUpTechOperation_Click(object sender, EventArgs e)
         {
+            EndEdit();
             if (_techProcessService.MoveBackwardTechOperation())
                 SwapNodes(treeView.SelectedNode, treeView.SelectedNode.PrevNode);
         }
 
         private void bMoveDownTechOperation_Click(object sender, EventArgs e)
         {
+            EndEdit();
             if (_techProcessService.MoveForwardTechOperation())
                 SwapNodes(treeView.SelectedNode, treeView.SelectedNode.NextNode);
-        }
-
-        private void bCreateTechProcess_Click(object sender, EventArgs e)
-        {
-            EndEdit();
-            var techProcess = _techProcessService.CreateTechProcess();
-            treeView.SelectedNode = treeView.Nodes.Add(techProcess.Id, techProcess.Name, 0, 0);
-            CreateNodes(techProcess.TechOperations);
-            treeView.SelectedNode.Expand();
         }
 
         private void treeView_AfterLabelEdit(object sender, NodeLabelEditEventArgs e)
