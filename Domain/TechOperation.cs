@@ -11,12 +11,10 @@ namespace CAM.Domain
     /// </summary>
     public abstract class TechOperation : ITechOperation
     {
-        public string Id { get; } = Guid.NewGuid().ToString();
-
         /// <summary>
-        /// Параметры технологического процесса обработки
+        /// Технологический процесс обработки
         /// </summary>
-        public TechProcessParams TechProcessParams { get; }
+        public TechProcess TechProcess { get; }
 
         /// <summary>
         /// Обрабатываемая область
@@ -33,9 +31,11 @@ namespace CAM.Domain
         /// </summary>
         public List<ProcessAction> ProcessActions { get; } = new List<ProcessAction>();
 
-        protected TechOperation(TechProcessParams techProcessParams, ProcessingArea processingArea)
+        protected TechOperation(TechProcess techProcess, ProcessingArea processingArea)
         {
-            TechProcessParams = techProcessParams;
+            TechProcess = techProcess;
+            TechProcess.TechOperations.Add(this);
+
             ProcessingArea = processingArea;
         }
 

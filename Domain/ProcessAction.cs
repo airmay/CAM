@@ -16,12 +16,20 @@ namespace CAM.Domain
         /// </summary>
         public readonly ObjectId ToolpathAcadObjectId;
 
+        /// <summary>
+        /// Технологическая операция
+        /// </summary>
+        public TechOperation TechOperation { get; }
+
         public string Name { get; }
 
         public string GroupName { get; }
 
-        public ProcessAction(string name, string groupName = null)
+        public ProcessAction(TechOperation techOperation, string name, string groupName = null)
         {
+            TechOperation = techOperation;
+            TechOperation.ProcessActions.Add(this);
+
             Name = name;
             GroupName = groupName;
         }

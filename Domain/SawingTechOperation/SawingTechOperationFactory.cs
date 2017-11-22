@@ -12,20 +12,16 @@ namespace CAM.Domain
     /// </summary>
     public class SawingTechOperationFactory //: ITechOperationFactory
     {
-        private TechProcessParams _techProcessParams;
         private SawingTechOperationParams _sawingLineTechOperationParamsDefault;
         private SawingTechOperationParams _sawingArcTechOperationParamsDefault;
 
         /// <summary>
         /// Конструктор фабрики
         /// </summary>
-        /// <param name="techProcessParams">Параметры технологического процесса обработки</param>
         /// <param name="sawingLineTechOperationParamsDefault">Параметры по-умолчанию технологической операция "Распиловка по прямой"</param>
         /// <param name="sawingArcTechOperationParamsDefault">Параметры по-умолчанию технологической операция "Распиловка по дуге"</param>
-        public SawingTechOperationFactory(TechProcessParams techProcessParams, 
-            SawingTechOperationParams sawingLineTechOperationParamsDefault, SawingTechOperationParams sawingArcTechOperationParamsDefault)
+        public SawingTechOperationFactory(SawingTechOperationParams sawingLineTechOperationParamsDefault, SawingTechOperationParams sawingArcTechOperationParamsDefault)
         {
-            _techProcessParams = techProcessParams;
             _sawingLineTechOperationParamsDefault = sawingLineTechOperationParamsDefault;
             _sawingArcTechOperationParamsDefault = sawingArcTechOperationParamsDefault;
         }
@@ -35,7 +31,7 @@ namespace CAM.Domain
         /// </summary>
         /// <param name="curve">Графическая кривая представляющая область обработки</param>
         /// <returns>Технологическая операцию</returns>
-        public SawingTechOperation Create(Curve curve)
+        public SawingTechOperation Create(TechProcess techProcess, Curve curve)
         {
             //if ((entity.Layer != "0" && ((Entity)dbObject).Layer != "Êàìåíü")
             //{
@@ -46,9 +42,9 @@ namespace CAM.Domain
 
             SawingTechOperation techOperation = null;
             if (curve is Line)
-                techOperation = new SawingLineTechOperation(_techProcessParams, _sawingLineTechOperationParamsDefault.Clone(), new LineProcessingArea(curve));
+                techOperation = new SawingLineTechOperation(techProcess, new LineProcessingArea(curve), _sawingLineTechOperationParamsDefault.Clone());
             if (curve is Arc)
-                techOperation = new SawingArcTechOperation(_techProcessParams, _sawingArcTechOperationParamsDefault.Clone(), new ArcProcessingArea(curve));
+                techOperation = new SawingArcTechOperation(techProcess, new ArcProcessingArea(curve), _sawingArcTechOperationParamsDefault.Clone());
             //Polyline Polyline2d Circle
 
             if (techOperation == null)

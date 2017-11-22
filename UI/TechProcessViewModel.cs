@@ -1,32 +1,34 @@
 ﻿using CAM.Domain;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace CAM.UI
 {
-    public class TechProcessViewModel : TreeNode
+    public class TechProcessNode : TreeNode
     {
-        public TechProcess TechProcess { get; }
+        private object _domainObject;
 
-        public SawingTechOperation TechOperation { get; }
+        public TechProcess TechProcess => (TechProcess)_domainObject;
 
-        public TechProcessViewModel(TechProcess techProcess) : base(techProcess.Name)
+        public SawingTechOperation TechOperation => (SawingTechOperation)_domainObject;
+
+        public ProcessAction ProcessAction => (ProcessAction)_domainObject;
+
+        public TreeNodeType Type { get; }
+
+        public TechProcessNode(TechProcess techProcess) : this(TreeNodeType.TechProcess, techProcess.Name, techProcess) { }
+
+        public TechProcessNode(TechOperation techOperation) : this(TreeNodeType.TechOperation, techOperation.Name, techOperation) { }
+
+        public TechProcessNode(ProcessAction processAction) : this(TreeNodeType.ProcessAction, processAction.Name, processAction) { }
+
+        public TechProcessNode(string processActionGroupName) : this(TreeNodeType.ProcessActionGroup, processActionGroupName) { }
+
+        public TechProcessNode(TreeNodeType type, string name, object domainObject = null) : base(name)
         {
-            TechProcess = techProcess;
-            ImageIndex = 0;
-            SelectedImageIndex = 0;
-        }
-
-        public TechProcessViewModel(SawingTechOperation techOperation, TechProcess techProcess) : base(techOperation.Name)
-        {
-            TechProcess = techProcess;
-            TechOperation = techOperation;
-            ImageIndex = 1;
-            SelectedImageIndex = 1;
+            Type = type;
+            _domainObject = domainObject;
+            ImageIndex = (int)Type;
+            SelectedImageIndex = (int)Type;
         }
     }
 }

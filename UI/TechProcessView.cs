@@ -14,6 +14,7 @@ namespace CAM.UI
     public partial class TechProcessView : UserControl
     {
         private TechProcessService _techProcessService;
+        private TechProcessNodeBuilder _techProcessNodeBuilder = new TechProcessNodeBuilder();
         private SawingParamsView _paramsView;
         private SawingTechOperationParams _emptyParams = new SawingTechOperationParams();
 
@@ -25,7 +26,7 @@ namespace CAM.UI
 
             _paramsView = new SawingParamsView();
             _paramsView.Dock = DockStyle.Fill;
-            _paramsView.Enabled = false;
+            _paramsView.Visible = false;
             splitContainer1.Panel2.Controls.Add(_paramsView);
         }
 
@@ -36,32 +37,32 @@ namespace CAM.UI
 
         private void treeView_AfterSelect(object sender, TreeViewEventArgs e)
         {
-            var node = treeView.SelectedNode as TechProcessViewModel;
-            _techProcessService.CurrentTechProcess = node.TechProcess;
-            _techProcessService.CurrentTechOperation = node.TechOperation;
-            _paramsView.Enabled = node.TechOperation != null;
-            _paramsView.sawingParamsBindingSource.DataSource = node.TechOperation?.TechOperationParams ?? _emptyParams;
-        }
-
-        private void CreateNodes(List<SawingTechOperation> operations)
-        {
-            var techProcessNode = (treeView.SelectedNode.Parent ?? treeView.SelectedNode) as TechProcessViewModel;
-            treeView.BeginUpdate();
-            int index = 0;
-            operations.ForEach(p => index = techProcessNode.Nodes.Add(new TechProcessViewModel(p, techProcessNode.TechProcess)));
-            treeView.SelectedNode = techProcessNode.Nodes[index];
-            treeView.EndUpdate();
+            switch (treeView.SelectedTechProcessNode().Type)
+            {
+                case TreeNodeType.TechProcess:
+                    _paramsView.Visible = false;
+                    break;
+                case TreeNodeType.TechOperation:
+                    _paramsView.Visible = true;
+                    _paramsView.sawingParamsBindingSource.DataSource = treeView.SelectedTechProcessNode().TechOperation.TechOperationParams;
+                    break;
+                case TreeNodeType.ProcessActionGroup:
+                    _paramsView.Visible = false;
+                    break;
+                case TreeNodeType.ProcessAction:
+                    _paramsView.Visible = false;
+                    break;
+            }
         }
 
         private void bCreateTechProcess_Click(object sender, EventArgs e)
         {
             EndEdit();
             var techProcess = _techProcessService.CreateTechProcess();
-            var techProcessNode = new TechProcessViewModel(techProcess);
+            var techProcessNode = _techProcessNodeBuilder.CreateTechProcessNode(techProcess);
             treeView.Nodes.Add(techProcessNode);
             treeView.SelectedNode = techProcessNode;
-            CreateNodes(techProcess.TechOperations);
-            treeView.SelectedNode.Expand();
+            treeView.SelectedNode.ExpandAll();
         }
 
         private void bCreateTechOperation_Click(object sender, EventArgs e)
@@ -70,7 +71,16 @@ namespace CAM.UI
             if (treeView.Nodes.Count == 0)
                 bCreateTechProcess_Click(sender, e);
             else
-                CreateNodes(_techProcessService.CreateTechOperation());
+            {
+                var rootNode = treeView.SelectedNode;
+                while (rootNode.Parent != null)
+                    rootNode = rootNode.Parent;
+
+                var techOperations = _techProcessService.CreateTechOperations(((TechProcessNode)rootNode).TechProcess);
+                int index = 0;
+                techOperations.ForEach(p => index = rootNode.Nodes.Add(_techProcessNodeBuilder.CreateTechOperationNode(p)));
+                treeView.SelectedNode = rootNode.Nodes[index];
+            }
         }
 
         private void EndEdit()
@@ -83,44 +93,66 @@ namespace CAM.UI
         {
             if (treeView.SelectedNode != null)
             {
-                _techProcessService.Remove();
+                var node = treeView.SelectedTechProcessNode();
+                switch (node.Type)
+                {
+                    case TreeNodeType.TechProcess:
+                        _techProcessService.RemoveTechProcess(node.TechProcess);
+                        break;
+                    case TreeNodeType.TechOperation:
+                        _techProcessService.RemoveTechOperation(node.TechOperation);
+                        break;
+                    case TreeNodeType.ProcessAction:
+                        _techProcessService.RemoveProcessAction(node.ProcessAction);
+                        break;
+                    default:
+                        return;
+                } 
                 treeView.SelectedNode.Remove();
             }
         }
 
-        private void SwapNodes(TreeNode src, TreeNode dst)
+        private void MoveSelectedNode(int shift)
         {
-            treeView.BeginUpdate();
-            var name = src.Name;
-            var text = src.Text;
-            src.Name = dst.Name;
-            src.Text = dst.Text;
-            dst.Name = name;
-            dst.Text = text;
-            treeView.SelectedNode = dst;
-            treeView.EndUpdate();
+            var node = treeView.SelectedNode;
+            var nodes = node.Parent.Nodes;
+            var index = nodes.IndexOf(node);
+            nodes.Remove(node);
+            nodes.Insert(index + shift, node);
+            treeView.SelectedNode = node;
         }
 
         private void bMoveUpTechOperation_Click(object sender, EventArgs e)
         {
-            EndEdit();
-            if (_techProcessService.MoveBackwardTechOperation())
-                SwapNodes(treeView.SelectedNode, treeView.SelectedNode.PrevNode);
+            if (treeView.SelectedTechProcessNode()?.Type == TreeNodeType.TechOperation)
+            {
+                EndEdit();
+                if (_techProcessService.MoveBackwardTechOperation(treeView.SelectedTechProcessNode().TechOperation))
+                    MoveSelectedNode(-1);
+            }
         }
 
         private void bMoveDownTechOperation_Click(object sender, EventArgs e)
         {
-            EndEdit();
-            if (_techProcessService.MoveForwardTechOperation())
-                SwapNodes(treeView.SelectedNode, treeView.SelectedNode.NextNode);
+            if (treeView.SelectedTechProcessNode()?.Type == TreeNodeType.TechOperation)
+            {
+                EndEdit();
+                if (_techProcessService.MoveForwardTechOperation(treeView.SelectedTechProcessNode().TechOperation))
+                    MoveSelectedNode(1);
+            }
         }
 
         private void treeView_AfterLabelEdit(object sender, NodeLabelEditEventArgs e)
         {
-            if (treeView.SelectedNode.Level == 0)
-                _techProcessService.RenameTechProcess(e.Label);
-            else
-                _techProcessService.RenameTechOperation(e.Label);
+            switch (treeView.SelectedTechProcessNode().Type)
+            {
+                case TreeNodeType.TechProcess:
+                    treeView.SelectedTechProcessNode().TechProcess.Name = e.Label;
+                    break;
+                case TreeNodeType.TechOperation:
+                    treeView.SelectedTechProcessNode().TechOperation.Name = e.Label;
+                    break;
+            }
         }
     }
 }

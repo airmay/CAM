@@ -18,16 +18,6 @@ namespace CAM.Domain
         private SawingTechOperationFactory _techOperationFactory;
         private AcadGateway _acad = new AcadGateway();
 
-        /// <summary>
-        /// Текущий техпроцесс
-        /// </summary>
-        public TechProcess CurrentTechProcess { get; set; }
-
-        /// <summary>
-        /// Текущая техоперация
-        /// </summary>
-        public SawingTechOperation CurrentTechOperation { get; set; }
-
         public TechProcessService()
         {
             _sawingLineTechOperationParamsDefault.Modes.Add(new SawingMode { Depth = 30, DepthStep = 5, Feed = 2000 });
@@ -35,75 +25,52 @@ namespace CAM.Domain
                 new SawingMode { Depth = 10, DepthStep = 5, Feed = 2000 },
                 new SawingMode { Depth = 20, DepthStep = 2, Feed = 1000 },
                 new SawingMode { Depth = 30, DepthStep = 1, Feed = 500 } });
-            _techOperationFactory = new SawingTechOperationFactory(_techProcessParams, _sawingLineTechOperationParamsDefault, _sawingArcTechOperationParamsDefault);
+            _techOperationFactory = new SawingTechOperationFactory(_sawingLineTechOperationParamsDefault, _sawingArcTechOperationParamsDefault);
         }
 
         public TechProcess CreateTechProcess()
         {
-            CurrentTechProcess = new TechProcess($"Изделие{_techProcessList.Count + 1}", _techProcessParams);
-            _techProcessList.Add(CurrentTechProcess);
-            CreateTechOperation();
-            return CurrentTechProcess;
+            var techProcess = new TechProcess($"Изделие{_techProcessList.Count + 1}", _techProcessParams);
+            _techProcessList.Add(techProcess);
+            CreateTechOperations(techProcess);
+            return techProcess;
         }
 
-        public List<SawingTechOperation> CreateTechOperation()
+        public List<SawingTechOperation> CreateTechOperations(TechProcess techProcess)
         {
-            var operations = _acad.GetSelectedCurves().Select(p => _techOperationFactory.Create(p)).ToList();
-            CurrentTechProcess.TechOperations.AddRange(operations);
-            CurrentTechOperation = operations.Last();
+            var operations = _acad.GetSelectedCurves().Select(p => _techOperationFactory.Create(techProcess, p)).ToList();
             return operations;
         }
 
-        public void Remove()
+        public bool MoveForwardTechOperation(TechOperation techOperation)
         {
-            if (CurrentTechOperation == null)
-            {
-                _techProcessList.Remove(CurrentTechProcess);
-                CurrentTechProcess = null;
-            }
-            else
-            {
-                CurrentTechProcess.TechOperations.Remove(CurrentTechOperation);
-                CurrentTechOperation = null;
-            }
-        }
-
-        public bool MoveForwardTechOperation()
-        {
-            var flag = CurrentTechOperation != null && CurrentTechOperation != CurrentTechProcess.TechOperations.Last();
+            var flag = techOperation != techOperation.TechProcess.TechOperations.Last();
             if (flag)
-                CurrentTechProcess.TechOperations.SwapNext(CurrentTechOperation);
+                techOperation.TechProcess.TechOperations.SwapNext(techOperation);
             return flag;
         }
 
-        public bool MoveBackwardTechOperation()
+        public bool MoveBackwardTechOperation(TechOperation techOperation)
         {
-            var flag = CurrentTechOperation != null && CurrentTechOperation != CurrentTechProcess.TechOperations.First();
+            var flag = techOperation != techOperation.TechProcess.TechOperations.First();
             if (flag)
-                CurrentTechProcess.TechOperations.SwapPrev(CurrentTechOperation);
+                techOperation.TechProcess.TechOperations.SwapPrev(techOperation);
             return flag;
         }
 
-        public void SetCurrentTechProcess(string techProcessId)
+        internal void RemoveTechProcess(TechProcess techProcess)
         {
-            CurrentTechProcess = _techProcessList.Single(p => p.GetHashCode().ToString() == techProcessId);
-            CurrentTechOperation = null;
+            _techProcessList.Remove(techProcess);
         }
 
-        public SawingTechOperation SetCurrentTechOperation(string techProcessId, string techOperationId)
+        internal void RemoveTechOperation(TechOperation techOperation)
         {
-            SetCurrentTechProcess(techProcessId);
-            return CurrentTechOperation = CurrentTechProcess.TechOperations.Single(p => p.Id == techOperationId);
+            techOperation.TechProcess.TechOperations.Remove(techOperation);
         }
 
-        public void RenameTechProcess(string name)
+        internal void RemoveProcessAction(ProcessAction processAction)
         {
-            CurrentTechProcess.Name = name;
-        }
-
-        public void RenameTechOperation(string name)
-        {
-            CurrentTechOperation.Name = name;
+            processAction.TechOperation.ProcessActions.Remove(processAction);
         }
     }
 }

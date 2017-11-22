@@ -8,19 +8,20 @@ namespace CAM.Domain
     /// </summary>
     public class TechProcess
     {
-        public string Id { get; } = Guid.NewGuid().ToString();
-
         /// <summary>
         /// Наименование
         /// </summary>
         public string Name { get; set; }
 
+        /// <summary>
+        /// Параметры технологического процесса
+        /// </summary>
         public TechProcessParams TechProcessParams { get; set; }
 
         /// <summary>
         /// Список технологических операций процесса
         /// </summary>
-        public List<SawingTechOperation> TechOperations { get; } = new List<SawingTechOperation>();
+        public List<TechOperation> TechOperations { get; } = new List<TechOperation>();
 
         public TechProcess(string name, TechProcessParams techProcessParams)
         {

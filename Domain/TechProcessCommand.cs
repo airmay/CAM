@@ -1,8 +1,11 @@
-﻿namespace CAM.Domain
+﻿using System;
+
+namespace CAM.Domain
 {
     /// <summary>
     /// Управляющая команда технологического процесса обработки
     /// </summary>
+    [Obsolete]
     public class TechProcessCommand
     {
         public string Name { get; }
