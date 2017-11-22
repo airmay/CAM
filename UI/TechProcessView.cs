@@ -1,11 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Drawing;
-using System.Data;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using CAM.Domain;
 
@@ -15,8 +8,8 @@ namespace CAM.UI
     {
         private TechProcessService _techProcessService;
         private TechProcessNodeBuilder _techProcessNodeBuilder = new TechProcessNodeBuilder();
-        private SawingParamsView _paramsView;
-        private SawingTechOperationParams _emptyParams = new SawingTechOperationParams();
+        private SawingParamsView _techOperationParamsView = new SawingParamsView();
+        private TechProcessParamsView _techProcessParamsView = new TechProcessParamsView();
 
         public TechProcessView()
         {
@@ -24,10 +17,10 @@ namespace CAM.UI
             imageList.Images.Add(Properties.Resources.folder);
             imageList.Images.Add(Properties.Resources.layer_shape_line);
 
-            _paramsView = new SawingParamsView();
-            _paramsView.Dock = DockStyle.Fill;
-            _paramsView.Visible = false;
-            splitContainer1.Panel2.Controls.Add(_paramsView);
+            splitContainer1.Panel2.Controls.Add(_techProcessParamsView);
+            splitContainer1.Panel2.Controls.Add(_techOperationParamsView);
+            foreach (Control control in splitContainer1.Panel2.Controls)
+                control.Dock = DockStyle.Fill;
         }
 
         public void SetTechProcessService(TechProcessService techProcessService)
@@ -40,17 +33,11 @@ namespace CAM.UI
             switch (treeView.SelectedTechProcessNode().Type)
             {
                 case TreeNodeType.TechProcess:
-                    _paramsView.Visible = false;
+                    _techProcessParamsView.BringToFront();
                     break;
                 case TreeNodeType.TechOperation:
-                    _paramsView.Visible = true;
-                    _paramsView.sawingParamsBindingSource.DataSource = treeView.SelectedTechProcessNode().TechOperation.TechOperationParams;
-                    break;
-                case TreeNodeType.ProcessActionGroup:
-                    _paramsView.Visible = false;
-                    break;
-                case TreeNodeType.ProcessAction:
-                    _paramsView.Visible = false;
+                    _techOperationParamsView.BringToFront();
+                    _techOperationParamsView.sawingParamsBindingSource.DataSource = treeView.SelectedTechProcessNode().TechOperation.TechOperationParams;
                     break;
             }
         }

@@ -89,6 +89,12 @@
     <Compile Include="UI\SawingParamsView.Designer.cs">
       <DependentUpon>SawingParamsView.cs</DependentUpon>
     </Compile>
+    <Compile Include="UI\TechProcessParamsView.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="UI\TechProcessParamsView.Designer.cs">
+      <DependentUpon>TechProcessParamsView.cs</DependentUpon>
+    </Compile>
     <Compile Include="UI\TechProcessView.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -113,6 +119,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="UI\SawingParamsView.resx">
       <DependentUpon>SawingParamsView.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UI\TechProcessParamsView.resx">
+      <DependentUpon>TechProcessParamsView.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="UI\TechProcessView.resx">
       <DependentUpon>TechProcessView.cs</DependentUpon>
