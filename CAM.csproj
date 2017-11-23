@@ -74,6 +74,7 @@
     <Compile Include="Domain\TechProcessParams.cs" />
     <Compile Include="Domain\TechProcessService.cs" />
     <Compile Include="Domain\Tool.cs" />
+    <Compile Include="IAcadGateway.cs" />
     <Compile Include="IListExtensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Domain\SawingTechOperation\SawingTechOperation.cs" />
@@ -103,7 +104,7 @@
     </Compile>
     <Compile Include="UI\TechProcessNode.cs" />
     <Compile Include="UI\TechProcessNodeBuilder.cs" />
-    <Compile Include="UI\TreeNodeType.cs" />
+    <Compile Include="UI\TechProcessNodeType.cs" />
     <Compile Include="UI\TreeViewExtensions.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -55,6 +55,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AcadGatewayMock.cs" />
     <Compile Include="TestForm.cs">
       <SubType>Form</SubType>
     </Compile>

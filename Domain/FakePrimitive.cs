@@ -6,7 +6,15 @@ using System.Threading.Tasks;
 
 namespace CAM.Domain
 {
-    public class ObjectId {}
+    public class ObjectId
+    {
+        public string Key { get; set; }
+
+        public ObjectId(string key)
+        {
+            Key = key;
+        }
+    }
 
     public struct Point3d
     {
@@ -23,17 +31,23 @@ namespace CAM.Domain
 
     public class Curve
     {
-        public ObjectId ObjectId { get; }
+        public ObjectId ObjectId { get; set; }
         
         public Point3d EndPoint { get; set; }
 
         public double Length { get; }
 
         public Point3d StartPoint { get; set; }
+
     }
 
     public class Line : Curve
     {
+        public Line(string key)
+        {
+            ObjectId = new ObjectId(key);
+        }
+
         public Line(Point3d pointer1, Point3d pointer2)
         {
             StartPoint = pointer1;
@@ -44,6 +58,11 @@ namespace CAM.Domain
 
     public class Arc : Curve
     {
+        public Arc(string key)
+        {
+            ObjectId = new ObjectId(key);
+        }
+
         public Arc(Point3d center, double radius, double startAngle, double endAngle)
         {
             Center = center;

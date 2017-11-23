@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Windows.Forms;
 using CAM.Domain;
+using System.Linq;
 
 namespace CAM.UI
 {
@@ -30,14 +31,17 @@ namespace CAM.UI
 
         private void treeView_AfterSelect(object sender, TreeViewEventArgs e)
         {
-            switch (treeView.SelectedTechProcessNode().Type)
+            var node = treeView.SelectedTechProcessNode();
+            switch (node.Type)
             {
                 case TechProcessNodeType.TechProcess:
                     _techProcessParamsView.BringToFront();
+                    _techProcessService.SelectTechProcess(node.TechProcess);
                     break;
                 case TechProcessNodeType.TechOperation:
                     _techOperationParamsView.BringToFront();
-                    _techOperationParamsView.sawingParamsBindingSource.DataSource = treeView.SelectedTechProcessNode().TechOperation.TechOperationParams;
+                    _techOperationParamsView.sawingParamsBindingSource.DataSource = node.TechOperation.TechOperationParams;
+                    _techProcessService.SelectTechOperation(node.TechOperation);
                     break;
             }
         }
@@ -64,9 +68,12 @@ namespace CAM.UI
                     rootNode = rootNode.Parent;
 
                 var techOperations = _techProcessService.CreateTechOperations(((TechProcessNode)rootNode).TechProcess);
-                int index = 0;
-                techOperations.ForEach(p => index = rootNode.Nodes.Add(_techProcessNodeBuilder.CreateTechOperationNode(p)));
-                treeView.SelectedNode = rootNode.Nodes[index];
+                if (techOperations.Any())
+                {
+                    int index = 0;
+                    techOperations.ForEach(p => index = rootNode.Nodes.Add(_techProcessNodeBuilder.CreateTechOperationNode(p)));
+                    treeView.SelectedNode = rootNode.Nodes[index];
+                }
             }
         }
 

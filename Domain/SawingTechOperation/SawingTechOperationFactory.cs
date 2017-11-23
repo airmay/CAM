@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace CAM.Domain
 {
@@ -48,7 +49,7 @@ namespace CAM.Domain
             //Polyline Polyline2d Circle
 
             if (techOperation == null)
-                throw new ArgumentException($"Неподдерживаемый тип кривой {curve.GetType()}");
+                MessageBox.Show($"Неподдерживаемый тип кривой {curve.GetType()}");
 
             return techOperation;
         }

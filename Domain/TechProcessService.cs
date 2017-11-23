@@ -16,10 +16,12 @@ namespace CAM.Domain
         private SawingTechOperationParams _sawingArcTechOperationParamsDefault = new SawingTechOperationParams();
         private TechProcessParams _techProcessParams = new TechProcessParams();
         private SawingTechOperationFactory _techOperationFactory;
-        private AcadGateway _acad = new AcadGateway();
+        private IAcadGateway _acad;
 
-        public TechProcessService()
+        public TechProcessService(IAcadGateway acad)
         {
+            _acad = acad;
+
             _sawingLineTechOperationParamsDefault.Modes.Add(new SawingMode { Depth = 30, DepthStep = 5, Feed = 2000 });
             _sawingArcTechOperationParamsDefault.Modes.AddRange(new SawingMode[3] {
                 new SawingMode { Depth = 10, DepthStep = 5, Feed = 2000 },
@@ -34,6 +36,16 @@ namespace CAM.Domain
             _techProcessList.Add(techProcess);
             CreateTechOperations(techProcess);
             return techProcess;
+        }
+
+        internal void SelectTechProcess(TechProcess techProcess)
+        {
+            _acad.SelectCurvies(techProcess.TechOperations.ConvertAll(p => p.ProcessingArea.AcadObjectId));
+        }
+
+        internal void SelectTechOperation(SawingTechOperation techOperation)
+        {
+            _acad.SelectCurvies(new List<ObjectId> { techOperation.ProcessingArea.AcadObjectId });
         }
 
         public List<SawingTechOperation> CreateTechOperations(TechProcess techProcess)
