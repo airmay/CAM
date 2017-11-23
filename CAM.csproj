@@ -101,7 +101,7 @@
     <Compile Include="UI\TechProcessView.Designer.cs">
       <DependentUpon>TechProcessView.cs</DependentUpon>
     </Compile>
-    <Compile Include="UI\TechProcessViewModel.cs" />
+    <Compile Include="UI\TechProcessNode.cs" />
     <Compile Include="UI\TechProcessNodeBuilder.cs" />
     <Compile Include="UI\TreeNodeType.cs" />
     <Compile Include="UI\TreeViewExtensions.cs" />

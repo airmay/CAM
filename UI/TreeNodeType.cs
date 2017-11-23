@@ -3,7 +3,7 @@
     /// <summary>
     /// Типа узла дерева
     /// </summary>
-    public enum TreeNodeType
+    public enum TechProcessNodeType
     {
         TechProcess,
         TechOperation,

@@ -32,10 +32,10 @@ namespace CAM.UI
         {
             switch (treeView.SelectedTechProcessNode().Type)
             {
-                case TreeNodeType.TechProcess:
+                case TechProcessNodeType.TechProcess:
                     _techProcessParamsView.BringToFront();
                     break;
-                case TreeNodeType.TechOperation:
+                case TechProcessNodeType.TechOperation:
                     _techOperationParamsView.BringToFront();
                     _techOperationParamsView.sawingParamsBindingSource.DataSource = treeView.SelectedTechProcessNode().TechOperation.TechOperationParams;
                     break;
@@ -83,13 +83,13 @@ namespace CAM.UI
                 var node = treeView.SelectedTechProcessNode();
                 switch (node.Type)
                 {
-                    case TreeNodeType.TechProcess:
+                    case TechProcessNodeType.TechProcess:
                         _techProcessService.RemoveTechProcess(node.TechProcess);
                         break;
-                    case TreeNodeType.TechOperation:
+                    case TechProcessNodeType.TechOperation:
                         _techProcessService.RemoveTechOperation(node.TechOperation);
                         break;
-                    case TreeNodeType.ProcessAction:
+                    case TechProcessNodeType.ProcessAction:
                         _techProcessService.RemoveProcessAction(node.ProcessAction);
                         break;
                     default:
@@ -111,7 +111,7 @@ namespace CAM.UI
 
         private void bMoveUpTechOperation_Click(object sender, EventArgs e)
         {
-            if (treeView.SelectedTechProcessNode()?.Type == TreeNodeType.TechOperation)
+            if (treeView.SelectedTechProcessNode()?.Type == TechProcessNodeType.TechOperation)
             {
                 EndEdit();
                 if (_techProcessService.MoveBackwardTechOperation(treeView.SelectedTechProcessNode().TechOperation))
@@ -121,7 +121,7 @@ namespace CAM.UI
 
         private void bMoveDownTechOperation_Click(object sender, EventArgs e)
         {
-            if (treeView.SelectedTechProcessNode()?.Type == TreeNodeType.TechOperation)
+            if (treeView.SelectedTechProcessNode()?.Type == TechProcessNodeType.TechOperation)
             {
                 EndEdit();
                 if (_techProcessService.MoveForwardTechOperation(treeView.SelectedTechProcessNode().TechOperation))
@@ -133,10 +133,10 @@ namespace CAM.UI
         {
             switch (treeView.SelectedTechProcessNode().Type)
             {
-                case TreeNodeType.TechProcess:
+                case TechProcessNodeType.TechProcess:
                     treeView.SelectedTechProcessNode().TechProcess.Name = e.Label;
                     break;
-                case TreeNodeType.TechOperation:
+                case TechProcessNodeType.TechOperation:
                     treeView.SelectedTechProcessNode().TechOperation.Name = e.Label;
                     break;
             }
