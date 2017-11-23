@@ -15,9 +15,8 @@ namespace CAM.UI
         public TechProcessView()
         {
             InitializeComponent();
-            imageList.Images.Add(Properties.Resources.folder);
-            imageList.Images.Add(Properties.Resources.layer_shape_line);
 
+            imageList.Images.AddRange(new[] { Properties.Resources.drive, Properties.Resources.drive_download, Properties.Resources.folder__arrow, Properties.Resources.gear__arrow });
             splitContainer1.Panel2.Controls.Add(_techProcessParamsView);
             splitContainer1.Panel2.Controls.Add(_techOperationParamsView);
             foreach (Control control in splitContainer1.Panel2.Controls)
@@ -63,10 +62,7 @@ namespace CAM.UI
                 bCreateTechProcess_Click(sender, e);
             else
             {
-                var rootNode = treeView.SelectedNode;
-                while (rootNode.Parent != null)
-                    rootNode = rootNode.Parent;
-
+                var rootNode = GetRootNode();
                 var techOperations = _techProcessService.CreateTechOperations(((TechProcessNode)rootNode).TechProcess);
                 if (techOperations.Any())
                 {
@@ -75,6 +71,14 @@ namespace CAM.UI
                     treeView.SelectedNode = rootNode.Nodes[index];
                 }
             }
+        }
+
+        private TreeNode GetRootNode()
+        {
+            var rootNode = treeView.SelectedNode;
+            while (rootNode.Parent != null)
+                rootNode = rootNode.Parent;
+            return rootNode;
         }
 
         private void EndEdit()
@@ -147,6 +151,12 @@ namespace CAM.UI
                     treeView.SelectedTechProcessNode().TechOperation.Name = e.Label;
                     break;
             }
+        }
+
+        private void bBuildProcessing_Click(object sender, EventArgs e)
+        {
+            //var rootNode = GetRootNode();
+            //((TechProcessNode)rootNode).TechProcess.BuildProcessing();
         }
     }
 }

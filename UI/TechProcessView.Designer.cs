@@ -40,6 +40,8 @@
             this.bMoveDownTechOperation = new System.Windows.Forms.ToolStripButton();
             this.bCreateTechProcess = new System.Windows.Forms.ToolStripButton();
             this.panel2 = new System.Windows.Forms.Panel();
+            this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
+            this.bBuildProcessing = new System.Windows.Forms.ToolStripButton();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.SuspendLayout();
@@ -100,7 +102,9 @@
             this.bRemove,
             this.bMoveUpTechOperation,
             this.bMoveDownTechOperation,
-            this.bCreateTechProcess});
+            this.bCreateTechProcess,
+            this.toolStripSeparator1,
+            this.bBuildProcessing});
             this.toolStrip1.Location = new System.Drawing.Point(0, 0);
             this.toolStrip1.Name = "toolStrip1";
             this.toolStrip1.Size = new System.Drawing.Size(312, 25);
@@ -150,7 +154,7 @@
             // bCreateTechProcess
             // 
             this.bCreateTechProcess.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.bCreateTechProcess.Image = global::CAM.Properties.Resources.folder__plus;
+            this.bCreateTechProcess.Image = global::CAM.Properties.Resources.drive__plus;
             this.bCreateTechProcess.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.bCreateTechProcess.Name = "bCreateTechProcess";
             this.bCreateTechProcess.Size = new System.Drawing.Size(23, 22);
@@ -165,6 +169,21 @@
             this.panel2.Name = "panel2";
             this.panel2.Size = new System.Drawing.Size(312, 711);
             this.panel2.TabIndex = 3;
+            // 
+            // toolStripSeparator1
+            // 
+            this.toolStripSeparator1.Name = "toolStripSeparator1";
+            this.toolStripSeparator1.Size = new System.Drawing.Size(6, 25);
+            // 
+            // bBuildProcessing
+            // 
+            this.bBuildProcessing.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.bBuildProcessing.Image = global::CAM.Properties.Resources.gear;
+            this.bBuildProcessing.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.bBuildProcessing.Name = "bBuildProcessing";
+            this.bBuildProcessing.Size = new System.Drawing.Size(23, 22);
+            this.bBuildProcessing.Text = "Рассчитать обработку";
+            this.bBuildProcessing.Click += new System.EventHandler(this.bBuildProcessing_Click);
             // 
             // TechProcessView
             // 
@@ -200,5 +219,7 @@
         private System.Windows.Forms.ToolStripButton bMoveDownTechOperation;
         private System.Windows.Forms.ToolStripButton bCreateTechProcess;
         private System.Windows.Forms.ImageList imageList;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
+        private System.Windows.Forms.ToolStripButton bBuildProcessing;
     }
 }
