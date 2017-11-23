@@ -70,19 +70,24 @@ namespace CAM.Domain
             return flag;
         }
 
-        internal void RemoveTechProcess(TechProcess techProcess)
+        public void RemoveTechProcess(TechProcess techProcess)
         {
             _techProcessList.Remove(techProcess);
         }
 
-        internal void RemoveTechOperation(TechOperation techOperation)
+        public void RemoveTechOperation(TechOperation techOperation)
         {
             techOperation.TechProcess.TechOperations.Remove(techOperation);
         }
 
-        internal void RemoveProcessAction(ProcessAction processAction)
+        public void RemoveProcessAction(ProcessAction processAction)
         {
             processAction.TechOperation.ProcessActions.Remove(processAction);
+        }
+
+        public void BuildProcessing(TechProcess techProcess)
+        {
+            techProcess.BuildProcessing();
         }
     }
 }

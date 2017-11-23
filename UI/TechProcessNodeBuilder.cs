@@ -4,52 +4,54 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace CAM.UI
 {
     /// <summary>
-    /// Конструктор узлов дерева
+    /// Конструктор дерева техпроцесса
     /// </summary>
-    public class TechProcessNodeBuilder
+    public class TechProcessTreeBuilder
     {
         /// <summary>
-        /// Создает узел техпроцесса со всеми дочерними узлами
+        /// Создает дерево техпроцесса
         /// </summary>
         /// <param name="techProcess"></param>
         /// <returns></returns>
-        public TechProcessNode CreateTechProcessNode(TechProcess techProcess)
+        public TechProcessNode CreateTechProcessTree(TechProcess techProcess)
         {
             var techProcessNode = new TechProcessNode(techProcess);
-            techProcess.TechOperations.ForEach(p => techProcessNode.Nodes.Add(CreateTechOperationNode(p)));
+            techProcess.TechOperations.ForEach(p => techProcessNode.Nodes.Add(new TechProcessNode(p)));
             return techProcessNode;
         }
 
         /// <summary>
-        /// Создает узел техоперации со всеми дочерними узлами
+        /// Перестраивает дерево техпроцесса
         /// </summary>
-        /// <param name="techOperation"></param>
-        /// <returns></returns>
-        public TechProcessNode CreateTechOperationNode(TechOperation techOperation)
+        /// <param name="rootNode"></param>
+        public void RebuildTechProcessTree(TreeNode rootNode)
         {
-            var techOperationNode = new TechProcessNode(techOperation);
-            TechProcessNode groupNode = null;
-            foreach (var processAction in techOperation.ProcessActions)
+            foreach (TechProcessNode techOperationNode in rootNode.Nodes)
             {
-                if (!string.IsNullOrEmpty(processAction.GroupName))
+                TechProcessNode groupNode = null;
+                techOperationNode.Nodes.Clear();
+                foreach (var processAction in techOperationNode.TechOperation.ProcessActions)
                 {
-                    if (groupNode?.Name != processAction.GroupName)
+                    if (!string.IsNullOrEmpty(processAction.GroupName))
                     {
-                        groupNode = new TechProcessNode(processAction.GroupName);
-                        techOperationNode.Nodes.Add(groupNode);
+                        if (groupNode?.Text != processAction.GroupName)
+                        {
+                            groupNode = new TechProcessNode(processAction.GroupName);
+                            techOperationNode.Nodes.Add(groupNode);
+                        }
                     }
-                }
-                else
-                    groupNode = null;
+                    else
+                        groupNode = null;
 
-                var processActionNode = new TechProcessNode(processAction);
-                (groupNode ?? techOperationNode).Nodes.Add(processActionNode);
+                    var processActionNode = new TechProcessNode(processAction);
+                    (groupNode ?? techOperationNode).Nodes.Add(processActionNode);
+                }
             }
-            return techOperationNode;
         }
     }
 }

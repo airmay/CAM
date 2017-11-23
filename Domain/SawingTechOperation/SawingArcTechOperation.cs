@@ -25,6 +25,7 @@ namespace CAM.Domain
 
         public override void BuildProcessing()
         {
+            base.BuildProcessing();
         }
     }
 }

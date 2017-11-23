@@ -25,7 +25,9 @@ namespace CAM.Domain
 
         public string GroupName { get; }
 
-        public ProcessAction(TechOperation techOperation, string name, string groupName = null)
+        public Point3d Point { get; }
+
+        public ProcessAction(TechOperation techOperation, string name, string groupName = null, Point3d point = default(Point3d))
         {
             TechOperation = techOperation;
             TechOperation.ProcessActions.Add(this);

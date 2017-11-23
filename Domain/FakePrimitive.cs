@@ -27,6 +27,7 @@ namespace CAM.Domain
         public double X { get; }
         public double Y { get; }
         public double Z { get; }
+
     }
 
     public class Curve
