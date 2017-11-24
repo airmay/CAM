@@ -9,12 +9,24 @@ namespace CAM
         /// Получает список выбранных примитивов автокада
         /// </summary>
         /// <returns></returns>
-        Curve[] GetSelectedCurves();
+        Curve[] GetSelectedEntities();
 
         /// <summary>
         /// Выделяет примитивы по заданным идентификаторам
         /// </summary>
-        /// <param name="list"></param>
-        void SelectCurvies(List<ObjectId> list);
+        /// <param name="м"></param>
+        void SelectEntities(List<ObjectId> idList);
+
+        /// <summary>
+        /// Создает примитивы в базе автокада
+        /// </summary>
+        /// <param name="idList"></param>
+        void CreateEntities(List<ObjectId> idList);
+
+        /// <summary>
+        /// Удаляет примитивы из автокада
+        /// </summary>
+        /// <param name="idList"></param>
+        void DeleteEntities(List<ObjectId> idList);
     }
 }

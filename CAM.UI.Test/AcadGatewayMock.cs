@@ -22,7 +22,7 @@ namespace CAM.UI.Test
                 _listBox.Items.Add((i % 2 == 0 ? "Прямая" : "Дуга") + i);
         }
 
-        public Curve[] GetSelectedCurves()
+        public Curve[] GetSelectedEntities()
         {
             var curvies = new List<Curve>();
             foreach (var item in _listBox.SelectedItems)
@@ -30,11 +30,22 @@ namespace CAM.UI.Test
             return curvies.ToArray();
         }
 
-        public void SelectCurvies(List<ObjectId> list)
+        public void SelectEntities(List<ObjectId> list)
         {
             var keys = list.ConvertAll(p => p.Key);
             for (int i = 0; i < _listBox.Items.Count; i++)
                 _listBox.SetSelected(i, keys.Contains(_listBox.Items[i]));
         }
+
+        public void CreateEntities(List<ObjectId> entities)
+        {
+            entities.ForEach(p => _listBox.Items.Add(p.Key));
+        }
+
+        public void DeleteEntities(List<ObjectId> idList)
+        {
+            idList.ForEach(p => _listBox.Items.Remove(p.Key));
+        }
+
     }
 }

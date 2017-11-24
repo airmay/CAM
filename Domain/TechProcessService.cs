@@ -40,17 +40,17 @@ namespace CAM.Domain
 
         internal void SelectTechProcess(TechProcess techProcess)
         {
-            _acad.SelectCurvies(techProcess.TechOperations.ConvertAll(p => p.ProcessingArea.AcadObjectId));
+            _acad.SelectEntities(techProcess.TechOperations.ConvertAll(p => p.ProcessingArea.AcadObjectId));
         }
 
         internal void SelectTechOperation(SawingTechOperation techOperation)
         {
-            _acad.SelectCurvies(new List<ObjectId> { techOperation.ProcessingArea.AcadObjectId });
+            _acad.SelectEntities(new List<ObjectId> { techOperation.ProcessingArea.AcadObjectId });
         }
 
         public List<SawingTechOperation> CreateTechOperations(TechProcess techProcess)
         {
-            var operations = _acad.GetSelectedCurves().Select(p => _techOperationFactory.Create(techProcess, p)).ToList();
+            var operations = _acad.GetSelectedEntities().Select(p => _techOperationFactory.Create(techProcess, p)).ToList();
             return operations;
         }
 
@@ -72,22 +72,36 @@ namespace CAM.Domain
 
         public void RemoveTechProcess(TechProcess techProcess)
         {
+            DeleteToolpath(techProcess);
             _techProcessList.Remove(techProcess);
+        }
+
+        private void DeleteToolpath(TechProcess techProcess)
+        {
+            _acad.DeleteEntities(techProcess.TechOperations.SelectMany(p => p.ProcessActions).Select(p => p.ToolpathAcadObjectId).ToList());
+        }
+
+        private void CreateToolpath(TechProcess techProcess)
+        {
+            _acad.CreateEntities(techProcess.TechOperations.SelectMany(p => p.ProcessActions).Select(p => p.ToolpathAcadObjectId).ToList());
         }
 
         public void RemoveTechOperation(TechOperation techOperation)
         {
+            _acad.DeleteEntities(techOperation.ProcessActions.ConvertAll(p => p.ToolpathAcadObjectId));
             techOperation.TechProcess.TechOperations.Remove(techOperation);
         }
 
         public void RemoveProcessAction(ProcessAction processAction)
         {
+            _acad.DeleteEntities(new List<ObjectId> { processAction.ToolpathAcadObjectId });
             processAction.TechOperation.ProcessActions.Remove(processAction);
         }
 
         public void BuildProcessing(TechProcess techProcess)
         {
+            DeleteToolpath(techProcess);
             techProcess.BuildProcessing();
-        }
+        }        
     }
 }
