@@ -21,15 +21,5 @@ namespace CAM.UI
         {
             MessageBox.Show("Введите корректное числовое значение", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
-
-        private void cbCalcExactlyBegin_CheckedChanged(object sender, EventArgs e)
-        {
-            cbExactlyBegin.Enabled = !cbCalcExactlyBegin.Checked;
-        }
-
-        private void cbCalcExactlyEnd_CheckedChanged(object sender, EventArgs e)
-        {
-            cbExactlyEnd.Enabled = !cbCalcExactlyEnd.Checked;
-        }
     }
 }

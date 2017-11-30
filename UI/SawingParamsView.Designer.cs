@@ -30,79 +30,55 @@
         {
             this.components = new System.ComponentModel.Container();
             this.gbExactlyEnds = new System.Windows.Forms.GroupBox();
-            this.cbCalcExactlyBegin = new System.Windows.Forms.CheckBox();
-            this.cbCalcExactlyEnd = new System.Windows.Forms.CheckBox();
-            this.cbExactlyBegin = new System.Windows.Forms.CheckBox();
             this.cbExactlyEnd = new System.Windows.Forms.CheckBox();
+            this.sawingParamsBindingSource = new System.Windows.Forms.BindingSource(this.components);
+            this.cbExactlyBegin = new System.Windows.Forms.CheckBox();
             this.gvSawingModes = new System.Windows.Forms.DataGridView();
             this.depthDataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.depthStepDataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.feedDataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.sawingParamsBindingSource = new System.Windows.Forms.BindingSource(this.components);
             this.gbExactlyEnds.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.gvSawingModes)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.sawingParamsBindingSource)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.gvSawingModes)).BeginInit();
             this.SuspendLayout();
             // 
             // gbExactlyEnds
             // 
             this.gbExactlyEnds.Controls.Add(this.cbExactlyEnd);
             this.gbExactlyEnds.Controls.Add(this.cbExactlyBegin);
-            this.gbExactlyEnds.Controls.Add(this.cbCalcExactlyEnd);
-            this.gbExactlyEnds.Controls.Add(this.cbCalcExactlyBegin);
             this.gbExactlyEnds.Dock = System.Windows.Forms.DockStyle.Top;
             this.gbExactlyEnds.Location = new System.Drawing.Point(0, 0);
             this.gbExactlyEnds.Name = "gbExactlyEnds";
-            this.gbExactlyEnds.Size = new System.Drawing.Size(245, 76);
+            this.gbExactlyEnds.Size = new System.Drawing.Size(245, 45);
             this.gbExactlyEnds.TabIndex = 0;
             this.gbExactlyEnds.TabStop = false;
             this.gbExactlyEnds.Text = "Концы";
-            // 
-            // cbCalcExactlyBegin
-            // 
-            this.cbCalcExactlyBegin.AutoSize = true;
-            this.cbCalcExactlyBegin.DataBindings.Add(new System.Windows.Forms.Binding("Checked", this.sawingParamsBindingSource, "CalcExactlyBegin", true));
-            this.cbCalcExactlyBegin.Location = new System.Drawing.Point(22, 24);
-            this.cbCalcExactlyBegin.Name = "cbCalcExactlyBegin";
-            this.cbCalcExactlyBegin.Size = new System.Drawing.Size(100, 17);
-            this.cbCalcExactlyBegin.TabIndex = 0;
-            this.cbCalcExactlyBegin.Text = "Начало расчет";
-            this.cbCalcExactlyBegin.UseVisualStyleBackColor = true;
-            this.cbCalcExactlyBegin.CheckedChanged += new System.EventHandler(this.cbCalcExactlyBegin_CheckedChanged);
-            // 
-            // cbCalcExactlyEnd
-            // 
-            this.cbCalcExactlyEnd.AutoSize = true;
-            this.cbCalcExactlyEnd.DataBindings.Add(new System.Windows.Forms.Binding("Checked", this.sawingParamsBindingSource, "CalcExactlyEnd", true));
-            this.cbCalcExactlyEnd.Location = new System.Drawing.Point(128, 24);
-            this.cbCalcExactlyEnd.Name = "cbCalcExactlyEnd";
-            this.cbCalcExactlyEnd.Size = new System.Drawing.Size(94, 17);
-            this.cbCalcExactlyEnd.TabIndex = 1;
-            this.cbCalcExactlyEnd.Text = "Конец расчет";
-            this.cbCalcExactlyEnd.UseVisualStyleBackColor = true;
-            this.cbCalcExactlyEnd.CheckedChanged += new System.EventHandler(this.cbCalcExactlyEnd_CheckedChanged);
-            // 
-            // cbExactlyBegin
-            // 
-            this.cbExactlyBegin.AutoSize = true;
-            this.cbExactlyBegin.DataBindings.Add(new System.Windows.Forms.Binding("Checked", this.sawingParamsBindingSource, "IsExactlyBegin", true));
-            this.cbExactlyBegin.Location = new System.Drawing.Point(22, 47);
-            this.cbExactlyBegin.Name = "cbExactlyBegin";
-            this.cbExactlyBegin.Size = new System.Drawing.Size(94, 17);
-            this.cbExactlyBegin.TabIndex = 2;
-            this.cbExactlyBegin.Text = "Начало точно";
-            this.cbExactlyBegin.UseVisualStyleBackColor = true;
             // 
             // cbExactlyEnd
             // 
             this.cbExactlyEnd.AutoSize = true;
             this.cbExactlyEnd.DataBindings.Add(new System.Windows.Forms.Binding("Checked", this.sawingParamsBindingSource, "IsExactlyEnd", true));
-            this.cbExactlyEnd.Location = new System.Drawing.Point(128, 47);
+            this.cbExactlyEnd.Location = new System.Drawing.Point(124, 19);
             this.cbExactlyEnd.Name = "cbExactlyEnd";
             this.cbExactlyEnd.Size = new System.Drawing.Size(88, 17);
             this.cbExactlyEnd.TabIndex = 3;
             this.cbExactlyEnd.Text = "Конец точно";
             this.cbExactlyEnd.UseVisualStyleBackColor = true;
+            // 
+            // sawingParamsBindingSource
+            // 
+            this.sawingParamsBindingSource.DataSource = typeof(CAM.Domain.SawingTechOperationParams);
+            // 
+            // cbExactlyBegin
+            // 
+            this.cbExactlyBegin.AutoSize = true;
+            this.cbExactlyBegin.DataBindings.Add(new System.Windows.Forms.Binding("Checked", this.sawingParamsBindingSource, "IsExactlyBegin", true));
+            this.cbExactlyBegin.Location = new System.Drawing.Point(18, 19);
+            this.cbExactlyBegin.Name = "cbExactlyBegin";
+            this.cbExactlyBegin.Size = new System.Drawing.Size(94, 17);
+            this.cbExactlyBegin.TabIndex = 2;
+            this.cbExactlyBegin.Text = "Начало точно";
+            this.cbExactlyBegin.UseVisualStyleBackColor = true;
             // 
             // gvSawingModes
             // 
@@ -118,10 +94,10 @@
             this.gvSawingModes.DataMember = "Modes";
             this.gvSawingModes.DataSource = this.sawingParamsBindingSource;
             this.gvSawingModes.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.gvSawingModes.Location = new System.Drawing.Point(0, 76);
+            this.gvSawingModes.Location = new System.Drawing.Point(0, 45);
             this.gvSawingModes.MultiSelect = false;
             this.gvSawingModes.Name = "gvSawingModes";
-            this.gvSawingModes.Size = new System.Drawing.Size(245, 335);
+            this.gvSawingModes.Size = new System.Drawing.Size(245, 366);
             this.gvSawingModes.TabIndex = 1;
             this.gvSawingModes.DataError += new System.Windows.Forms.DataGridViewDataErrorEventHandler(this.gvSawingModes_DataError);
             // 
@@ -147,10 +123,6 @@
             this.feedDataGridViewTextBoxColumn.Name = "feedDataGridViewTextBoxColumn";
             this.feedDataGridViewTextBoxColumn.Width = 69;
             // 
-            // sawingParamsBindingSource
-            // 
-            this.sawingParamsBindingSource.DataSource = typeof(CAM.Domain.SawingTechOperationParams);
-            // 
             // SawingParamsView
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -161,8 +133,8 @@
             this.Size = new System.Drawing.Size(245, 411);
             this.gbExactlyEnds.ResumeLayout(false);
             this.gbExactlyEnds.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.gvSawingModes)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.sawingParamsBindingSource)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.gvSawingModes)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -172,8 +144,6 @@
         private System.Windows.Forms.GroupBox gbExactlyEnds;
         private System.Windows.Forms.CheckBox cbExactlyEnd;
         private System.Windows.Forms.CheckBox cbExactlyBegin;
-        private System.Windows.Forms.CheckBox cbCalcExactlyEnd;
-        private System.Windows.Forms.CheckBox cbCalcExactlyBegin;
         private System.Windows.Forms.DataGridView gvSawingModes;
         private System.Windows.Forms.DataGridViewTextBoxColumn depthDataGridViewTextBoxColumn;
         private System.Windows.Forms.DataGridViewTextBoxColumn depthStepDataGridViewTextBoxColumn;

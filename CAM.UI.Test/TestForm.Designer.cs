@@ -30,15 +30,17 @@
         {
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tabPage1 = new System.Windows.Forms.TabPage();
+            this.techProcessView = new CAM.UI.TechProcessView();
             this.tabPage2 = new System.Windows.Forms.TabPage();
             this.tabPage3 = new System.Windows.Forms.TabPage();
             this.tabPage4 = new System.Windows.Forms.TabPage();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
-            this.panel1 = new System.Windows.Forms.Panel();
             this.listBox = new System.Windows.Forms.ListBox();
-            this.techProcessView = new CAM.UI.TechProcessView();
+            this.panel1 = new System.Windows.Forms.Panel();
+            this.programView = new CAM.UI.ProgramView();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
+            this.tabPage2.SuspendLayout();
             this.groupBox1.SuspendLayout();
             this.panel1.SuspendLayout();
             this.SuspendLayout();
@@ -67,14 +69,23 @@
             this.tabPage1.Text = "TechProcessView";
             this.tabPage1.UseVisualStyleBackColor = true;
             // 
+            // techProcessView
+            // 
+            this.techProcessView.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.techProcessView.Location = new System.Drawing.Point(3, 3);
+            this.techProcessView.Name = "techProcessView";
+            this.techProcessView.Size = new System.Drawing.Size(283, 477);
+            this.techProcessView.TabIndex = 0;
+            // 
             // tabPage2
             // 
+            this.tabPage2.Controls.Add(this.programView);
             this.tabPage2.Location = new System.Drawing.Point(4, 22);
             this.tabPage2.Name = "tabPage2";
             this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage2.Size = new System.Drawing.Size(441, 483);
+            this.tabPage2.Size = new System.Drawing.Size(289, 483);
             this.tabPage2.TabIndex = 1;
-            this.tabPage2.Text = "tabPage2";
+            this.tabPage2.Text = "ProgramView";
             this.tabPage2.UseVisualStyleBackColor = true;
             // 
             // tabPage3
@@ -82,7 +93,7 @@
             this.tabPage3.Location = new System.Drawing.Point(4, 22);
             this.tabPage3.Name = "tabPage3";
             this.tabPage3.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage3.Size = new System.Drawing.Size(441, 483);
+            this.tabPage3.Size = new System.Drawing.Size(289, 483);
             this.tabPage3.TabIndex = 2;
             this.tabPage3.Text = "tabPage3";
             this.tabPage3.UseVisualStyleBackColor = true;
@@ -92,7 +103,7 @@
             this.tabPage4.Location = new System.Drawing.Point(4, 22);
             this.tabPage4.Name = "tabPage4";
             this.tabPage4.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage4.Size = new System.Drawing.Size(441, 483);
+            this.tabPage4.Size = new System.Drawing.Size(289, 483);
             this.tabPage4.TabIndex = 3;
             this.tabPage4.Text = "tabPage4";
             this.tabPage4.UseVisualStyleBackColor = true;
@@ -108,15 +119,6 @@
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "AcadView";
             // 
-            // panel1
-            // 
-            this.panel1.Controls.Add(this.tabControl1);
-            this.panel1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.panel1.Location = new System.Drawing.Point(0, 0);
-            this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(297, 509);
-            this.panel1.TabIndex = 2;
-            // 
             // listBox
             // 
             this.listBox.Dock = System.Windows.Forms.DockStyle.Fill;
@@ -127,13 +129,22 @@
             this.listBox.Size = new System.Drawing.Size(194, 490);
             this.listBox.TabIndex = 0;
             // 
-            // techProcessView
+            // panel1
             // 
-            this.techProcessView.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.techProcessView.Location = new System.Drawing.Point(3, 3);
-            this.techProcessView.Name = "techProcessView";
-            this.techProcessView.Size = new System.Drawing.Size(283, 477);
-            this.techProcessView.TabIndex = 0;
+            this.panel1.Controls.Add(this.tabControl1);
+            this.panel1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.panel1.Location = new System.Drawing.Point(0, 0);
+            this.panel1.Name = "panel1";
+            this.panel1.Size = new System.Drawing.Size(297, 509);
+            this.panel1.TabIndex = 2;
+            // 
+            // programView
+            // 
+            this.programView.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.programView.Location = new System.Drawing.Point(3, 3);
+            this.programView.Name = "programView";
+            this.programView.Size = new System.Drawing.Size(283, 477);
+            this.programView.TabIndex = 0;
             // 
             // TestForm
             // 
@@ -146,6 +157,7 @@
             this.Text = "TestForm";
             this.tabControl1.ResumeLayout(false);
             this.tabPage1.ResumeLayout(false);
+            this.tabPage2.ResumeLayout(false);
             this.groupBox1.ResumeLayout(false);
             this.panel1.ResumeLayout(false);
             this.ResumeLayout(false);
@@ -163,6 +175,7 @@
         private System.Windows.Forms.GroupBox groupBox1;
         private System.Windows.Forms.ListBox listBox;
         private System.Windows.Forms.Panel panel1;
+        private ProgramView programView;
     }
 }
 

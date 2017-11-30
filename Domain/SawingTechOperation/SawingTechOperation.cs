@@ -31,12 +31,12 @@ namespace CAM.Domain
             builder.SetGroup(ProcessActionNames.Approach);
             builder.Move(ProcessingArea.StartPoint.X, ProcessingArea.StartPoint.Y);
             builder.Descent(0);
-            int z = 0;
             var modes = TechOperationParams.Modes.OrderBy(p => p.Depth).GetEnumerator();
             modes.MoveNext();
             var mode = modes.Current;
             var pass = 1;
-            while(true)
+            int z = ProcessingArea.Type == ProcessingAreaType.Arc ? -mode.DepthStep : 0;
+            while (true)
             {
                 z += mode.DepthStep;
                 if (z > mode.Depth)

@@ -18,6 +18,8 @@ namespace CAM.Domain
         private SawingTechOperationFactory _techOperationFactory;
         private IAcadGateway _acad;
 
+        public EventHandler<ProgramEventArgs> ProgramGenerated;
+
         public TechProcessService(IAcadGateway acad)
         {
             _acad = acad;
@@ -28,6 +30,10 @@ namespace CAM.Domain
                 new SawingMode { Depth = 20, DepthStep = 2, Feed = 1000 },
                 new SawingMode { Depth = 30, DepthStep = 1, Feed = 500 } });
             _techOperationFactory = new SawingTechOperationFactory(_sawingLineTechOperationParamsDefault, _sawingArcTechOperationParamsDefault);
+
+            _techProcessParams.Tool = new Tool();
+            _techProcessParams.Tool.Number = 1;
+            // TODO убрать
         }
 
         public TechProcess CreateTechProcess()
@@ -99,6 +105,20 @@ namespace CAM.Domain
             var actionGenerator = new ProcessBuilder(techProcess.TechProcessParams);
             techProcess.TechOperations.ForEach(p => p.BuildProcessing(actionGenerator));
             _acad.CreateEntities(actionGenerator.Entities);
+
+            var programGenerator = new ScemaLogicProgramGenerator();
+            var program = programGenerator.Generate(techProcess);
+            ProgramGenerated?.Invoke(this, new ProgramEventArgs(program));
         }        
+    }
+
+    public class ProgramEventArgs : EventArgs
+    {
+        public string Program { get; set; }
+
+        public ProgramEventArgs(string program)
+        {
+            Program = program;
+        }
     }
 }

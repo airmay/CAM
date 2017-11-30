@@ -60,6 +60,7 @@
     <Compile Include="Domain\ProcessActionNames.cs" />
     <Compile Include="Domain\ProcessingArea\ArcProcessingArea.cs" />
     <Compile Include="Domain\CuttingDiscTechnonogy.cs" />
+    <Compile Include="Domain\ScemaLogicProgramGenerator.cs" />
     <Compile Include="Domain\TechProcessCommand.cs" />
     <Compile Include="Domain\ITechnonogy.cs" />
     <Compile Include="Domain\ITechOperation.cs" />
@@ -86,6 +87,12 @@
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="UI\ProgramView.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="UI\ProgramView.Designer.cs">
+      <DependentUpon>ProgramView.cs</DependentUpon>
     </Compile>
     <Compile Include="UI\SawingParamsView.cs">
       <SubType>UserControl</SubType>
@@ -120,6 +127,9 @@
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UI\ProgramView.resx">
+      <DependentUpon>ProgramView.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="UI\SawingParamsView.resx">
       <DependentUpon>SawingParamsView.cs</DependentUpon>
@@ -169,6 +179,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\gear--arrow.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\document--arrow.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
