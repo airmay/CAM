@@ -50,7 +50,7 @@ namespace CAM.Domain
 
         public override string ToString()
         {
-            return $"Дуга[{ Math.Round(Length) }]";
+            return $"Дуга L{ Math.Round(Length) }";
         }
     }
 }

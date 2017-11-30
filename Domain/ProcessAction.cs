@@ -21,11 +21,6 @@ namespace CAM.Domain
         /// </summary>
         public readonly Curve ToolpathAcadObject;
 
-        /// <summary>
-        /// Технологическая операция
-        /// </summary>
-        public TechOperation TechOperation { get; }
-
         public string Name { get; }
 
         public string GroupName { get; }
@@ -34,11 +29,8 @@ namespace CAM.Domain
 
         public int Feed { get; set; }
 
-        public ProcessAction(TechOperation techOperation, string name, string groupName = null, Curve toolpathAcadObject = null, int feed = 0)
+        public ProcessAction(string name, string groupName = null, Curve toolpathAcadObject = null, int feed = 0)
         {
-            TechOperation = techOperation;
-            TechOperation.ProcessActions.Add(this);
-
             ToolpathAcadObject = toolpathAcadObject;
             Name = name;
             GroupName = groupName;

@@ -20,12 +20,13 @@ namespace CAM.Domain
             : base(techProcess, processingArea)
         {
             TechOperationParams = techOperationParams;
-            Name = $"Распил-{ processingArea }";
+            Name = $"Распил { processingArea }";
         }
 
         public override void BuildProcessing(ProcessBuilder builder)
         {
             ProcessActions.Clear();
+            builder.ProcessActions = ProcessActions;
 
             builder.SetGroup(ProcessActionNames.Approach);
             builder.Move(ProcessingArea.StartPoint.X, ProcessingArea.StartPoint.Y);

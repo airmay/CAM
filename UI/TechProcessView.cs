@@ -101,7 +101,9 @@ namespace CAM.UI
                         _techProcessService.RemoveTechOperation(node.TechOperation);
                         break;
                     case TechProcessNodeType.ProcessAction:
-                        _techProcessService.RemoveProcessAction(node.ProcessAction);
+                        var parentNode = node.Parent as TechProcessNode;
+                        var toNode = parentNode.Type == TechProcessNodeType.TechOperation ? parentNode : (TechProcessNode)parentNode.Parent;
+                        _techProcessService.RemoveProcessAction(toNode.TechOperation, node.ProcessAction);
                         break;
                     default:
                         return;

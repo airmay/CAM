@@ -11,22 +11,17 @@ namespace CAM.Domain
     /// </summary>
     public class ProcessBuilder
     {
-        public List<Curve> Entities { get; } = new List<Curve>();
-
-        //private TechProcess _techProcess;
-        private TechOperation _techOperation;
         private string _groupName;
         private Point3d _currentPoint = Point3d.Origin;
         private TechProcessParams _techProcessParams;
 
+        public List<Curve> Entities { get; } = new List<Curve>();
+
+        public List<ProcessAction> ProcessActions { get; set; }
+
         public ProcessBuilder(TechProcessParams techProcessParams)
         {
             _techProcessParams = techProcessParams;
-        }
-
-        public void SetTechOperation(TechOperation techOperation)
-        {
-            _techOperation = techOperation;
         }
 
         public void SetGroup(string groupName) => _groupName = groupName;
@@ -36,7 +31,7 @@ namespace CAM.Domain
             var destPoint = new Point3d(x, y, z);
             var line = new Line(_currentPoint, destPoint);
             line.ObjectId = new ObjectId("перемещение");
-            new ProcessAction(_techOperation, name, _groupName, line, feed);
+            ProcessActions.Add(new ProcessAction(name, _groupName, line, feed));
             _currentPoint = destPoint;
             Entities.Add(line);
         }
@@ -53,7 +48,7 @@ namespace CAM.Domain
             if (_currentPoint == Point3d.Origin)
             {
                 _currentPoint = new Point3d(x, y, _techProcessParams.ZSafety);
-                new ProcessAction(_techOperation, ProcessActionNames.InitialMove, _groupName);
+                ProcessActions.Add(new ProcessAction(ProcessActionNames.InitialMove, _groupName));
             }
             else
                 MoveXYZ(x, y, _currentPoint.Z, ProcessActionNames.Fast);
@@ -96,7 +91,7 @@ namespace CAM.Domain
             else
                 throw new Exception("Несоответствие текущей позиции и рассчитанной траектории");
 
-            new ProcessAction(_techOperation, $"{ProcessActionNames.Cutting} F{feed}", _groupName, toolpathCurve, feed);
+            ProcessActions.Add(new ProcessAction($"{ProcessActionNames.Cutting} F{feed}", _groupName, toolpathCurve, feed));
             Entities.Add(toolpathCurve);
         }
     }

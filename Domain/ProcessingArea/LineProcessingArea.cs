@@ -23,7 +23,7 @@ namespace CAM.Domain
 
         public override string ToString()
         {
-            return $"Прямая[{ Math.Round(Length) }]";
+            return $"Прямая L{ Math.Round(Length) }";
         }
     }
 }

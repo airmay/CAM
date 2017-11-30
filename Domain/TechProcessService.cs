@@ -87,22 +87,17 @@ namespace CAM.Domain
             techOperation.TechProcess.TechOperations.Remove(techOperation);
         }
 
-        public void RemoveProcessAction(ProcessAction processAction)
+        public void RemoveProcessAction(TechOperation techOperation, ProcessAction processAction)
         {
             _acad.DeleteEntities(new List<ObjectId> { processAction.ToolpathAcadObject.ObjectId });
-            processAction.TechOperation.ProcessActions.Remove(processAction);
+            techOperation.ProcessActions.Remove(processAction);
         }
 
         public void BuildProcessing(TechProcess techProcess)
         {
             DeleteToolpath(techProcess);
             var actionGenerator = new ProcessBuilder(techProcess.TechProcessParams);
-            techProcess.TechOperations.ForEach(p => 
-            {
-                // TODO переделать 
-                actionGenerator.SetTechOperation(p);
-                p.BuildProcessing(actionGenerator);
-            });
+            techProcess.TechOperations.ForEach(p => p.BuildProcessing(actionGenerator));
             _acad.CreateEntities(actionGenerator.Entities);
         }        
     }
