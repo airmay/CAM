@@ -14,14 +14,14 @@ namespace CAM
         /// <summary>
         /// Выделяет примитивы по заданным идентификаторам
         /// </summary>
-        /// <param name="м"></param>
+        /// <param name="idList"></param>
         void SelectEntities(List<ObjectId> idList);
 
         /// <summary>
         /// Создает примитивы в базе автокада
         /// </summary>
-        /// <param name="idList"></param>
-        void CreateEntities(List<ObjectId> idList);
+        /// <param name="entities"></param>
+        void CreateEntities(List<Curve> entities);
 
         /// <summary>
         /// Удаляет примитивы из автокада

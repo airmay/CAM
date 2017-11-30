@@ -23,22 +23,34 @@ namespace CAM.Domain
             Name = $"Распил-{ processingArea }";
         }
 
-        public override void BuildProcessing()
+        public override void BuildProcessing(ProcessBuilder builder)
         {
             ProcessActions.Clear();
-            new ProcessAction(this, "Подвод", "Перемещение", new Point3d(ProcessingArea.StartPoint.X, ProcessingArea.StartPoint.Y, TechProcess.TechProcessParams.ZSafety));
-            new ProcessAction(this, "Опускание", "Перемещение", ProcessingArea.StartPoint);
-            //int z = 0;
-            //do
-            //{
-            //    z += obj.Depth;
-            //    if (z > obj.DepthAll)
-            //    {
-            //        z = obj.DepthAll;
-            //    }
-            //    new ProcessAction(this, "Перемещение", "Опускание", ProcessingArea.StartPoint);
-            //}
-            //while (z < obj.DepthAll);
+
+            builder.SetGroup(ProcessActionNames.Approach);
+            builder.Move(ProcessingArea.StartPoint.X, ProcessingArea.StartPoint.Y);
+            builder.Descent(0);
+            int z = 0;
+            var modes = TechOperationParams.Modes.OrderBy(p => p.Depth).GetEnumerator();
+            modes.MoveNext();
+            var mode = modes.Current;
+            var pass = 1;
+            while(true)
+            {
+                z += mode.DepthStep;
+                if (z > mode.Depth)
+                {
+                    if (modes.MoveNext())
+                        mode = modes.Current;
+                    else
+                        break;
+                }
+                builder.SetGroup($"{pass++} {ProcessActionNames.Pass} Z{-z}");
+                builder.Penetration(-z);
+                builder.Cutting(ProcessingArea.Curve, dz: -z, feed: mode.Feed);
+            }
+            builder.SetGroup(ProcessActionNames.Departure);
+            builder.Uplifting();
         }
     }
 }

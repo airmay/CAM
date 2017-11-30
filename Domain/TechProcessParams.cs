@@ -21,12 +21,12 @@ namespace CAM.Domain
         /// <summary>
         /// Скорость заглубления
         /// </summary>
-        public int PenetrationRate { get; set; }
+        public int PenetrationRate { get; set; } = 250;
 
         /// <summary>
         /// Частота вращения шпинделя
         /// </summary>
-        public int Frequency { get; set; }
+        public int Frequency { get; set; } = 2500;
 
         /// <summary>
         /// Инструмент

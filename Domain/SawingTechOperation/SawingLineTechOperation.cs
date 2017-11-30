@@ -22,9 +22,9 @@ namespace CAM.Domain
         {
         }
 
-        public override void BuildProcessing()
+        public override void BuildProcessing(ProcessBuilder actionGenerator)
         {
-            base.BuildProcessing();
+            base.BuildProcessing(actionGenerator);
         }
     }
 }

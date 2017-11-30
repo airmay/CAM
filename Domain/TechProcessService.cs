@@ -78,30 +78,32 @@ namespace CAM.Domain
 
         private void DeleteToolpath(TechProcess techProcess)
         {
-            _acad.DeleteEntities(techProcess.TechOperations.SelectMany(p => p.ProcessActions).Select(p => p.ToolpathAcadObjectId).ToList());
-        }
-
-        private void CreateToolpath(TechProcess techProcess)
-        {
-            _acad.CreateEntities(techProcess.TechOperations.SelectMany(p => p.ProcessActions).Select(p => p.ToolpathAcadObjectId).ToList());
+            _acad.DeleteEntities(techProcess.TechOperations.SelectMany(p => p.ProcessActions).Select(p => p.ToolpathAcadObject?.ObjectId).Where(p => p != null).ToList());
         }
 
         public void RemoveTechOperation(TechOperation techOperation)
         {
-            _acad.DeleteEntities(techOperation.ProcessActions.ConvertAll(p => p.ToolpathAcadObjectId));
+            _acad.DeleteEntities(techOperation.ProcessActions.ConvertAll(p => p.ToolpathAcadObject.ObjectId));
             techOperation.TechProcess.TechOperations.Remove(techOperation);
         }
 
         public void RemoveProcessAction(ProcessAction processAction)
         {
-            _acad.DeleteEntities(new List<ObjectId> { processAction.ToolpathAcadObjectId });
+            _acad.DeleteEntities(new List<ObjectId> { processAction.ToolpathAcadObject.ObjectId });
             processAction.TechOperation.ProcessActions.Remove(processAction);
         }
 
         public void BuildProcessing(TechProcess techProcess)
         {
             DeleteToolpath(techProcess);
-            techProcess.BuildProcessing();
+            var actionGenerator = new ProcessBuilder(techProcess.TechProcessParams);
+            techProcess.TechOperations.ForEach(p => 
+            {
+                // TODO переделать 
+                actionGenerator.SetTechOperation(p);
+                p.BuildProcessing(actionGenerator);
+            });
+            _acad.CreateEntities(actionGenerator.Entities);
         }        
     }
 }

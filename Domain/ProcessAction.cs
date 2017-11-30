@@ -17,6 +17,11 @@ namespace CAM.Domain
         public readonly ObjectId ToolpathAcadObjectId;
 
         /// <summary>
+        /// Графический примитив автокада представляющего траекторию инструмента
+        /// </summary>
+        public readonly Curve ToolpathAcadObject;
+
+        /// <summary>
         /// Технологическая операция
         /// </summary>
         public TechOperation TechOperation { get; }
@@ -27,13 +32,17 @@ namespace CAM.Domain
 
         public Point3d Point { get; }
 
-        public ProcessAction(TechOperation techOperation, string name, string groupName = null, Point3d point = default(Point3d))
+        public int Feed { get; set; }
+
+        public ProcessAction(TechOperation techOperation, string name, string groupName = null, Curve toolpathAcadObject = null, int feed = 0)
         {
             TechOperation = techOperation;
             TechOperation.ProcessActions.Add(this);
 
+            ToolpathAcadObject = toolpathAcadObject;
             Name = name;
             GroupName = groupName;
+            Feed = feed;
         }
     }
 }

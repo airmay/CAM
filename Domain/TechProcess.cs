@@ -35,7 +35,6 @@ namespace CAM.Domain
         /// <returns></returns>
         public void BuildProcessing()
         {
-            TechOperations.ForEach(p => p.BuildProcessing());
 
             //SetupCommands.Clear();
             //SetupCommands.Add(new TechProcessCommand("G98", "Установка"));
@@ -43,6 +42,11 @@ namespace CAM.Domain
             //SetupCommands.Add(new TechProcessCommand("17 XYCZ", "Установка"));
             //SetupCommands.Add(new TechProcessCommand("28 XYCZ", "Установка"));
             //SetupCommands.Add(new TechProcessCommand($"G97 M6 {TechProcessParams.Tool.Number}", "Установка"));
+        }
+
+        internal void BuildProcessing(ProcessBuilder actionGenerator)
+        {
+            TechOperations.ForEach(p => p.BuildProcessing(actionGenerator));
         }
     }
 }

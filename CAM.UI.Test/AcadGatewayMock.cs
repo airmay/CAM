@@ -37,15 +37,14 @@ namespace CAM.UI.Test
                 _listBox.SetSelected(i, keys.Contains(_listBox.Items[i]));
         }
 
-        public void CreateEntities(List<ObjectId> entities)
+        public void CreateEntities(List<Curve> entities)
         {
-            entities.ForEach(p => _listBox.Items.Add(p.Key));
+            entities.ForEach(p => _listBox.Items.Add(p.ObjectId.Key));
         }
 
         public void DeleteEntities(List<ObjectId> idList)
         {
-            idList.ForEach(p => _listBox.Items.Remove(p.Key));
+            idList.ForEach(p => { if (_listBox.Items.Contains(p.Key)) _listBox.Items.Remove(p.Key); });
         }
-
     }
 }

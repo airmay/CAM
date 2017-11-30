@@ -24,22 +24,28 @@ namespace CAM.Domain
             Y = y;
             Z = z;
         }
+
+        public static Point3d Origin { get; } = new Point3d(0, 0, 0);
         public double X { get; }
         public double Y { get; }
-        public double Z { get; }
+        public double Z { get; set; }
 
+        public static bool operator ==(Point3d p1, Point3d p2) => p1.X == p2.X && p1.Y == p2.Y && p1.Z == p2.Z;
+
+        public static bool operator !=(Point3d p1, Point3d p2) => !(p1 == p2);
     }
 
-    public class Curve
+    public abstract class Curve
     {
         public ObjectId ObjectId { get; set; }
-        
-        public Point3d EndPoint { get; set; }
+
+        public Point3d EndPoint = new Point3d(2, 2, 0);
 
         public double Length { get; }
 
-        public Point3d StartPoint { get; set; }
+        public Point3d StartPoint = new Point3d(1, 1, 0);
 
+        public abstract Curve GetOffsetCurves(double dz = 0);
     }
 
     public class Line : Curve
@@ -55,7 +61,15 @@ namespace CAM.Domain
             EndPoint = pointer2;
         }
         public double Angle { get; }
-}
+
+        public override Curve GetOffsetCurves(double dz = 0)
+        {
+            var line = new Line(StartPoint, EndPoint);
+            line.StartPoint.Z += dz;
+            line.EndPoint.Z += dz;
+            return line;
+        }
+    }
 
     public class Arc : Curve
     {
@@ -79,5 +93,13 @@ namespace CAM.Domain
         public double EndAngle { get; set; }
 
         public double StartAngle { get; set; }
+
+        public override Curve GetOffsetCurves(double dz = 0)
+        {
+            var arc = new Arc(Center, Radius, StartAngle, EndAngle);
+            arc.StartPoint.Z += dz;
+            arc.EndPoint.Z += dz;
+            return arc;
+        }
     }
 }

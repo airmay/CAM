@@ -155,10 +155,14 @@ namespace CAM.UI
 
         private void bBuildProcessing_Click(object sender, EventArgs e)
         {
+            if (treeView.Nodes.Count == 0)
+                return;
             var rootNode = GetRootNode();
             _techProcessService.BuildProcessing(((TechProcessNode)rootNode).TechProcess);
             _techProcessTreeBuilder.RebuildTechProcessTree(rootNode);
-            rootNode.ExpandAll();
+            rootNode.Expand();
+            foreach (TreeNode node in rootNode.Nodes)
+                node.Expand();
         }
     }
 }

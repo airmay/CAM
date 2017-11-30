@@ -19,6 +19,9 @@ namespace CAM.Domain
         /// </summary>
         public readonly ObjectId AcadObjectId;
 
+        public Curve Curve { get; set; }
+
+
         /// <summary>
         /// Тип обрабатываемой области
         /// </summary>
@@ -68,6 +71,7 @@ namespace CAM.Domain
         /// <param name="curve"></param>
         protected virtual void Set(Curve curve)
         {
+            Curve = curve;
             StartPoint = curve.StartPoint;
             EndPoint = curve.EndPoint;
             Length = curve.Length;

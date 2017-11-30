@@ -16,6 +16,6 @@ namespace CAM.Domain
         /// Создает обработку по технологической операции
         /// </summary>
         /// <returns></returns>
-        void BuildProcessing();
+        void BuildProcessing(ProcessBuilder actionGenerator);
     }
 }

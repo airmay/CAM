@@ -39,6 +39,6 @@ namespace CAM.Domain
             ProcessingArea = processingArea;
         }
 
-        public abstract void BuildProcessing();
+        public abstract void BuildProcessing(ProcessBuilder actionGenerator);
     }
 }
