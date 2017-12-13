@@ -12,6 +12,11 @@ namespace CAM.Domain
     public abstract class SawingTechOperation : TechOperation
     {
         /// <summary>
+        /// Вид технологической операции
+        /// </summary>
+        public override TechOperationType Type { get; } = TechOperationType.Sawing;
+
+        /// <summary>
         /// Параметры технологической операции
         /// </summary>
         public SawingTechOperationParams TechOperationParams { get; }

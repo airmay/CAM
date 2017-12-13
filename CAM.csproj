@@ -62,6 +62,7 @@
     <Compile Include="Domain\CuttingDiscTechnonogy.cs" />
     <Compile Include="Domain\SawingTechOperation\SawingDefaultParams.cs" />
     <Compile Include="Domain\ScemaLogicProgramGenerator.cs" />
+    <Compile Include="Domain\TechOperationType.cs" />
     <Compile Include="Domain\TechProcessCommand.cs" />
     <Compile Include="Domain\ITechnonogy.cs" />
     <Compile Include="Domain\ITechOperation.cs" />

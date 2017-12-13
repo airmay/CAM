@@ -12,6 +12,11 @@ namespace CAM.Domain
     public abstract class TechOperation : ITechOperation
     {
         /// <summary>
+        /// Вид технологической операции
+        /// </summary>
+        public abstract TechOperationType Type { get; }
+
+        /// <summary>
         /// Технологический процесс обработки
         /// </summary>
         public TechProcess TechProcess { get; }

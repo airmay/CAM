@@ -42,7 +42,7 @@
             this.label2 = new System.Windows.Forms.Label();
             this.cbTechOperation = new System.Windows.Forms.ComboBox();
             this.label3 = new System.Windows.Forms.Label();
-            this.gbTechOperation = new System.Windows.Forms.GroupBox();
+            this.gbTechOperationParams = new System.Windows.Forms.GroupBox();
             this.gbTechProcessParams.SuspendLayout();
             this.gbTool.SuspendLayout();
             this.SuspendLayout();
@@ -120,9 +120,9 @@
             this.gbTool.Controls.Add(this.label1);
             this.gbTool.Controls.Add(this.edToolNumber);
             this.gbTool.Controls.Add(this.lbToolNumber);
-            this.gbTool.Location = new System.Drawing.Point(3, 73);
+            this.gbTool.Location = new System.Drawing.Point(13, 73);
             this.gbTool.Name = "gbTool";
-            this.gbTool.Size = new System.Drawing.Size(188, 104);
+            this.gbTool.Size = new System.Drawing.Size(178, 101);
             this.gbTool.TabIndex = 4;
             this.gbTool.TabStop = false;
             this.gbTool.Text = "Инструмент";
@@ -130,7 +130,7 @@
             // lbToolNumber
             // 
             this.lbToolNumber.AutoSize = true;
-            this.lbToolNumber.Location = new System.Drawing.Point(6, 25);
+            this.lbToolNumber.Location = new System.Drawing.Point(20, 22);
             this.lbToolNumber.Name = "lbToolNumber";
             this.lbToolNumber.Size = new System.Drawing.Size(41, 13);
             this.lbToolNumber.TabIndex = 3;
@@ -138,7 +138,7 @@
             // 
             // edToolNumber
             // 
-            this.edToolNumber.Location = new System.Drawing.Point(65, 22);
+            this.edToolNumber.Location = new System.Drawing.Point(79, 19);
             this.edToolNumber.Multiline = true;
             this.edToolNumber.Name = "edToolNumber";
             this.edToolNumber.Size = new System.Drawing.Size(58, 20);
@@ -146,7 +146,7 @@
             // 
             // edDiameter
             // 
-            this.edDiameter.Location = new System.Drawing.Point(65, 48);
+            this.edDiameter.Location = new System.Drawing.Point(79, 45);
             this.edDiameter.Multiline = true;
             this.edDiameter.Name = "edDiameter";
             this.edDiameter.Size = new System.Drawing.Size(58, 20);
@@ -155,7 +155,7 @@
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(6, 51);
+            this.label1.Location = new System.Drawing.Point(20, 48);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(53, 13);
             this.label1.TabIndex = 5;
@@ -163,7 +163,7 @@
             // 
             // edThickness
             // 
-            this.edThickness.Location = new System.Drawing.Point(65, 74);
+            this.edThickness.Location = new System.Drawing.Point(79, 71);
             this.edThickness.Multiline = true;
             this.edThickness.Name = "edThickness";
             this.edThickness.Size = new System.Drawing.Size(58, 20);
@@ -172,7 +172,7 @@
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(6, 77);
+            this.label2.Location = new System.Drawing.Point(20, 74);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(53, 13);
             this.label2.TabIndex = 7;
@@ -185,37 +185,38 @@
             this.cbTechOperation.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cbTechOperation.FormattingEnabled = true;
             this.cbTechOperation.Items.AddRange(new object[] {
-            "Распил",
+            "Распиловка",
             "Профилирование"});
-            this.cbTechOperation.Location = new System.Drawing.Point(91, 183);
+            this.cbTechOperation.Location = new System.Drawing.Point(91, 180);
             this.cbTechOperation.Name = "cbTechOperation";
             this.cbTechOperation.Size = new System.Drawing.Size(100, 21);
             this.cbTechOperation.TabIndex = 6;
+            this.cbTechOperation.SelectedIndexChanged += new System.EventHandler(this.cbTechOperation_SelectedIndexChanged);
             // 
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(9, 186);
+            this.label3.Location = new System.Drawing.Point(10, 183);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(76, 13);
             this.label3.TabIndex = 5;
             this.label3.Text = "Тех.операция";
             // 
-            // gbTechOperation
+            // gbTechOperationParams
             // 
-            this.gbTechOperation.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.gbTechOperation.Location = new System.Drawing.Point(0, 211);
-            this.gbTechOperation.Name = "gbTechOperation";
-            this.gbTechOperation.Size = new System.Drawing.Size(203, 216);
-            this.gbTechOperation.TabIndex = 7;
-            this.gbTechOperation.TabStop = false;
-            this.gbTechOperation.Text = "Параметры тех. операции";
+            this.gbTechOperationParams.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.gbTechOperationParams.Location = new System.Drawing.Point(0, 211);
+            this.gbTechOperationParams.Name = "gbTechOperationParams";
+            this.gbTechOperationParams.Size = new System.Drawing.Size(203, 216);
+            this.gbTechOperationParams.TabIndex = 7;
+            this.gbTechOperationParams.TabStop = false;
+            this.gbTechOperationParams.Text = "Параметры тех. операции";
             // 
             // TechProcessParamsView
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.Controls.Add(this.gbTechOperation);
+            this.Controls.Add(this.gbTechOperationParams);
             this.Controls.Add(this.gbTechProcessParams);
             this.Name = "TechProcessParamsView";
             this.Size = new System.Drawing.Size(203, 427);
@@ -243,6 +244,6 @@
         private System.Windows.Forms.Label lbMachine;
         private System.Windows.Forms.ComboBox cbTechOperation;
         private System.Windows.Forms.Label label3;
-        private System.Windows.Forms.GroupBox gbTechOperation;
+        private System.Windows.Forms.GroupBox gbTechOperationParams;
     }
 }
