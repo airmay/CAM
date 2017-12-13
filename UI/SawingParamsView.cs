@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using CAM.Domain;
 
 namespace CAM.UI
 {
@@ -17,9 +18,9 @@ namespace CAM.UI
             InitializeComponent();
         }
 
-        private void gvSawingModes_DataError(object sender, DataGridViewDataErrorEventArgs e)
+        private void sawingParamsBindingSource_DataSourceChanged(object sender, EventArgs e)
         {
-            MessageBox.Show("Введите корректное числовое значение", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            sawingModesView.sawingModesBindingSource.DataSource = ((SawingTechOperationParams)sawingParamsBindingSource.DataSource).Modes;
         }
     }
 }

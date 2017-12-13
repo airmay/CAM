@@ -60,6 +60,7 @@
     <Compile Include="Domain\ProcessActionNames.cs" />
     <Compile Include="Domain\ProcessingArea\ArcProcessingArea.cs" />
     <Compile Include="Domain\CuttingDiscTechnonogy.cs" />
+    <Compile Include="Domain\SawingTechOperation\SawingDefaultParams.cs" />
     <Compile Include="Domain\ScemaLogicProgramGenerator.cs" />
     <Compile Include="Domain\TechProcessCommand.cs" />
     <Compile Include="Domain\ITechnonogy.cs" />
@@ -94,6 +95,18 @@
     <Compile Include="UI\ProgramView.Designer.cs">
       <DependentUpon>ProgramView.cs</DependentUpon>
     </Compile>
+    <Compile Include="UI\SawingModesView.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="UI\SawingModesView.Designer.cs">
+      <DependentUpon>SawingModesView.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UI\SawingParamsDefaultView.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="UI\SawingParamsDefaultView.Designer.cs">
+      <DependentUpon>SawingParamsDefaultView.cs</DependentUpon>
+    </Compile>
     <Compile Include="UI\SawingParamsView.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -118,10 +131,8 @@
     <Compile Include="UI\TreeViewExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Properties\DataSources\CAM.Domain.ProcessingParams.datasource" />
-    <None Include="Properties\DataSources\CAM.Domain.Product.datasource" />
+    <None Include="Properties\DataSources\CAM.Domain.SawingMode.datasource" />
     <None Include="Properties\DataSources\CAM.Domain.SawingTechOperationParams.datasource" />
-    <None Include="Properties\DataSources\CAM.Domain.Segment.datasource" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Properties\Resources.resx">
@@ -130,6 +141,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="UI\ProgramView.resx">
       <DependentUpon>ProgramView.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UI\SawingModesView.resx">
+      <DependentUpon>SawingModesView.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UI\SawingParamsDefaultView.resx">
+      <DependentUpon>SawingParamsDefaultView.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="UI\SawingParamsView.resx">
       <DependentUpon>SawingParamsView.cs</DependentUpon>

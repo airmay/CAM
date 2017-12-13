@@ -16,7 +16,7 @@ namespace CAM.Domain
         public string Generate(TechProcess techProcess)
         {
             var program = new StringBuilder();
-            program.AppendLine($"; Программа обработки для станка Denver {DateTime.Now}");
+            //program.AppendLine($"; Программа обработки для станка Denver {DateTime.Now}");
             program.AppendLine("98");
             program.AppendLine("97 2 1");
             program.AppendLine("17 XYCZ");

@@ -12,6 +12,11 @@ namespace CAM.Domain
     public class SawingTechOperationParams
     {
         /// <summary>
+        /// Скорость заглубления
+        /// </summary>
+        public int PenetrationRate { get; set; } = 250;
+
+        /// <summary>
         /// Режимы распиловки
         /// </summary>
         public List<SawingMode> Modes { get; } = new List<SawingMode>();
@@ -27,15 +32,9 @@ namespace CAM.Domain
         public bool IsExactlyEnd { get; set; }
 
         /// <summary>
-        /// Расчет параметра "Точно начало"
+        /// Компенсация
         /// </summary>
-        public bool CalcExactlyBegin { get; set; } = true;
-
-        /// <summary>
-        /// Расчет параметра "Точно конец"
-        /// </summary>
-        public bool CalcExactlyEnd { get; set; } = true;
-
+        public double Compensation { get; set; }
 
         public SawingTechOperationParams Clone()
         {
