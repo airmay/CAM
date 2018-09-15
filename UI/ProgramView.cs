@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using CAM.Domain;
 
 namespace CAM.UI
 {
@@ -17,9 +18,9 @@ namespace CAM.UI
             InitializeComponent();
         }
 
-        public void ShowProgram(string program)
+        public void ShowProgram(List<ProgramLine> program)
         {
-            textBox.Text = program;
+            dataGridView.DataSource = program;
         }
     }
 }

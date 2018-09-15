@@ -38,7 +38,7 @@ namespace CAM.Domain
 
         public TechProcess CreateTechProcess()
         {
-            var techProcess = new TechProcess($"Изделие{_techProcessList.Count + 1}", _techProcessParams);
+            var techProcess = new TechProcess($"Обработка{_techProcessList.Count + 1}", _techProcessParams);
             _techProcessList.Add(techProcess);
             CreateTechOperations(techProcess);
             return techProcess;
@@ -114,9 +114,9 @@ namespace CAM.Domain
 
     public class ProgramEventArgs : EventArgs
     {
-        public string Program { get; set; }
+        public List<ProgramLine> Program { get; set; }
 
-        public ProgramEventArgs(string program)
+        public ProgramEventArgs(List<ProgramLine> program)
         {
             Program = program;
         }
