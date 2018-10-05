@@ -2,7 +2,6 @@
 using System.Windows.Forms;
 using CAM.Domain;
 using System.Linq;
-using CAM.Properties;
 
 namespace CAM.UI
 {
@@ -17,7 +16,7 @@ namespace CAM.UI
         {
             InitializeComponent();
 
-            imageList.Images.AddRange(new[] { Resources.drive, Resources.drive_download, Resources.folder__arrow, Resources.gear__arrow });
+            imageList.Images.AddRange(new[] { Properties.Resources.drive, Properties.Resources.drive_download, Properties.Resources.folder__arrow, Properties.Resources.gear__arrow });
             splitContainer1.Panel2.Controls.Add(_techProcessParamsView);
             splitContainer1.Panel2.Controls.Add(_techOperationParamsView);
             foreach (Control control in splitContainer1.Panel2.Controls)

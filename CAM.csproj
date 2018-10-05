@@ -90,7 +90,6 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <Compile Include="Domain\ProgramLine.cs" />
     <Compile Include="UI\ProgramView.cs">
       <SubType>UserControl</SubType>
     </Compile>

@@ -29,10 +29,9 @@
         private void InitializeComponent()
         {
             this.toolStrip1 = new System.Windows.Forms.ToolStrip();
+            this.textBox = new System.Windows.Forms.TextBox();
             this.bSendProgram = new System.Windows.Forms.ToolStripButton();
-            this.dataGridView = new System.Windows.Forms.DataGridView();
             this.toolStrip1.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.dataGridView)).BeginInit();
             this.SuspendLayout();
             // 
             // toolStrip1
@@ -45,6 +44,15 @@
             this.toolStrip1.TabIndex = 0;
             this.toolStrip1.Text = "toolStrip1";
             // 
+            // textBox
+            // 
+            this.textBox.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.textBox.Location = new System.Drawing.Point(0, 25);
+            this.textBox.Multiline = true;
+            this.textBox.Name = "textBox";
+            this.textBox.Size = new System.Drawing.Size(413, 500);
+            this.textBox.TabIndex = 1;
+            // 
             // bSendProgram
             // 
             this.bSendProgram.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
@@ -55,26 +63,16 @@
             this.bSendProgram.Text = "toolStripButton1";
             this.bSendProgram.ToolTipText = "Загрузить программу на станок";
             // 
-            // dataGridView
-            // 
-            this.dataGridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dataGridView.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.dataGridView.Location = new System.Drawing.Point(0, 25);
-            this.dataGridView.Name = "dataGridView";
-            this.dataGridView.Size = new System.Drawing.Size(413, 500);
-            this.dataGridView.TabIndex = 1;
-            // 
             // ProgramView
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.Controls.Add(this.dataGridView);
+            this.Controls.Add(this.textBox);
             this.Controls.Add(this.toolStrip1);
             this.Name = "ProgramView";
             this.Size = new System.Drawing.Size(413, 525);
             this.toolStrip1.ResumeLayout(false);
             this.toolStrip1.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.dataGridView)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -84,6 +82,6 @@
 
         private System.Windows.Forms.ToolStrip toolStrip1;
         private System.Windows.Forms.ToolStripButton bSendProgram;
-        private System.Windows.Forms.DataGridView dataGridView;
+        private System.Windows.Forms.TextBox textBox;
     }
 }
