@@ -36,6 +36,11 @@ namespace CAM.Domain
         /// </summary>
         public double Compensation { get; set; }
 
+        /// <summary>
+        ///  Первый проход по поверхности
+        /// </summary>
+        public bool IsFirstPassOnSurface { get; internal set; }
+
         public SawingTechOperationParams Clone()
         {
             var sawingTechOperationParams = new SawingTechOperationParams();

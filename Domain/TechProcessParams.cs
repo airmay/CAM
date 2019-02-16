@@ -11,6 +11,12 @@ namespace CAM.Domain
     /// </summary>
     public class TechProcessParams
     {
+
+        /// <summary>
+        /// Толщина заготовки
+        /// </summary>
+        public int BilletThickness { get; set; }
+
         /// <summary>
         /// Высота подъема инструмента
         /// </summary>

@@ -45,7 +45,7 @@ namespace CAM.Domain
 
         public Point3d StartPoint = new Point3d(1, 1, 0);
 
-        public abstract Curve GetOffsetCurves(double dz = 0);
+        public abstract Curve GetOffsetCurves(double offset = 0, double dz = 0);
     }
 
     public class Line : Curve
@@ -62,7 +62,7 @@ namespace CAM.Domain
         }
         public double Angle { get; }
 
-        public override Curve GetOffsetCurves(double dz = 0)
+        public override Curve GetOffsetCurves(double offset = 0, double dz = 0)
         {
             var line = new Line(StartPoint, EndPoint);
             line.StartPoint.Z += dz;
@@ -94,7 +94,7 @@ namespace CAM.Domain
 
         public double StartAngle { get; set; }
 
-        public override Curve GetOffsetCurves(double dz = 0)
+        public override Curve GetOffsetCurves(double offset = 0, double dz = 0)
         {
             var arc = new Arc(Center, Radius, StartAngle, EndAngle);
             arc.StartPoint.Z += dz;

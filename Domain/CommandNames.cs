@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace CAM.Domain
 {
-    public static class ProcessActionNames
+    public static class CommandNames
     {
         public const string Approach = "Подвод";
         public const string Departure = "Отвод";

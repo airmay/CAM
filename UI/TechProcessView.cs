@@ -17,9 +17,9 @@ namespace CAM.UI
             InitializeComponent();
 
             imageList.Images.AddRange(new[] { Properties.Resources.drive, Properties.Resources.drive_download, Properties.Resources.folder__arrow, Properties.Resources.gear__arrow });
-            splitContainer1.Panel2.Controls.Add(_techProcessParamsView);
-            splitContainer1.Panel2.Controls.Add(_techOperationParamsView);
-            foreach (Control control in splitContainer1.Panel2.Controls)
+            tabPageParams.Controls.Add(_techProcessParamsView);
+            tabPageParams.Controls.Add(_techOperationParamsView);
+            foreach (Control control in tabPageParams.Controls)
                 control.Dock = DockStyle.Fill;
         }
 

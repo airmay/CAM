@@ -30,33 +30,56 @@ namespace CAM.Domain
 
         public override void BuildProcessing(ProcessBuilder builder)
         {
-            ProcessActions.Clear();
-            builder.ProcessActions = ProcessActions;
-
-            builder.SetGroup(ProcessActionNames.Approach);
-            builder.Move(ProcessingArea.StartPoint.X, ProcessingArea.StartPoint.Y);
-            builder.Descent(0);
+            builder.Setup(ProcessingArea.Curve);
             var modes = TechOperationParams.Modes.OrderBy(p => p.Depth).GetEnumerator();
             modes.MoveNext();
             var mode = modes.Current;
-            var pass = 1;
-            int z = ProcessingArea.Type == ProcessingAreaType.Arc ? -mode.DepthStep : 0;
-            while (true)
+            int z = TechOperationParams.IsFirstPassOnSurface ? 0 : -mode.DepthStep;
+            var billetThickness = TechProcess.TechProcessParams.BilletThickness;
+            do
             {
                 z += mode.DepthStep;
-                if (z > mode.Depth)
-                {
-                    if (modes.MoveNext())
-                        mode = modes.Current;
-                    else
-                        break;
-                }
-                builder.SetGroup($"{pass++} {ProcessActionNames.Pass} Z{-z}");
+                if (z > mode.Depth && modes.MoveNext())
+                    mode = modes.Current;
+                if (z > billetThickness)
+                    z = billetThickness;
                 builder.Penetration(-z);
                 builder.Cutting(ProcessingArea.Curve, dz: -z, feed: mode.Feed);
             }
-            builder.SetGroup(ProcessActionNames.Departure);
+            while (z < billetThickness);
             builder.Uplifting();
         }
+
+        //public override void BuildProcessing(ProcessBuilder builder)
+        //{
+        //    ProcessActions.Clear();
+        //    builder.ProcessActions = ProcessActions;
+
+        //    builder.SetGroup(CommandNames.Approach);
+        //    builder.Move(ProcessingArea.StartPoint.X, ProcessingArea.StartPoint.Y);
+        //    builder.Descent(0);
+        //    var modes = TechOperationParams.Modes.OrderBy(p => p.Depth).GetEnumerator();
+        //    modes.MoveNext();
+        //    var mode = modes.Current;
+        //    var pass = 1;
+        //    int z = ProcessingArea.Type == ProcessingAreaType.Arc ? -mode.DepthStep : 0;
+        //    while (true)
+        //    {
+        //        z += mode.DepthStep;
+        //        if (z > mode.Depth)
+        //        {
+        //            if (modes.MoveNext())
+        //                mode = modes.Current;
+        //            else
+        //                break;
+        //        }
+        //        builder.SetGroup($"{pass++} {CommandNames.Pass} Z{-z}");
+        //        builder.Penetration(-z);
+        //        builder.Cutting(ProcessingArea.Curve, dz: -z, feed: mode.Feed);
+        //    }
+        //    builder.SetGroup(CommandNames.Departure);
+        //    builder.Uplifting();
+        //}
+
     }
 }

@@ -36,6 +36,11 @@ namespace CAM.Domain
         /// </summary>
         public List<ProcessAction> ProcessActions { get; } = new List<ProcessAction>();
 
+        /// <summary>
+        /// Команды
+        /// </summary>
+        public List<ProcessCommand> ProcessCommands { get; } = new List<ProcessCommand>();
+
         protected TechOperation(TechProcess techProcess, ProcessingArea processingArea)
         {
             TechProcess = techProcess;

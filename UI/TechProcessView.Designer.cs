@@ -42,12 +42,29 @@
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.bBuildProcessing = new System.Windows.Forms.ToolStripButton();
             this.panel2 = new System.Windows.Forms.Panel();
+            this.tabControl = new System.Windows.Forms.TabControl();
+            this.tabPageParams = new System.Windows.Forms.TabPage();
+            this.tabPageCommands = new System.Windows.Forms.TabPage();
+            this.dataGridView1 = new System.Windows.Forms.DataGridView();
+            this.processCommandBindingSource = new System.Windows.Forms.BindingSource(this.components);
+            this.descriptionDataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.codeDataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.param1DataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.param2DataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.param3DataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.param4DataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.param5DataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
+            this.splitContainer1.Panel2.SuspendLayout();
             this.splitContainer1.SuspendLayout();
             this.panel1.SuspendLayout();
             this.toolStrip1.SuspendLayout();
             this.panel2.SuspendLayout();
+            this.tabControl.SuspendLayout();
+            this.tabPageCommands.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.processCommandBindingSource)).BeginInit();
             this.SuspendLayout();
             // 
             // splitContainer1
@@ -60,6 +77,10 @@
             // splitContainer1.Panel1
             // 
             this.splitContainer1.Panel1.Controls.Add(this.treeView);
+            // 
+            // splitContainer1.Panel2
+            // 
+            this.splitContainer1.Panel2.Controls.Add(this.tabControl);
             this.splitContainer1.Size = new System.Drawing.Size(312, 711);
             this.splitContainer1.SplitterDistance = 346;
             this.splitContainer1.TabIndex = 0;
@@ -185,6 +206,116 @@
             this.panel2.Size = new System.Drawing.Size(312, 711);
             this.panel2.TabIndex = 3;
             // 
+            // tabControl
+            // 
+            this.tabControl.Controls.Add(this.tabPageParams);
+            this.tabControl.Controls.Add(this.tabPageCommands);
+            this.tabControl.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tabControl.Location = new System.Drawing.Point(0, 0);
+            this.tabControl.Name = "tabControl";
+            this.tabControl.SelectedIndex = 0;
+            this.tabControl.Size = new System.Drawing.Size(312, 361);
+            this.tabControl.TabIndex = 0;
+            // 
+            // tabPageParams
+            // 
+            this.tabPageParams.Location = new System.Drawing.Point(4, 22);
+            this.tabPageParams.Name = "tabPageParams";
+            this.tabPageParams.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPageParams.Size = new System.Drawing.Size(304, 335);
+            this.tabPageParams.TabIndex = 0;
+            this.tabPageParams.Text = "Параметры";
+            this.tabPageParams.UseVisualStyleBackColor = true;
+            // 
+            // tabPageCommands
+            // 
+            this.tabPageCommands.Controls.Add(this.dataGridView1);
+            this.tabPageCommands.Location = new System.Drawing.Point(4, 22);
+            this.tabPageCommands.Name = "tabPageCommands";
+            this.tabPageCommands.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPageCommands.Size = new System.Drawing.Size(304, 335);
+            this.tabPageCommands.TabIndex = 1;
+            this.tabPageCommands.Text = "Программа";
+            this.tabPageCommands.UseVisualStyleBackColor = true;
+            // 
+            // dataGridView1
+            // 
+            this.dataGridView1.AutoGenerateColumns = false;
+            this.dataGridView1.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.DisplayedCellsExceptHeader;
+            this.dataGridView1.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.dataGridView1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.dataGridView1.ColumnHeadersVisible = false;
+            this.dataGridView1.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
+            this.descriptionDataGridViewTextBoxColumn,
+            this.codeDataGridViewTextBoxColumn,
+            this.param1DataGridViewTextBoxColumn,
+            this.param2DataGridViewTextBoxColumn,
+            this.param3DataGridViewTextBoxColumn,
+            this.param4DataGridViewTextBoxColumn,
+            this.param5DataGridViewTextBoxColumn});
+            this.dataGridView1.DataSource = this.processCommandBindingSource;
+            this.dataGridView1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.dataGridView1.EditMode = System.Windows.Forms.DataGridViewEditMode.EditOnEnter;
+            this.dataGridView1.Location = new System.Drawing.Point(3, 3);
+            this.dataGridView1.Name = "dataGridView1";
+            this.dataGridView1.RowHeadersVisible = false;
+            this.dataGridView1.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.CellSelect;
+            this.dataGridView1.Size = new System.Drawing.Size(298, 329);
+            this.dataGridView1.TabIndex = 0;
+            // 
+            // processCommandBindingSource
+            // 
+            this.processCommandBindingSource.DataSource = typeof(CAM.Domain.ProcessCommand);
+            // 
+            // descriptionDataGridViewTextBoxColumn
+            // 
+            this.descriptionDataGridViewTextBoxColumn.DataPropertyName = "Description";
+            this.descriptionDataGridViewTextBoxColumn.HeaderText = "Description";
+            this.descriptionDataGridViewTextBoxColumn.Name = "descriptionDataGridViewTextBoxColumn";
+            this.descriptionDataGridViewTextBoxColumn.Width = 21;
+            // 
+            // codeDataGridViewTextBoxColumn
+            // 
+            this.codeDataGridViewTextBoxColumn.DataPropertyName = "Code";
+            this.codeDataGridViewTextBoxColumn.HeaderText = "Code";
+            this.codeDataGridViewTextBoxColumn.Name = "codeDataGridViewTextBoxColumn";
+            this.codeDataGridViewTextBoxColumn.Width = 21;
+            // 
+            // param1DataGridViewTextBoxColumn
+            // 
+            this.param1DataGridViewTextBoxColumn.DataPropertyName = "Param1";
+            this.param1DataGridViewTextBoxColumn.HeaderText = "Param1";
+            this.param1DataGridViewTextBoxColumn.Name = "param1DataGridViewTextBoxColumn";
+            this.param1DataGridViewTextBoxColumn.Width = 21;
+            // 
+            // param2DataGridViewTextBoxColumn
+            // 
+            this.param2DataGridViewTextBoxColumn.DataPropertyName = "Param2";
+            this.param2DataGridViewTextBoxColumn.HeaderText = "Param2";
+            this.param2DataGridViewTextBoxColumn.Name = "param2DataGridViewTextBoxColumn";
+            this.param2DataGridViewTextBoxColumn.Width = 21;
+            // 
+            // param3DataGridViewTextBoxColumn
+            // 
+            this.param3DataGridViewTextBoxColumn.DataPropertyName = "Param3";
+            this.param3DataGridViewTextBoxColumn.HeaderText = "Param3";
+            this.param3DataGridViewTextBoxColumn.Name = "param3DataGridViewTextBoxColumn";
+            this.param3DataGridViewTextBoxColumn.Width = 21;
+            // 
+            // param4DataGridViewTextBoxColumn
+            // 
+            this.param4DataGridViewTextBoxColumn.DataPropertyName = "Param4";
+            this.param4DataGridViewTextBoxColumn.HeaderText = "Param4";
+            this.param4DataGridViewTextBoxColumn.Name = "param4DataGridViewTextBoxColumn";
+            this.param4DataGridViewTextBoxColumn.Width = 21;
+            // 
+            // param5DataGridViewTextBoxColumn
+            // 
+            this.param5DataGridViewTextBoxColumn.DataPropertyName = "Param5";
+            this.param5DataGridViewTextBoxColumn.HeaderText = "Param5";
+            this.param5DataGridViewTextBoxColumn.Name = "param5DataGridViewTextBoxColumn";
+            this.param5DataGridViewTextBoxColumn.Width = 21;
+            // 
             // TechProcessView
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -194,6 +325,7 @@
             this.Name = "TechProcessView";
             this.Size = new System.Drawing.Size(312, 736);
             this.splitContainer1.Panel1.ResumeLayout(false);
+            this.splitContainer1.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).EndInit();
             this.splitContainer1.ResumeLayout(false);
             this.panel1.ResumeLayout(false);
@@ -201,6 +333,10 @@
             this.toolStrip1.ResumeLayout(false);
             this.toolStrip1.PerformLayout();
             this.panel2.ResumeLayout(false);
+            this.tabControl.ResumeLayout(false);
+            this.tabPageCommands.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.processCommandBindingSource)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -221,5 +357,17 @@
         private System.Windows.Forms.ImageList imageList;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
         private System.Windows.Forms.ToolStripButton bBuildProcessing;
+        private System.Windows.Forms.TabControl tabControl;
+        private System.Windows.Forms.TabPage tabPageParams;
+        private System.Windows.Forms.TabPage tabPageCommands;
+        private System.Windows.Forms.DataGridView dataGridView1;
+        private System.Windows.Forms.DataGridViewTextBoxColumn descriptionDataGridViewTextBoxColumn;
+        private System.Windows.Forms.DataGridViewTextBoxColumn codeDataGridViewTextBoxColumn;
+        private System.Windows.Forms.DataGridViewTextBoxColumn param1DataGridViewTextBoxColumn;
+        private System.Windows.Forms.DataGridViewTextBoxColumn param2DataGridViewTextBoxColumn;
+        private System.Windows.Forms.DataGridViewTextBoxColumn param3DataGridViewTextBoxColumn;
+        private System.Windows.Forms.DataGridViewTextBoxColumn param4DataGridViewTextBoxColumn;
+        private System.Windows.Forms.DataGridViewTextBoxColumn param5DataGridViewTextBoxColumn;
+        private System.Windows.Forms.BindingSource processCommandBindingSource;
     }
 }
