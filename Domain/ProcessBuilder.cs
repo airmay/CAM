@@ -20,6 +20,7 @@ namespace CAM.Domain
         private int _currentFeed;
         private TechProcessParams _techProcessParams;
         private Curve _curve;
+        private double[] _toolAngles;
 
         public List<Curve> Entities { get; } = new List<Curve>();
 
@@ -44,12 +45,13 @@ namespace CAM.Domain
         internal void Setup(Curve curve, Corner corner = Corner.Start)
         {
             _curve = curve;
+            _toolAngles = CalcToolAngles(curve);
             string name = _currentPoint == Point3d.Origin ? CommandNames.InitialMove : CommandNames.Fast;
             Line line = null;
             var z = _techProcessParams.ZSafety;
-            //var destPoint = corner == Corner.Start ? curve.st;
+            var destPoint = corner == Corner.Start ? curve.StartPoint : curve.EndPoint;
             if (_currentPoint != Point3d.Origin)
-                CreateCommand(name, "0", line, "XYC", 0, x, y, c);
+                CreateCommand(name, "0", line, "XYC", 0, destPoint.X, destPoint.Y, c);
             CreateCommand(name, "0", line, "XYZ", 0, x, y, z);
             if (_currentPoint == Point3d.Origin)
             {
@@ -67,6 +69,44 @@ namespace CAM.Domain
             CreateCommand("Setup", "28", plane: "XYCZ");  // цикл
             _currentPoint = destPoint;
         }
+
+        private double[] CalcToolAngles(Curve curve)
+        {
+            var angles = new double[2];
+            switch (curve)
+            {
+                case Line line:
+                    angles[0] = angles[1] = ToDeg((Math.PI * 2 - line.Angle) % Math.PI);
+                    break;
+                case Arc arc:
+    //                if (obj.ObjectType == ObjectType.Arc && (
+    //(obj.ProcessArc.StartAngle < cPI2 && obj.ProcessArc.EndAngle > cPI2) ||
+    //(obj.ProcessArc.StartAngle < cPI + cPI2 && (obj.ProcessArc.EndAngle > cPI + cPI2 || obj.ProcessArc.EndAngle < obj.ProcessArc.StartAngle))))
+    //                {
+    //                    Application.ShowAlertDialog("Обработка дуги невозможна - дуга пересекает угол 90 или 270 градусов. Текущие углы: начальный " +
+    //                        (180 / cPI * obj.ProcessArc.StartAngle).ToString() + ", конечный " + (180 / cPI * obj.ProcessArc.EndAngle).ToString());
+    //                    //Application.ShowAlertDialog($"Обработка дуги {obj} невозможна - дуга пересекает угол 90 или 270 градусов. Текущие углы: начальный {180 / cPI * obj.ProcessArc.StartAngle}, конечный {180 / cPI * obj.ProcessArc.EndAngle}");
+    //                    return;
+    //                }
+                    bool isLeftArc = arc.StartAngle >= Math.PI * 0.5 && arc.StartAngle < Math.PI * 1.5;
+                    angles[(int)Corner.Start] = calc(arc.StartAngle, isLeftArc);
+                    angles[(int)Corner.End] = calc(arc.EndAngle, isLeftArc);
+                    break;
+                default:
+                    throw new Exception($"Неподдерживаемый тип кривой {curve.GetType()}");
+            }
+            return angles;
+
+            double calc(double angle, bool isLeftArc)
+            {
+                var c = (Math.PI * 2.5 - angle) % Math.PI;
+                if (c == 0 && !isLeftArc ^ angle == Math.PI / 2)
+                    c = Math.PI;
+                return c;
+            }
+        }
+
+
 
         public void SetTool(double x, double y, double c)
         {
