@@ -19,6 +19,7 @@ namespace CAM.Domain
         private Point3d _currentPoint = Point3d.Origin;
         private int _currentFeed;
         private TechProcessParams _techProcessParams;
+        private Curve _curve;
 
         public List<Curve> Entities { get; } = new List<Curve>();
 
@@ -40,9 +41,31 @@ namespace CAM.Domain
             Entities.Add(line);
         }
 
-        internal void Setup(Curve curve)
+        internal void Setup(Curve curve, Corner corner = Corner.Start)
         {
-            throw new NotImplementedException();
+            _curve = curve;
+            string name = _currentPoint == Point3d.Origin ? CommandNames.InitialMove : CommandNames.Fast;
+            Line line = null;
+            var z = _techProcessParams.ZSafety;
+            //var destPoint = corner == Corner.Start ? curve.st;
+            if (_currentPoint != Point3d.Origin)
+                CreateCommand(name, "0", line, "XYC", 0, x, y, c);
+            CreateCommand(name, "0", line, "XYZ", 0, x, y, z);
+            if (_currentPoint == Point3d.Origin)
+            {
+                name = "Setup";
+                CreateCommand(name, "97;7");
+                CreateCommand(name, "97;8");
+                CreateCommand(name, "97;3", feed: _techProcessParams.Frequency);
+            }
+            else
+            {
+                line = new Line(_currentPoint, destPoint);
+                line.ObjectId = new ObjectId(name);
+                Entities.Add(line);
+            }
+            CreateCommand("Setup", "28", plane: "XYCZ");  // цикл
+            _currentPoint = destPoint;
         }
 
         public void SetTool(double x, double y, double c)

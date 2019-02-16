@@ -57,6 +57,7 @@
     <Compile Include="Context.cs" />
     <Compile Include="Domain\CommandCode.cs" />
     <Compile Include="Domain\CommandNames.cs" />
+    <Compile Include="Domain\Corner.cs" />
     <Compile Include="Domain\FakePrimitive.cs" />
     <Compile Include="Domain\ProcessAction.cs" />
     <Compile Include="Domain\ProcessBuilder.cs" />
