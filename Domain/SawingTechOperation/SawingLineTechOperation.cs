@@ -22,7 +22,7 @@ namespace CAM.Domain
         {
         }
 
-        public override void BuildProcessing(ProcessBuilder actionGenerator)
+        public override void BuildProcessing(ScemaLogicProgramBuilder actionGenerator)
         {
             base.BuildProcessing(actionGenerator);
         }

@@ -44,7 +44,7 @@ namespace CAM.Domain
             //SetupCommands.Add(new TechProcessCommand($"G97 M6 {TechProcessParams.Tool.Number}", "Установка"));
         }
 
-        internal void BuildProcessing(ProcessBuilder actionGenerator)
+        internal void BuildProcessing(ScemaLogicProgramBuilder actionGenerator)
         {
             TechOperations.ForEach(p => p.BuildProcessing(actionGenerator));
         }

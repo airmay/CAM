@@ -102,7 +102,7 @@ namespace CAM.Domain
         public void BuildProcessing(TechProcess techProcess)
         {
             DeleteToolpath(techProcess);
-            var actionGenerator = new ProcessBuilder(techProcess.TechProcessParams);
+            var actionGenerator = new ScemaLogicProgramBuilder(techProcess.TechProcessParams);
             techProcess.TechOperations.ForEach(p => p.BuildProcessing(actionGenerator));
             _acad.CreateEntities(actionGenerator.Entities);
 

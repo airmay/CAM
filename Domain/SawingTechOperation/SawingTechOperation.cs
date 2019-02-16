@@ -28,7 +28,7 @@ namespace CAM.Domain
             Name = $"Распил { processingArea }";
         }
 
-        public override void BuildProcessing(ProcessBuilder builder)
+        public override void BuildProcessing(ScemaLogicProgramBuilder builder)
         {
             builder.Setup(ProcessingArea.Curve);
             var modes = TechOperationParams.Modes.OrderBy(p => p.Depth).GetEnumerator();

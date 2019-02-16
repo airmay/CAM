@@ -49,6 +49,6 @@ namespace CAM.Domain
             ProcessingArea = processingArea;
         }
 
-        public abstract void BuildProcessing(ProcessBuilder actionGenerator);
+        public abstract void BuildProcessing(ScemaLogicProgramBuilder actionGenerator);
     }
 }

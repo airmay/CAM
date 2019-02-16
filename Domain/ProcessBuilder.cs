@@ -9,7 +9,7 @@ namespace CAM.Domain
     /// <summary>
     /// Генератор команд процесса обработки
     /// </summary>
-    public class ProcessBuilder
+    public class ScemaLogicProgramBuilder
     {
         //private static Dictionary<string, string> CommandCodes =
         //{
@@ -24,7 +24,7 @@ namespace CAM.Domain
 
         public List<ProcessCommand> Commands { get; } = new List<ProcessCommand>();
 
-        public ProcessBuilder(TechProcessParams techProcessParams)
+        public ScemaLogicProgramBuilder(TechProcessParams techProcessParams)
         {
             _techProcessParams = techProcessParams;
         }
