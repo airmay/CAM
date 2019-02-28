@@ -39,7 +39,7 @@ namespace CAM.Domain
         /// <summary>
         /// Команды
         /// </summary>
-        public List<ProcessCommand> ProcessCommands { get; } = new List<ProcessCommand>();
+        public List<ProcessCommand> ProcessCommands { get; set; } = new List<ProcessCommand>();
 
         protected TechOperation(TechProcess techProcess, ProcessingArea processingArea)
         {
@@ -49,6 +49,6 @@ namespace CAM.Domain
             ProcessingArea = processingArea;
         }
 
-        public abstract void BuildProcessing(ScemaLogicProgramBuilder actionGenerator);
+        public abstract void BuildProcessing(Point3d startPoint);
     }
 }

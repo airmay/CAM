@@ -45,8 +45,33 @@ namespace CAM.Domain
 
         public Point3d StartPoint = new Point3d(1, 1, 0);
 
-        public abstract Curve GetOffsetCurves(double offset = 0, double dz = 0);
+        public abstract Curve GetOffsetCurves(double offset = 0, double z = 0);
+
+		public Point3d this[Corner corner]
+		{
+			get => corner == Corner.Start ? StartPoint : EndPoint;
+			set
+			{
+				if (corner == Corner.Start)
+					StartPoint = value;
+				else
+					EndPoint = value;
+			}
+		}
     }
+
+	public static class CurveExt
+	{
+		public static Point3d GetPoint(this Curve curve, Corner corner) => corner == Corner.Start ? curve.StartPoint : curve.EndPoint;
+
+		public static void SetPoint(this Curve curve, Corner corner, Point3d point)
+		{
+			if (corner == Corner.Start)
+				curve.StartPoint = point;
+			else
+				curve.EndPoint = point;
+		}
+	}
 
     public class Line : Curve
     {
@@ -69,6 +94,11 @@ namespace CAM.Domain
             line.EndPoint.Z += dz;
             return line;
         }
+
+	    public Point3d GetPointAtDist(double startIndent)
+	    {
+		    throw new NotImplementedException();
+	    }
     }
 
     public class Arc : Curve

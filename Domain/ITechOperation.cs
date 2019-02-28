@@ -16,6 +16,6 @@ namespace CAM.Domain
         /// Создает обработку по технологической операции
         /// </summary>
         /// <returns></returns>
-        void BuildProcessing(ScemaLogicProgramBuilder actionGenerator);
+        void BuildProcessing(Point3d startPoint);
     }
 }

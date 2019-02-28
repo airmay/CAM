@@ -22,9 +22,9 @@ namespace CAM.Domain
         {
         }
 
-        public override void BuildProcessing(ScemaLogicProgramBuilder actionGenerator)
+        public override void BuildProcessing(Point3d startPoint)
         {
-            base.BuildProcessing(actionGenerator);
+            base.BuildProcessing(startPoint);
         }
     }
 }
