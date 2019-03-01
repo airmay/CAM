@@ -64,6 +64,8 @@ namespace CAM.Domain
 	{
 		public static Point3d GetPoint(this Curve curve, Corner corner) => corner == Corner.Start ? curve.StartPoint : curve.EndPoint;
 
+		public static Corner GetCorner(this Curve curve, Point3d point) => point == curve.StartPoint ? Corner.Start : Corner.End;
+
 		public static void SetPoint(this Curve curve, Corner corner, Point3d point)
 		{
 			if (corner == Corner.Start)

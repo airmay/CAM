@@ -28,5 +28,7 @@ namespace CAM
         /// </summary>
         /// <param name="idList"></param>
         void DeleteEntities(List<ObjectId> idList);
+
+	    void CreateEntities(IEnumerable<Curve> entities);
     }
 }

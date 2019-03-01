@@ -16,6 +16,6 @@ namespace CAM.Domain
         /// Создает обработку по технологической операции
         /// </summary>
         /// <returns></returns>
-        void BuildProcessing(Point3d startPoint);
+        Point3d BuildProcessing(Point3d startPoint, bool isLast);
     }
 }

@@ -20,7 +20,7 @@ namespace CAM.UI.Test
         {
             InitializeComponent();
 
-            var techProcessService = new TechProcessService(new AcadGatewayMock(listBox));
+            var techProcessService = new TechProcessManager(new AcadGatewayMock(listBox));
             techProcessView.SetTechProcessService(techProcessService);
             techProcessService.ProgramGenerated += (object sender, ProgramEventArgs e) => programView.ShowProgram(e.Program);
         }

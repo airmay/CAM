@@ -1,33 +1,29 @@
 ﻿using System.Collections.Generic;
-using System.Diagnostics.Contracts;
 
 namespace CAM
 {
-    static class IListExtensions
+    static class ListExtensions
     {
-        public static void Swap<T>(this List<T> list, int firstIndex, int secondIndex)
+        public static bool Swap<T>(this List<T> list, int firstIndex, int secondIndex)
         {
-            Contract.Requires(list != null);
-            Contract.Requires(firstIndex >= 0 && firstIndex < list.Count);
-            Contract.Requires(secondIndex >= 0 && secondIndex < list.Count);
-            if (firstIndex == secondIndex)
-                return;
-
-            T temp = list[firstIndex];
-            list[firstIndex] = list[secondIndex];
-            list[secondIndex] = temp;
+	        if (!(firstIndex >= 0 && firstIndex < list.Count && secondIndex >= 0 && secondIndex < list.Count && firstIndex != secondIndex))
+		        return false;
+	        var temp = list[firstIndex];
+	        list[firstIndex] = list[secondIndex];
+	        list[secondIndex] = temp;
+	        return true;
         }
 
-        public static void SwapNext<T>(this List<T> list, T item)
+        public static bool SwapNext<T>(this List<T> list, T item)
         {
             var index = list.IndexOf(item);
-            list.Swap(index, index + 1);
+	        return list.Swap(index, index + 1);
         }
 
-        public static void SwapPrev<T>(this List<T> list, T item)
+        public static bool SwapPrev<T>(this List<T> list, T item)
         {
             var index = list.IndexOf(item);
-            list.Swap(index, index - 1);
+	        return list.Swap(index, index - 1);
         }
     }
 }

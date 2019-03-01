@@ -132,16 +132,23 @@ namespace CAM.Domain
 	    /// <summary>
 	    /// Опускание
 	    /// </summary>
+	    /// <param name="isLast"></param>
 	    /// <param name="z"></param>
-	    //public void Descent(double z) => MoveZ(CommandNames.Descent, z, _techProcessParams.PenetrationRate);
-
 	    /// <summary>
 	    /// Поднятие
 	    /// </summary>
-	    public List<ProcessCommand> Completion()
+	    public Point3d Completion(bool isLast)
 	    {
 		    Move(CommandNames.Uplifting, "0", "XYZ", 0, z: _techProcessParams.ZSafety);
-		    return Commands;
+		    if (isLast)
+		    {
+			    var name = "End";
+				CreateCommand(name, "97;9");
+			    CreateCommand(name, "97;10");
+			    CreateCommand(name, "97;5");
+			    CreateCommand(name, "97;30");
+		    }
+			return _currentPoint;
 	    }
 
 	    /// <summary>

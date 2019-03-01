@@ -46,5 +46,10 @@ namespace CAM.UI.Test
         {
             idList.ForEach(p => { if (_listBox.Items.Contains(p.Key)) _listBox.Items.Remove(p.Key); });
         }
+
+	    public void CreateEntities(IEnumerable<Curve> entities)
+	    {
+		    throw new NotImplementedException();
+	    }
     }
 }

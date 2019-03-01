@@ -7,7 +7,7 @@ namespace CAM.UI
 {
     public partial class TechProcessView : UserControl
     {
-        private TechProcessService _techProcessService;
+        private TechProcessManager _techProcessManager;
         private TechProcessTreeBuilder _techProcessTreeBuilder = new TechProcessTreeBuilder();
         private SawingParamsView _techOperationParamsView = new SawingParamsView();
         private TechProcessParamsView _techProcessParamsView = new TechProcessParamsView();
@@ -23,9 +23,9 @@ namespace CAM.UI
                 control.Dock = DockStyle.Fill;
         }
 
-        public void SetTechProcessService(TechProcessService techProcessService)
+        public void SetTechProcessService(TechProcessManager techProcessManager)
         {
-            _techProcessService = techProcessService;
+            _techProcessManager = techProcessManager;
         }
 
         private void treeView_AfterSelect(object sender, TreeViewEventArgs e)
@@ -35,12 +35,12 @@ namespace CAM.UI
             {
                 case TechProcessNodeType.TechProcess:
                     _techProcessParamsView.BringToFront();
-                    _techProcessService.SelectTechProcess(node.TechProcess);
+                    _techProcessManager.SelectTechProcess(node.TechProcess);
                     break;
                 case TechProcessNodeType.TechOperation:
                     _techOperationParamsView.BringToFront();
                     _techOperationParamsView.sawingParamsBindingSource.DataSource = node.TechOperation.TechOperationParams;
-                    _techProcessService.SelectTechOperation(node.TechOperation);
+                    _techProcessManager.SelectTechOperation(node.TechOperation);
                     break;
             }
         }
@@ -48,7 +48,7 @@ namespace CAM.UI
         private void bCreateTechProcess_Click(object sender, EventArgs e)
         {
             EndEdit();
-            var techProcess = _techProcessService.CreateTechProcess();
+            var techProcess = _techProcessManager.CreateTechProcess();
             var techProcessNode = _techProcessTreeBuilder.CreateTechProcessTree(techProcess);
             treeView.Nodes.Add(techProcessNode);
             treeView.SelectedNode = techProcessNode;
@@ -63,13 +63,11 @@ namespace CAM.UI
             else
             {
                 var rootNode = GetRootNode();
-                var techOperations = _techProcessService.CreateTechOperations(((TechProcessNode)rootNode).TechProcess);
-                if (techOperations.Any())
-                {
-                    int index = 0;
-                    techOperations.ForEach(p => index = rootNode.Nodes.Add(new TechProcessNode(p)));
-                    treeView.SelectedNode = rootNode.Nodes[index];
-                }
+                var techOperations = _techProcessManager.CreateTechOperations(((TechProcessNode)rootNode).TechProcess, TechOperationType.Sawing);
+	            var index = treeView.SelectedNode.Index;
+	            foreach (var techOperation in techOperations)
+                    index = rootNode.Nodes.Add(new TechProcessNode(techOperation));
+                treeView.SelectedNode = rootNode.Nodes[index];
             }
         }
 
@@ -95,15 +93,15 @@ namespace CAM.UI
                 switch (node.Type)
                 {
                     case TechProcessNodeType.TechProcess:
-                        _techProcessService.RemoveTechProcess(node.TechProcess);
+                        _techProcessManager.RemoveTechProcess(node.TechProcess);
                         break;
                     case TechProcessNodeType.TechOperation:
-                        _techProcessService.RemoveTechOperation(node.TechOperation);
+                        _techProcessManager.RemoveTechOperation(node.TechOperation);
                         break;
                     case TechProcessNodeType.ProcessAction:
                         var parentNode = node.Parent as TechProcessNode;
                         var toNode = parentNode.Type == TechProcessNodeType.TechOperation ? parentNode : (TechProcessNode)parentNode.Parent;
-                        _techProcessService.RemoveProcessAction(toNode.TechOperation, node.ProcessAction);
+                        _techProcessManager.RemoveProcessAction(toNode.TechOperation, node.ProcessAction);
                         break;
                     default:
                         return;
@@ -127,7 +125,7 @@ namespace CAM.UI
             if (treeView.SelectedTechProcessNode()?.Type == TechProcessNodeType.TechOperation)
             {
                 EndEdit();
-                if (_techProcessService.MoveBackwardTechOperation(treeView.SelectedTechProcessNode().TechOperation))
+                if (_techProcessManager.MoveBackwardTechOperation(treeView.SelectedTechProcessNode().TechOperation))
                     MoveSelectedNode(-1);
             }
         }
@@ -137,7 +135,7 @@ namespace CAM.UI
             if (treeView.SelectedTechProcessNode()?.Type == TechProcessNodeType.TechOperation)
             {
                 EndEdit();
-                if (_techProcessService.MoveForwardTechOperation(treeView.SelectedTechProcessNode().TechOperation))
+                if (_techProcessManager.MoveForwardTechOperation(treeView.SelectedTechProcessNode().TechOperation))
                     MoveSelectedNode(1);
             }
         }
@@ -160,7 +158,7 @@ namespace CAM.UI
             if (treeView.Nodes.Count == 0)
                 return;
             var rootNode = GetRootNode();
-            _techProcessService.BuildProcessing(((TechProcessNode)rootNode).TechProcess);
+            _techProcessManager.BuildProcessing(((TechProcessNode)rootNode).TechProcess);
             _techProcessTreeBuilder.RebuildTechProcessTree(rootNode);
             rootNode.Expand();
             foreach (TreeNode node in rootNode.Nodes)

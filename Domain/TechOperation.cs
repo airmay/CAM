@@ -49,6 +49,6 @@ namespace CAM.Domain
             ProcessingArea = processingArea;
         }
 
-        public abstract void BuildProcessing(Point3d startPoint);
+        public abstract Point3d BuildProcessing(Point3d startPoint, bool isLast);
     }
 }

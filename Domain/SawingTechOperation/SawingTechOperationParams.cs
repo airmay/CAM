@@ -14,12 +14,12 @@ namespace CAM.Domain
         /// <summary>
         /// Скорость заглубления
         /// </summary>
-        public int PenetrationRate { get; set; } = 250;
+        //public int PenetrationRate { get; set; } = 250;
 
         /// <summary>
         /// Режимы распиловки
         /// </summary>
-        public List<SawingMode> Modes { get; } = new List<SawingMode>();
+        public List<SawingMode> Modes { get; set; } = new List<SawingMode>();
 
         /// <summary>
         /// Точно начало
@@ -43,8 +43,10 @@ namespace CAM.Domain
 
         public SawingTechOperationParams Clone()
         {
-            var sawingTechOperationParams = new SawingTechOperationParams();
-            sawingTechOperationParams.Modes.AddRange(Modes.ConvertAll(p => p.Clone()));
+	        var sawingTechOperationParams = new SawingTechOperationParams()
+	        {
+		        Modes = Modes.ConvertAll(p => p.Clone())
+	        };
             return sawingTechOperationParams;
         }
     }

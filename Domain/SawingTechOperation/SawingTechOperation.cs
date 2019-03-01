@@ -12,26 +12,88 @@ namespace CAM.Domain
     /// </summary>
     public class SawingTechOperation : TechOperation
     {
-        /// <summary>
+	    const double AngleTolerance = 0.000001;
+
+	    /// <summary>
         /// Вид технологической операции
         /// </summary>
         public override TechOperationType Type { get; } = TechOperationType.Sawing;
 
-        /// <summary>
+	    /// <summary>
         /// Параметры технологической операции
         /// </summary>
         public SawingTechOperationParams TechOperationParams { get; }
 
 	    public Side OuterSide { get; set; }
 
-        protected SawingTechOperation(TechProcess techProcess, ProcessingArea processingArea, SawingTechOperationParams techOperationParams)
+
+	    public SawingTechOperation(TechProcess techProcess, ProcessingArea processingArea, SawingTechOperationParams techOperationParams)
             : base(techProcess, processingArea)
         {
             TechOperationParams = techOperationParams;
             Name = $"Распил { processingArea }";
+
+	        CalcExactlyEnd(Corner.Start);
+	        CalcExactlyEnd(Corner.End);
         }
 
-        public override void BuildProcessing(Point3d startPoint)
+	    public void CalcExactlyEnd(Corner corner)
+	    {
+		    if (TechProcess.TechOperations.Count == 1)
+			    return;
+
+		    var point = ProcessingArea.Curve.GetPoint(corner);
+		    var nextOperation = TechProcess.TechOperations.SingleOrDefault(p => p != this && (p.ProcessingArea.Curve.StartPoint == point || p.ProcessingArea.Curve.EndPoint == point));
+			if (nextOperation == null)
+				return;
+
+		    var nextCorner = nextOperation.ProcessingArea.Curve.GetCorner(point);
+		    var isAligned = corner != nextCorner;
+
+
+
+			OuterSide =
+
+
+		    switch (ProcessingArea.Curve)
+		    {
+			    case Line line:
+				    bool isLeftTurn, isExactly;
+				    switch (nextOperation.ProcessingArea.Curve)
+				    {
+					    case Line nextLine:
+						    var angleDiff = nextLine.Angle - line.Angle;
+						    if (Math.Abs(angleDiff) > AngleTolerance)
+						    {
+							    isLeftTurn = Math.Sin(angleDiff) > 0;
+							    var isLeftOuterSide = OuterSide == Side.Left;
+							    var isNextStartPoint = nextCorner == Corner.Start;
+							    isExactly = isLeftTurn ^ isLeftOuterSide ^ isNextStartPoint;
+							}
+							break;
+					    case Arc nextArc:
+						    var angleTan = nextCorner == Corner.Start ? nextArc.StartAngle + Math.PI / 2 : nextArc.EndAngle - Math.PI / 2;
+						    angleDiff = angleTan - line.Angle;
+						    isLeftTurn = Math.Abs(angleDiff) > AngleTolerance 
+							    ? Math.Sin(angleDiff) > 0
+							    : nextCorner == Corner.Start;
+						    var isRightProcessSide = OuterSide == Side.Right;
+						    isExactly = isLeftTurn ^ isRightProcessSide;
+						    break;
+					}
+					break;
+				case Arc arc:
+					if (nextOperation.ProcessingArea.Curve is Line)
+					{
+						connectObject.Side = vertex != connectVertex ? obj.Side : obj.Side.Opposite();
+						isExactly = CalcExactlyEnd(connectObject, connectVertex);
+					}
+					break; 
+			}
+
+		}
+
+	    public override Point3d BuildProcessing(Point3d startPoint, bool isLast)
         {
 			var builder = new ScemaLogicProcessBuilder(TechProcess.TechProcessParams, startPoint, ProcessingArea.Curve, CalcStartCorner());
 
@@ -54,7 +116,7 @@ namespace CAM.Domain
 			       // h = obj.DepthAll;
 			       // pointC = obj.ProcessCurve.StartPoint + obj.ProcessCurve.GetFirstDerivative(0).GetNormal() * (obj.IsBeginExactly ? s : obj.Length - s);
 		        //}
-				return;
+				return Point3d.Origin;
 			}
 
 	        TechOperationParams.Compensation = builder.CalcCompensation(OuterSide, TechProcess.TechProcessParams.BilletThickness);
@@ -76,7 +138,10 @@ namespace CAM.Domain
             }
             while (z < billetThickness);
 			modes.Dispose();
-            ProcessCommands = builder.Completion();
+            var currentPoint = builder.Completion(isLast);
+            ProcessCommands = builder.Commands;
+
+	        return currentPoint;
         }
 
 	    private Corner CalcStartCorner()

@@ -9,27 +9,27 @@ namespace CAM.Domain
     /// <summary>
     /// Сервисный класс для работы с техпроцессами
     /// </summary>
-    public class TechProcessService
+    public class TechProcessManager
     {
         private List<TechProcess> _techProcessList = new List<TechProcess>();
         private SawingTechOperationParams _sawingLineTechOperationParamsDefault = new SawingTechOperationParams();
-        private SawingTechOperationParams _sawingArcTechOperationParamsDefault = new SawingTechOperationParams();
+        private SawingTechOperationParams _sawingCurveTechOperationParamsDefault = new SawingTechOperationParams();
         private TechProcessParams _techProcessParams = new TechProcessParams();
         private SawingTechOperationFactory _techOperationFactory;
         private IAcadGateway _acad;
 
         public EventHandler<ProgramEventArgs> ProgramGenerated;
 
-        public TechProcessService(IAcadGateway acad)
+        public TechProcessManager(IAcadGateway acad)
         {
             _acad = acad;
 
             _sawingLineTechOperationParamsDefault.Modes.Add(new SawingMode { Depth = 30, DepthStep = 5, Feed = 2000 });
-            _sawingArcTechOperationParamsDefault.Modes.AddRange(new SawingMode[3] {
+            _sawingCurveTechOperationParamsDefault.Modes.AddRange(new SawingMode[3] {
                 new SawingMode { Depth = 10, DepthStep = 5, Feed = 2000 },
                 new SawingMode { Depth = 20, DepthStep = 2, Feed = 1000 },
                 new SawingMode { Depth = 30, DepthStep = 1, Feed = 500 } });
-            _techOperationFactory = new SawingTechOperationFactory(_sawingLineTechOperationParamsDefault, _sawingArcTechOperationParamsDefault);
+            _techOperationFactory = new SawingTechOperationFactory(_sawingLineTechOperationParamsDefault, _sawingCurveTechOperationParamsDefault);
 
             _techProcessParams.Tool = new Tool();
             _techProcessParams.Tool.Number = 1;
@@ -40,7 +40,6 @@ namespace CAM.Domain
         {
             var techProcess = new TechProcess($"Изделие{_techProcessList.Count + 1}", _techProcessParams);
             _techProcessList.Add(techProcess);
-            CreateTechOperations(techProcess);
             return techProcess;
         }
 
@@ -54,27 +53,28 @@ namespace CAM.Domain
             _acad.SelectEntities(new List<ObjectId> { techOperation.ProcessingArea.AcadObjectId });
         }
 
-        public List<SawingTechOperation> CreateTechOperations(TechProcess techProcess)
+        public IEnumerable<SawingTechOperation> CreateTechOperations(TechProcess techProcess, TechOperationType techOperationType)
         {
-            var operations = _acad.GetSelectedEntities().Select(p => _techOperationFactory.Create(techProcess, p)).ToList();
-            return operations;
+	        var factory = techProcess.TechOperationFactorys.SingleOrDefault(p => p.TechOperationType == techOperationType);
+	        if (factory == null)
+	        {
+		        switch (techOperationType)
+		        {
+			        case TechOperationType.Sawing:
+				        factory = new SawingTechOperationFactory(_sawingLineTechOperationParamsDefault, _sawingCurveTechOperationParamsDefault);
+						break;
+		        }
+
+		        techProcess.TechOperationFactorys.Add(factory);
+	        }
+
+	        return _acad.GetSelectedEntities().Select(p => _techOperationFactory.Create(techProcess, p));
         }
 
-        public bool MoveForwardTechOperation(TechOperation techOperation)
-        {
-            var flag = techOperation != techOperation.TechProcess.TechOperations.Last();
-            if (flag)
-                techOperation.TechProcess.TechOperations.SwapNext(techOperation);
-            return flag;
-        }
+        public bool MoveForwardTechOperation(TechOperation techOperation) => techOperation.TechProcess.TechOperations.SwapNext(techOperation);
 
-        public bool MoveBackwardTechOperation(TechOperation techOperation)
-        {
-            var flag = techOperation != techOperation.TechProcess.TechOperations.First();
-            if (flag)
-                techOperation.TechProcess.TechOperations.SwapPrev(techOperation);
-            return flag;
-        }
+	    public bool MoveBackwardTechOperation(TechOperation techOperation) => techOperation.TechProcess.TechOperations.SwapPrev(techOperation);
+
 
         public void RemoveTechProcess(TechProcess techProcess)
         {
@@ -84,12 +84,12 @@ namespace CAM.Domain
 
         private void DeleteToolpath(TechProcess techProcess)
         {
-            _acad.DeleteEntities(techProcess.TechOperations.SelectMany(p => p.ProcessActions).Select(p => p.ToolpathAcadObject?.ObjectId).Where(p => p != null).ToList());
+            _acad.DeleteEntities(techProcess.TechOperations.SelectMany(p => p.ProcessCommands).Select(p => p.ToolpathAcadObject?.ObjectId).Where(p => p != null).ToList());
         }
 
         public void RemoveTechOperation(TechOperation techOperation)
         {
-            _acad.DeleteEntities(techOperation.ProcessActions.ConvertAll(p => p.ToolpathAcadObject.ObjectId));
+            _acad.DeleteEntities(techOperation.ProcessCommands.ConvertAll(p => p.ToolpathAcadObject?.ObjectId).FindAll(p => p != null));
             techOperation.TechProcess.TechOperations.Remove(techOperation);
         }
 
@@ -102,9 +102,9 @@ namespace CAM.Domain
         public void BuildProcessing(TechProcess techProcess)
         {
             DeleteToolpath(techProcess);
-            var actionGenerator = new ScemaLogicProcessBuilder(techProcess.TechProcessParams);
-            techProcess.TechOperations.ForEach(p => p.BuildProcessing(actionGenerator));
-            _acad.CreateEntities(actionGenerator.Entities);
+	        var currentPoint = Point3d.Origin;
+			techProcess.TechOperations.ForEach(p => currentPoint = p.BuildProcessing(currentPoint, p == techProcess.TechOperations.Last()));
+            _acad.CreateEntities(techProcess.TechOperations.SelectMany(p => p.ProcessCommands).Select(p => p.ToolpathAcadObject));
 
             var programGenerator = new ScemaLogicProgramGenerator();
             var program = programGenerator.Generate(techProcess);

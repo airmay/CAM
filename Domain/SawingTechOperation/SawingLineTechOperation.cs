@@ -22,9 +22,9 @@ namespace CAM.Domain
         {
         }
 
-        public override void BuildProcessing(Point3d startPoint)
+        public override Point3d BuildProcessing(Point3d startPoint, bool isLast)
         {
-            base.BuildProcessing(startPoint);
+            return base.BuildProcessing(startPoint, isLast);
         }
     }
 }
