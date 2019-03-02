@@ -18,7 +18,7 @@ namespace CAM.Domain
         /// </summary>
         public TechProcessParams TechProcessParams { get; set; }
 
-	    public List<ITechOperationFactory> TechOperationFactorys { get; set; }
+        public List<ITechOperationFactory> TechOperationFactorys { get; set; } = new List<ITechOperationFactory>();
 
         /// <summary>
         /// Список технологических операций процесса

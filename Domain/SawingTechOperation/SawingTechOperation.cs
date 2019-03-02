@@ -39,61 +39,70 @@ namespace CAM.Domain
 
 	    public void CalcExactlyEnd(Corner corner)
 	    {
-		    if (TechProcess.TechOperations.Count == 1)
-			    return;
-
 		    var point = ProcessingArea.Curve.GetPoint(corner);
-		    var nextOperation = TechProcess.TechOperations.SingleOrDefault(p => p != this && (p.ProcessingArea.Curve.StartPoint == point || p.ProcessingArea.Curve.EndPoint == point));
+		    var nextOperation = TechProcess.TechOperations.OfType<SawingTechOperation>().SingleOrDefault(p => p != this && (p.ProcessingArea.Curve.StartPoint == point || p.ProcessingArea.Curve.EndPoint == point));
 			if (nextOperation == null)
 				return;
 
 		    var nextCorner = nextOperation.ProcessingArea.Curve.GetCorner(point);
-		    var isAligned = corner != nextCorner;
+            OuterSide = nextOperation.OuterSide != Side.None
+                    ? (corner != nextCorner ? nextOperation.OuterSide : nextOperation.OuterSide.Swap())
+                    : CalcOuterSide();
 
+            bool isExactly = false;
+            switch (ProcessingArea.Curve)
+            {
+                case Line line:
+                    bool isLeftTurn;
+                    switch (nextOperation.ProcessingArea.Curve)
+                    {
+                        case Line nextLine:
+                            var angleDiff = nextLine.Angle - line.Angle;
+                            if (Math.Abs(angleDiff) > AngleTolerance)
+                            {
+                                isLeftTurn = Math.Sin(angleDiff) > 0;
+                                var isLeftOuterSide = OuterSide == Side.Left;
+                                var isNextStartPoint = nextCorner == Corner.Start;
+                                isExactly = isLeftTurn ^ isLeftOuterSide ^ isNextStartPoint;
+                            }
+                            break;
+                        case Arc nextArc:
+                            var angleTan = nextCorner == Corner.Start ? nextArc.StartAngle + Math.PI / 2 : nextArc.EndAngle - Math.PI / 2;
+                            angleDiff = angleTan - line.Angle;
+                            isLeftTurn = Math.Abs(angleDiff) > AngleTolerance
+                                ? Math.Sin(angleDiff) > 0
+                                : nextCorner == Corner.Start;
+                            var isRightProcessSide = OuterSide == Side.Right;
+                            isExactly = isLeftTurn ^ isRightProcessSide;
+                            break;
+                    }
+                    break;
+                case Arc arc:
+                    if (nextOperation.ProcessingArea.Curve is Line)
+                    {
+                        nextOperation.CalcExactlyEnd(nextCorner);
+                        return;
+                    }
+                    break;
+            }
+            SetExactly(nextCorner, isExactly);
+            nextOperation.SetExactly(nextCorner, isExactly);
+        }
 
+        private Side CalcOuterSide()
+        {
+            return Side.Right;
+        }
 
-			OuterSide =
+        public void SetExactly(Corner corner, bool isExectly)
+        {
+            if (corner == Corner.Start)
+                TechOperationParams.IsExactlyBegin = isExectly;
+            else
+                TechOperationParams.IsExactlyEnd = isExectly;
+        }
 
-
-		    switch (ProcessingArea.Curve)
-		    {
-			    case Line line:
-				    bool isLeftTurn, isExactly;
-				    switch (nextOperation.ProcessingArea.Curve)
-				    {
-					    case Line nextLine:
-						    var angleDiff = nextLine.Angle - line.Angle;
-						    if (Math.Abs(angleDiff) > AngleTolerance)
-						    {
-							    isLeftTurn = Math.Sin(angleDiff) > 0;
-							    var isLeftOuterSide = OuterSide == Side.Left;
-							    var isNextStartPoint = nextCorner == Corner.Start;
-							    isExactly = isLeftTurn ^ isLeftOuterSide ^ isNextStartPoint;
-							}
-							break;
-					    case Arc nextArc:
-						    var angleTan = nextCorner == Corner.Start ? nextArc.StartAngle + Math.PI / 2 : nextArc.EndAngle - Math.PI / 2;
-						    angleDiff = angleTan - line.Angle;
-						    isLeftTurn = Math.Abs(angleDiff) > AngleTolerance 
-							    ? Math.Sin(angleDiff) > 0
-							    : nextCorner == Corner.Start;
-						    var isRightProcessSide = OuterSide == Side.Right;
-						    isExactly = isLeftTurn ^ isRightProcessSide;
-						    break;
-					}
-					break;
-				case Arc arc:
-					if (nextOperation.ProcessingArea.Curve is Line)
-					{
-						connectObject.Side = vertex != connectVertex ? obj.Side : obj.Side.Opposite();
-						isExactly = CalcExactlyEnd(connectObject, connectVertex);
-					}
-					break; 
-			}
-
-		}
-
-	    public override Point3d BuildProcessing(Point3d startPoint, bool isLast)
+        public override Point3d BuildProcessing(Point3d startPoint, bool isLast)
         {
 			var builder = new ScemaLogicProcessBuilder(TechProcess.TechProcessParams, startPoint, ProcessingArea.Curve, CalcStartCorner());
 
