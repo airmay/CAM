@@ -9,7 +9,7 @@ namespace CAM.Domain
     /// <summary>
     /// Сервисный класс для работы с техпроцессами
     /// </summary>
-    public class TechProcessManager
+    public class CamManager
     {
         private List<TechProcess> _techProcessList = new List<TechProcess>();
         private SawingTechOperationParams _sawingLineTechOperationParamsDefault = new SawingTechOperationParams();
@@ -20,7 +20,7 @@ namespace CAM.Domain
 
         public EventHandler<ProgramEventArgs> ProgramGenerated;
 
-        public TechProcessManager(IAcadGateway acad)
+        public CamManager(IAcadGateway acad)
         {
             _acad = acad;
 
@@ -68,7 +68,9 @@ namespace CAM.Domain
 		        techProcess.TechOperationFactorys.Add(factory);
 	        }
 
-	        return _acad.GetSelectedEntities().Select(p => _techOperationFactory.Create(techProcess, p));
+	        var operations = _acad.GetSelectedEntities().Select(p => _techOperationFactory.Create(techProcess, p));
+
+	        return operations;
         }
 
         public bool MoveForwardTechOperation(TechOperation techOperation) => techOperation.TechProcess.TechOperations.SwapNext(techOperation);
@@ -84,12 +86,12 @@ namespace CAM.Domain
 
         private void DeleteToolpath(TechProcess techProcess)
         {
-            _acad.DeleteEntities(techProcess.TechOperations.SelectMany(p => p.ProcessCommands).Select(p => p.ToolpathAcadObject?.ObjectId).Where(p => p != null).ToList());
+            _acad.DeleteEntities(techProcess.ToolpathCurves);
         }
 
         public void RemoveTechOperation(TechOperation techOperation)
         {
-            _acad.DeleteEntities(techOperation.ProcessCommands.ConvertAll(p => p.ToolpathAcadObject?.ObjectId).FindAll(p => p != null));
+            _acad.DeleteEntities(techOperation.ProcessCommands.ConvertAll(p => p.ToolpathAcadObject).FindAll(p => p != null));
             techOperation.TechProcess.TechOperations.Remove(techOperation);
         }
 
@@ -102,9 +104,8 @@ namespace CAM.Domain
         public void BuildProcessing(TechProcess techProcess)
         {
             DeleteToolpath(techProcess);
-	        var currentPoint = Point3d.Origin;
-			techProcess.TechOperations.ForEach(p => currentPoint = p.BuildProcessing(currentPoint, p == techProcess.TechOperations.Last()));
-            _acad.CreateEntities(techProcess.TechOperations.SelectMany(p => p.ProcessCommands).Select(p => p.ToolpathAcadObject));
+	        techProcess.BuildProcessing();
+            _acad.CreateEntities(techProcess.ToolpathCurves);
 
             var programGenerator = new ScemaLogicProgramGenerator();
             var program = programGenerator.Generate(techProcess);

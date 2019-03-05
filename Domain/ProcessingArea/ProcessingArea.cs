@@ -21,11 +21,10 @@ namespace CAM.Domain
 
         public Curve Curve { get; set; }
 
-
         /// <summary>
         /// Тип обрабатываемой области
         /// </summary>
-        public abstract ProcessingAreaType Type { get; }
+        //public abstract ProcessingAreaType Type { get; }
 
         /// <summary>
         /// Начальная точка кривой
@@ -76,5 +75,18 @@ namespace CAM.Domain
             EndPoint = curve.EndPoint;
             Length = curve.Length;
         }
-    }
+
+	    public override string ToString()
+	    {
+		    switch (Curve)
+		    {
+			    case Line _:
+				    return $"Прямая L{ Math.Round(Length) }";
+				case Arc _:
+				    return $"Дуга L{ Math.Round(Length) }";
+				default:
+					return $"{Curve.GetType()} L{ Math.Round(Length) }";
+		    }
+	    }
+	}
 }

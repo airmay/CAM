@@ -50,9 +50,9 @@ namespace CAM.Domain
 	        switch (curve)
 	        {
 		        case Line line:
-			        return new SawingTechOperation(techProcess, new LineProcessingArea(line), SawingLineTechOperationParams.Clone());
+			        return new SawingTechOperation(techProcess, new BorderProcessingArea(line), SawingLineTechOperationParams.Clone());
 		        case Arc arc:
-			        return new SawingTechOperation(techProcess, new ArcProcessingArea(arc), SawingCurveTechOperationParams.Clone());
+			        return new SawingTechOperation(techProcess, new BorderProcessingArea(arc), SawingCurveTechOperationParams.Clone());
 		        default:
 			        throw new Exception($"Неподдерживаемый тип кривой {curve.GetType()}");
 	        }

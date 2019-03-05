@@ -15,7 +15,7 @@ namespace CAM.Domain
         /// <summary>
         /// Тип обрабатываемой области
         /// </summary>
-        public override ProcessingAreaType Type { get; } = ProcessingAreaType.Line;
+        //public override ProcessingAreaType Type { get; } = ProcessingAreaType.Line;
 
         public LineProcessingArea(Curve curve) : base(curve)
         {

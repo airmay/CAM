@@ -22,16 +22,6 @@ namespace CAM.Domain
         public List<SawingMode> Modes { get; set; } = new List<SawingMode>();
 
         /// <summary>
-        /// Точно начало
-        /// </summary>
-        public bool IsExactlyBegin { get; set; }
-
-        /// <summary>
-        /// Точно конец
-        /// </summary>
-        public bool IsExactlyEnd { get; set; }
-
-        /// <summary>
         /// Компенсация
         /// </summary>
         public double Compensation { get; set; }

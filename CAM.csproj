@@ -64,6 +64,7 @@
     <Compile Include="Domain\ProcessCommand.cs" />
     <Compile Include="Domain\ProcessingArea\ArcProcessingArea.cs" />
     <Compile Include="Domain\CuttingDiscTechnonogy.cs" />
+    <Compile Include="Domain\ProcessingArea\BorderProcessingArea.cs" />
     <Compile Include="Domain\SawingTechOperation\ITechOperationFactory.cs" />
     <Compile Include="Domain\SawingTechOperation\SawingDefaultParams.cs" />
     <Compile Include="Domain\ScemaLogicProgramGenerator.cs" />
@@ -82,7 +83,7 @@
     <Compile Include="Domain\SawingTechOperation\SawingTechOperationParams.cs" />
     <Compile Include="Domain\TechOperation.cs" />
     <Compile Include="Domain\TechProcessParams.cs" />
-    <Compile Include="Domain\TechProcessManager.cs" />
+    <Compile Include="Domain\CamManager.cs" />
     <Compile Include="Domain\Tool.cs" />
     <Compile Include="Graph.cs" />
     <Compile Include="IAcadGateway.cs" />

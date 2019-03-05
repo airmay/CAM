@@ -27,7 +27,7 @@ namespace CAM
         /// Удаляет примитивы из автокада
         /// </summary>
         /// <param name="idList"></param>
-        void DeleteEntities(List<ObjectId> idList);
+        void DeleteEntities(IEnumerable<Curve> idList);
 
 	    void CreateEntities(IEnumerable<Curve> entities);
     }

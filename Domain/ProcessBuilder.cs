@@ -39,7 +39,7 @@ namespace CAM.Domain
 	    {
 		    var toolpathCurve = curve.GetOffsetCurves(offset, z);
 
-			switch (curve)
+			switch (toolpathCurve)
 		    {
 				case Line line:
 					line.StartPoint = line.GetPointAtDist(startIndent);
@@ -129,15 +129,12 @@ namespace CAM.Domain
 
 	    private static string GetParam(double? value, string paramName = null) => value.HasValue ? $" {paramName}{value:0.####}" : null;
 
-	    /// <summary>
-	    /// Опускание
-	    /// </summary>
-	    /// <param name="isLast"></param>
-	    /// <param name="z"></param>
-	    /// <summary>
-	    /// Поднятие
-	    /// </summary>
-	    public Point3d Completion(bool isLast)
+		/// <summary>
+		/// Завершение операции
+		/// </summary>
+		/// <param name="isLast"></param>
+		/// <returns></returns>
+		public Point3d Completion(bool isLast)
 	    {
 		    Move(CommandNames.Uplifting, "0", "XYZ", 0, z: _techProcessParams.ZSafety);
 		    if (isLast)

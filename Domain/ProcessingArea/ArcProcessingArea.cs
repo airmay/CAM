@@ -15,7 +15,7 @@ namespace CAM.Domain
         /// <summary>
         /// Тип обрабатываемой области
         /// </summary>
-        public override ProcessingAreaType Type { get; } = ProcessingAreaType.Arc;
+        //public override ProcessingAreaType Type { get; } = ProcessingAreaType.Arc;
 
         /// <summary>
         /// Начальный угол дуги
