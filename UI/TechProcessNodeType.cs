@@ -7,7 +7,5 @@
     {
         TechProcess,
         TechOperation,
-        ProcessActionGroup,
-        ProcessAction
     }
 }

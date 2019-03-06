@@ -38,8 +38,9 @@ namespace CAM.Domain
 
         public TechProcess CreateTechProcess()
         {
-            var techProcess = new TechProcess($"Изделие{_techProcessList.Count + 1}", _techProcessParams);
+            var techProcess = new TechProcess($"Обработка{_techProcessList.Count + 1}", _techProcessParams);
             _techProcessList.Add(techProcess);
+
             return techProcess;
         }
 
@@ -48,7 +49,7 @@ namespace CAM.Domain
             _acad.SelectEntities(techProcess.TechOperations.ConvertAll(p => p.ProcessingArea.AcadObjectId));
         }
 
-        internal void SelectTechOperation(SawingTechOperation techOperation)
+        internal void SelectTechOperation(TechOperation techOperation)
         {
             _acad.SelectEntities(new List<ObjectId> { techOperation.ProcessingArea.AcadObjectId });
         }
@@ -93,12 +94,6 @@ namespace CAM.Domain
         {
             _acad.DeleteEntities(techOperation.ProcessCommands.ConvertAll(p => p.ToolpathAcadObject).FindAll(p => p != null));
             techOperation.TechProcess.TechOperations.Remove(techOperation);
-        }
-
-        public void RemoveProcessAction(TechOperation techOperation, ProcessAction processAction)
-        {
-            _acad.DeleteEntities(new List<ObjectId> { processAction.ToolpathAcadObject.ObjectId });
-            techOperation.ProcessActions.Remove(processAction);
         }
 
         public void BuildProcessing(TechProcess techProcess)

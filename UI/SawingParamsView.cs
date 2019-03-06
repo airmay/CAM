@@ -22,5 +22,5 @@ namespace CAM.UI
         {
             sawingModesView.sawingModesBindingSource.DataSource = ((SawingTechOperationParams)sawingParamsBindingSource.DataSource).Modes;
         }
-    }
+	}
 }

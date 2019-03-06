@@ -42,9 +42,9 @@ namespace CAM.UI.Test
             entities.ForEach(p => _listBox.Items.Add(p.ObjectId.Key));
         }
 
-        public void DeleteEntities(IEnumerable<ObjectId> ids)
+	    public void DeleteEntities(IEnumerable<Curve> ids)
         {
-            ids.ToList().ForEach(p => { if (_listBox.Items.Contains(p.Key)) _listBox.Items.Remove(p.Key); });
+            ids.ToList().ForEach(p => { if (_listBox.Items.Contains(p.ObjectId.Key)) _listBox.Items.Remove(p.ObjectId.Key); });
         }
 
 	    public void CreateEntities(IEnumerable<Curve> entities)
