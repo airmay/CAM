@@ -9,68 +9,84 @@ namespace CAM.UI
     public partial class TechProcessView : UserControl
     {
         private CamManager _camManager;
-        //private TechProcessTreeBuilder _techProcessTreeBuilder = new TechProcessTreeBuilder();
         private SawingParamsView _techOperationParamsView = new SawingParamsView();
         private TechProcessParamsView _techProcessParamsView = new TechProcessParamsView();
+        private BorderProcessingAreaView _borderProcessingAreaView = new BorderProcessingAreaView();
+	    private UserControl _paramsView = new UserControl();
 
-        public TechProcessView()
+	    private TechProcess CurrentTechProcess => (treeView.SelectedNode.Parent ?? treeView.SelectedNode).Tag as TechProcess;
+		
+	    private static TreeNode CreateTechOperationNode(TechOperation techOperation) => new TreeNode(techOperation.Name, 1, 1) {Tag = techOperation };
+
+	    public TechProcessView()
+	    {
+		    InitializeComponent();
+
+		    imageList.Images.AddRange(new Image[] { Properties.Resources.drive, Properties.Resources.drive_download, Properties.Resources.folder__arrow, Properties.Resources.gear__arrow });
+
+		    _techProcessParamsView.Dock = DockStyle.Fill;
+		    _techOperationParamsView.Dock = DockStyle.Fill;
+		    _borderProcessingAreaView.Dock = DockStyle.Top;
+		    _paramsView.Dock = DockStyle.Fill;
+
+		    tabPageParams.Controls.Add(_techProcessParamsView);
+		    tabPageParams.Controls.Add(_paramsView);
+		    _paramsView.Controls.Add(_techOperationParamsView);
+		    _paramsView.Controls.Add(_borderProcessingAreaView);
+	    }
+
+	    public void Init(CamManager camManager)
         {
-            InitializeComponent();
+	        _camManager = camManager;
+	        _camManager.TechProcessList.ForEach(CreateTechProcessNode);
+		}
 
-            imageList.Images.AddRange(new Image[] { Properties.Resources.drive, Properties.Resources.drive_download, Properties.Resources.folder__arrow, Properties.Resources.gear__arrow });
-            tabPageParams.Controls.Add(_techProcessParamsView);
-            tabPageParams.Controls.Add(_techOperationParamsView);
-            foreach (Control control in tabPageParams.Controls)
-                control.Dock = DockStyle.Fill;
-        }
+	    private void CreateTechProcessNode(TechProcess techProcess)
+	    {
+		    var children = techProcess.TechOperations.ConvertAll(CreateTechOperationNode).ToArray();
+			var techProcessNode = new TreeNode(techProcess.Name, 0, 0, children) {Tag = techProcess};
+		    treeView.Nodes.Add(techProcessNode);
+		    treeView.SelectedNode = techProcessNode;
+	    }
 
-        public void SetTechProcessService(CamManager camManager)
+	    private void treeView_AfterSelect(object sender, TreeViewEventArgs e)
         {
-            _camManager = camManager;
-        }
-
-        private void treeView_AfterSelect(object sender, TreeViewEventArgs e)
-        {
-            switch (treeView.SelectedNode)
+			switch (treeView.SelectedNode.Tag)
             {
-                case TechProcessNode techProcessNode:
+                case TechProcess techProcess:
                     _techProcessParamsView.BringToFront();
-                    _camManager.SelectTechProcess(techProcessNode.TechProcess);
+                    _camManager.SelectTechProcess(techProcess);
                     break;
-                case TechOperationNode techOperationNode:
-                    _techOperationParamsView.BringToFront();
-                    _techOperationParamsView.sawingParamsBindingSource.DataSource = ((SawingTechOperation)techOperationNode.TechOperation).TechOperationParams;
-                    _camManager.SelectTechOperation(techOperationNode.TechOperation);
+                case TechOperation techOperation:
+	                _borderProcessingAreaView.Visible = techOperation.ProcessingArea is BorderProcessingArea;
+					if (_borderProcessingAreaView.Visible)
+						_borderProcessingAreaView.SetDataSource(techOperation.ProcessingArea as BorderProcessingArea);
+	                _techOperationParamsView.sawingParamsBindingSource.DataSource = ((SawingTechOperation)techOperation).TechOperationParams;
+	                _paramsView.BringToFront();
+	                _camManager.SelectTechOperation(techOperation);
                     break;
             }
         }
 
-        private void bCreateTechProcess_Click(object sender, EventArgs e)
+	    private void bCreateTechProcess_Click(object sender, EventArgs e)
         {
             EndEdit();
-            var techProcess = _camManager.CreateTechProcess();
-            var techProcessNode = new TechProcessNode(techProcess);
-            treeView.Nodes.Add(techProcessNode);
-            treeView.SelectedNode = techProcessNode;
+	        CreateTechProcessNode(_camManager.CreateTechProcess());
         }
 
 	    private void bCreateTechOperation_Click(object sender, EventArgs e)
 	    {
 		    EndEdit();
 		    if (treeView.Nodes.Count == 0)
-			    bCreateTechProcess_Click(sender, e);
+				CreateTechProcessNode(_camManager.CreateTechProcess());
 
-		    var techProcessNode = GetTechProcessNode();
-		    var techOperations = _camManager.CreateTechOperations(techProcessNode.TechProcess, TechOperationType.Sawing);
-		    var index = treeView.SelectedNode.Index;
-		    foreach (var techOperation in techOperations)
-			    index = techProcessNode.Nodes.Add(new TechOperationNode(techOperation));
-		    treeView.SelectedNode = techProcessNode.Nodes[index];
+			var techProcessNode = treeView.SelectedNode.Parent ?? treeView.SelectedNode;
+		    var techOperations = _camManager.CreateTechOperations(CurrentTechProcess, TechOperationType.Sawing);
+		    techProcessNode.Nodes.AddRange(techOperations.Select(CreateTechOperationNode).ToArray());
+		    treeView.SelectedNode = techProcessNode.Nodes[techProcessNode.Nodes.Count - 1];
 	    }
 
-	    private TechProcessNode GetTechProcessNode() => (treeView.SelectedNode.Parent ?? treeView.SelectedNode) as TechProcessNode;
-
-        private void EndEdit()
+	    private void EndEdit()
         {
             if (treeView.SelectedNode != null && treeView.SelectedNode.IsEditing)
                 treeView.SelectedNode.EndEdit(false);
@@ -80,13 +96,13 @@ namespace CAM.UI
         {
 	        if (treeView.SelectedNode == null)
 		        return;
-	        switch (treeView.SelectedNode)
+	        switch (treeView.SelectedNode.Tag)
 	        {
-		        case TechProcessNode techProcessNode:
-					_camManager.RemoveTechProcess(techProcessNode.TechProcess);
+		        case TechProcess techProcess:
+					_camManager.RemoveTechProcess(techProcess);
 			        break;
-		        case TechOperationNode techOperationNode:
-					_camManager.RemoveTechOperation(techOperationNode.TechOperation);
+		        case TechOperation techOperation:
+					_camManager.RemoveTechOperation(techOperation);
 			        break;
 	        } 
 	        treeView.SelectedNode.Remove();
@@ -104,33 +120,33 @@ namespace CAM.UI
 
         private void bMoveUpTechOperation_Click(object sender, EventArgs e)
         {
-			if (treeView.SelectedNode is TechOperationNode techOperationNode)
+			if (treeView.SelectedNode.Tag is TechOperation techOperation)
             {
                 EndEdit();
-                if (_camManager.MoveBackwardTechOperation(techOperationNode.TechOperation))
+                if (_camManager.MoveBackwardTechOperation(techOperation))
                     MoveSelectedNode(-1);
             }
         }
 
-        private void bMoveDownTechOperation_Click(object sender, EventArgs e)
+		private void bMoveDownTechOperation_Click(object sender, EventArgs e)
         {
-	        if (treeView.SelectedNode is TechOperationNode techOperationNode)
+			if (treeView.SelectedNode.Tag is TechOperation techOperation)
             {
 				EndEdit();
-                if (_camManager.MoveForwardTechOperation(techOperationNode.TechOperation))
+                if (_camManager.MoveForwardTechOperation(techOperation))
                     MoveSelectedNode(1);
             }
         }
 
-        private void treeView_AfterLabelEdit(object sender, NodeLabelEditEventArgs e)
+		private void treeView_AfterLabelEdit(object sender, NodeLabelEditEventArgs e)
         {
-			switch (treeView.SelectedNode)
+			switch (treeView.SelectedNode.Tag)
 			{
-				case TechProcessNode techProcessNode:
-					techProcessNode.TechProcess.Name = e.Label;
+				case TechProcess techProcess:
+					techProcess.Name = e.Label;
                     break;
-				case TechOperationNode techOperationNode:
-					techOperationNode.TechOperation.Name = e.Label;
+				case TechOperation techOperation:
+					techOperation.Name = e.Label;
                     break;
             }
         }
@@ -138,7 +154,7 @@ namespace CAM.UI
         private void bBuildProcessing_Click(object sender, EventArgs e)
         {
             if (treeView.Nodes.Count != 0)
-				_camManager.BuildProcessing(GetTechProcessNode().TechProcess);
+				_camManager.BuildProcessing(CurrentTechProcess);
         }
     }
 }

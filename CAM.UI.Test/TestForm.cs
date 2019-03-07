@@ -21,8 +21,8 @@ namespace CAM.UI.Test
             InitializeComponent();
 
             var techProcessService = new CamManager(new AcadGatewayMock(listBox));
-            techProcessView.SetTechProcessService(techProcessService);
+            techProcessView.Init(techProcessService);
             techProcessService.ProgramGenerated += (object sender, ProgramEventArgs e) => programView.ShowProgram(e.Program);
         }
-    }
+	}
 }

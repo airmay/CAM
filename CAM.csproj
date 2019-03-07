@@ -97,6 +97,12 @@
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <Compile Include="Side.cs" />
+    <Compile Include="UI\BorderProcessingAreaView.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="UI\BorderProcessingAreaView.Designer.cs">
+      <DependentUpon>BorderProcessingAreaView.cs</DependentUpon>
+    </Compile>
     <Compile Include="UI\ProgramView.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -121,7 +127,6 @@
     <Compile Include="UI\SawingParamsView.Designer.cs">
       <DependentUpon>SawingParamsView.cs</DependentUpon>
     </Compile>
-    <Compile Include="UI\TechOperationNode.cs" />
     <Compile Include="UI\TechProcessParamsView.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -134,12 +139,9 @@
     <Compile Include="UI\TechProcessView.Designer.cs">
       <DependentUpon>TechProcessView.cs</DependentUpon>
     </Compile>
-    <Compile Include="UI\TechProcessNode.cs" />
-    <Compile Include="UI\TechProcessTreeBuilder.cs" />
-    <Compile Include="UI\TechProcessNodeType.cs" />
-    <Compile Include="UI\TreeViewExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Properties\DataSources\CAM.Domain.BorderProcessingArea.datasource" />
     <None Include="Properties\DataSources\CAM.Domain.ProcessCommand.datasource" />
     <None Include="Properties\DataSources\CAM.Domain.SawingMode.datasource" />
     <None Include="Properties\DataSources\CAM.Domain.SawingTechOperationParams.datasource" />
@@ -148,6 +150,9 @@
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UI\BorderProcessingAreaView.resx">
+      <DependentUpon>BorderProcessingAreaView.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="UI\ProgramView.resx">
       <DependentUpon>ProgramView.cs</DependentUpon>

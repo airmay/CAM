@@ -11,7 +11,7 @@ namespace CAM.Domain
     /// </summary>
     public class CamManager
     {
-        private List<TechProcess> _techProcessList = new List<TechProcess>();
+        public List<TechProcess> TechProcessList = new List<TechProcess>();
         private SawingTechOperationParams _sawingLineTechOperationParamsDefault = new SawingTechOperationParams();
         private SawingTechOperationParams _sawingCurveTechOperationParamsDefault = new SawingTechOperationParams();
         private TechProcessParams _techProcessParams = new TechProcessParams();
@@ -33,13 +33,15 @@ namespace CAM.Domain
 
             _techProcessParams.Tool = new Tool();
             _techProcessParams.Tool.Number = 1;
-            // TODO убрать
+
+	        CreateTechProcess();
+	        // TODO убрать
         }
 
         public TechProcess CreateTechProcess()
         {
-            var techProcess = new TechProcess($"Обработка{_techProcessList.Count + 1}", _techProcessParams);
-            _techProcessList.Add(techProcess);
+            var techProcess = new TechProcess($"Обработка{TechProcessList.Count + 1}", _techProcessParams);
+            TechProcessList.Add(techProcess);
 
             return techProcess;
         }
@@ -82,7 +84,7 @@ namespace CAM.Domain
         public void RemoveTechProcess(TechProcess techProcess)
         {
             DeleteToolpath(techProcess);
-            _techProcessList.Remove(techProcess);
+            TechProcessList.Remove(techProcess);
         }
 
         private void DeleteToolpath(TechProcess techProcess)
