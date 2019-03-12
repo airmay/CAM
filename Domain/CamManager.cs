@@ -56,7 +56,7 @@ namespace CAM.Domain
             _acad.SelectEntities(new List<ObjectId> { techOperation.ProcessingArea.AcadObjectId });
         }
 
-        public IEnumerable<SawingTechOperation> CreateTechOperations(TechProcess techProcess, TechOperationType techOperationType)
+        public List<SawingTechOperation> CreateTechOperations(TechProcess techProcess, TechOperationType techOperationType)
         {
 	        var factory = techProcess.TechOperationFactorys.SingleOrDefault(p => p.TechOperationType == techOperationType);
 	        if (factory == null)
@@ -71,7 +71,7 @@ namespace CAM.Domain
 		        techProcess.TechOperationFactorys.Add(factory);
 	        }
 
-	        var operations = _acad.GetSelectedEntities().Select(p => _techOperationFactory.Create(techProcess, p));
+	        var operations = _acad.GetSelectedEntities().Select(p => _techOperationFactory.Create(techProcess, p)).ToList();
 
 	        return operations;
         }

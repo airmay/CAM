@@ -29,47 +29,24 @@
         private void InitializeComponent()
         {
 			this.components = new System.ComponentModel.Container();
-			this.gbCalcParams = new System.Windows.Forms.GroupBox();
-			this.bCalculate = new System.Windows.Forms.Button();
 			this.edCompensation = new System.Windows.Forms.TextBox();
 			this.lbCompensation = new System.Windows.Forms.Label();
 			this.gbSawingModes = new System.Windows.Forms.GroupBox();
 			this.pSawingModesButton = new System.Windows.Forms.Panel();
 			this.bLoadSawingModes = new System.Windows.Forms.Button();
 			this.bSaveSawingModes = new System.Windows.Forms.Button();
+			this.panel1 = new System.Windows.Forms.Panel();
 			this.sawingModesView = new CAM.UI.SawingModesView();
 			this.sawingParamsBindingSource = new System.Windows.Forms.BindingSource(this.components);
-			this.gbCalcParams.SuspendLayout();
 			this.gbSawingModes.SuspendLayout();
 			this.pSawingModesButton.SuspendLayout();
+			this.panel1.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.sawingParamsBindingSource)).BeginInit();
 			this.SuspendLayout();
 			// 
-			// gbCalcParams
-			// 
-			this.gbCalcParams.Controls.Add(this.bCalculate);
-			this.gbCalcParams.Controls.Add(this.edCompensation);
-			this.gbCalcParams.Controls.Add(this.lbCompensation);
-			this.gbCalcParams.Dock = System.Windows.Forms.DockStyle.Top;
-			this.gbCalcParams.Location = new System.Drawing.Point(0, 0);
-			this.gbCalcParams.Name = "gbCalcParams";
-			this.gbCalcParams.Size = new System.Drawing.Size(245, 96);
-			this.gbCalcParams.TabIndex = 0;
-			this.gbCalcParams.TabStop = false;
-			this.gbCalcParams.Text = "Расчетные параметры";
-			// 
-			// bCalculate
-			// 
-			this.bCalculate.Location = new System.Drawing.Point(6, 68);
-			this.bCalculate.Name = "bCalculate";
-			this.bCalculate.Size = new System.Drawing.Size(75, 23);
-			this.bCalculate.TabIndex = 6;
-			this.bCalculate.Text = "Рассчитать";
-			this.bCalculate.UseVisualStyleBackColor = true;
-			// 
 			// edCompensation
 			// 
-			this.edCompensation.Location = new System.Drawing.Point(85, 42);
+			this.edCompensation.Location = new System.Drawing.Point(82, 7);
 			this.edCompensation.Name = "edCompensation";
 			this.edCompensation.Size = new System.Drawing.Size(50, 20);
 			this.edCompensation.TabIndex = 5;
@@ -77,7 +54,7 @@
 			// lbCompensation
 			// 
 			this.lbCompensation.AutoSize = true;
-			this.lbCompensation.Location = new System.Drawing.Point(3, 45);
+			this.lbCompensation.Location = new System.Drawing.Point(0, 10);
 			this.lbCompensation.Name = "lbCompensation";
 			this.lbCompensation.Size = new System.Drawing.Size(76, 13);
 			this.lbCompensation.TabIndex = 4;
@@ -85,12 +62,12 @@
 			// 
 			// gbSawingModes
 			// 
-			this.gbSawingModes.Controls.Add(this.pSawingModesButton);
 			this.gbSawingModes.Controls.Add(this.sawingModesView);
+			this.gbSawingModes.Controls.Add(this.pSawingModesButton);
 			this.gbSawingModes.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.gbSawingModes.Location = new System.Drawing.Point(0, 96);
+			this.gbSawingModes.Location = new System.Drawing.Point(0, 34);
 			this.gbSawingModes.Name = "gbSawingModes";
-			this.gbSawingModes.Size = new System.Drawing.Size(245, 315);
+			this.gbSawingModes.Size = new System.Drawing.Size(245, 377);
 			this.gbSawingModes.TabIndex = 2;
 			this.gbSawingModes.TabStop = false;
 			this.gbSawingModes.Text = "Режимы обработки";
@@ -100,10 +77,11 @@
 			this.pSawingModesButton.Controls.Add(this.bLoadSawingModes);
 			this.pSawingModesButton.Controls.Add(this.bSaveSawingModes);
 			this.pSawingModesButton.Dock = System.Windows.Forms.DockStyle.Bottom;
-			this.pSawingModesButton.Location = new System.Drawing.Point(3, 283);
+			this.pSawingModesButton.Location = new System.Drawing.Point(3, 345);
 			this.pSawingModesButton.Name = "pSawingModesButton";
 			this.pSawingModesButton.Size = new System.Drawing.Size(239, 29);
 			this.pSawingModesButton.TabIndex = 2;
+			this.pSawingModesButton.Visible = false;
 			// 
 			// bLoadSawingModes
 			// 
@@ -123,47 +101,54 @@
 			this.bSaveSawingModes.Text = "Сохранить";
 			this.bSaveSawingModes.UseVisualStyleBackColor = true;
 			// 
+			// panel1
+			// 
+			this.panel1.Controls.Add(this.edCompensation);
+			this.panel1.Controls.Add(this.lbCompensation);
+			this.panel1.Dock = System.Windows.Forms.DockStyle.Top;
+			this.panel1.Location = new System.Drawing.Point(0, 0);
+			this.panel1.Name = "panel1";
+			this.panel1.Size = new System.Drawing.Size(245, 34);
+			this.panel1.TabIndex = 7;
+			// 
 			// sawingModesView
 			// 
 			this.sawingModesView.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.sawingModesView.Location = new System.Drawing.Point(3, 16);
 			this.sawingModesView.Name = "sawingModesView";
-			this.sawingModesView.Size = new System.Drawing.Size(239, 296);
+			this.sawingModesView.Size = new System.Drawing.Size(239, 329);
 			this.sawingModesView.TabIndex = 1;
 			// 
 			// sawingParamsBindingSource
 			// 
 			this.sawingParamsBindingSource.DataSource = typeof(CAM.Domain.SawingTechOperationParams);
-			this.sawingParamsBindingSource.DataSourceChanged += new System.EventHandler(this.sawingParamsBindingSource_DataSourceChanged);
 			// 
 			// SawingParamsView
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.Controls.Add(this.gbSawingModes);
-			this.Controls.Add(this.gbCalcParams);
+			this.Controls.Add(this.panel1);
 			this.Name = "SawingParamsView";
 			this.Size = new System.Drawing.Size(245, 411);
-			this.gbCalcParams.ResumeLayout(false);
-			this.gbCalcParams.PerformLayout();
 			this.gbSawingModes.ResumeLayout(false);
 			this.pSawingModesButton.ResumeLayout(false);
+			this.panel1.ResumeLayout(false);
+			this.panel1.PerformLayout();
 			((System.ComponentModel.ISupportInitialize)(this.sawingParamsBindingSource)).EndInit();
 			this.ResumeLayout(false);
 
         }
 
         #endregion
-
-        private System.Windows.Forms.GroupBox gbCalcParams;
-        public System.Windows.Forms.BindingSource sawingParamsBindingSource;
         private SawingModesView sawingModesView;
-        private System.Windows.Forms.Button bCalculate;
         private System.Windows.Forms.TextBox edCompensation;
         private System.Windows.Forms.Label lbCompensation;
         private System.Windows.Forms.GroupBox gbSawingModes;
         private System.Windows.Forms.Panel pSawingModesButton;
         private System.Windows.Forms.Button bLoadSawingModes;
         private System.Windows.Forms.Button bSaveSawingModes;
-    }
+		private System.Windows.Forms.Panel panel1;
+		private System.Windows.Forms.BindingSource sawingParamsBindingSource;
+	}
 }

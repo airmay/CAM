@@ -17,10 +17,11 @@ namespace CAM.UI
         {
             InitializeComponent();
         }
-
-        private void sawingParamsBindingSource_DataSourceChanged(object sender, EventArgs e)
-        {
-            sawingModesView.sawingModesBindingSource.DataSource = ((SawingTechOperationParams)sawingParamsBindingSource.DataSource).Modes;
-        }
+		
+	    public void SetDataSource(SawingTechOperationParams dataSource)
+	    {
+		    sawingParamsBindingSource.DataSource = dataSource;
+		    sawingModesView.sawingModesBindingSource.DataSource = ((SawingTechOperationParams)sawingParamsBindingSource.DataSource).Modes;
+	    }
 	}
 }
