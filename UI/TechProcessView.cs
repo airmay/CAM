@@ -4,7 +4,6 @@ using System.Drawing;
 using System.Windows.Forms;
 using CAM.Domain;
 using System.Linq;
-using Autodesk.AutoCAD.Runtime;
 
 namespace CAM.UI
 {
@@ -50,11 +49,13 @@ namespace CAM.UI
 	        switch (treeView.SelectedNode.Tag)
 	        {
 		        case TechProcess techProcess:
+					_techProcessParamsView.SetDataSource(techProcess.TechProcessParams);
 			        _techProcessParamsView.BringToFront();
 			        _camManager.SelectTechProcess(techProcess);
+
 			        break;
+
 		        case TechOperation techOperation:
-			        _paramsView.BringToFront();
 
 			        if (techOperation.ProcessingArea is BorderProcessingArea && _borderProcessingAreaView == null)
 			        {
@@ -77,6 +78,7 @@ namespace CAM.UI
 
 			                break;
 	                }
+			        _paramsView.BringToFront();
 	                _camManager.SelectTechOperation(techOperation);
 
                     break;
@@ -152,10 +154,10 @@ namespace CAM.UI
 			    switch (treeView.SelectedNode.Tag)
 			    {
 				    case TechProcess techProcess:
-					    _camManager.RemoveTechProcess(techProcess);
+					    _camManager.DeleteTechProcess(techProcess);
 					    break;
 				    case TechOperation techOperation:
-					    _camManager.RemoveTechOperation(techOperation);
+					    _camManager.DeleteTechOperation(techOperation);
 					    break;
 			    }
 			    treeView.SelectedNode.Remove();

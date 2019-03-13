@@ -50,5 +50,8 @@ namespace CAM.Domain
         }
 
         public abstract Point3d BuildProcessing(Point3d startPoint, bool isLast);
-    }
+
+	    public IEnumerable<Curve> ToolpathCurves => ProcessCommands.Select(p => p.ToolpathCurve).Where(p => p != null);
+
+	}
 }

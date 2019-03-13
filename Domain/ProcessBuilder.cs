@@ -230,19 +230,19 @@ namespace CAM.Domain
 			    case Arc arc:
 				    hasToolOffset = (arc.StartAngle >= 0.5 * Math.PI && arc.StartAngle < 1.5 * Math.PI) ^ (outerSide == Side.Right);
 				    if (outerSide == Side.Left)
-					    d = arc.Radius - Math.Sqrt(arc.Radius * arc.Radius - depth * (_techProcessParams.Tool.Diameter - depth));
+					    d = arc.Radius - Math.Sqrt(arc.Radius * arc.Radius - depth * (_techProcessParams.ToolDiameter - depth));
 				    break;
 		    }
 		    double sign = outerSide == Side.Left ^ _curve is Arc ? 1 : -1;
 
-		    return _compensation = sign * ((hasToolOffset ? _techProcessParams.Tool.Thickness : 0) + d);
+		    return _compensation = sign * ((hasToolOffset ? _techProcessParams.ToolThickness : 0) + d);
 	    }
 
 	    public double CalcIndent(bool isExactlyBegin, bool isExactlyEnd, int depth)
 	    {
 			const int cornerIndentIncrease = 5;
 
-			var indent = Math.Sqrt(depth * (_techProcessParams.Tool.Diameter - depth)) + cornerIndentIncrease;
+			var indent = Math.Sqrt(depth * (_techProcessParams.ToolDiameter - depth)) + cornerIndentIncrease;
 		    _startIndent = isExactlyBegin ? indent : 0;
 		    _endIndent = isExactlyEnd ? indent : 0;
 

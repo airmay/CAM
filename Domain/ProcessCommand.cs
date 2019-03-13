@@ -29,20 +29,21 @@ namespace CAM.Domain
         /// <summary>
         /// Идентификатор графического примитива автокада представляющего траекторию инструмента
         /// </summary>
-        public readonly ObjectId ToolpathAcadObjectId;
+        public readonly ObjectId ToolpathCurveId;
 
         /// <summary>
         /// Графический примитив автокада представляющего траекторию инструмента
         /// </summary>
-        public readonly Curve ToolpathAcadObject;
+        public readonly Curve ToolpathCurve;
+
         private List<string> par;
         private string v;
 
-        public ProcessCommand(string name, string code, Curve toolpathAcadObject = null, string param1 = null, string param2 = null, string param3 = null, string param4 = null, string param5 = null, string param6 = null)
+        public ProcessCommand(string name, string code, Curve toolpathCurve = null, string param1 = null, string param2 = null, string param3 = null, string param4 = null, string param5 = null, string param6 = null)
         {
             Name = name;
             Code = code;
-            ToolpathAcadObject = toolpathAcadObject;
+            ToolpathCurve = toolpathCurve;
             Param1 = param1;
             Param2 = param2;
             Param3 = param3;
@@ -51,11 +52,11 @@ namespace CAM.Domain
             Param6 = param6;
         }
 
-        //public ProcessCommand(string name, string code, Curve toolpathAcadObject = null, params string[] @params)
+        //public ProcessCommand(string name, string code, Curve toolpathCurve = null, params string[] @params)
         //{
         //    Name = name;
         //    Code = code;
-        //    ToolpathAcadObject = toolpathAcadObject;
+        //    ToolpathCurve = toolpathCurve;
         //    Param1 = @params.Length > 0 ? @params[0] : null;
         //    Param2 = @params.Length > 1 ? @params[1] : null;
         //    Param3 = @params.Length > 2 ? @params[2] : null;

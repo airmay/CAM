@@ -26,12 +26,12 @@ namespace CAM.Domain
         /// </summary>
         public List<TechOperation> TechOperations { get; } = new List<TechOperation>();
 
-	    public IEnumerable<Curve> ToolpathCurves => TechOperations.SelectMany(p => p.ProcessCommands).Select(p => p.ToolpathAcadObject).Where(p => p != null);
+	    public IEnumerable<Curve> ToolpathCurves => TechOperations.SelectMany(p => p.ToolpathCurves);
 
-	    public TechProcess(string name, TechProcessParams techProcessParams)
+	    public TechProcess(string name)
         {
             Name = name;
-            TechProcessParams = techProcessParams;
+            TechProcessParams = new TechProcessParams();
         }
 
 	    public void BuildProcessing()

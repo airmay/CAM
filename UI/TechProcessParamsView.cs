@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using CAM.Domain;
 
 namespace CAM.UI
 {
@@ -14,12 +15,20 @@ namespace CAM.UI
     {
         private SawingParamsDefaultView _sawingParamsDefaultView;
 
-        public TechProcessParamsView()
+		public TechProcessParamsView()
         {
             InitializeComponent();
+
+	        cbMachine.DataSource = Enum.GetValues(typeof(Machine));
+			cbMaterial.DataSource = Enum.GetValues(typeof(MaterialType));
         }
 
-        private void cbTechOperation_SelectedIndexChanged(object sender, EventArgs e)
+		public void SetDataSource(TechProcessParams dataSource)
+	    {
+		    techProcessParamsBindingSource.DataSource = dataSource;
+	    }
+
+		private void cbTechOperation_SelectedIndexChanged(object sender, EventArgs e)
         {
             if (cbTechOperation.Text == "Распиловка")
             {
@@ -32,5 +41,5 @@ namespace CAM.UI
                 _sawingParamsDefaultView.BringToFront();
             }
         }
-    }
+	}
 }
