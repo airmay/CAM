@@ -55,12 +55,14 @@
 			this.edPenetrationRate = new System.Windows.Forms.TextBox();
 			this.label7 = new System.Windows.Forms.Label();
 			this.pParams = new System.Windows.Forms.Panel();
+			this.panel2 = new System.Windows.Forms.Panel();
 			this.techProcessParamsBindingSource = new System.Windows.Forms.BindingSource(this.components);
 			this.gbTool.SuspendLayout();
 			this.gbTechOperationParams.SuspendLayout();
 			this.panel1.SuspendLayout();
 			this.gbBillet.SuspendLayout();
 			this.pParams.SuspendLayout();
+			this.panel2.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.techProcessParamsBindingSource)).BeginInit();
 			this.SuspendLayout();
 			// 
@@ -73,16 +75,16 @@
 			this.cbTechOperation.Items.AddRange(new object[] {
             "Распиловка",
             "Профилирование"});
-			this.cbTechOperation.Location = new System.Drawing.Point(85, 19);
+			this.cbTechOperation.Location = new System.Drawing.Point(81, 0);
 			this.cbTechOperation.Name = "cbTechOperation";
-			this.cbTechOperation.Size = new System.Drawing.Size(225, 21);
+			this.cbTechOperation.Size = new System.Drawing.Size(232, 21);
 			this.cbTechOperation.TabIndex = 6;
 			this.cbTechOperation.SelectedIndexChanged += new System.EventHandler(this.cbTechOperation_SelectedIndexChanged);
 			// 
 			// label3
 			// 
 			this.label3.AutoSize = true;
-			this.label3.Location = new System.Drawing.Point(3, 22);
+			this.label3.Location = new System.Drawing.Point(-1, 3);
 			this.label3.Name = "label3";
 			this.label3.Size = new System.Drawing.Size(76, 13);
 			this.label3.TabIndex = 5;
@@ -210,8 +212,7 @@
 			// 
 			// gbTechOperationParams
 			// 
-			this.gbTechOperationParams.Controls.Add(this.label3);
-			this.gbTechOperationParams.Controls.Add(this.cbTechOperation);
+			this.gbTechOperationParams.Controls.Add(this.panel2);
 			this.gbTechOperationParams.Controls.Add(this.panel1);
 			this.gbTechOperationParams.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.gbTechOperationParams.Location = new System.Drawing.Point(0, 278);
@@ -357,6 +358,16 @@
 			this.pParams.Size = new System.Drawing.Size(322, 278);
 			this.pParams.TabIndex = 15;
 			// 
+			// panel2
+			// 
+			this.panel2.Controls.Add(this.cbTechOperation);
+			this.panel2.Controls.Add(this.label3);
+			this.panel2.Dock = System.Windows.Forms.DockStyle.Top;
+			this.panel2.Location = new System.Drawing.Point(3, 16);
+			this.panel2.Name = "panel2";
+			this.panel2.Size = new System.Drawing.Size(316, 21);
+			this.panel2.TabIndex = 7;
+			// 
 			// techProcessParamsBindingSource
 			// 
 			this.techProcessParamsBindingSource.DataSource = typeof(CAM.Domain.TechProcessParams);
@@ -374,12 +385,13 @@
 			this.gbTool.ResumeLayout(false);
 			this.gbTool.PerformLayout();
 			this.gbTechOperationParams.ResumeLayout(false);
-			this.gbTechOperationParams.PerformLayout();
 			this.panel1.ResumeLayout(false);
 			this.gbBillet.ResumeLayout(false);
 			this.gbBillet.PerformLayout();
 			this.pParams.ResumeLayout(false);
 			this.pParams.PerformLayout();
+			this.panel2.ResumeLayout(false);
+			this.panel2.PerformLayout();
 			((System.ComponentModel.ISupportInitialize)(this.techProcessParamsBindingSource)).EndInit();
 			this.ResumeLayout(false);
 
@@ -413,5 +425,6 @@
 		private System.Windows.Forms.Label label7;
 		private System.Windows.Forms.Panel pParams;
 		private System.Windows.Forms.BindingSource techProcessParamsBindingSource;
+		private System.Windows.Forms.Panel panel2;
 	}
 }

@@ -82,7 +82,7 @@
 			// 
 			this.splitContainer1.Panel2.Controls.Add(this.tabControl);
 			this.splitContainer1.Size = new System.Drawing.Size(312, 711);
-			this.splitContainer1.SplitterDistance = 346;
+			this.splitContainer1.SplitterDistance = 271;
 			this.splitContainer1.TabIndex = 0;
 			// 
 			// treeView
@@ -95,7 +95,7 @@
 			this.treeView.Location = new System.Drawing.Point(0, 0);
 			this.treeView.Name = "treeView";
 			this.treeView.SelectedImageIndex = 0;
-			this.treeView.Size = new System.Drawing.Size(312, 346);
+			this.treeView.Size = new System.Drawing.Size(312, 271);
 			this.treeView.TabIndex = 0;
 			this.treeView.AfterLabelEdit += new System.Windows.Forms.NodeLabelEditEventHandler(this.treeView_AfterLabelEdit);
 			this.treeView.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.treeView_AfterSelect);
@@ -114,7 +114,7 @@
 			this.tabControl.Location = new System.Drawing.Point(0, 0);
 			this.tabControl.Name = "tabControl";
 			this.tabControl.SelectedIndex = 0;
-			this.tabControl.Size = new System.Drawing.Size(312, 361);
+			this.tabControl.Size = new System.Drawing.Size(312, 436);
 			this.tabControl.TabIndex = 0;
 			// 
 			// tabPageParams
@@ -122,7 +122,7 @@
 			this.tabPageParams.Location = new System.Drawing.Point(4, 22);
 			this.tabPageParams.Name = "tabPageParams";
 			this.tabPageParams.Padding = new System.Windows.Forms.Padding(3);
-			this.tabPageParams.Size = new System.Drawing.Size(304, 335);
+			this.tabPageParams.Size = new System.Drawing.Size(304, 410);
 			this.tabPageParams.TabIndex = 0;
 			this.tabPageParams.Text = "Параметры";
 			this.tabPageParams.UseVisualStyleBackColor = true;
