@@ -32,11 +32,6 @@ namespace CAM.Domain
         public string Name { get; set; }
 
         /// <summary>
-        /// Действия для выполнения операции
-        /// </summary>
-        public List<ProcessAction> ProcessActions { get; } = new List<ProcessAction>();
-
-        /// <summary>
         /// Команды
         /// </summary>
         public List<ProcessCommand> ProcessCommands { get; set; } = new List<ProcessCommand>();
@@ -49,7 +44,7 @@ namespace CAM.Domain
             ProcessingArea = processingArea;
         }
 
-        public abstract Point3d BuildProcessing(Point3d startPoint, bool isLast);
+        public abstract void BuildProcessing(ScemaLogicProcessBuilder builder);
 
 	    public IEnumerable<Curve> ToolpathCurves => ProcessCommands.Select(p => p.ToolpathCurve).Where(p => p != null);
 

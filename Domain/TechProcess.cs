@@ -42,9 +42,9 @@ namespace CAM.Domain
 	    public void BuildProcessing()
 	    {
 			BorderProcessingArea.SetupBorders(TechOperations.Select(p => p.ProcessingArea).OfType<BorderProcessingArea>().ToList());
-			var currentPoint = Point3d.Origin;
-		    TechOperations.ForEach(p => currentPoint = p.BuildProcessing(currentPoint, p == TechOperations.Last()));
-	        ProcessCommands = TechOperations.SelectMany(p => p.ProcessCommands).ToList();
+	        var builder = new ScemaLogicProcessBuilder(TechProcessParams);
+            TechOperations.ForEach(p => p.BuildProcessing(builder));
+	        ProcessCommands = builder.FinishTechProcess();
 	    }
 	}
 }

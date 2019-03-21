@@ -8,11 +8,13 @@ namespace CAM.Domain
 {
     public class ProcessCommand
     {
+        public int Number { get; set; }
+
         public string Name { get; set; }
 
-        public string Code { get; set; }
+        public string GCode { get; set; }
 
-        public string Description { get; set; }
+        public string MCode { get; set; }
 
         public string Param1 { get; set; }
 
@@ -24,7 +26,7 @@ namespace CAM.Domain
 
         public string Param5 { get; set; }
 
-        public string Param6 { get; set; }
+        //public string Param6 { get; set; }
 
         /// <summary>
         /// Идентификатор графического примитива автокада представляющего траекторию инструмента
@@ -39,23 +41,24 @@ namespace CAM.Domain
         private List<string> par;
         private string v;
 
-        public ProcessCommand(string name, string code, Curve toolpathCurve = null, string param1 = null, string param2 = null, string param3 = null, string param4 = null, string param5 = null, string param6 = null)
+        public ProcessCommand(string name, int number, string gCode, string mCode, string param1, string param2, string param3, string param4, string param5, Curve toolpathCurve)
         {
             Name = name;
-            Code = code;
+            Number = number;
+            GCode = gCode;
+            MCode = mCode;
             ToolpathCurve = toolpathCurve;
             Param1 = param1;
             Param2 = param2;
             Param3 = param3;
             Param4 = param4;
             Param5 = param5;
-            Param6 = param6;
         }
 
-        //public ProcessCommand(string name, string code, Curve toolpathCurve = null, params string[] @params)
+        //public ProcessCommand(string name, string gCode, Curve toolpathCurve = null, params string[] @params)
         //{
         //    Name = name;
-        //    Code = code;
+        //    GCode = gCode;
         //    ToolpathCurve = toolpathCurve;
         //    Param1 = @params.Length > 0 ? @params[0] : null;
         //    Param2 = @params.Length > 1 ? @params[1] : null;

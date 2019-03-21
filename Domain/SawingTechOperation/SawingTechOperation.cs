@@ -29,11 +29,11 @@ namespace CAM.Domain
             Name = $"Распил { processingArea }";
         }
 
-        public override Point3d BuildProcessing(Point3d startPoint, bool isLast)
+        public override void BuildProcessing(ScemaLogicProcessBuilder builder)
         {
-			var builder = new ScemaLogicProcessBuilder(TechProcess.TechProcessParams, startPoint, ProcessingArea.Curve, CalcStartCorner());
+            builder.StartTechOperation(ProcessingArea.Curve, CalcStartCorner());
 
-	        var indentSum = builder.CalcIndent(((BorderProcessingArea)ProcessingArea).IsExactlyBegin, ((BorderProcessingArea)ProcessingArea).IsExactlyEnd, TechProcess.TechProcessParams.BilletThickness);
+            var indentSum = builder.CalcIndent(((BorderProcessingArea)ProcessingArea).IsExactlyBegin, ((BorderProcessingArea)ProcessingArea).IsExactlyEnd, TechProcess.TechProcessParams.BilletThickness);
 	        if (indentSum >= ProcessingArea.Curve.Length)
 	        {
 				// TODO Намечание
@@ -52,7 +52,6 @@ namespace CAM.Domain
 			       // h = obj.DepthAll;
 			       // pointC = obj.ProcessCurve.StartPoint + obj.ProcessCurve.GetFirstDerivative(0).GetNormal() * (obj.IsBeginExactly ? s : obj.Length - s);
 		        //}
-				return Point3d.Origin;
 			}
 
 	        TechOperationParams.Compensation = builder.CalcCompensation(((BorderProcessingArea)ProcessingArea).OuterSide, TechProcess.TechProcessParams.BilletThickness);
@@ -74,10 +73,7 @@ namespace CAM.Domain
             }
             while (z < billetThickness);
 			modes.Dispose();
-            var currentPoint = builder.Completion(isLast);
-            ProcessCommands = builder.Commands;
-
-	        return currentPoint;
+            ProcessCommands = builder.FinishTechOperation();
         }
 
 	    private Corner CalcStartCorner()

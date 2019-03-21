@@ -22,10 +22,5 @@ namespace CAM.Domain
              : base(techProcess, processingArea, techOperationParams)
         {
         }
-
-        public override Point3d BuildProcessing(Point3d startPoint, bool isLast)
-        {
-	        return base.BuildProcessing(startPoint, isLast);
-        }
     }
 }

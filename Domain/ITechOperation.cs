@@ -16,6 +16,6 @@ namespace CAM.Domain
         /// Создает обработку по технологической операции
         /// </summary>
         /// <returns></returns>
-        Point3d BuildProcessing(Point3d startPoint, bool isLast);
+        void BuildProcessing(ScemaLogicProcessBuilder builder);
     }
 }
