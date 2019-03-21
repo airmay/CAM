@@ -41,7 +41,7 @@ namespace CAM.Domain
 
         public Point3d EndPoint = new Point3d(2, 2, 0);
 
-        public double Length { get; }
+        public double Length { get; set; }
 
         public Point3d StartPoint = new Point3d(1, 1, 0);
 
@@ -94,12 +94,13 @@ namespace CAM.Domain
             var line = new Line(StartPoint, EndPoint);
             line.StartPoint.Z += dz;
             line.EndPoint.Z += dz;
+            line.Length = Length;
             return line;
         }
 
 	    public Point3d GetPointAtDist(double startIndent)
 	    {
-		    throw new NotImplementedException();
+	        return startIndent == 0 ? StartPoint : EndPoint;
 	    }
     }
 

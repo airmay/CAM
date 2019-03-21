@@ -17,10 +17,10 @@ namespace CAM.Domain
 
 		public MaterialType Material { get; set; }
 
-		/// <summary>
-		/// Толщина заготовки
-		/// </summary>
-		public int BilletThickness { get; set; }
+	    /// <summary>
+	    /// Толщина заготовки
+	    /// </summary>
+	    public int BilletThickness { get; set; } = 30;
 
 		/// <summary>
 		/// Высота подъема инструмента
@@ -47,15 +47,15 @@ namespace CAM.Domain
 		/// </summary>
 		public int ToolNumber { get; set; } = 1;
 
-		/// <summary>
-		/// Диаметр
-		/// </summary>
-		public double ToolDiameter { get; set; }
+	    /// <summary>
+	    /// Диаметр
+	    /// </summary>
+	    public double ToolDiameter { get; set; } = 100;
 
-		/// <summary>
-		/// Толщина
-		/// </summary>
-		public double ToolThickness { get; set; }
+	    /// <summary>
+	    /// Толщина
+	    /// </summary>
+	    public double ToolThickness { get; set; } = 5;
 
 	}
 

@@ -88,10 +88,16 @@ namespace CAM.Domain
 			techProcess.BuildProcessing();
             _acad.CreateEntities(techProcess.ToolpathCurves);
 
-            var programGenerator = new ScemaLogicProgramGenerator();
-            var program = programGenerator.Generate(techProcess);
-            ProgramGenerated?.Invoke(this, new ProgramEventArgs(program));
-        }        
+            //var programGenerator = new ScemaLogicProgramGenerator();
+            //var program = programGenerator.Generate(techProcess);
+            //ProgramGenerated?.Invoke(this, new ProgramEventArgs(program));
+        }
+
+        public void SelectProcessCommand(ProcessCommand processCommand)
+        {
+            if (processCommand.ToolpathCurve != null)
+                _acad.SelectCurve(processCommand.ToolpathCurve);
+        }
     }
 
     public class ProgramEventArgs : EventArgs

@@ -28,7 +28,12 @@ namespace CAM.Domain
 
 	    public IEnumerable<Curve> ToolpathCurves => TechOperations.SelectMany(p => p.ToolpathCurves);
 
-	    public TechProcess(string name)
+        /// <summary>
+        /// Команды
+        /// </summary>
+        public List<ProcessCommand> ProcessCommands { get; set; } = new List<ProcessCommand>();
+
+        public TechProcess(string name)
         {
             Name = name;
             TechProcessParams = new TechProcessParams();
@@ -39,6 +44,7 @@ namespace CAM.Domain
 			BorderProcessingArea.SetupBorders(TechOperations.Select(p => p.ProcessingArea).OfType<BorderProcessingArea>().ToList());
 			var currentPoint = Point3d.Origin;
 		    TechOperations.ForEach(p => currentPoint = p.BuildProcessing(currentPoint, p == TechOperations.Last()));
-		}
+	        ProcessCommands = TechOperations.SelectMany(p => p.ProcessCommands).ToList();
+	    }
 	}
 }

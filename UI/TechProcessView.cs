@@ -51,7 +51,8 @@ namespace CAM.UI
 		        case TechProcess techProcess:
 					_techProcessParamsView.SetDataSource(techProcess.TechProcessParams);
 			        _techProcessParamsView.BringToFront();
-			        _camManager.SelectTechProcess(techProcess);
+		            processCommandBindingSource.DataSource = techProcess.ProcessCommands;
+                    _camManager.SelectTechProcess(techProcess);
 
 			        break;
 
@@ -79,7 +80,8 @@ namespace CAM.UI
 			                break;
 	                }
 			        _paramsView.BringToFront();
-	                _camManager.SelectTechOperation(techOperation);
+		            processCommandBindingSource.DataSource = techOperation.ProcessCommands;
+                    _camManager.SelectTechOperation(techOperation);
 
                     break;
             }
@@ -196,10 +198,19 @@ namespace CAM.UI
 
 	    private void bBuildProcessing_Click(object sender, EventArgs e)
 	    {
-		    if (CurrentTechProcess != null)
-			    _camManager.BuildProcessing(CurrentTechProcess);
+	        if (CurrentTechProcess != null)
+	        {
+	            _camManager.BuildProcessing(CurrentTechProcess);
+	            treeView_AfterSelect( null, null);
+	        }
 	    }
 
-	    #endregion
-	}
+        #endregion
+
+        private void processCommandBindingSource_CurrentChanged(object sender, EventArgs e)
+        {
+            _camManager.SelectProcessCommand(processCommandBindingSource.Current as ProcessCommand);
+        }
+
+    }
 }

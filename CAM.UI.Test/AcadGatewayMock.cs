@@ -19,14 +19,24 @@ namespace CAM.UI.Test
         {
             _listBox = listBox;
             for (int i = 1; i < 10; i++)
-                _listBox.Items.Add((i % 2 == 0 ? "Прямая" : "Дуга") + i);
+                _listBox.Items.Add((i % 2 == 0 ? "Прямая" : "Дуга") + "_" + i);
         }
 
         public Curve[] GetSelectedEntities()
         {
             var curvies = new List<Curve>();
             foreach (var item in _listBox.SelectedItems)
-                curvies.Add(item.ToString().StartsWith("Прямая") ? new Line(item.ToString()) as Curve : new Arc(item.ToString()));
+            {
+                var strings = item.ToString().Split('_');
+                var curve = strings[0] == "Прямая"
+                    ? new Line(item.ToString()) as Curve
+                    : new Arc(item.ToString());
+                var pos = Int32.Parse(strings[1]) * 1000;
+                curve.StartPoint = new Point3d(pos, pos, pos);
+                curve.EndPoint = new Point3d(pos + 1000, pos + 1000, pos + 1000);
+                curve.Length = 1000;
+                curvies.Add(curve);
+            }
             return curvies.ToArray();
         }
 
@@ -49,7 +59,13 @@ namespace CAM.UI.Test
 
 	    public void CreateEntities(IEnumerable<Curve> entities)
 	    {
-		    throw new NotImplementedException();
-	    }
+	        entities.ToList().ForEach(p => _listBox.Items.Add(p.ObjectId.Key));
+        }
+
+        public void SelectCurve(Curve curve)
+        {
+            for (int i = 0; i < _listBox.Items.Count; i++)
+                _listBox.SetSelected(i, curve.ObjectId.Key == _listBox.Items[i].ToString());
+        }
     }
 }

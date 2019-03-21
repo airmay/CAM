@@ -30,5 +30,7 @@ namespace CAM
         void DeleteEntities(IEnumerable<Curve> idList);
 
 	    void CreateEntities(IEnumerable<Curve> entities);
+
+        void SelectCurve(Curve curve);
     }
 }

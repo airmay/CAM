@@ -140,7 +140,8 @@ namespace CAM.Domain
 		    if (isLast)
 		    {
 			    var name = "End";
-				CreateCommand(name, "97;9");
+
+		        CreateCommand(name, "97;9");
 			    CreateCommand(name, "97;10");
 			    CreateCommand(name, "97;5");
 			    CreateCommand(name, "97;30");
@@ -159,7 +160,7 @@ namespace CAM.Domain
 		    // TODO проверка совпадения точек
 		    var destPoint = new Point3d(x ?? _currentPoint.X, y ?? _currentPoint.Y, z ?? _currentPoint.Z);
 		    var line = _currentPoint != Point3d.Origin
-			    ? new Line(_currentPoint, destPoint) {ObjectId = new ObjectId(name)}
+			    ? new Line(_currentPoint, destPoint) {ObjectId = new ObjectId(name + Guid.NewGuid())}
 			    : null;
 		    CreateCommand(name, code, line, axis, feed, destPoint.X, destPoint.Y, destPoint.Z);
 		    _currentPoint = destPoint;
@@ -179,7 +180,7 @@ namespace CAM.Domain
 
 	        Move(CommandNames.Penetration, "1", "XYCZ", _techProcessParams.PenetrationRate, toolpathCurve.GetPoint(_corner).X, toolpathCurve.GetPoint(_corner).Y, z: z);
 
-			toolpathCurve.ObjectId = new ObjectId($"{_curve.ObjectId.Key} обработка");
+			toolpathCurve.ObjectId = new ObjectId($"{_curve.ObjectId.Key} обработка{Guid.NewGuid()}");
 	        _corner = _corner.Swap();
             _currentPoint = toolpathCurve.GetPoint(_corner);
 
