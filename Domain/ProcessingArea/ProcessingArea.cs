@@ -73,7 +73,7 @@ namespace CAM.Domain
             Curve = curve;
             StartPoint = curve.StartPoint;
             EndPoint = curve.EndPoint;
-            Length = curve.Length;
+            Length = curve.Length();
         }
 
 	    public override string ToString()

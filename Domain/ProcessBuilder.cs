@@ -5,6 +5,8 @@ using System.Security.Policy;
 using System.Text;
 using System.Threading.Tasks;
 using Autodesk.AutoCAD.ApplicationServices;
+using Autodesk.AutoCAD.DatabaseServices;
+using Autodesk.AutoCAD.Geometry;
 
 namespace CAM.Domain
 {
@@ -49,7 +51,7 @@ namespace CAM.Domain
 
         private static Curve CreateToolpathCurve(Curve curve, double offset, double z, double startIndent, double endIndent)
 	    {
-		    var toolpathCurve = curve.GetOffsetCurves(offset, z);
+		    var toolpathCurve = curve.GetOffsetCurves(offset)[0] as Curve; //, z)[0];
 
 			switch (toolpathCurve)
 		    {
@@ -178,7 +180,7 @@ namespace CAM.Domain
 		    // TODO проверка совпадения точек
 		    var destPoint = new Point3d(x ?? _currentPoint.X, y ?? _currentPoint.Y, z ?? _currentPoint.Z);
 		    var line = _currentPoint != Point3d.Origin
-			    ? new Line(_currentPoint, destPoint) {ObjectId = new ObjectId(name + Guid.NewGuid())}
+			    ? new Line(_currentPoint, destPoint)
 			    : null;
 		    CreateCommand(name, code, axis, feed, line, destPoint.X, destPoint.Y, destPoint.Z);
 		    _currentPoint = destPoint;
@@ -198,7 +200,6 @@ namespace CAM.Domain
 
 	        Move(CommandNames.Penetration, 1, "XYCZ", _techProcessParams.PenetrationRate, toolpathCurve.GetPoint(_corner).X, toolpathCurve.GetPoint(_corner).Y, z: z);
 
-			toolpathCurve.ObjectId = new ObjectId($"{_curve.ObjectId.Key} обработка{Guid.NewGuid()}");
 	        _corner = _corner.Swap();
             _currentPoint = toolpathCurve.GetPoint(_corner);
 

@@ -34,11 +34,11 @@
   <ItemGroup>
     <Reference Include="AcDbMgd">
       <HintPath>AcadAssembly\AcDbMgd.dll</HintPath>
-      <Private>False</Private>
+      <Private>True</Private>
     </Reference>
     <Reference Include="AcMgd">
       <HintPath>AcadAssembly\AcMgd.dll</HintPath>
-      <Private>False</Private>
+      <Private>True</Private>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -59,18 +59,14 @@
     <Compile Include="Domain\CommandNames.cs" />
     <Compile Include="Domain\Corner.cs" />
     <Compile Include="Domain\FakePrimitive.cs" />
-    <Compile Include="Domain\ProcessAction.cs" />
     <Compile Include="Domain\ProcessBuilder.cs" />
     <Compile Include="Domain\ProcessCommand.cs" />
     <Compile Include="Domain\ProcessingArea\ArcProcessingArea.cs" />
-    <Compile Include="Domain\CuttingDiscTechnonogy.cs" />
     <Compile Include="Domain\ProcessingArea\BorderProcessingArea.cs" />
     <Compile Include="Domain\SawingTechOperation\ITechOperationFactory.cs" />
     <Compile Include="Domain\SawingTechOperation\SawingDefaultParams.cs" />
     <Compile Include="Domain\ScemaLogicProgramGenerator.cs" />
     <Compile Include="Domain\TechOperationType.cs" />
-    <Compile Include="Domain\TechProcessCommand.cs" />
-    <Compile Include="Domain\ITechnonogy.cs" />
     <Compile Include="Domain\ITechOperation.cs" />
     <Compile Include="Domain\ProcessingArea\LineProcessingArea.cs" />
     <Compile Include="Domain\ProcessingArea\ProcessingArea.cs" />

@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Autodesk.AutoCAD.DatabaseServices;
 
 namespace CAM.Domain
 {
@@ -34,7 +35,7 @@ namespace CAM.Domain
             builder.StartTechOperation(ProcessingArea.Curve, CalcStartCorner());
 
             var indentSum = builder.CalcIndent(((BorderProcessingArea)ProcessingArea).IsExactlyBegin, ((BorderProcessingArea)ProcessingArea).IsExactlyEnd, TechProcess.TechProcessParams.BilletThickness);
-	        if (indentSum >= ProcessingArea.Curve.Length)
+	        if (indentSum >= ProcessingArea.Curve.Length())
 	        {
 				// TODO Намечание
 		        //if (!(obj is ProcessObjectLine))

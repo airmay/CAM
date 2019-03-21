@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using Autodesk.AutoCAD.DatabaseServices;
+using Autodesk.AutoCAD.Geometry;
 using CAM.Domain;
 
 namespace CAM.UI.Test
@@ -29,12 +31,11 @@ namespace CAM.UI.Test
             {
                 var strings = item.ToString().Split('_');
                 var curve = strings[0] == "Прямая"
-                    ? new Line(item.ToString()) as Curve
-                    : new Arc(item.ToString());
+                    ? new Line() as Curve
+                    : new Arc();
                 var pos = Int32.Parse(strings[1]) * 1000;
                 curve.StartPoint = new Point3d(pos, pos, pos);
                 curve.EndPoint = new Point3d(pos + 1000, pos + 1000, pos + 1000);
-                curve.Length = 1000;
                 curvies.Add(curve);
             }
             return curvies.ToArray();
@@ -42,30 +43,30 @@ namespace CAM.UI.Test
 
         public void SelectEntities(List<ObjectId> list)
         {
-            var keys = list.ConvertAll(p => p.Key);
+            var keys = list.ConvertAll(p => p.ToString());
             for (int i = 0; i < _listBox.Items.Count; i++)
                 _listBox.SetSelected(i, keys.Contains(_listBox.Items[i]));
         }
 
         public void CreateEntities(List<Curve> entities)
         {
-            entities.ForEach(p => _listBox.Items.Add(p.ObjectId.Key));
+            entities.ForEach(p => _listBox.Items.Add(p.ObjectId.ToString()));
         }
 
 	    public void DeleteEntities(IEnumerable<Curve> ids)
         {
-            ids.ToList().ForEach(p => { if (_listBox.Items.Contains(p.ObjectId.Key)) _listBox.Items.Remove(p.ObjectId.Key); });
+            ids.ToList().ForEach(p => { if (_listBox.Items.Contains(p.ObjectId.ToString())) _listBox.Items.Remove(p.ObjectId.ToString()); });
         }
 
 	    public void CreateEntities(IEnumerable<Curve> entities)
 	    {
-	        entities.ToList().ForEach(p => _listBox.Items.Add(p.ObjectId.Key));
+	        entities.ToList().ForEach(p => _listBox.Items.Add(p.ObjectId.ToString()));
         }
 
         public void SelectCurve(Curve curve)
         {
             for (int i = 0; i < _listBox.Items.Count; i++)
-                _listBox.SetSelected(i, curve.ObjectId.Key == _listBox.Items[i].ToString());
+                _listBox.SetSelected(i, curve.ObjectId.ToString() == _listBox.Items[i].ToString());
         }
     }
 }
