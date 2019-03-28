@@ -1,12 +1,7 @@
 ﻿using Autodesk.AutoCAD.Runtime;
 using Autodesk.AutoCAD.Windows;
 using CAM.UI;
-using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CAM
 {
@@ -42,6 +37,8 @@ namespace CAM
 
             //AutocadUtils.CreateTest();
             //RunTest();
+
+            new CamManager(new AcadGateway());
         }
 
         public void Terminate()

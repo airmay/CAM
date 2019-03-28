@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Autodesk.AutoCAD.DatabaseServices;
+using CAM.Domain;
 
-namespace CAM.Domain
+namespace CAM
 {
     /// <summary>
     /// Управляющий класс
@@ -13,26 +12,15 @@ namespace CAM.Domain
     public class CamManager
     {
         public List<TechProcess> TechProcessList = new List<TechProcess>();
-        private SawingTechOperationParams _sawingLineTechOperationParamsDefault = new SawingTechOperationParams();
-        private SawingTechOperationParams _sawingCurveTechOperationParamsDefault = new SawingTechOperationParams();
-        private SawingTechOperationFactory _techOperationFactory;
         private IAcadGateway _acad;
+        private CamContainer _container = CamContainer.Load();
 
         public EventHandler<ProgramEventArgs> ProgramGenerated;
 
         public CamManager(IAcadGateway acad)
         {
             _acad = acad;
-
-            _sawingLineTechOperationParamsDefault.Modes.Add(new SawingMode { Depth = 30, DepthStep = 5, Feed = 2000 });
-            _sawingCurveTechOperationParamsDefault.Modes.AddRange(new SawingMode[3] {
-                new SawingMode { Depth = 10, DepthStep = 5, Feed = 2000 },
-                new SawingMode { Depth = 20, DepthStep = 2, Feed = 1000 },
-                new SawingMode { Depth = 30, DepthStep = 1, Feed = 500 } });
-            _techOperationFactory = new SawingTechOperationFactory(_sawingLineTechOperationParamsDefault, _sawingCurveTechOperationParamsDefault);
-
 	        CreateTechProcess();
-	        // TODO убрать
         }
 
         public TechProcess CreateTechProcess()
@@ -55,14 +43,14 @@ namespace CAM.Domain
 		        switch (techOperationType)
 		        {
 			        case TechOperationType.Sawing:
-				        factory = new SawingTechOperationFactory(_sawingLineTechOperationParamsDefault, _sawingCurveTechOperationParamsDefault);
+				        factory = new SawingTechOperationFactory(_container.SawingLineTechOperationParams, _container.SawingCurveTechOperationParams);
 						break;
 		        }
 
 		        techProcess.TechOperationFactorys.Add(factory);
 	        }
 
-	        var operations = _acad.GetSelectedEntities().Select(p => _techOperationFactory.Create(techProcess, p)).ToList();
+	        var operations = _acad.GetSelectedEntities().Select(p => factory.Create(techProcess, p)).ToList();
 
 	        return operations;
         }
