@@ -10,7 +10,7 @@ namespace CAM.Domain
     /// </summary>
     public class CamContainer
     {
-        private static string _filePath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "cam_data.json");
+        private static readonly string _filePath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "cam_data.json");
 
         #region Methods
 
