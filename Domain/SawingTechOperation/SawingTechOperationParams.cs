@@ -9,6 +9,7 @@ namespace CAM.Domain
     /// <summary>
     /// Параметры технологической операция "Распиловка"
     /// </summary>
+    [Serializable]
     public class SawingTechOperationParams
     {
         /// <summary>

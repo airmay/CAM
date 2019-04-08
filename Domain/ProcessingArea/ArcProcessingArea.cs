@@ -33,20 +33,20 @@ namespace CAM.Domain
         /// <param name="curve">Дуга</param>
         public ArcProcessingArea(Curve curve) : base(curve)
         {
-            Set(curve);
+            //Set(curve);
         }
 
         /// <summary>
         /// Заполнение параметров обрабатываемой области в соответствии с полученной кривой
         /// </summary>
         /// <param name="curve"></param>
-        protected override void Set(Curve curve)
-        {
-            base.Set(curve);
-            var arc = curve as Arc;
-            StartAngle = Math.Round(arc.StartAngle, 6);
-            EndAngle = Math.Round(arc.EndAngle, 6);
-        }
+        //protected override void Set(Curve curve)
+        //{
+        //    base.Set(curve);
+        //    var arc = curve as Arc;
+        //    StartAngle = Math.Round(arc.StartAngle, 6);
+        //    EndAngle = Math.Round(arc.EndAngle, 6);
+        //}
 
         public override string ToString()
         {

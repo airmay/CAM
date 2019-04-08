@@ -1,20 +1,42 @@
-﻿using Autodesk.AutoCAD.Runtime;
+﻿using Autodesk.AutoCAD.ApplicationServices;
+using Autodesk.AutoCAD.DatabaseServices;
+using Autodesk.AutoCAD.Runtime;
 using Autodesk.AutoCAD.Windows;
 using CAM.UI;
+using System;
 using System.Diagnostics;
+using System.Drawing;
+using System.IO;
+using System.Reflection;
 
 namespace CAM
 {
     public class Bootstrapper : IExtensionApplication
     {
+        private CamManager _manager;
+
         public void Initialize()
         {
             var acad = new AcadGateway();
-            PaletteSet paletteSet = acad.CreatePaletteSet();
-            //AutocadUtils.WriteMessage("Инициализация плагина ProcessingProgram. Версия с режимом обработки."); // + DateTime.Today.ToShortDateString()); TODO Assemlly.DateTime()
+            acad.WriteMessage($"\nИнициализация плагина. Версия сборки от {File.GetLastWriteTime(Assembly.GetExecutingAssembly().Location)}");
 
-            paletteSet.Add("Объекты", new TechProcessView());
+            _manager = new CamManager(acad);
+
+            PaletteSet paletteSet = CreatePaletteSet();
+
+            //var techProcessView = new TechProcessView();
+            paletteSet.Add("Объекты", new TechProcessView(_manager));
             paletteSet.Add("Программа", new ProgramView());
+
+            Application.DocumentManager.DocumentActivated += (sender, args) => _manager.SetActiveDocument(args.Document);
+            
+            _manager.SetActiveDocument(acad.Document);
+
+            //PaletteSet focus use Autodesk.AutoCAD.Internal.Utils.SetFocusToDwgView();
+            //PaletteSet.PaletteActivated
+
+            //Application.DocumentManager.DocumentLockModeChanged += DocumentManagerOnDocumentLockModeChanged;
+            //Application.DocumentManager.DocumentActivated += (sender, args) => SetActiveDocument(args.Document);
 
             //ProcessingForm.CurrentChanged += (sender, args) => AutocadUtils.SelectObjects(args.Data.ObjectId, args.Data.ToolObjectId);
             //ProcessingForm.DeleteProcessing += (sender, args) => DeleteProcessing();
@@ -38,8 +60,18 @@ namespace CAM
             //AutocadUtils.CreateTest();
             //RunTest();
 
-            new CamManager(new AcadGateway());
         }
+
+        //private static void DocumentManagerOnDocumentLockModeChanged(object sender, DocumentLockModeChangedEventArgs documentLockModeChangedEventArgs)
+        //{
+        //    if (documentLockModeChangedEventArgs.GlobalCommandName.ToUpper() == "QUIT")
+        //    {
+        //        documentLockModeChangedEventArgs.Veto();
+        //        Application.DocumentManager.DocumentLockModeChanged -= DocumentManagerOnDocumentLockModeChanged;
+        //        Здесь делаем, что нам надо перед закрытием
+        //                Close();
+        //    }
+        //}
 
         public void Terminate()
         {
@@ -47,6 +79,15 @@ namespace CAM
             //ProcessingParams.SaveDefault();
             //Settings.Save();
         }
+
+        private PaletteSet CreatePaletteSet() => 
+            new PaletteSet("Технология")
+        {
+            Style = PaletteSetStyles.NameEditable | PaletteSetStyles.ShowPropertiesMenu | PaletteSetStyles.ShowAutoHideButton | PaletteSetStyles.ShowCloseButton,
+            MinimumSize = new Size(300, 200),
+            KeepFocus = true,
+            Visible = true
+        };
 
         [CommandMethod("show")]
         public void ShowPaletteSet()

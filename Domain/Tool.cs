@@ -9,6 +9,7 @@ namespace CAM.Domain
     /// <summary>
     /// Инструмент
     /// </summary>
+    [Serializable]
     public class Tool
     {
         /// <summary>
@@ -25,6 +26,6 @@ namespace CAM.Domain
         /// Толщина
         /// </summary>
         public double Thickness { get; set; }
-        
+
     }
 }

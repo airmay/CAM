@@ -9,6 +9,7 @@ namespace CAM.Domain
     /// <summary>
     /// Режим распиловки
     /// </summary>
+    [Serializable]
     public class SawingMode
     {
         /// <summary>

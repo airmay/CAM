@@ -7,6 +7,7 @@ using Autodesk.AutoCAD.DatabaseServices;
 
 namespace CAM.Domain
 {
+    [Serializable]
     public class BorderProcessingArea : ProcessingArea
     {
         const double AngleTolerance = 0.000001;

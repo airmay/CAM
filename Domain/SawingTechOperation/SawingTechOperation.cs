@@ -11,6 +11,7 @@ namespace CAM.Domain
     /// <summary>
     /// Технологическая операция "Распиловка"
     /// </summary>
+    [Serializable]
     public class SawingTechOperation : TechOperation
     {
 		/// <summary>

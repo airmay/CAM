@@ -10,6 +10,7 @@ namespace CAM.Domain
     /// <summary>
     /// Базовая технологическая операция
     /// </summary>
+    [Serializable]
     public abstract class TechOperation : ITechOperation
     {
         /// <summary>

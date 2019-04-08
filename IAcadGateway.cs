@@ -10,7 +10,7 @@ namespace CAM
         /// Получает список выбранных примитивов автокада
         /// </summary>
         /// <returns></returns>
-        Curve[] GetSelectedEntities();
+        List<Curve> GetSelectedEntities();
 
         /// <summary>
         /// Выделяет примитивы по заданным идентификаторам

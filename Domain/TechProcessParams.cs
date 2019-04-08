@@ -11,7 +11,8 @@ namespace CAM.Domain
 	/// <summary>
 	/// Параметры технологического процесса обработки
 	/// </summary>
-	public class TechProcessParams
+    [Serializable]
+    public class TechProcessParams
 	{
 		public Machine Machine { get; set; }
 

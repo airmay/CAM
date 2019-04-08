@@ -11,6 +11,7 @@ namespace CAM.Domain
     /// <summary>
     /// Фабрика для создания технологических операций "Распиловка"
     /// </summary>
+    [Serializable]
     public class SawingTechOperationFactory : ITechOperationFactory
     {
 	    /// <summary>

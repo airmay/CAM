@@ -10,8 +10,8 @@ namespace CAM.UI
 	public partial class TechProcessView : UserControl
     {
 	    private CamManager _camManager;
-	    private readonly TechProcessParamsView _techProcessParamsView = new TechProcessParamsView {Dock = DockStyle.Fill};
-	    private readonly UserControl _paramsView = new UserControl { Dock = DockStyle.Fill };
+        private readonly TechProcessParamsView _techProcessParamsView = new TechProcessParamsView { Dock = DockStyle.Fill, Visible = false };
+        private readonly UserControl _paramsView = new UserControl { Dock = DockStyle.Fill, Visible = false };
 	    private readonly Dictionary<Type, Control> _paramsViews = new Dictionary<Type, Control>();
 	    private BorderProcessingAreaView _borderProcessingAreaView;
 
@@ -19,30 +19,37 @@ namespace CAM.UI
 
 	    private static TreeNode CreateTechOperationNode(TechOperation techOperation) => new TreeNode(techOperation.Name, 1, 1) {Tag = techOperation};
 
-	    public TechProcessView()
-	    {
-		    InitializeComponent();
-
-		    imageList.Images.AddRange(new Image[] { Properties.Resources.drive, Properties.Resources.drive_download, Properties.Resources.folder__arrow, Properties.Resources.gear__arrow });
-
-		    tabPageParams.Controls.Add(_techProcessParamsView);
-		    tabPageParams.Controls.Add(_paramsView);
-		}
-
-		public void Init(CamManager camManager)
+        public TechProcessView(CamManager camManager)
         {
-	        _camManager = camManager;
-	        _camManager.TechProcessList.ForEach(CreateTechProcessNode);
-		}
+            InitializeComponent();
 
-	    private void CreateTechProcessNode(TechProcess techProcess)
+            imageList.Images.AddRange(new Image[] { Properties.Resources.drive, Properties.Resources.drive_download });
+
+            tabPageParams.Controls.Add(_techProcessParamsView);
+            tabPageParams.Controls.Add(_paramsView);
+
+            _camManager = camManager;
+            _camManager.TechProcessView = this;
+        }
+
+        public void Reset()
+        {
+            treeView.Nodes.Clear();
+            _camManager.TechProcessList.ForEach(CreateTechProcessNode);
+            SetParamsViewsVisible();
+        }
+
+        private void SetParamsViewsVisible() => _techProcessParamsView.Visible = _paramsView.Visible = treeView.Nodes.Count > 0;
+
+        private void CreateTechProcessNode(TechProcess techProcess)
 	    {
 		    var children = techProcess.TechOperations.ConvertAll(CreateTechOperationNode).ToArray();
 			var techProcessNode = new TreeNode(techProcess.Name, 0, 0, children) {Tag = techProcess};
 		    treeView.Nodes.Add(techProcessNode);
 		    techProcessNode.ExpandAll();
 			treeView.SelectedNode = techProcessNode;
-	    }
+            SetParamsViewsVisible();
+        }
 
 	    private void treeView_AfterSelect(object sender, TreeViewEventArgs e)
         {
@@ -204,6 +211,11 @@ namespace CAM.UI
 	            treeView_AfterSelect( null, null);
 	        }
 	    }
+
+        private void bSave_Click(object sender, EventArgs e)
+        {
+            _camManager.SaveTechProsess();
+        }
 
         #endregion
 

@@ -1,22 +1,31 @@
-﻿using Autodesk.AutoCAD.DatabaseServices;
-using Autodesk.AutoCAD.Geometry;
-using Autodesk.AutoCAD.Windows;
-using CAM.Domain;
+﻿using Autodesk.AutoCAD.ApplicationServices;
+using Autodesk.AutoCAD.DatabaseServices;
+using Autodesk.AutoCAD.EditorInput;
 using System;
 using System.Collections.Generic;
-using System.Drawing;
+using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
+using System.Runtime.Serialization.Formatters.Binary;
 
 namespace CAM
 {
     /// <summary>
     /// Класс осуществляющий взаимодействие с автокадом
     /// </summary>
-    public class AcadGateway : IAcadGateway
+    public class AcadGateway //: IAcadGateway
     {
+        private static AcadGateway _instance;
+
+        public static AcadGateway Instance { get => _instance ?? (_instance = new AcadGateway()); }
+
+        public Document Document => Application.DocumentManager.MdiActiveDocument;
+
+        public Database Database => Application.DocumentManager.MdiActiveDocument.Database;
+
+        public Editor Editor => Application.DocumentManager.MdiActiveDocument.Editor;
+
+        public ObjectId GetObjectId(long handle) => Database.GetObjectId(false, new Handle(handle), 0);
+
         public void CreateEntities(List<Curve> entities)
         {
             throw new NotImplementedException();
@@ -32,49 +41,96 @@ namespace CAM
             throw new NotImplementedException();
         }
 
-        public Curve[] GetSelectedCurves()
+        public List<Curve> GetSelectedEntities()
         {
-            return new Curve[] { new Line(new Point3d(0, 0, 0), new Point3d(1, 0, 0)), new Arc(new Point3d(0, 0, 0), 1, 0, 1) };
-        }
-
-        public Curve[] GetSelectedEntities()
-        {
-            throw new NotImplementedException();
-        }
-
-        public void SelectCurve(Curve curve)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void SelectEntities(List<ObjectId> idList)
-        {
-            throw new NotImplementedException();
-        }
-
-
-        public static void AddPaletteSet(PaletteSet paletteSet, string name, Control control)
-        {
-            if (paletteSet == null)
-                paletteSet = new PaletteSet("Технология")
-                {
-                    Style = PaletteSetStyles.NameEditable | PaletteSetStyles.ShowPropertiesMenu | PaletteSetStyles.ShowAutoHideButton | PaletteSetStyles.ShowCloseButton,
-                    MinimumSize = new Size(300, 200),
-                    KeepFocus = true,
-                    Visible = true
-                };
-            paletteSet.Add(name, control);
-        }
-
-        internal PaletteSet CreatePaletteSet()
-        {
-            return new PaletteSet("Технология")
+            List<Curve> result = null;
+            var TransactionManager = HostApplicationServices.WorkingDatabase.TransactionManager;
+            var Editor = Application.DocumentManager.MdiActiveDocument.Editor;
+            //PromptSelectionResult sel = Editor.SelectPrevious(); //SelectImplied(); // 
+            using (var trans = TransactionManager.StartTransaction())
             {
-                Style = PaletteSetStyles.NameEditable | PaletteSetStyles.ShowPropertiesMenu | PaletteSetStyles.ShowAutoHideButton | PaletteSetStyles.ShowCloseButton,
-                MinimumSize = new Size(300, 200),
-                KeepFocus = true,
-                Visible = true
-            };
+                //var sel = Editor.SelectPrevious();  // вызов команды из командной строки
+                //if (sel.Status != PromptStatus.OK)
+                var sel = Editor.SelectImplied();   // вызов команды нажатием кнопки на тулбаре
+                if (sel.Status == PromptStatus.OK)
+                    result = sel.Value.GetObjectIds().Select(p => trans.GetObject(p, OpenMode.ForRead)).Cast<Curve>().ToList();
+                else
+                    Editor.WriteMessage("Нет выбранных объектов");
+                trans.Commit();
+            }
+            return result;
         }
+
+        public void SelectCurve(ObjectId objectId)
+        {
+            SelectCurves(new ObjectId[] { objectId });
+        }
+
+        public void SelectCurves(IEnumerable<ObjectId> objectIds)
+        {
+            Editor.SetImpliedSelection(objectIds.ToArray());
+            Editor.UpdateScreen();
+        }
+
+        public object LoadDocumentData(string dataKey)
+        {
+            using (Transaction tr = Database.TransactionManager.StartTransaction())
+            using (DBDictionary dict = tr.GetObject(Database.NamedObjectsDictionaryId, OpenMode.ForRead) as DBDictionary)
+                if (dict.Contains(dataKey))
+                    using (Xrecord xRecord = tr.GetObject(dict.GetAt(dataKey), OpenMode.ForRead) as Xrecord)
+                    using (ResultBuffer resultBuffer = xRecord.Data)
+                    using (MemoryStream stream = new MemoryStream())
+                    {
+                        foreach(var typedValue in resultBuffer)
+                        {
+                            var datachunk = Convert.FromBase64String((string)typedValue.Value);
+                            stream.Write(datachunk, 0, datachunk.Length);
+                        }
+                        stream.Position = 0;
+                        var formatter = new BinaryFormatter();
+                        return formatter.Deserialize(stream);
+                    }
+            return null;
+        }
+
+        public void SaveDocumentData(object data, string dataKey)
+        {
+            const int kMaxChunkSize = 127;
+            using (var resultBuffer = new ResultBuffer())
+            {
+                using (MemoryStream stream = new MemoryStream())
+                {
+                    BinaryFormatter formatter = new BinaryFormatter();
+                    formatter.Serialize(stream, data);
+                    stream.Position = 0;
+                    for (int i = 0; i < stream.Length; i += kMaxChunkSize)
+                    {
+                        int length = (int)Math.Min(stream.Length - i, kMaxChunkSize);
+                        byte[] datachunk = new byte[length];
+                        stream.Read(datachunk, 0, length);
+                        resultBuffer.Add(new TypedValue((int)DxfCode.Text, Convert.ToBase64String(datachunk)));
+                    }
+                }
+
+                using (DocumentLock acLckDoc = Document.LockDocument())
+                using (Transaction tr = Database.TransactionManager.StartTransaction())
+                using (DBDictionary dict = tr.GetObject(Database.NamedObjectsDictionaryId, OpenMode.ForWrite) as DBDictionary)
+                {
+                    if (dict.Contains(dataKey))
+                        using (var xrec = tr.GetObject(dict.GetAt(dataKey), OpenMode.ForWrite) as Xrecord)
+                            xrec.Data = resultBuffer;
+                    else
+                        using (var xrec = new Xrecord { Data = resultBuffer })
+                        {
+                            dict.SetAt(dataKey, xrec);
+                            tr.AddNewlyCreatedDBObject(xrec, true);
+                            //xrec.ObjectClosed += new ObjectClosedEventHandler(OnDataModified);
+                        }
+                    tr.Commit();
+                }
+            }
+        }
+
+        public void WriteMessage(string message) => Editor.WriteMessage($"{message}\n");
     }
 }

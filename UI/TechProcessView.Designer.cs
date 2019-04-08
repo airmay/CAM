@@ -36,25 +36,27 @@
             this.tabPageParams = new System.Windows.Forms.TabPage();
             this.tabPageCommands = new System.Windows.Forms.TabPage();
             this.dataGridViewCommand = new System.Windows.Forms.DataGridView();
+            this.Number = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.MCode = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.panel1 = new System.Windows.Forms.Panel();
             this.toolStrip1 = new System.Windows.Forms.ToolStrip();
+            this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
+            this.panel2 = new System.Windows.Forms.Panel();
+            this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
             this.bCreateTechOperation = new System.Windows.Forms.ToolStripButton();
             this.bRemove = new System.Windows.Forms.ToolStripButton();
             this.bMoveUpTechOperation = new System.Windows.Forms.ToolStripButton();
             this.bMoveDownTechOperation = new System.Windows.Forms.ToolStripButton();
             this.bCreateTechProcess = new System.Windows.Forms.ToolStripButton();
-            this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.bBuildProcessing = new System.Windows.Forms.ToolStripButton();
-            this.panel2 = new System.Windows.Forms.Panel();
-            this.processCommandBindingSource = new System.Windows.Forms.BindingSource(this.components);
-            this.Number = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.bSave = new System.Windows.Forms.ToolStripButton();
             this.codeDataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.MCode = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.param1DataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.param2DataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.param3DataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.param4DataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.param5DataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.processCommandBindingSource = new System.Windows.Forms.BindingSource(this.components);
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
@@ -165,6 +167,20 @@
             this.dataGridViewCommand.Size = new System.Drawing.Size(298, 404);
             this.dataGridViewCommand.TabIndex = 0;
             // 
+            // Number
+            // 
+            this.Number.DataPropertyName = "Number";
+            this.Number.HeaderText = "Number";
+            this.Number.Name = "Number";
+            this.Number.Width = 21;
+            // 
+            // MCode
+            // 
+            this.MCode.DataPropertyName = "MCode";
+            this.MCode.HeaderText = "MCode";
+            this.MCode.Name = "MCode";
+            this.MCode.Width = 21;
+            // 
             // panel1
             // 
             this.panel1.AutoSize = true;
@@ -184,12 +200,33 @@
             this.bMoveDownTechOperation,
             this.bCreateTechProcess,
             this.toolStripSeparator1,
-            this.bBuildProcessing});
+            this.bBuildProcessing,
+            this.toolStripSeparator2,
+            this.bSave});
             this.toolStrip1.Location = new System.Drawing.Point(0, 0);
             this.toolStrip1.Name = "toolStrip1";
             this.toolStrip1.Size = new System.Drawing.Size(312, 25);
             this.toolStrip1.TabIndex = 0;
             this.toolStrip1.Text = "toolStrip1";
+            // 
+            // toolStripSeparator1
+            // 
+            this.toolStripSeparator1.Name = "toolStripSeparator1";
+            this.toolStripSeparator1.Size = new System.Drawing.Size(6, 25);
+            // 
+            // panel2
+            // 
+            this.panel2.Controls.Add(this.splitContainer1);
+            this.panel2.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.panel2.Location = new System.Drawing.Point(0, 25);
+            this.panel2.Name = "panel2";
+            this.panel2.Size = new System.Drawing.Size(312, 711);
+            this.panel2.TabIndex = 3;
+            // 
+            // toolStripSeparator2
+            // 
+            this.toolStripSeparator2.Name = "toolStripSeparator2";
+            this.toolStripSeparator2.Size = new System.Drawing.Size(6, 25);
             // 
             // bCreateTechOperation
             // 
@@ -241,11 +278,6 @@
             this.bCreateTechProcess.Text = "Добавить техпроцесс";
             this.bCreateTechProcess.Click += new System.EventHandler(this.bCreateTechProcess_Click);
             // 
-            // toolStripSeparator1
-            // 
-            this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(6, 25);
-            // 
             // bBuildProcessing
             // 
             this.bBuildProcessing.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
@@ -256,75 +288,62 @@
             this.bBuildProcessing.Text = "Рассчитать обработку";
             this.bBuildProcessing.Click += new System.EventHandler(this.bBuildProcessing_Click);
             // 
-            // panel2
+            // bSave
             // 
-            this.panel2.Controls.Add(this.splitContainer1);
-            this.panel2.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.panel2.Location = new System.Drawing.Point(0, 25);
-            this.panel2.Name = "panel2";
-            this.panel2.Size = new System.Drawing.Size(312, 711);
-            this.panel2.TabIndex = 3;
-            // 
-            // processCommandBindingSource
-            // 
-            this.processCommandBindingSource.DataSource = typeof(CAM.Domain.ProcessCommand);
-            this.processCommandBindingSource.CurrentChanged += new System.EventHandler(this.processCommandBindingSource_CurrentChanged);
-            // 
-            // Number
-            // 
-            this.Number.DataPropertyName = "Number";
-            this.Number.HeaderText = "Number";
-            this.Number.Name = "Number";
-            this.Number.Width = 5;
+            this.bSave.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.bSave.Image = global::CAM.Properties.Resources.disk;
+            this.bSave.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.bSave.Name = "bSave";
+            this.bSave.Size = new System.Drawing.Size(23, 22);
+            this.bSave.Text = "Сохранить обработку в файле чертежа";
+            this.bSave.Click += new System.EventHandler(this.bSave_Click);
             // 
             // codeDataGridViewTextBoxColumn
             // 
             this.codeDataGridViewTextBoxColumn.DataPropertyName = "GCode";
             this.codeDataGridViewTextBoxColumn.HeaderText = "GCode";
             this.codeDataGridViewTextBoxColumn.Name = "codeDataGridViewTextBoxColumn";
-            this.codeDataGridViewTextBoxColumn.Width = 5;
-            // 
-            // MCode
-            // 
-            this.MCode.DataPropertyName = "MCode";
-            this.MCode.HeaderText = "MCode";
-            this.MCode.Name = "MCode";
-            this.MCode.Width = 5;
+            this.codeDataGridViewTextBoxColumn.Width = 21;
             // 
             // param1DataGridViewTextBoxColumn
             // 
             this.param1DataGridViewTextBoxColumn.DataPropertyName = "Param1";
             this.param1DataGridViewTextBoxColumn.HeaderText = "Param1";
             this.param1DataGridViewTextBoxColumn.Name = "param1DataGridViewTextBoxColumn";
-            this.param1DataGridViewTextBoxColumn.Width = 5;
+            this.param1DataGridViewTextBoxColumn.Width = 21;
             // 
             // param2DataGridViewTextBoxColumn
             // 
             this.param2DataGridViewTextBoxColumn.DataPropertyName = "Param2";
             this.param2DataGridViewTextBoxColumn.HeaderText = "Param2";
             this.param2DataGridViewTextBoxColumn.Name = "param2DataGridViewTextBoxColumn";
-            this.param2DataGridViewTextBoxColumn.Width = 5;
+            this.param2DataGridViewTextBoxColumn.Width = 21;
             // 
             // param3DataGridViewTextBoxColumn
             // 
             this.param3DataGridViewTextBoxColumn.DataPropertyName = "Param3";
             this.param3DataGridViewTextBoxColumn.HeaderText = "Param3";
             this.param3DataGridViewTextBoxColumn.Name = "param3DataGridViewTextBoxColumn";
-            this.param3DataGridViewTextBoxColumn.Width = 5;
+            this.param3DataGridViewTextBoxColumn.Width = 21;
             // 
             // param4DataGridViewTextBoxColumn
             // 
             this.param4DataGridViewTextBoxColumn.DataPropertyName = "Param4";
             this.param4DataGridViewTextBoxColumn.HeaderText = "Param4";
             this.param4DataGridViewTextBoxColumn.Name = "param4DataGridViewTextBoxColumn";
-            this.param4DataGridViewTextBoxColumn.Width = 5;
+            this.param4DataGridViewTextBoxColumn.Width = 21;
             // 
             // param5DataGridViewTextBoxColumn
             // 
             this.param5DataGridViewTextBoxColumn.DataPropertyName = "Param5";
             this.param5DataGridViewTextBoxColumn.HeaderText = "Param5";
             this.param5DataGridViewTextBoxColumn.Name = "param5DataGridViewTextBoxColumn";
-            this.param5DataGridViewTextBoxColumn.Width = 5;
+            this.param5DataGridViewTextBoxColumn.Width = 21;
+            // 
+            // processCommandBindingSource
+            // 
+            this.processCommandBindingSource.DataSource = typeof(CAM.Domain.ProcessCommand);
+            this.processCommandBindingSource.CurrentChanged += new System.EventHandler(this.processCommandBindingSource_CurrentChanged);
             // 
             // TechProcessView
             // 
@@ -380,5 +399,7 @@
         private System.Windows.Forms.DataGridViewTextBoxColumn param3DataGridViewTextBoxColumn;
         private System.Windows.Forms.DataGridViewTextBoxColumn param4DataGridViewTextBoxColumn;
         private System.Windows.Forms.DataGridViewTextBoxColumn param5DataGridViewTextBoxColumn;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
+        private System.Windows.Forms.ToolStripButton bSave;
     }
 }

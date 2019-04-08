@@ -12,14 +12,19 @@ namespace CAM.Domain
     /// <summary>
     /// Обрабатываемая область
     /// </summary>
+    [Serializable]
     public abstract class ProcessingArea
     {
+        public long Handle { get; set; }
+
         /// <summary>
         /// Идентификатор графического примитива автокада
         /// </summary>
-        public readonly ObjectId AcadObjectId;
+        [NonSerialized]
+        public ObjectId AcadObjectId;
 
-        public Curve Curve { get; set; }
+        [NonSerialized]
+        public Curve Curve;
 
         /// <summary>
         /// Тип обрабатываемой области
@@ -29,17 +34,17 @@ namespace CAM.Domain
         /// <summary>
         /// Начальная точка кривой
         /// </summary>
-        public Point3d StartPoint { get; protected set; }
+        public Point3d StartPoint { get { return Curve.StartPoint; } }
 
         /// <summary>
         /// Конечная точка кривой
         /// </summary>
-        public Point3d EndPoint { get; protected set; }
+        public Point3d EndPoint { get { return Curve.EndPoint; } }
 
         /// <summary>
         /// Длина
         /// </summary>
-        public double Length { get; protected set; }
+        public double Length { get { return Curve.Length(); } }
 
         /// <summary>
         /// Конструктор
@@ -47,8 +52,10 @@ namespace CAM.Domain
         /// <param name="curve">Графический примитива автокада представляющий область</param>
         protected ProcessingArea(Curve curve)
         {
+            Curve = curve;
             AcadObjectId = curve.ObjectId;
-            Set(curve);
+            Handle = curve.Handle.Value;
+            //Set(curve);
         }
 
         /// <summary>
@@ -61,20 +68,21 @@ namespace CAM.Domain
             if (curve.ObjectId != AcadObjectId)
                 throw new ArgumentException("Обрабатываемая область не соответствует полученной кривой");
 
-            Set(curve);
+            //Set(curve);
+            var h = curve.Handle;
         }
 
         /// <summary>
         /// Заполнение параметров обрабатываемой области в соответствии с полученной кривой
         /// </summary>
         /// <param name="curve"></param>
-        protected virtual void Set(Curve curve)
-        {
-            Curve = curve;
-            StartPoint = curve.StartPoint;
-            EndPoint = curve.EndPoint;
-            Length = curve.Length();
-        }
+        //protected virtual void Set(Curve curve)
+        //{
+        //    Curve = curve;
+        //    StartPoint = curve.StartPoint;
+        //    EndPoint = curve.EndPoint;
+        //    Length = curve.Length();
+        //}
 
 	    public override string ToString()
 	    {

@@ -7,6 +7,7 @@ using Autodesk.AutoCAD.DatabaseServices;
 
 namespace CAM.Domain
 {
+    [Serializable]
     public class ProcessCommand
     {
         public int Number { get; set; }

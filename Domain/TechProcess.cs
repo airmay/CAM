@@ -8,6 +8,7 @@ namespace CAM.Domain
     /// <summary>
     /// Технологический процесс обработки
     /// </summary>
+    [Serializable]
     public class TechProcess
     {
         /// <summary>
