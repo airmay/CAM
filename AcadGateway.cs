@@ -24,6 +24,8 @@ namespace CAM
 
         public Editor Editor => Application.DocumentManager.MdiActiveDocument.Editor;
 
+        public void WriteMessage(string message) => Editor.WriteMessage($"{message}\n");
+
         public ObjectId GetObjectId(long handle) => Database.GetObjectId(false, new Handle(handle), 0);
 
         public void CreateEntities(List<Curve> entities)
@@ -72,6 +74,7 @@ namespace CAM
             Editor.UpdateScreen();
         }
 
+        #region XRecord methods
         public object LoadDocumentData(string dataKey)
         {
             using (Transaction tr = Database.TransactionManager.StartTransaction())
@@ -81,7 +84,7 @@ namespace CAM
                     using (ResultBuffer resultBuffer = xRecord.Data)
                     using (MemoryStream stream = new MemoryStream())
                     {
-                        foreach(var typedValue in resultBuffer)
+                        foreach (var typedValue in resultBuffer)
                         {
                             var datachunk = Convert.FromBase64String((string)typedValue.Value);
                             stream.Write(datachunk, 0, datachunk.Length);
@@ -129,8 +132,8 @@ namespace CAM
                     tr.Commit();
                 }
             }
-        }
+        } 
+        #endregion
 
-        public void WriteMessage(string message) => Editor.WriteMessage($"{message}\n");
     }
 }

@@ -13,12 +13,18 @@ namespace CAM
     public class CamManager
     {
         private const string DataKey = "TechProcessList";
-        public List<TechProcess> TechProcessList => _documentTeshProcessList[_acad.Document];
+
         private AcadGateway _acad;
-        private CamContainer _container = CamContainer.Load();
+
+        public CamContainer Container { get; set; }
+
         public TechProcessView TechProcessView { get; set; }
 
-        public EventHandler<ProgramEventArgs> ProgramGenerated;
+        private Dictionary<Document, List<TechProcess>> _documentTechProcessList = new Dictionary<Document, List<TechProcess>>();
+
+        private List<TechProcess> TechProcessList => _documentTechProcessList[_acad.Document];
+
+        //public EventHandler<ProgramEventArgs> ProgramGenerated;
 
         public CamManager(AcadGateway acad)
         {
@@ -30,24 +36,17 @@ namespace CAM
         {
             var techProcess = new TechProcess($"Обработка{TechProcessList.Count + 1}");
             TechProcessList.Add(techProcess);
-
             return techProcess;
         }
 
-        internal void SelectTechProcess(TechProcess techProcess) => _acad.SelectCurves(techProcess.TechOperations.Select(p => p.ProcessingArea.AcadObjectId));
-
-        private Dictionary<Document, List<TechProcess>> _documentTeshProcessList = new Dictionary<Document, List<TechProcess>>();
-
-        //private Document _activeDocument;
-
         public void SetActiveDocument(Document document)
         {
-            if (!_documentTeshProcessList.ContainsKey(document))
-                _documentTeshProcessList[document] = LoadTechProsess() ?? new List<TechProcess>();
-
-            //_activeDocument = document;
-            TechProcessView.Reset();
+            if (!_documentTechProcessList.ContainsKey(document))
+                _documentTechProcessList[document] = LoadTechProsess() ?? new List<TechProcess>();
+            TechProcessView.SetTechProcessList(TechProcessList);
         }
+
+        internal void SelectTechProcess(TechProcess techProcess) => _acad.SelectCurves(techProcess.TechOperations.Select(p => p.ProcessingArea.AcadObjectId));
 
         internal void SelectTechOperation(TechOperation techOperation) => _acad.SelectCurve(techOperation.ProcessingArea.AcadObjectId);
 
@@ -60,7 +59,7 @@ namespace CAM
                 switch (techOperationType)
                 {
                     case TechOperationType.Sawing:
-                        factory = new SawingTechOperationFactory(_container.SawingLineTechOperationParams, _container.SawingCurveTechOperationParams);
+                        factory = new SawingTechOperationFactory(Container.SawingLineTechOperationParams, Container.SawingCurveTechOperationParams);
                         break;
                 }
 
@@ -120,7 +119,7 @@ namespace CAM
                 }
                 return techProcessList;
             }
-            catch (System.Exception e)
+            catch (Exception e)
             {
                 _acad.WriteMessage(string.Format($"Ошибка при загрузке техпроцессов:\n{e}"));
                 return null;
@@ -134,20 +133,20 @@ namespace CAM
                 _acad.SaveDocumentData(TechProcessList, DataKey);
                 _acad.WriteMessage("Техпроцессы успешно сохранены в файле чертежа");
             }
-            catch (System.Exception e)
+            catch (Exception e)
             {
                 Application.ShowAlertDialog($"Ошибка при записи техпроцессов:\n{e}");
             }
         }
     }
 
-    public class ProgramEventArgs : EventArgs
-    {
-        public string Program { get; set; }
+    //public class ProgramEventArgs : EventArgs
+    //{
+    //    public string Program { get; set; }
 
-        public ProgramEventArgs(string program)
-        {
-            Program = program;
-        }
-    }
+    //    public ProgramEventArgs(string program)
+    //    {
+    //        Program = program;
+    //    }
+    //}
 }

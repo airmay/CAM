@@ -2,6 +2,7 @@
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Runtime;
 using Autodesk.AutoCAD.Windows;
+using CAM.Domain;
 using CAM.UI;
 using System;
 using System.Diagnostics;
@@ -13,24 +14,23 @@ namespace CAM
 {
     public class Bootstrapper : IExtensionApplication
     {
-        private CamManager _manager;
-
         public void Initialize()
         {
             var acad = new AcadGateway();
             acad.WriteMessage($"\nИнициализация плагина. Версия сборки от {File.GetLastWriteTime(Assembly.GetExecutingAssembly().Location)}");
 
-            _manager = new CamManager(acad);
+             var manager = new CamManager(acad);
 
             PaletteSet paletteSet = CreatePaletteSet();
 
             //var techProcessView = new TechProcessView();
-            paletteSet.Add("Объекты", new TechProcessView(_manager));
+            paletteSet.Add("Объекты", new TechProcessView(manager));
             paletteSet.Add("Программа", new ProgramView());
 
-            Application.DocumentManager.DocumentActivated += (sender, args) => _manager.SetActiveDocument(args.Document);
+            Application.DocumentManager.DocumentActivated += (sender, args) => manager.SetActiveDocument(args.Document);
             
-            _manager.SetActiveDocument(acad.Document);
+            manager.Container = CamContainer.Load();
+            manager.SetActiveDocument(acad.Document);
 
             //PaletteSet focus use Autodesk.AutoCAD.Internal.Utils.SetFocusToDwgView();
             //PaletteSet.PaletteActivated
@@ -89,28 +89,28 @@ namespace CAM
             Visible = true
         };
 
-        [CommandMethod("show")]
-        public void ShowPaletteSet()
-        {
-            //AutocadUtils.ShowPaletteSet();
-        }
+        //[CommandMethod("show")]
+        //public void ShowPaletteSet()
+        //{
+        //    //AutocadUtils.ShowPaletteSet();
+        //}
 
-        [Conditional("DEBUG")]
-        private void RunTest()
-        {
-            //var selectedObjects = AutocadUtils.GetAllCurves();
-            //if (selectedObjects == null || !Tools.Any())
-            //    return;
-            //ProcessObjectFactory.Create(selectedObjects.FindAll(p => p.GetLength() > 100), Tools.Where(p => p.No == 2));
-            ///*
-            //SectionCurves.AddRange(selectedObjects.FindAll(p => p.GetLength() < 100).Cast<Curve>().ToList());
-            //var points = SectionCurves.Select(p => p.StartPoint.Y).Concat(SectionCurves.Select(p => p.EndPoint.Y));
-            //Settings.GetInstance().HeightMax = points.Max();
-            //Settings.GetInstance().HeightMin = points.Min();
-            //SettingForm.RefreshForm();
-            // * */
-            //Calculate();
-            //ObjectForm.RefreshList();
-        }
+        //[Conditional("DEBUG")]
+        //private void RunTest()
+        //{
+        //    //var selectedObjects = AutocadUtils.GetAllCurves();
+        //    //if (selectedObjects == null || !Tools.Any())
+        //    //    return;
+        //    //ProcessObjectFactory.Create(selectedObjects.FindAll(p => p.GetLength() > 100), Tools.Where(p => p.No == 2));
+        //    ///*
+        //    //SectionCurves.AddRange(selectedObjects.FindAll(p => p.GetLength() < 100).Cast<Curve>().ToList());
+        //    //var points = SectionCurves.Select(p => p.StartPoint.Y).Concat(SectionCurves.Select(p => p.EndPoint.Y));
+        //    //Settings.GetInstance().HeightMax = points.Max();
+        //    //Settings.GetInstance().HeightMin = points.Min();
+        //    //SettingForm.RefreshForm();
+        //    // * */
+        //    //Calculate();
+        //    //ObjectForm.RefreshList();
+        //}
     }
 }

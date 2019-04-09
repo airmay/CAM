@@ -32,10 +32,10 @@ namespace CAM.UI
             _camManager.TechProcessView = this;
         }
 
-        public void Reset()
+        public void SetTechProcessList(List<TechProcess> techProcessList)
         {
             treeView.Nodes.Clear();
-            _camManager.TechProcessList.ForEach(CreateTechProcessNode);
+            techProcessList.ForEach(CreateTechProcessNode);
             SetParamsViewsVisible();
         }
 
