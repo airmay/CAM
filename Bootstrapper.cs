@@ -4,6 +4,7 @@ using Autodesk.AutoCAD.Runtime;
 using Autodesk.AutoCAD.Windows;
 using CAM.Domain;
 using CAM.UI;
+using Dreambuild.AutoCAD;
 using System;
 using System.Diagnostics;
 using System.Drawing;
@@ -19,7 +20,7 @@ namespace CAM
         public void Initialize()
         {
             var acad = new AcadGateway();
-            acad.WriteMessage($"\nИнициализация плагина. Версия сборки от {File.GetLastWriteTime(Assembly.GetExecutingAssembly().Location)}");
+            Interaction.WriteLine($"Инициализация плагина. Версия сборки от {File.GetLastWriteTime(Assembly.GetExecutingAssembly().Location)}");
 
              var manager = new CamManager(acad);
 

@@ -4,6 +4,7 @@ using System.Linq;
 using Autodesk.AutoCAD.ApplicationServices;
 using CAM.Domain;
 using CAM.UI;
+using Dreambuild.AutoCAD;
 
 namespace CAM
 {
@@ -115,7 +116,7 @@ namespace CAM
                 if (techProcessList != null)
                 {
                     techProcessList.ForEach(tp => tp.TechOperations.ForEach(to => to.ProcessingArea.AcadObjectId = _acad.GetObjectId(to.ProcessingArea.Handle)));
-                    _acad.WriteMessage($"Загружены техпроцессы: {string.Join(", ", techProcessList.Select(p => p.Name))}");
+                    Interaction.WriteLine($"Загружены техпроцессы: {string.Join(", ", techProcessList.Select(p => p.Name))}");
                 }
                 return techProcessList;
             }
@@ -131,7 +132,7 @@ namespace CAM
             try
             {
                 _acad.SaveDocumentData(TechProcessList, DataKey);
-                _acad.WriteMessage("Техпроцессы успешно сохранены в файле чертежа");
+                Interaction.WriteLine("Техпроцессы успешно сохранены в файле чертежа");
             }
             catch (Exception e)
             {
