@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Serialization;
 
 namespace CAM.Domain
 {
@@ -24,13 +25,14 @@ namespace CAM.Domain
 
         /// <summary>
         /// Компенсация
-        /// </summary>
+        /// </summary>  
+        [XmlIgnore]
         public double Compensation { get; set; }
 
         /// <summary>
         ///  Первый проход по поверхности
         /// </summary>
-        public bool IsFirstPassOnSurface { get; internal set; }
+        public bool IsFirstPassOnSurface { get; set; }
 
         public SawingTechOperationParams Clone()
         {

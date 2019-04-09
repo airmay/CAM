@@ -14,6 +14,8 @@ namespace CAM
 {
     public class Bootstrapper : IExtensionApplication
     {
+        private CamContainer _container;
+
         public void Initialize()
         {
             var acad = new AcadGateway();
@@ -28,8 +30,9 @@ namespace CAM
             paletteSet.Add("Программа", new ProgramView());
 
             Application.DocumentManager.DocumentActivated += (sender, args) => manager.SetActiveDocument(args.Document);
-            
-            manager.Container = CamContainer.Load();
+
+            _container = CamContainer.Load();
+            manager.Container = _container;
             manager.SetActiveDocument(acad.Document);
 
             //PaletteSet focus use Autodesk.AutoCAD.Internal.Utils.SetFocusToDwgView();
@@ -75,6 +78,7 @@ namespace CAM
 
         public void Terminate()
         {
+            _container.Save();
             //SettingForm.RefreshSettings();
             //ProcessingParams.SaveDefault();
             //Settings.Save();

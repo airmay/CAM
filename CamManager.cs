@@ -121,7 +121,7 @@ namespace CAM
             }
             catch (Exception e)
             {
-                _acad.WriteMessage(string.Format($"Ошибка при загрузке техпроцессов:\n{e}"));
+                Application.ShowAlertDialog($"Ошибка при загрузке техпроцессов:\n{e.Message}");
                 return null;
             }
         }
@@ -135,7 +135,7 @@ namespace CAM
             }
             catch (Exception e)
             {
-                Application.ShowAlertDialog($"Ошибка при записи техпроцессов:\n{e}");
+                Application.ShowAlertDialog($"Ошибка при записи техпроцессов:\n{e.Message}");
             }
         }
     }

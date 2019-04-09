@@ -71,9 +71,6 @@
       <HintPath>packages\AutoCAD-2012.Net.Base.1.0.0\lib\net40\AdWindows.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>packages\Newtonsoft.Json.12.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
@@ -119,7 +116,6 @@
     <Compile Include="Graph.cs" />
     <Compile Include="IAcadGateway.cs" />
     <Compile Include="IListExtensions.cs" />
-    <Compile Include="JsonSerialization.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Domain\SawingTechOperation\SawingTechOperation.cs" />
     <Compile Include="Domain\TechProcess.cs" />

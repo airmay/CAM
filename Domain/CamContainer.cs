@@ -1,7 +1,9 @@
-﻿using System;
+﻿using Autodesk.AutoCAD.ApplicationServices;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
+using System.Xml.Serialization;
 
 namespace CAM.Domain
 {
@@ -10,7 +12,7 @@ namespace CAM.Domain
     /// </summary>
     public class CamContainer
     {
-        private static readonly string _filePath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "cam_data.json");
+        private static readonly string _filePath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "cam_data.xml");
 
         #region Methods
 
@@ -20,13 +22,15 @@ namespace CAM.Domain
         /// <returns></returns>
         public static CamContainer Load()
         {
+            var formatter = new XmlSerializer(typeof(CamContainer));
             try
             {
-                return JsonSerialization.ReadFromJsonFile<CamContainer>(_filePath);
+                using (var fileStream = new FileStream(_filePath, FileMode.Open))
+                    return (CamContainer)formatter.Deserialize(fileStream);
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                // TODO Message
+                Application.ShowAlertDialog($"Ошибка при загрузке данных из файла 'cam_data.xml' :\n{e.Message}");
                 return new CamContainer
                 {
                     Tools = new List<Tool>(),
@@ -39,7 +43,19 @@ namespace CAM.Domain
         /// <summary>
         /// Сохранить данные в файл
         /// </summary>
-        public void Save() => JsonSerialization.WriteToJsonFile(_filePath, this); 
+        public void Save()
+        {
+            var formatter = new XmlSerializer(typeof(CamContainer));
+            try
+            {
+                using (var fileStream = new FileStream(_filePath, FileMode.Create))
+                    formatter.Serialize(fileStream, this);
+            }
+            catch (Exception e)
+            {
+                Application.ShowAlertDialog($"Ошибка при сохранении данных в файл 'cam_data.xml':\n{e.Message}");
+            }
+        }
 
         #endregion
 
