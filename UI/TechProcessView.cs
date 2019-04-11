@@ -56,7 +56,7 @@ namespace CAM.UI
 	        switch (treeView.SelectedNode.Tag)
 	        {
 		        case TechProcess techProcess:
-					_techProcessParamsView.SetDataSource(techProcess.TechProcessParams);
+					_techProcessParamsView.SetTechProcess(techProcess);
 			        _techProcessParamsView.BringToFront();
 		            processCommandBindingSource.DataSource = techProcess.ProcessCommands;
                     _camManager.SelectTechProcess(techProcess);
@@ -94,7 +94,7 @@ namespace CAM.UI
             }
         }
 
-	    private T GetParamsView<T>() where T : Control, new()
+        private T GetParamsView<T>() where T : Control, new()
 	    {
 		    if (!_paramsViews.TryGetValue(typeof(T), out var view))
 		    {
@@ -102,7 +102,7 @@ namespace CAM.UI
 				_paramsViews.Add(typeof(T), view);
 				_paramsView.Controls.Add(view);
 		    }
-		    view.BringToFront();
+            view.BringToFront();
 
 			return (T)view;
 	    }
@@ -142,8 +142,11 @@ namespace CAM.UI
 		    {
 			    var techProcessNode = treeView.SelectedNode.Parent ?? treeView.SelectedNode;
 			    var techOperations = _camManager.CreateTechOperations(CurrentTechProcess, TechOperationType.Sawing);
-			    techProcessNode.Nodes.AddRange(techOperations.Select(CreateTechOperationNode).ToArray());
-			    treeView.SelectedNode = techProcessNode.Nodes[techProcessNode.Nodes.Count - 1];
+                if (techOperations != null)
+                {
+                    techProcessNode.Nodes.AddRange(techOperations.Select(CreateTechOperationNode).ToArray());
+                    treeView.SelectedNode = techProcessNode.Nodes[techProcessNode.Nodes.Count - 1];
+                }
 		    }
 	    }
 
@@ -170,8 +173,9 @@ namespace CAM.UI
 					    break;
 			    }
 			    treeView.SelectedNode.Remove();
-		    }
-	    }
+                SetParamsViewsVisible();
+            }
+        }
 
 	    private void MoveSelectedNode(int shift)
 	    {

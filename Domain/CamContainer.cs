@@ -34,6 +34,7 @@ namespace CAM.Domain
                 return new CamContainer
                 {
                     Tools = new List<Tool>(),
+                    TechProcessParams = new TechProcessParams(),
                     SawingLineTechOperationParams = new SawingTechOperationParams(),
                     SawingCurveTechOperationParams = new SawingTechOperationParams()
                 };
@@ -61,6 +62,8 @@ namespace CAM.Domain
 
 
         public List<Tool> Tools { get; set; }
+
+        public TechProcessParams TechProcessParams { get; set; }
 
         #region TechOperationParams
 

@@ -1,22 +1,16 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Autodesk.AutoCAD.DatabaseServices;
 
 namespace CAM.Domain
 {
-	/// <summary>
-	/// Параметры технологического процесса обработки
-	/// </summary>
+    /// <summary>
+    /// Параметры технологического процесса обработки
+    /// </summary>
     [Serializable]
     public class TechProcessParams
 	{
 		public Machine Machine { get; set; }
 
-		public MaterialType Material { get; set; }
+		public Material Material { get; set; }
 
 	    /// <summary>
 	    /// Толщина заготовки
@@ -33,15 +27,10 @@ namespace CAM.Domain
 		/// </summary>
 		public int PenetrationRate { get; set; } = 250;
 
-		/// <summary>
-		/// Частота вращения шпинделя
-		/// </summary>
-		public int Frequency { get; set; } = 2500;
-
-		///// <summary>
-		///// Инструмент
-		///// </summary>
-		//public Tool Tool { get; set; } = new Tool();
+        /// <summary>
+        /// Частота вращения шпинделя
+        /// </summary>
+        public int Frequency { get; set; } = 2000;
 
 		/// <summary>
 		/// Номер
@@ -58,9 +47,10 @@ namespace CAM.Domain
 	    /// </summary>
 	    public double ToolThickness { get; set; } = 5;
 
-	}
+        public TechProcessParams Clone() => (TechProcessParams)MemberwiseClone();
+    }
 
-	public enum MaterialType
+	public enum Material
 	{
 		Мрамор,
 

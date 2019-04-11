@@ -41,7 +41,7 @@ namespace CAM
 
         public void DeleteEntities(IEnumerable<Curve> idList)
         {
-            throw new NotImplementedException();
+            //idList.Select(p => p.ObjectId).QForEach(p => p.Erase());
         }
 
         public List<Curve> GetSelectedEntities()

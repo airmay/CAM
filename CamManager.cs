@@ -35,7 +35,7 @@ namespace CAM
 
         public TechProcess CreateTechProcess()
         {
-            var techProcess = new TechProcess($"Обработка{TechProcessList.Count + 1}");
+            var techProcess = new TechProcess($"Обработка{TechProcessList.Count + 1}", Container);
             TechProcessList.Add(techProcess);
             return techProcess;
         }
@@ -51,26 +51,7 @@ namespace CAM
 
         internal void SelectTechOperation(TechOperation techOperation) => _acad.SelectCurve(techOperation.ProcessingArea.AcadObjectId);
 
-        public List<SawingTechOperation> CreateTechOperations(TechProcess techProcess, TechOperationType techOperationType)
-        {
-            // select operation Autodesk.AutoCAD.ApplicationServices.Application  ShowModalDialog и ShowModelessDialog.
-            var factory = techProcess.TechOperationFactorys.SingleOrDefault(p => p.TechOperationType == techOperationType);
-            if (factory == null)
-            {
-                switch (techOperationType)
-                {
-                    case TechOperationType.Sawing:
-                        factory = new SawingTechOperationFactory(Container.SawingLineTechOperationParams, Container.SawingCurveTechOperationParams);
-                        break;
-                }
-
-                techProcess.TechOperationFactorys.Add(factory);
-            }
-
-            var operations = _acad.GetSelectedEntities().Select(p => factory.Create(techProcess, p)).ToList();
-
-            return operations;
-        }
+        public List<SawingTechOperation> CreateTechOperations(TechProcess techProcess, TechOperationType techOperationType) => techProcess.CreateTechOperations(techOperationType, _acad.GetSelectedEntities());
 
         public bool MoveForwardTechOperation(TechOperation techOperation) => techOperation.TechProcess.TechOperations.SwapNext(techOperation);
 
@@ -115,7 +96,11 @@ namespace CAM
                 var techProcessList = (List<TechProcess>)_acad.LoadDocumentData(DataKey);
                 if (techProcessList != null)
                 {
-                    techProcessList.ForEach(tp => tp.TechOperations.ForEach(to => to.ProcessingArea.AcadObjectId = _acad.GetObjectId(to.ProcessingArea.Handle)));
+                    techProcessList.ForEach(tp =>
+                    {
+                        tp.SetContainer(Container);
+                        tp.TechOperations.ForEach(to => to.ProcessingArea.AcadObjectId = _acad.GetObjectId(to.ProcessingArea.Handle));
+                    });
                     Interaction.WriteLine($"Загружены техпроцессы: {string.Join(", ", techProcessList.Select(p => p.Name))}");
                 }
                 return techProcessList;
