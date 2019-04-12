@@ -81,6 +81,34 @@ namespace CAM.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to &lt;?xml version=&quot;1.0&quot;?&gt;
+        ///&lt;CamContainer xmlns:xsd=&quot;http://www.w3.org/2001/XMLSchema&quot; xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;&gt;
+        ///  &lt;Tools&gt;
+        ///    &lt;Tool&gt;
+        ///      &lt;Number&gt;1&lt;/Number&gt;
+        ///      &lt;Diameter&gt;429&lt;/Diameter&gt;
+        ///      &lt;Thickness&gt;1.5&lt;/Thickness&gt;
+        ///    &lt;/Tool&gt;
+        ///    &lt;Tool&gt;
+        ///      &lt;Number&gt;2&lt;/Number&gt;
+        ///      &lt;Diameter&gt;450&lt;/Diameter&gt;
+        ///      &lt;Thickness&gt;1.5&lt;/Thickness&gt;
+        ///    &lt;/Tool&gt;
+        ///    &lt;Tool&gt;
+        ///      &lt;Number&gt;3&lt;/Number&gt;
+        ///      &lt;Diameter&gt;500&lt;/Diameter&gt;
+        ///      &lt;Thickness&gt;2&lt;/Thickness&gt;
+        ///    &lt;/Tool&gt;
+        ///    &lt;Tool&gt;
+        ///   [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string cam_data {
+            get {
+                return ResourceManager.GetString("cam_data", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
         internal static System.Drawing.Bitmap disk {
