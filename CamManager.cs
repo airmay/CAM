@@ -30,14 +30,6 @@ namespace CAM
         public CamManager(AcadGateway acad)
         {
             _acad = acad;
-            //CreateTechProcess();
-        }
-
-        public TechProcess CreateTechProcess()
-        {
-            var techProcess = new TechProcess($"Обработка{TechProcessList.Count + 1}", Container);
-            TechProcessList.Add(techProcess);
-            return techProcess;
         }
 
         public void SetActiveDocument(Document document)
@@ -47,11 +39,19 @@ namespace CAM
             TechProcessView.SetTechProcessList(TechProcessList);
         }
 
+        public TechProcess CreateTechProcess()
+        {
+            var techProcess = new TechProcess($"Обработка{TechProcessList.Count + 1}", Container);
+            TechProcessList.Add(techProcess);
+            return techProcess;
+        }
+
+        public List<SawingTechOperation> CreateTechOperations(TechProcess techProcess, TechOperationType techOperationType) =>
+            techProcess.CreateTechOperations(techOperationType, _acad.GetSelectedEntities());
+
         internal void SelectTechProcess(TechProcess techProcess) => _acad.SelectCurves(techProcess.TechOperations.Select(p => p.ProcessingArea.AcadObjectId));
 
         internal void SelectTechOperation(TechOperation techOperation) => _acad.SelectCurve(techOperation.ProcessingArea.AcadObjectId);
-
-        public List<SawingTechOperation> CreateTechOperations(TechProcess techProcess, TechOperationType techOperationType) => techProcess.CreateTechOperations(techOperationType, _acad.GetSelectedEntities());
 
         public bool MoveForwardTechOperation(TechOperation techOperation) => techOperation.TechProcess.TechOperations.SwapNext(techOperation);
 
@@ -86,6 +86,7 @@ namespace CAM
                 _acad.SelectCurve(processCommand.ToolpathCurve.ObjectId);
         }
 
+        #region Load/Save TechProsess
         /// <summary>
         /// Загрузить технологические процессы из файла чертежа
         /// </summary>
@@ -124,15 +125,17 @@ namespace CAM
                 Application.ShowAlertDialog($"Ошибка при записи техпроцессов:\n{e.Message}");
             }
         }
+
+        #endregion    }
+
+        //public class ProgramEventArgs : EventArgs
+        //{
+        //    public string Program { get; set; }
+
+        //    public ProgramEventArgs(string program)
+        //    {
+        //        Program = program;
+        //    }
+        //}
     }
-
-    //public class ProgramEventArgs : EventArgs
-    //{
-    //    public string Program { get; set; }
-
-    //    public ProgramEventArgs(string program)
-    //    {
-    //        Program = program;
-    //    }
-    //}
 }

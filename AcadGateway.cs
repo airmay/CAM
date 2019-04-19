@@ -41,7 +41,8 @@ namespace CAM
 
         public void DeleteEntities(IEnumerable<Curve> idList)
         {
-            //idList.Select(p => p.ObjectId).QForEach(p => p.Erase());
+            if (idList.Any())
+                idList.Select(p => p.ObjectId).QForEach(p => p.Erase());
         }
 
         public List<Curve> GetSelectedEntities()
@@ -64,10 +65,7 @@ namespace CAM
             return result;
         }
 
-        public void SelectCurve(ObjectId objectId)
-        {
-            SelectCurves(new ObjectId[] { objectId });
-        }
+        public void SelectCurve(ObjectId objectId) => SelectCurves(new ObjectId[] { objectId });
 
         public void SelectCurves(IEnumerable<ObjectId> objectIds)
         {

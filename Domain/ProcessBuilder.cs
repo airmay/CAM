@@ -53,18 +53,18 @@ namespace CAM.Domain
 	    {
 		    var toolpathCurve = curve.GetOffsetCurves(offset)[0] as Curve; //, z)[0];
 
-			switch (toolpathCurve)
-		    {
-				case Line line:
-					line.StartPoint = line.GetPointAtDist(startIndent);
-					line.EndPoint = line.GetPointAtDist(line.Length - endIndent);
-					break;
+            switch (toolpathCurve)
+            {
+                case Line line:
+                    line.StartPoint = line.GetPointAtDist(startIndent);
+                    line.EndPoint = line.GetPointAtDist(line.Length - endIndent);
+                    break;
 
-			    case Arc arc:
-					    arc.StartAngle = arc.StartAngle + startIndent / arc.Radius;
-					    arc.EndAngle = arc.EndAngle - endIndent / arc.Radius;
-				    break;
-		    }
+                case Arc arc:
+                    arc.StartAngle = arc.StartAngle + startIndent / arc.Radius;
+                    arc.EndAngle = arc.EndAngle - endIndent / arc.Radius;
+                    break;
+            }
 
 		    return toolpathCurve;
 	    }

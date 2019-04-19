@@ -64,98 +64,94 @@ namespace CAM.Domain
 
         public bool IsAutoExactly(Corner corner) => corner == Corner.Start ? IsAutoExactlyBegin : IsAutoExactlyEnd;
 
-        public static void SetupBorders(List<BorderProcessingArea> borders)
+        public static void ProcessBorders(List<BorderProcessingArea> borders, BorderProcessingArea fixedSideBorder = null)
         {
-            var processed = new HashSet<BorderProcessingArea>();
-            BorderProcessingArea border;
-            while ((border = borders.Find(p => !processed.Contains(p) && p.OuterSide != Side.None) ??
-                             borders.Find(p => !processed.Contains(p))) != null)
+            BorderProcessingArea startBorder;
+            while ((startBorder = fixedSideBorder ?? borders.Find(p => p.OuterSide != Side.None) ?? borders.FirstOrDefault()) != null)
             {
-                if (border.OuterSide == Side.None)
-                    border.CalcOuterSide(borders);
-                CalcBordersChain(border, Corner.Start, borders, processed);
-                if (!processed.Contains(border))
-                    CalcBordersChain(border, Corner.End, borders, processed);
-                processed.Add(border);
-            }
-        }
-
-        private static void CalcBordersChain(BorderProcessingArea border, Corner corner,
-            List<BorderProcessingArea> borders, ISet<BorderProcessingArea> processed)
-        {
-            var startPoint = border.Curve.GetPoint(corner);
-            var point = startPoint;
-            BorderProcessingArea nextBorder;
-            while ((nextBorder = borders.SingleOrDefault(p =>
-                       !processed.Contains(p) && p != border &&
-                       (p.Curve.StartPoint == point || p.Curve.EndPoint == point))) != null)
-            {
-                var nextCorner = nextBorder.Curve.GetCorner(point);
-                nextBorder.OuterSide = corner != nextCorner ? border.OuterSide : border.OuterSide.Swap();
-                var isExactly = !border.IsAutoExactly(corner)
-                    ? border.IsExactly(corner)
-                    : (!nextBorder.IsAutoExactly(nextCorner)
-                        ? nextBorder.IsExactly(nextCorner)
-                        : CalcIsExactly(border, corner, nextBorder, nextCorner));
-                border.IsExactly(corner) = isExactly;
-                nextBorder.IsExactly(nextCorner) = isExactly;
-                processed.Add(nextBorder);
-
-                border = nextBorder;
-                corner = nextCorner.Swap();
-                point = border.Curve.GetPoint(corner);
-                if (point == startPoint) // цикл
-                    return;
+                fixedSideBorder = null;
+                if (startBorder.OuterSide == Side.None)
+                    CalcOuterSide(startBorder);
+                CalcBordersChain(Corner.Start);
+                if (borders.Contains(startBorder))
+                    CalcBordersChain(Corner.End);
+                borders.Remove(startBorder);
             }
 
-            // свободный конец цепочки
-            if (border.IsAutoExactly(corner))
-                border.IsExactly(corner) = false;
-        }
-
-        private static bool CalcIsExactly(BorderProcessingArea border, Corner corner, BorderProcessingArea nextBorder,
-            Corner nextCorner)
-        {
-            switch (border.Curve)
+            void CalcBordersChain(Corner corner)
             {
-                case Line line:
-                    bool isLeftTurn;
-                    switch (nextBorder.Curve)
-                    {
-                        case Line nextLine:
-                            var angleDiff = nextLine.Angle - line.Angle;
-                            if (Math.Abs(angleDiff) < AngleTolerance)
-                                return false;
-                            isLeftTurn = Math.Sin(angleDiff) > 0;
-                            var isLeftOuterSide = border.OuterSide == Side.Left;
-                            var isNextStartPoint = nextCorner == Corner.Start;
-                            return isLeftTurn ^ isLeftOuterSide ^ isNextStartPoint;
+                var border = startBorder;
+                var point = border.Curve.GetPoint(corner);
+                BorderProcessingArea nextBorder;
+                while ((nextBorder = borders.SingleOrDefault(p => p != border && (p.Curve.StartPoint == point || p.Curve.EndPoint == point))) != null)
+                {
+                    borders.Remove(nextBorder);
+                    var nextCorner = nextBorder.Curve.GetCorner(point);
 
-                        case Arc nextArc:
-                            var angleTan = nextCorner == Corner.Start
-                                ? nextArc.StartAngle + Math.PI / 2
-                                : nextArc.EndAngle - Math.PI / 2;
-                            angleDiff = angleTan - line.Angle;
-                            isLeftTurn = Math.Abs(angleDiff) > AngleTolerance
-                                ? Math.Sin(angleDiff) > 0
-                                : nextCorner == Corner.Start;
-                            var isRightProcessSide = border.OuterSide == Side.Right;
-                            return isLeftTurn ^ isRightProcessSide;
-                    }
+                    var isExactly = !border.IsAutoExactly(corner)
+                        ? border.IsExactly(corner)
+                        : (!nextBorder.IsAutoExactly(nextCorner)
+                            ? nextBorder.IsExactly(nextCorner)
+                            : CalcIsExactly(border, corner, nextBorder, nextCorner));
+                    border.IsExactly(corner) = nextBorder.IsExactly(nextCorner) = isExactly;
 
-                    break;
-                case Arc arc:
-                    if (nextBorder.Curve is Line)
-                        return CalcIsExactly(nextBorder, nextCorner, border, corner);
-                    break;
+                    if (nextBorder == startBorder) // цикл
+                        return;
+
+                    nextBorder.OuterSide = nextCorner != corner ? border.OuterSide : border.OuterSide.Swap();
+                    border = nextBorder;
+                    corner = nextCorner.Swap();
+                    point = border.Curve.GetPoint(corner);
+                }
+
+                // свободный конец цепочки
+                if (!borders.Contains(border) && border.IsAutoExactly(corner))
+                    border.IsExactly(corner) = false;
             }
 
-            throw new InvalidOperationException("CalcIsExactly throw Error");
-        }
+            bool CalcIsExactly(BorderProcessingArea border, Corner corner, BorderProcessingArea nextBorder, Corner nextCorner)
+            {
+                switch (border.Curve)
+                {
+                    case Line line:
+                        bool isLeftTurn;
+                        switch (nextBorder.Curve)
+                        {
+                            case Line nextLine:
+                                var angleDiff = nextLine.Angle - line.Angle;
+                                if (Math.Abs(angleDiff) < AngleTolerance)
+                                    return false;
+                                isLeftTurn = Math.Sin(angleDiff) > 0;
+                                var isLeftOuterSide = border.OuterSide == Side.Left;
+                                var isNextStartPoint = nextCorner == Corner.Start;
+                                return isLeftTurn ^ isLeftOuterSide ^ isNextStartPoint;
 
-        private void CalcOuterSide(List<BorderProcessingArea> borders)
-        {
-            OuterSide = Side.Right;
+                            case Arc nextArc:
+                                var angleTan = nextCorner == Corner.Start
+                                    ? nextArc.StartAngle + Math.PI / 2
+                                    : nextArc.EndAngle - Math.PI / 2;
+                                angleDiff = angleTan - line.Angle;
+                                isLeftTurn = Math.Abs(angleDiff) > AngleTolerance
+                                    ? Math.Sin(angleDiff) > 0
+                                    : nextCorner == Corner.Start;
+                                var isRightProcessSide = border.OuterSide == Side.Right;
+                                return isLeftTurn ^ isRightProcessSide;
+                        }
+
+                        break;
+                    case Arc arc:
+                        if (nextBorder.Curve is Line)
+                            return CalcIsExactly(nextBorder, nextCorner, border, corner);
+                        break;
+                }
+
+                throw new InvalidOperationException("CalcIsExactly throw Error");
+            }
+
+            void CalcOuterSide(BorderProcessingArea border)
+            {
+                border.OuterSide = Side.Right;
+            }
         }
     }
 }

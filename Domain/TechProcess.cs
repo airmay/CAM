@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Autodesk.AutoCAD.ApplicationServices;
 using Autodesk.AutoCAD.DatabaseServices;
+using Dreambuild.AutoCAD;
 
 namespace CAM.Domain
 {
@@ -50,7 +51,8 @@ namespace CAM.Domain
 
 	    public void BuildProcessing()
 	    {
-			BorderProcessingArea.SetupBorders(TechOperations.Select(p => p.ProcessingArea).OfType<BorderProcessingArea>().ToList());
+            TechOperations.ForEach(p => p.ProcessingArea.Curve = p.ProcessingArea.AcadObjectId.QOpenForRead<Curve>());
+            BorderProcessingArea.ProcessBorders(TechOperations.Select(p => p.ProcessingArea).OfType<BorderProcessingArea>().ToList());
 	        var builder = new ScemaLogicProcessBuilder(TechProcessParams);
             TechOperations.ForEach(p => p.BuildProcessing(builder));
 	        ProcessCommands = builder.FinishTechProcess();
