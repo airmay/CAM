@@ -5,8 +5,10 @@ using System.Security.Policy;
 using System.Text;
 using System.Threading.Tasks;
 using Autodesk.AutoCAD.ApplicationServices;
+using Autodesk.AutoCAD.Colors;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
+using Dreambuild.AutoCAD;
 
 namespace CAM.Domain
 {
@@ -20,8 +22,16 @@ namespace CAM.Domain
         //    [
         //}
 
-	    private readonly TechProcessParams _techProcessParams;
-	    private Curve _curve;
+        private readonly TechProcessParams _techProcessParams;
+        private static readonly Dictionary<string, Color> Colors = new Dictionary<string, Color>()
+        {
+            [CommandNames.Cutting] = Color.FromColor(System.Drawing.Color.Green),
+            [CommandNames.Uplifting] = Color.FromColor(System.Drawing.Color.Blue),
+            [CommandNames.Penetration] = Color.FromColor(System.Drawing.Color.Yellow),
+            [CommandNames.InitialMove] = Color.FromColor(System.Drawing.Color.Crimson),
+            [CommandNames.Fast] = Color.FromColor(System.Drawing.Color.Crimson)
+        };
+        private Curve _curve;
         private Point3d _currentPoint = Point3d.Origin;
         private Corner _corner;
 	    private double _startIndent;
@@ -52,6 +62,8 @@ namespace CAM.Domain
         private static Curve CreateToolpathCurve(Curve curve, double offset, double z, double startIndent, double endIndent)
 	    {
 		    var toolpathCurve = curve.GetOffsetCurves(offset)[0] as Curve; //, z)[0];
+            //var copy = entity.Clone() as Entity;
+            toolpathCurve.TransformBy(Matrix3d.Displacement(Vector3d.ZAxis * z));
 
             switch (toolpathCurve)
             {
@@ -65,8 +77,8 @@ namespace CAM.Domain
                     arc.EndAngle = arc.EndAngle - endIndent / arc.Radius;
                     break;
             }
-
-		    return toolpathCurve;
+            toolpathCurve.Color = Colors[CommandNames.Cutting];
+            return toolpathCurve;
 	    }
 
 	    //private double[] CalcToolAngles(Curve curve)
@@ -180,7 +192,7 @@ namespace CAM.Domain
 		    // TODO проверка совпадения точек
 		    var destPoint = new Point3d(x ?? _currentPoint.X, y ?? _currentPoint.Y, z ?? _currentPoint.Z);
 		    var line = _currentPoint != Point3d.Origin
-			    ? new Line(_currentPoint, destPoint)
+			    ? new Line(_currentPoint, destPoint) { Color = Colors[name] }
 			    : null;
 		    CreateCommand(name, code, axis, feed, line, destPoint.X, destPoint.Y, destPoint.Z);
 		    _currentPoint = destPoint;

@@ -29,23 +29,24 @@ namespace CAM
 
         public ObjectId GetObjectId(long handle) => Database.GetObjectId(false, new Handle(handle), 0);
 
-        public void CreateEntities(List<Curve> entities)
+        public void SaveCurves(IEnumerable<Curve> entities)
         {
-            throw new NotImplementedException();
+            using (DocumentLock acLckDoc = Document.LockDocument())
+            {
+                string layer = "Обработка";
+                var layerId = DbHelper.GetLayerId(layer);
+                entities.Select(p => { p.LayerId = layerId; return p; }).AddToCurrentSpace();
+            }
         }
 
-        public void CreateEntities(IEnumerable<Curve> entities)
+        public void DeleteCurves(IEnumerable<Curve> idList)
         {
-            throw new NotImplementedException();
+            if (idList?.Any() == true)
+                using (DocumentLock acLckDoc = Document.LockDocument())
+                    idList.Select(p => p.ObjectId).QForEach(p => p.Erase());
         }
 
-        public void DeleteEntities(IEnumerable<Curve> idList)
-        {
-            if (idList.Any())
-                idList.Select(p => p.ObjectId).QForEach(p => p.Erase());
-        }
-
-        public List<Curve> GetSelectedEntities()
+        public List<Curve> GetSelectedCurves()
         {
             List<Curve> result = null;
             var TransactionManager = HostApplicationServices.WorkingDatabase.TransactionManager;

@@ -21,7 +21,8 @@ namespace CAM.Domain
         /// <summary>
         /// Технологический процесс обработки
         /// </summary>
-        public TechProcess TechProcess { get; }
+        [NonSerialized]
+        public TechProcess TechProcess;
 
         /// <summary>
         /// Обрабатываемая область
@@ -36,7 +37,8 @@ namespace CAM.Domain
         /// <summary>
         /// Команды
         /// </summary>
-        public List<ProcessCommand> ProcessCommands { get; set; } = new List<ProcessCommand>();
+        [NonSerialized]
+        public List<ProcessCommand> ProcessCommands;
 
         protected TechOperation(TechProcess techProcess, ProcessingArea processingArea)
         {
@@ -48,7 +50,7 @@ namespace CAM.Domain
 
         public abstract void BuildProcessing(ScemaLogicProcessBuilder builder);
 
-	    public IEnumerable<Curve> ToolpathCurves => ProcessCommands.Select(p => p.ToolpathCurve).Where(p => p != null);
+	    public IEnumerable<Curve> ToolpathCurves => ProcessCommands?.Select(p => p.ToolpathCurve).Where(p => p != null);
 
 	}
 }

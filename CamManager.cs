@@ -47,7 +47,7 @@ namespace CAM
         }
 
         public List<SawingTechOperation> CreateTechOperations(TechProcess techProcess, TechOperationType techOperationType) =>
-            techProcess.CreateTechOperations(techOperationType, _acad.GetSelectedEntities());
+            techProcess.CreateTechOperations(techOperationType, _acad.GetSelectedCurves());
 
         internal void SelectTechProcess(TechProcess techProcess) => _acad.SelectCurves(techProcess.TechOperations.Select(p => p.ProcessingArea.AcadObjectId));
 
@@ -59,21 +59,21 @@ namespace CAM
 
         public void DeleteTechProcess(TechProcess techProcess)
         {
-            _acad.DeleteEntities(techProcess.ToolpathCurves);
+            _acad.DeleteCurves(techProcess.ToolpathCurves);
             TechProcessList.Remove(techProcess);
         }
 
         public void DeleteTechOperation(TechOperation techOperation)
         {
-            _acad.DeleteEntities(techOperation.ToolpathCurves);
+            _acad.DeleteCurves(techOperation.ToolpathCurves);
             techOperation.TechProcess.TechOperations.Remove(techOperation);
         }
 
         public void BuildProcessing(TechProcess techProcess)
         {
-            _acad.DeleteEntities(techProcess.ToolpathCurves);
+            _acad.DeleteCurves(techProcess.ToolpathCurves);
             techProcess.BuildProcessing();
-            _acad.CreateEntities(techProcess.ToolpathCurves);
+            _acad.SaveCurves(techProcess.ToolpathCurves);
 
             //var programGenerator = new ScemaLogicProgramGenerator();
             //var program = programGenerator.Generate(techProcess);
@@ -82,7 +82,7 @@ namespace CAM
 
         public void SelectProcessCommand(ProcessCommand processCommand)
         {
-            if (processCommand.ToolpathCurve != null)
+            if (processCommand?.ToolpathCurve != null)
                 _acad.SelectCurve(processCommand.ToolpathCurve.ObjectId);
         }
 
@@ -100,7 +100,11 @@ namespace CAM
                     techProcessList.ForEach(tp =>
                     {
                         tp.SetContainer(Container);
-                        tp.TechOperations.ForEach(to => to.ProcessingArea.AcadObjectId = _acad.GetObjectId(to.ProcessingArea.Handle));
+                        tp.TechOperations.ForEach(to =>
+                        {
+                            to.ProcessingArea.AcadObjectId = _acad.GetObjectId(to.ProcessingArea.Handle);
+                            to.TechProcess = tp;
+                        });
                     });
                     Interaction.WriteLine($"Загружены техпроцессы: {string.Join(", ", techProcessList.Select(p => p.Name))}");
                 }

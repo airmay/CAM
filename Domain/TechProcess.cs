@@ -33,12 +33,13 @@ namespace CAM.Domain
         /// </summary>
         public List<TechOperation> TechOperations { get; } = new List<TechOperation>();
 
-	    public IEnumerable<Curve> ToolpathCurves => TechOperations.SelectMany(p => p.ToolpathCurves);
+	    public IEnumerable<Curve> ToolpathCurves => TechOperations.Where(p => p.ToolpathCurves != null).SelectMany(p => p.ToolpathCurves);
 
         /// <summary>
         /// Команды
         /// </summary>
-        public List<ProcessCommand> ProcessCommands { get; set; } = new List<ProcessCommand>();
+        [NonSerialized]
+        public List<ProcessCommand> ProcessCommands;
 
         public TechProcess(string name, CamContainer container)
         {
