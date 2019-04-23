@@ -31,46 +31,35 @@ namespace CAM
 
         public void SaveCurves(IEnumerable<Curve> entities)
         {
-            using (DocumentLock acLckDoc = Document.LockDocument())
+            App.LockAndExecute(() =>
             {
                 string layer = "Обработка";
                 var layerId = DbHelper.GetLayerId(layer);
                 entities.Select(p => { p.LayerId = layerId; return p; }).AddToCurrentSpace();
-            }
+            });
         }
 
         public void DeleteCurves(IEnumerable<Curve> idList)
         {
             if (idList?.Any() == true)
-                using (DocumentLock acLckDoc = Document.LockDocument())
-                    idList.Select(p => p.ObjectId).QForEach(p => p.Erase());
+                App.LockAndExecute(() => idList.Select(p => p.ObjectId).QForEach(p => p.Erase()));
         }
 
-        public List<Curve> GetSelectedCurves()
-        {
-            List<Curve> result = null;
-            var TransactionManager = HostApplicationServices.WorkingDatabase.TransactionManager;
-            var Editor = Application.DocumentManager.MdiActiveDocument.Editor;
-            //PromptSelectionResult sel = Editor.SelectPrevious(); //SelectImplied(); // 
-            using (var trans = TransactionManager.StartTransaction())
-            {
-                //var sel = Editor.SelectPrevious();  // вызов команды из командной строки
-                //if (sel.Status != PromptStatus.OK)
-                var sel = Editor.SelectImplied();   // вызов команды нажатием кнопки на тулбаре
-                if (sel.Status == PromptStatus.OK)
-                    result = sel.Value.GetObjectIds().Select(p => trans.GetObject(p, OpenMode.ForRead)).Cast<Curve>().ToList();
-                else
-                    Editor.WriteMessage("Нет выбранных объектов");
-                trans.Commit();
-            }
-            return result;
-        }
+        public IEnumerable<Curve> GetSelectedCurves() => Interaction.GetPickSet().QOpenForRead<Curve>();
 
         public void SelectCurve(ObjectId objectId) => SelectCurves(new ObjectId[] { objectId });
 
-        public void SelectCurves(IEnumerable<ObjectId> objectIds)
+        private ObjectId[] _highlightedObjects;
+
+        public void SelectCurves(ObjectId[] objectIds)
         {
-            Editor.SetImpliedSelection(objectIds.ToArray());
+            App.LockAndExecute(() =>
+            {
+                if (_highlightedObjects != null)
+                    Interaction.UnhighlightObjects(_highlightedObjects);
+                Interaction.HighlightObjects(objectIds);
+                _highlightedObjects = objectIds;
+            });
             Editor.UpdateScreen();
         }
 

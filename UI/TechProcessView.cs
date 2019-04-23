@@ -144,7 +144,7 @@ namespace CAM.UI
 			    var techOperations = _camManager.CreateTechOperations(CurrentTechProcess, TechOperationType.Sawing);
                 if (techOperations != null)
                 {
-                    techProcessNode.Nodes.AddRange(techOperations.Select(CreateTechOperationNode).ToArray());
+                    techProcessNode.Nodes.AddRange(Array.ConvertAll(techOperations, CreateTechOperationNode));
                     treeView.SelectedNode = techProcessNode.Nodes[techProcessNode.Nodes.Count - 1];
                 }
 		    }

@@ -46,10 +46,17 @@ namespace CAM
             return techProcess;
         }
 
-        public List<SawingTechOperation> CreateTechOperations(TechProcess techProcess, TechOperationType techOperationType) =>
-            techProcess.CreateTechOperations(techOperationType, _acad.GetSelectedCurves());
+        public TechOperation[] CreateTechOperations(TechProcess techProcess, TechOperationType techOperationType)
+        {
+            var curves = _acad.GetSelectedCurves();
+            if (curves.Any())
+                return techProcess.CreateTechOperations(techOperationType, curves);
 
-        internal void SelectTechProcess(TechProcess techProcess) => _acad.SelectCurves(techProcess.TechOperations.Select(p => p.ProcessingArea.AcadObjectId));
+            Application.ShowAlertDialog($"Не выбраны элементы чертежа");
+            return null;
+        }
+
+        internal void SelectTechProcess(TechProcess techProcess) => _acad.SelectCurves(techProcess.TechOperations.Select(p => p.ProcessingArea.AcadObjectId).ToArray());
 
         internal void SelectTechOperation(TechOperation techOperation) => _acad.SelectCurve(techOperation.ProcessingArea.AcadObjectId);
 

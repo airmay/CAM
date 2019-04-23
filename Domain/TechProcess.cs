@@ -87,15 +87,6 @@ namespace CAM.Domain
             return tool != null;
         }
 
-        public List<SawingTechOperation> CreateTechOperations(TechOperationType techOperationType, List<Curve> curves)
-        {
-            if (curves == null)
-            {
-                Application.ShowAlertDialog($"Не выбраны элементы чертежа");
-                return null;
-            }
-            var factory = GetFactory(techOperationType);
-            return curves.ConvertAll(p => factory.Create(this, p));
-        }
+        public SawingTechOperation[] CreateTechOperations(TechOperationType techOperationType, IEnumerable<Curve> curves) => curves.Select(p => GetFactory(techOperationType).Create(this, p)).ToArray();
     }
 }
