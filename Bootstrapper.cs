@@ -1,5 +1,6 @@
 ﻿using Autodesk.AutoCAD.ApplicationServices;
 using Autodesk.AutoCAD.DatabaseServices;
+using Autodesk.AutoCAD.Geometry;
 using Autodesk.AutoCAD.Runtime;
 using Autodesk.AutoCAD.Windows;
 using CAM.Domain;
@@ -36,6 +37,8 @@ namespace CAM
             manager.Container = _container;
             manager.SetActiveDocument(acad.Document);
 
+            //PrepareTest();
+
             //PaletteSet focus use Autodesk.AutoCAD.Internal.Utils.SetFocusToDwgView();
             //PaletteSet.PaletteActivated
 
@@ -64,6 +67,16 @@ namespace CAM
             //AutocadUtils.CreateTest();
             //RunTest();
 
+        }
+
+        private void PrepareTest()
+        {
+            var rect = NoDraw.Rectang(new Point3d(3000, 2000, 0), new Point3d(5000, 3000, 0));
+            DBObjectCollection entitySet = new DBObjectCollection();
+            rect.SetBulgeAt(2, 0.5);
+            rect.Explode(entitySet);
+            foreach (Entity ent in entitySet)
+                ent.AddToCurrentSpace();
         }
 
         //private static void DocumentManagerOnDocumentLockModeChanged(object sender, DocumentLockModeChangedEventArgs documentLockModeChangedEventArgs)
