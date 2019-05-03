@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Autodesk.AutoCAD.ApplicationServices;
+using Autodesk.AutoCAD.DatabaseServices;
 using CAM.Domain;
 using CAM.UI;
 using Dreambuild.AutoCAD;
@@ -78,9 +79,17 @@ namespace CAM
 
         public void BuildProcessing(TechProcess techProcess)
         {
-            _acad.DeleteCurves(techProcess.ToolpathCurves);
-            techProcess.BuildProcessing();
-            _acad.SaveCurves(techProcess.ToolpathCurves);
+            try
+            {
+                _acad.DeleteCurves(techProcess.ToolpathCurves);
+                techProcess.BuildProcessing();
+                _acad.SaveCurves(techProcess.ToolpathCurves);
+                TechProcessView.RefreshView();
+            }
+            catch (Exception e)
+            {
+                Application.ShowAlertDialog(e.Message);
+            }
 
             //var programGenerator = new ScemaLogicProgramGenerator();
             //var program = programGenerator.Generate(techProcess);
@@ -91,6 +100,17 @@ namespace CAM
         {
             if (processCommand?.ToolpathCurve != null)
                 _acad.SelectCurve(processCommand.ToolpathCurve.ObjectId);
+        }
+
+        public void SwapOuterSide(TechProcess techProcess, TechOperation techOperation)
+        {
+            var to = techOperation ?? techProcess?.TechOperations?.FirstOrDefault();
+            if (to?.ProcessingArea is BorderProcessingArea border)
+            {
+                border.OuterSide = border.OuterSide.Swap();
+                to.TechProcess.ProcessBorders(border);
+                BuildProcessing(to.TechProcess);
+            }
         }
 
         #region Load/Save TechProsess

@@ -59,6 +59,12 @@ namespace CAM.Domain
 	        ProcessCommands = builder.FinishTechProcess();
 	    }
 
+        public void ProcessBorders(BorderProcessingArea startBorder = null)
+        {
+            TechOperations.ForEach(p => p.ProcessingArea.Curve = p.ProcessingArea.AcadObjectId.QOpenForRead<Curve>());
+            BorderProcessingArea.ProcessBorders(TechOperations.Select(p => p.ProcessingArea).OfType<BorderProcessingArea>().ToList(), startBorder);
+        }
+
         public ITechOperationFactory GetFactory(TechOperationType techOperationType)
         {
             if (!TechOperationFactorys.TryGetValue(techOperationType, out ITechOperationFactory factory))

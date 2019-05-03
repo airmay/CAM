@@ -24,7 +24,7 @@ namespace CAM
                 case Side.Right:
                     return Side.Left;
                 default:
-                    throw new Exception($"Error Side.Swap() for side={side}");
+                    return Side.None;
             }
         }
     }

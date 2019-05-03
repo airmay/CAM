@@ -33,9 +33,9 @@ namespace CAM.Domain
 
         public override void BuildProcessing(ScemaLogicProcessBuilder builder)
         {
-            builder.StartTechOperation(ProcessingArea.Curve, CalcStartCorner());
-
-            var indentSum = builder.CalcIndent(((BorderProcessingArea)ProcessingArea).IsExactlyBegin, ((BorderProcessingArea)ProcessingArea).IsExactlyEnd, TechProcess.TechProcessParams.BilletThickness);
+            int thickness = TechProcess.TechProcessParams.BilletThickness;
+            BorderProcessingArea border = ((BorderProcessingArea)ProcessingArea);
+            var indentSum = builder.CalcIndent(border.IsExactlyBegin, border.IsExactlyEnd, thickness);
 	        if (indentSum >= ProcessingArea.Curve.Length())
 	        {
 				// TODO Намечание
@@ -56,57 +56,53 @@ namespace CAM.Domain
 		        //}
 			}
 
-	        TechOperationParams.Compensation = builder.CalcCompensation(((BorderProcessingArea)ProcessingArea).OuterSide, TechProcess.TechProcessParams.BilletThickness);
-
-			var modes = TechOperationParams.Modes.OrderBy(p => p.Depth).GetEnumerator();
-            modes.MoveNext();
-            var mode = modes.Current;
-	        Debug.Assert(mode != null, nameof(mode) + " != null");
-	        var z = TechOperationParams.IsFirstPassOnSurface ? -mode.DepthStep : 0;
-            var billetThickness = TechProcess.TechProcessParams.BilletThickness;
-            do
+            bool oddPassCount = false;
+            Calculate(false);
+            Corner startCorner = Corner.Start;
+            switch (ProcessingArea.Curve)
             {
-                z += mode.DepthStep;
-                if (z > mode.Depth && modes.MoveNext())
-                    mode = modes.Current;
-                if (z > billetThickness)
-                    z = billetThickness;
-                builder.Cutting(mode.Feed, -z);
+                case Line line:
+                    startCorner = (line.Angle > 0 && line.Angle <= Math.PI) ^ oddPassCount ? Corner.End : Corner.Start;
+                    break;
+
+                case Arc arc:
+                    startCorner = (arc.StartAngle >= 0.5 * Math.PI && arc.StartAngle < 1.5 * Math.PI) ^ oddPassCount ? Corner.Start : Corner.End;
+                    break;
             }
-            while (z < billetThickness);
-			modes.Dispose();
+            builder.StartTechOperation(ProcessingArea.Curve, startCorner);
+            TechOperationParams.Compensation = builder.CalcCompensation(border.OuterSide, thickness);
+            Calculate(true);
+
             ProcessCommands = builder.FinishTechOperation();
+
+            void Calculate(bool buildMode)
+            {
+                var modes = TechOperationParams.Modes.OrderBy(p => p.Depth).GetEnumerator();
+                if (!modes.MoveNext())
+                    throw new InvalidOperationException("Не заданы режимы обработки");
+                var mode = modes.Current;
+                modes.MoveNext();
+                var nextMode = modes.Current;
+                var z = TechOperationParams.IsFirstPassOnSurface ? -mode.DepthStep : 0;
+                do
+                {
+                    z += mode.DepthStep;
+                    if (nextMode != null && z >= nextMode.Depth)
+                    {
+                        mode = nextMode;
+                        modes.MoveNext();
+                        nextMode = modes.Current;
+                    }
+                    if (z > thickness)
+                        z = thickness;
+                    if (buildMode)
+                        builder.Cutting(mode.Feed, -z);
+
+                    oddPassCount = !oddPassCount;
+                }
+                while (z < thickness);
+                modes.Dispose();
+            }
         }
-
-	    private Corner CalcStartCorner()
-	    {
-		    var modes = TechOperationParams.Modes.OrderBy(p => p.Depth).GetEnumerator();
-		    modes.MoveNext();
-		    var mode = modes.Current;
-		    Debug.Assert(mode != null, nameof(mode) + " != null");
-		    var z = TechOperationParams.IsFirstPassOnSurface ? -mode.DepthStep : 0;
-		    var passCount = 0;
-		    do
-		    {
-			    z += mode.DepthStep;
-			    if (z > mode.Depth && modes.MoveNext())
-				    mode = modes.Current;
-			    passCount++;
-		    }
-		    while (z < TechProcess.TechProcessParams.BilletThickness);
-		    modes.Dispose();
-
-		    switch (ProcessingArea.Curve)
-		    {
-			    case Line line:
-				    return (line.Angle > 0 && line.Angle <= Math.PI) ^ (passCount % 2 == 1) ? Corner.End : Corner.Start;
-
-			    case Arc arc:
-				    return (arc.StartAngle >= 0.5 * Math.PI && arc.StartAngle < 1.5 * Math.PI) ^ (passCount % 2 == 1) ? Corner.Start : Corner.End;
-
-			    default:
-				    return Corner.Start;
-		    }
-	    }
 	}
 }

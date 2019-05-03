@@ -40,16 +40,16 @@
             this.MCode = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.panel1 = new System.Windows.Forms.Panel();
             this.toolStrip1 = new System.Windows.Forms.ToolStrip();
-            this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
-            this.panel2 = new System.Windows.Forms.Panel();
-            this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
             this.bCreateTechOperation = new System.Windows.Forms.ToolStripButton();
             this.bRemove = new System.Windows.Forms.ToolStripButton();
             this.bMoveUpTechOperation = new System.Windows.Forms.ToolStripButton();
             this.bMoveDownTechOperation = new System.Windows.Forms.ToolStripButton();
             this.bCreateTechProcess = new System.Windows.Forms.ToolStripButton();
+            this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.bBuildProcessing = new System.Windows.Forms.ToolStripButton();
+            this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
             this.bSave = new System.Windows.Forms.ToolStripButton();
+            this.panel2 = new System.Windows.Forms.Panel();
             this.codeDataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.param1DataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.param2DataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
@@ -57,6 +57,7 @@
             this.param4DataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.param5DataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.processCommandBindingSource = new System.Windows.Forms.BindingSource(this.components);
+            this.bSwapOuterSide = new System.Windows.Forms.ToolStripButton();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
@@ -200,6 +201,7 @@
             this.bMoveDownTechOperation,
             this.bCreateTechProcess,
             this.toolStripSeparator1,
+            this.bSwapOuterSide,
             this.bBuildProcessing,
             this.toolStripSeparator2,
             this.bSave});
@@ -208,25 +210,6 @@
             this.toolStrip1.Size = new System.Drawing.Size(312, 25);
             this.toolStrip1.TabIndex = 0;
             this.toolStrip1.Text = "toolStrip1";
-            // 
-            // toolStripSeparator1
-            // 
-            this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(6, 25);
-            // 
-            // panel2
-            // 
-            this.panel2.Controls.Add(this.splitContainer1);
-            this.panel2.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.panel2.Location = new System.Drawing.Point(0, 25);
-            this.panel2.Name = "panel2";
-            this.panel2.Size = new System.Drawing.Size(312, 711);
-            this.panel2.TabIndex = 3;
-            // 
-            // toolStripSeparator2
-            // 
-            this.toolStripSeparator2.Name = "toolStripSeparator2";
-            this.toolStripSeparator2.Size = new System.Drawing.Size(6, 25);
             // 
             // bCreateTechOperation
             // 
@@ -278,6 +261,11 @@
             this.bCreateTechProcess.Text = "Добавить техпроцесс";
             this.bCreateTechProcess.Click += new System.EventHandler(this.bCreateTechProcess_Click);
             // 
+            // toolStripSeparator1
+            // 
+            this.toolStripSeparator1.Name = "toolStripSeparator1";
+            this.toolStripSeparator1.Size = new System.Drawing.Size(6, 25);
+            // 
             // bBuildProcessing
             // 
             this.bBuildProcessing.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
@@ -288,6 +276,11 @@
             this.bBuildProcessing.Text = "Рассчитать обработку";
             this.bBuildProcessing.Click += new System.EventHandler(this.bBuildProcessing_Click);
             // 
+            // toolStripSeparator2
+            // 
+            this.toolStripSeparator2.Name = "toolStripSeparator2";
+            this.toolStripSeparator2.Size = new System.Drawing.Size(6, 25);
+            // 
             // bSave
             // 
             this.bSave.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
@@ -297,6 +290,15 @@
             this.bSave.Size = new System.Drawing.Size(23, 22);
             this.bSave.Text = "Сохранить обработку в файле чертежа";
             this.bSave.Click += new System.EventHandler(this.bSave_Click);
+            // 
+            // panel2
+            // 
+            this.panel2.Controls.Add(this.splitContainer1);
+            this.panel2.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.panel2.Location = new System.Drawing.Point(0, 25);
+            this.panel2.Name = "panel2";
+            this.panel2.Size = new System.Drawing.Size(312, 711);
+            this.panel2.TabIndex = 3;
             // 
             // codeDataGridViewTextBoxColumn
             // 
@@ -344,6 +346,16 @@
             // 
             this.processCommandBindingSource.DataSource = typeof(CAM.Domain.ProcessCommand);
             this.processCommandBindingSource.CurrentChanged += new System.EventHandler(this.processCommandBindingSource_CurrentChanged);
+            // 
+            // bSwapOuterSide
+            // 
+            this.bSwapOuterSide.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.bSwapOuterSide.Image = global::CAM.Properties.Resources.layer_shape_line;
+            this.bSwapOuterSide.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.bSwapOuterSide.Name = "bSwapOuterSide";
+            this.bSwapOuterSide.Size = new System.Drawing.Size(23, 22);
+            this.bSwapOuterSide.Text = "Поменять внешнюю сторону";
+            this.bSwapOuterSide.Click += new System.EventHandler(this.bSwapOuterSide_Click);
             // 
             // TechProcessView
             // 
@@ -401,5 +413,6 @@
         private System.Windows.Forms.DataGridViewTextBoxColumn param5DataGridViewTextBoxColumn;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
         private System.Windows.Forms.ToolStripButton bSave;
+        private System.Windows.Forms.ToolStripButton bSwapOuterSide;
     }
 }

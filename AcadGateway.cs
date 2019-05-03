@@ -41,11 +41,18 @@ namespace CAM
 
         public void DeleteCurves(IEnumerable<Curve> idList)
         {
-            if (idList?.Any() == true)
-                App.LockAndExecute(() => idList.Select(p => p.ObjectId).QForEach(p => p.Erase()));
+            _highlightedObjects = null;
+            var actualList = idList?.Where(p => !p.ObjectId.IsNull);
+            if (actualList?.Any() == true)
+                App.LockAndExecute(() => actualList.Select(p => p.ObjectId).QForEach(p => p.Erase()));
         }
 
-        public IEnumerable<Curve> GetSelectedCurves() => Interaction.GetPickSet().QOpenForRead<Curve>();
+        public IEnumerable<Curve> GetSelectedCurves() => OpenForRead(Interaction.GetPickSet());
+
+        public static Curve[] OpenForRead(IEnumerable<ObjectId> ids)
+        {
+            return ids.Any() ? ids.QOpenForRead<Curve>() : Array.Empty<Curve>();
+        }
 
         public void SelectCurve(ObjectId objectId) => SelectCurves(new ObjectId[] { objectId });
 
@@ -55,12 +62,18 @@ namespace CAM
         {
             App.LockAndExecute(() =>
             {
-                if (_highlightedObjects != null)
+                if (_highlightedObjects != null && _highlightedObjects.Length > 0)
                     Interaction.UnhighlightObjects(_highlightedObjects);
-                Interaction.HighlightObjects(objectIds);
+                if (objectIds.Length > 0)
+                    Interaction.HighlightObjects(objectIds);
                 _highlightedObjects = objectIds;
             });
             Editor.UpdateScreen();
+        }
+
+        public void ClearSelection()
+        {
+            _highlightedObjects = null;
         }
 
         #region XRecord methods

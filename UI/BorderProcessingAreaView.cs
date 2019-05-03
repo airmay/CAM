@@ -21,6 +21,7 @@ namespace CAM.UI
 		public void SetDataSource(BorderProcessingArea dataSource)
 		{
 			borderProcessingAreaBindingSource.DataSource = dataSource;
+            borderProcessingAreaBindingSource.ResetBindings(false);
 		}
 	}
 }

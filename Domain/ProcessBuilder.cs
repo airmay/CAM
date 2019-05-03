@@ -75,6 +75,10 @@ namespace CAM.Domain
                 case Arc arc:
                     arc.StartAngle = arc.StartAngle + startIndent / arc.Radius;
                     arc.EndAngle = arc.EndAngle - endIndent / arc.Radius;
+
+                    if ((arc.StartAngle >= 0.5 * Math.PI && arc.StartAngle < 1.5 * Math.PI) ^ (arc.EndAngle > 0.5 * Math.PI && arc.EndAngle <= 1.5 * Math.PI))
+                        throw new InvalidOperationException($"Обработка дуги невозможна - дуга пересекает угол 90 или 270 градусов. Текущие углы: начальный {ToDeg(arc.StartAngle)}, конечный {ToDeg(arc.EndAngle)}");
+                    
                     break;
             }
             toolpathCurve.Color = Colors[CommandNames.Cutting];
@@ -106,10 +110,6 @@ namespace CAM.Domain
 
 	    private static double CalcToolAngle(Curve curve, Corner corner)
         {
-			//TODO Обработка дуги невозможна
-			//if (arc.StartAngle < Math.PI / 2 && arc.EndAngle > Math.PI / 2 || arc.StartAngle < Math.PI * 3 / 2 && arc.EndAngle > Math.PI * 3 / 2)
-			//	throw new Exception($"Обработка дуги невозможна - дуга пересекает угол 90 или 270 градусов. Текущие углы: начальный {ToDeg(arc.StartAngle)}, конечный {ToDeg(arc.EndAngle)}");
-
 			switch (curve)
             {
                 case Line line:
@@ -260,7 +260,9 @@ namespace CAM.Domain
 					hasToolOffset = (line.Angle > 0 && line.Angle <= Math.PI) ^ (outerSide == Side.Left);
 					break;
 			    case Arc arc:
-				    hasToolOffset = (arc.StartAngle >= 0.5 * Math.PI && arc.StartAngle < 1.5 * Math.PI) ^ (outerSide == Side.Right);
+                    var angle = (arc.GetPointAtParameter(0.5) - arc.Center).ToVector2d().Angle;
+                    hasToolOffset = (angle >= 0.5 * Math.PI && angle < 1.5 * Math.PI) ^ (outerSide == Side.Right);
+                    //hasToolOffset = (arc.StartAngle >= 0.5 * Math.PI && arc.StartAngle < 1.5 * Math.PI) ^ (outerSide == Side.Right);
 				    if (outerSide == Side.Left)
 					    d = arc.Radius - Math.Sqrt(arc.Radius * arc.Radius - depth * (_techProcessParams.ToolDiameter - depth));
 				    break;

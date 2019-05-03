@@ -51,9 +51,14 @@ namespace CAM.UI
             SetParamsViewsVisible();
         }
 
-	    private void treeView_AfterSelect(object sender, TreeViewEventArgs e)
+        private void treeView_AfterSelect(object sender, TreeViewEventArgs e)
         {
-	        switch (treeView.SelectedNode.Tag)
+            RefreshView();
+        }
+
+        public void RefreshView()
+        {
+            switch (treeView.SelectedNode.Tag)
 	        {
 		        case TechProcess techProcess:
 					_techProcessParamsView.SetTechProcess(techProcess);
@@ -211,8 +216,9 @@ namespace CAM.UI
 	    {
 	        if (CurrentTechProcess != null)
 	        {
-	            _camManager.BuildProcessing(CurrentTechProcess);
-	            treeView_AfterSelect( null, null);
+                //var view = GetParamsView<SawingParamsView>();
+                treeView.Focus();
+                _camManager.BuildProcessing(CurrentTechProcess);
 	        }
 	    }
 
@@ -228,5 +234,9 @@ namespace CAM.UI
             _camManager.SelectProcessCommand(processCommandBindingSource.Current as ProcessCommand);
         }
 
+        private void bSwapOuterSide_Click(object sender, EventArgs e)
+        {
+            _camManager.SwapOuterSide(treeView.SelectedNode?.Tag as TechProcess, treeView.SelectedNode?.Tag as TechOperation);
+        }
     }
 }

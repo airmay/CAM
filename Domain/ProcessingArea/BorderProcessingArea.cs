@@ -87,6 +87,7 @@ namespace CAM.Domain
                 {
                     borders.Remove(nextBorder);
                     var nextCorner = nextBorder.Curve.GetCorner(point);
+                    nextBorder.OuterSide = nextCorner != corner ? border.OuterSide : border.OuterSide.Swap();
 
                     var isExactly = !border.IsAutoExactly(corner)
                         ? border.IsExactly(corner)
@@ -98,7 +99,6 @@ namespace CAM.Domain
                     if (nextBorder == startBorder) // цикл
                         return;
 
-                    nextBorder.OuterSide = nextCorner != corner ? border.OuterSide : border.OuterSide.Swap();
                     border = nextBorder;
                     corner = nextCorner.Swap();
                     point = border.Curve.GetPoint(corner);
@@ -111,6 +111,7 @@ namespace CAM.Domain
 
             bool CalcIsExactly(BorderProcessingArea border, Corner corner, BorderProcessingArea nextBorder, Corner nextCorner)
             {
+                // TODO  угол касательной
                 switch (border.Curve)
                 {
                     case Line line:

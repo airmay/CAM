@@ -61,6 +61,6 @@
         <Feed>2000</Feed>
       </SawingMode>
     </Modes>
-    <IsFirstPassOnSurface>false</IsFirstPassOnSurface>
+    <IsFirstPassOnSurface>true</IsFirstPassOnSurface>
   </SawingCurveTechOperationParams>
 </CamContainer>
