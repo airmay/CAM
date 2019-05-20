@@ -35,12 +35,14 @@ namespace CAM
             });
         }
 
-        public static void DeleteCurves(IEnumerable<Curve> idList)
+        public static void DeleteCurves(IEnumerable<Curve> curves)
         {
-            _highlightedObjects = null;
-            var actualList = idList?.Where(p => !p.ObjectId.IsNull);
-            if (actualList?.Any() == true)
-                App.LockAndExecute(() => actualList.Select(p => p.ObjectId).QForEach(p => p.Erase()));
+            var ids = curves.Select(p => p.ObjectId).ToArray();
+            if (ids.Any())
+            {
+                _highlightedObjects = _highlightedObjects.Except(ids).ToArray();
+                App.LockAndExecute(() => ids.QForEach(p => p.Erase()));
+            }
         }
 
         public static IEnumerable<Curve> GetSelectedCurves() => OpenForRead(Interaction.GetPickSet());
@@ -50,26 +52,27 @@ namespace CAM
             return ids.Any() ? ids.QOpenForRead<Curve>() : Array.Empty<Curve>();
         }
 
-        public static void SelectCurve(ObjectId objectId) => SelectCurves(new ObjectId[] { objectId });
+        private static ObjectId[] _highlightedObjects = Array.Empty<ObjectId>();
 
-        private static ObjectId[] _highlightedObjects;
+        public static void SelectCurve(Curve curve)
+        {
+            if (curve != null)
+                SelectObjectIds(curve.ObjectId);
+            else
+                SelectObjectIds();
+        }
 
-        public static void SelectCurves(ObjectId[] objectIds)
+        public static void SelectObjectIds(params ObjectId[] objectIds)
         {
             App.LockAndExecute(() =>
             {
-                if (_highlightedObjects != null && _highlightedObjects.Length > 0)
+                if (_highlightedObjects.Any())
                     Interaction.UnhighlightObjects(_highlightedObjects);
-                if (objectIds.Length > 0)
+                if (objectIds.Any())
                     Interaction.HighlightObjects(objectIds);
                 _highlightedObjects = objectIds;
             });
             Editor.UpdateScreen();
-        }
-
-        public static void ClearSelection()
-        {
-            _highlightedObjects = null;
         }
 
         #region XRecord methods

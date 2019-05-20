@@ -50,9 +50,9 @@ namespace CAM
             return null;
         }
 
-        internal void SelectTechProcess(TechProcess techProcess) => Acad.SelectCurves(techProcess.TechOperations.Select(p => p.ProcessingArea.AcadObjectId).ToArray());
+        internal void SelectTechProcess(TechProcess techProcess) => Acad.SelectObjectIds(techProcess.TechOperations.Select(p => p.ProcessingArea.AcadObjectId).ToArray());
 
-        internal void SelectTechOperation(TechOperation techOperation) => Acad.SelectCurve(techOperation.ProcessingArea.AcadObjectId);
+        internal void SelectTechOperation(TechOperation techOperation) => Acad.SelectObjectIds(techOperation.ProcessingArea.AcadObjectId);
 
         public bool MoveForwardTechOperation(TechOperation techOperation) => techOperation.TechProcess.TechOperations.SwapNext(techOperation);
 
@@ -91,8 +91,7 @@ namespace CAM
 
         public void SelectProcessCommand(ProcessCommand processCommand)
         {
-            if (processCommand?.ToolpathCurve != null)
-                Acad.SelectCurve(processCommand.ToolpathCurve.ObjectId);
+            Acad.SelectCurve(processCommand.ToolpathCurve);
         }
 
         public void SwapOuterSide(TechProcess techProcess, TechOperation techOperation)
