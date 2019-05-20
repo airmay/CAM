@@ -13,23 +13,19 @@ namespace CAM
     /// <summary>
     /// Класс осуществляющий взаимодействие с автокадом
     /// </summary>
-    public class AcadGateway //: IAcadGateway
+    public static class Acad
     {
-        private static AcadGateway _instance;
+        public static Document Document => Application.DocumentManager.MdiActiveDocument;
 
-        public static AcadGateway Instance { get => _instance ?? (_instance = new AcadGateway()); }
+        public static Database Database => Application.DocumentManager.MdiActiveDocument.Database;
 
-        public Document Document => Application.DocumentManager.MdiActiveDocument;
+        public static Editor Editor => Application.DocumentManager.MdiActiveDocument.Editor;
 
-        public Database Database => Application.DocumentManager.MdiActiveDocument.Database;
+        public static void WriteMessage(string message) => Editor.WriteMessage($"{message}\n");
 
-        public Editor Editor => Application.DocumentManager.MdiActiveDocument.Editor;
+        public static ObjectId GetObjectId(long handle) => Database.GetObjectId(false, new Handle(handle), 0);
 
-        public void WriteMessage(string message) => Editor.WriteMessage($"{message}\n");
-
-        public ObjectId GetObjectId(long handle) => Database.GetObjectId(false, new Handle(handle), 0);
-
-        public void SaveCurves(IEnumerable<Curve> entities)
+        public static void SaveCurves(IEnumerable<Curve> entities)
         {
             App.LockAndExecute(() =>
             {
@@ -39,7 +35,7 @@ namespace CAM
             });
         }
 
-        public void DeleteCurves(IEnumerable<Curve> idList)
+        public static void DeleteCurves(IEnumerable<Curve> idList)
         {
             _highlightedObjects = null;
             var actualList = idList?.Where(p => !p.ObjectId.IsNull);
@@ -47,18 +43,18 @@ namespace CAM
                 App.LockAndExecute(() => actualList.Select(p => p.ObjectId).QForEach(p => p.Erase()));
         }
 
-        public IEnumerable<Curve> GetSelectedCurves() => OpenForRead(Interaction.GetPickSet());
+        public static IEnumerable<Curve> GetSelectedCurves() => OpenForRead(Interaction.GetPickSet());
 
         public static Curve[] OpenForRead(IEnumerable<ObjectId> ids)
         {
             return ids.Any() ? ids.QOpenForRead<Curve>() : Array.Empty<Curve>();
         }
 
-        public void SelectCurve(ObjectId objectId) => SelectCurves(new ObjectId[] { objectId });
+        public static void SelectCurve(ObjectId objectId) => SelectCurves(new ObjectId[] { objectId });
 
-        private ObjectId[] _highlightedObjects;
+        private static ObjectId[] _highlightedObjects;
 
-        public void SelectCurves(ObjectId[] objectIds)
+        public static void SelectCurves(ObjectId[] objectIds)
         {
             App.LockAndExecute(() =>
             {
@@ -71,13 +67,13 @@ namespace CAM
             Editor.UpdateScreen();
         }
 
-        public void ClearSelection()
+        public static void ClearSelection()
         {
             _highlightedObjects = null;
         }
 
         #region XRecord methods
-        public object LoadDocumentData(string dataKey)
+        public static object LoadDocumentData(string dataKey)
         {
             using (Transaction tr = Database.TransactionManager.StartTransaction())
             using (DBDictionary dict = tr.GetObject(Database.NamedObjectsDictionaryId, OpenMode.ForRead) as DBDictionary)
@@ -98,7 +94,7 @@ namespace CAM
             return null;
         }
 
-        public void SaveDocumentData(object data, string dataKey)
+        public static void SaveDocumentData(object data, string dataKey)
         {
             const int kMaxChunkSize = 127;
             using (var resultBuffer = new ResultBuffer())

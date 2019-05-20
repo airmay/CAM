@@ -16,22 +16,15 @@ namespace CAM
     {
         private const string DataKey = "TechProcessList";
 
-        private AcadGateway _acad;
-
         public CamContainer Container { get; set; }
 
         public TechProcessView TechProcessView { get; set; }
 
         private Dictionary<Document, List<TechProcess>> _documentTechProcessList = new Dictionary<Document, List<TechProcess>>();
 
-        private List<TechProcess> TechProcessList => _documentTechProcessList[_acad.Document];
+        private List<TechProcess> TechProcessList => _documentTechProcessList[Acad.Document];
 
         //public EventHandler<ProgramEventArgs> ProgramGenerated;
-
-        public CamManager(AcadGateway acad)
-        {
-            _acad = acad;
-        }
 
         public void SetActiveDocument(Document document)
         {
@@ -49,7 +42,7 @@ namespace CAM
 
         public TechOperation[] CreateTechOperations(TechProcess techProcess, TechOperationType techOperationType)
         {
-            var curves = _acad.GetSelectedCurves();
+            var curves = Acad.GetSelectedCurves();
             if (curves.Any())
                 return techProcess.CreateTechOperations(techOperationType, curves);
 
@@ -57,9 +50,9 @@ namespace CAM
             return null;
         }
 
-        internal void SelectTechProcess(TechProcess techProcess) => _acad.SelectCurves(techProcess.TechOperations.Select(p => p.ProcessingArea.AcadObjectId).ToArray());
+        internal void SelectTechProcess(TechProcess techProcess) => Acad.SelectCurves(techProcess.TechOperations.Select(p => p.ProcessingArea.AcadObjectId).ToArray());
 
-        internal void SelectTechOperation(TechOperation techOperation) => _acad.SelectCurve(techOperation.ProcessingArea.AcadObjectId);
+        internal void SelectTechOperation(TechOperation techOperation) => Acad.SelectCurve(techOperation.ProcessingArea.AcadObjectId);
 
         public bool MoveForwardTechOperation(TechOperation techOperation) => techOperation.TechProcess.TechOperations.SwapNext(techOperation);
 
@@ -67,13 +60,13 @@ namespace CAM
 
         public void DeleteTechProcess(TechProcess techProcess)
         {
-            _acad.DeleteCurves(techProcess.ToolpathCurves);
+            Acad.DeleteCurves(techProcess.ToolpathCurves);
             TechProcessList.Remove(techProcess);
         }
 
         public void DeleteTechOperation(TechOperation techOperation)
         {
-            _acad.DeleteCurves(techOperation.ToolpathCurves);
+            Acad.DeleteCurves(techOperation.ToolpathCurves);
             techOperation.TechProcess.TechOperations.Remove(techOperation);
         }
 
@@ -81,9 +74,9 @@ namespace CAM
         {
             try
             {
-                _acad.DeleteCurves(techProcess.ToolpathCurves);
+                Acad.DeleteCurves(techProcess.ToolpathCurves);
                 techProcess.BuildProcessing();
-                _acad.SaveCurves(techProcess.ToolpathCurves);
+                Acad.SaveCurves(techProcess.ToolpathCurves);
                 TechProcessView.RefreshView();
             }
             catch (Exception e)
@@ -99,7 +92,7 @@ namespace CAM
         public void SelectProcessCommand(ProcessCommand processCommand)
         {
             if (processCommand?.ToolpathCurve != null)
-                _acad.SelectCurve(processCommand.ToolpathCurve.ObjectId);
+                Acad.SelectCurve(processCommand.ToolpathCurve.ObjectId);
         }
 
         public void SwapOuterSide(TechProcess techProcess, TechOperation techOperation)
@@ -121,7 +114,7 @@ namespace CAM
         {
             try
             {
-                var techProcessList = (List<TechProcess>)_acad.LoadDocumentData(DataKey);
+                var techProcessList = (List<TechProcess>)Acad.LoadDocumentData(DataKey);
                 if (techProcessList != null)
                 {
                     techProcessList.ForEach(tp =>
@@ -129,7 +122,7 @@ namespace CAM
                         tp.SetContainer(Container);
                         tp.TechOperations.ForEach(to =>
                         {
-                            to.ProcessingArea.AcadObjectId = _acad.GetObjectId(to.ProcessingArea.Handle);
+                            to.ProcessingArea.AcadObjectId = Acad.GetObjectId(to.ProcessingArea.Handle);
                             to.TechProcess = tp;
                         });
                     });
@@ -148,7 +141,7 @@ namespace CAM
         {
             try
             {
-                _acad.SaveDocumentData(TechProcessList, DataKey);
+                Acad.SaveDocumentData(TechProcessList, DataKey);
                 Interaction.WriteLine("Техпроцессы успешно сохранены в файле чертежа");
             }
             catch (Exception e)

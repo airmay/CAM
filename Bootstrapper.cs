@@ -20,10 +20,9 @@ namespace CAM
 
         public void Initialize()
         {
-            var acad = new AcadGateway();
-            Interaction.WriteLine($"Инициализация плагина. Версия сборки от {File.GetLastWriteTime(Assembly.GetExecutingAssembly().Location)}");
+            Acad.WriteMessage($"Инициализация плагина. Версия сборки от {File.GetLastWriteTime(Assembly.GetExecutingAssembly().Location)}");
 
-             var manager = new CamManager(acad);
+             var manager = new CamManager();
 
             PaletteSet paletteSet = CreatePaletteSet();
 
@@ -35,7 +34,7 @@ namespace CAM
 
             _container = CamContainer.Load();
             manager.Container = _container;
-            manager.SetActiveDocument(acad.Document);
+            manager.SetActiveDocument(Acad.Document);
 
             //PrepareTest();
 
