@@ -32,11 +32,12 @@ namespace CAM.UI
             _camManager.TechProcessView = this;
         }
 
-        public void SetTechProcessList(List<TechProcess> techProcessList)
+        public void Refresh(List<TechProcess> techProcessList = null)
         {
             treeView.Nodes.Clear();
-            techProcessList.ForEach(CreateTechProcessNode);
+            techProcessList?.ForEach(CreateTechProcessNode);
             SetParamsViewsVisible();
+            toolStrip1.Enabled = techProcessList != null;
         }
 
         private void SetParamsViewsVisible() => _techProcessParamsView.Visible = _paramsView.Visible = treeView.Nodes.Count > 0;
@@ -51,6 +52,14 @@ namespace CAM.UI
             SetParamsViewsVisible();
         }
 
+        public void SetCommands(List<ProcessCommand> commands)
+        {
+            if (commands == null)
+                processCommandBindingSource.Clear();
+            else
+                processCommandBindingSource.DataSource = commands;
+        }
+
         private void treeView_AfterSelect(object sender, TreeViewEventArgs e)
         {
             RefreshView();
@@ -63,7 +72,7 @@ namespace CAM.UI
 		        case TechProcess techProcess:
 					_techProcessParamsView.SetTechProcess(techProcess);
 			        _techProcessParamsView.BringToFront();
-		            processCommandBindingSource.DataSource = techProcess.ProcessCommands;
+                    SetCommands(techProcess.ProcessCommands);
                     _camManager.SelectTechProcess(techProcess);
 
 			        break;
@@ -92,7 +101,7 @@ namespace CAM.UI
 			                break;
 	                }
 			        _paramsView.BringToFront();
-		            processCommandBindingSource.DataSource = techOperation.ProcessCommands;
+                    SetCommands(techOperation.ProcessCommands);
                     _camManager.SelectTechOperation(techOperation);
 
                     break;
@@ -224,7 +233,7 @@ namespace CAM.UI
 
         private void bSave_Click(object sender, EventArgs e)
         {
-            _camManager.SaveTechProsess();
+            //_camManager.SaveTechProsess();
         }
 
         #endregion

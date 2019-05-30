@@ -41,7 +41,6 @@ namespace CAM
             //PaletteSet focus use Autodesk.AutoCAD.Internal.Utils.SetFocusToDwgView();
             //PaletteSet.PaletteActivated
 
-            //Application.DocumentManager.DocumentLockModeChanged += DocumentManagerOnDocumentLockModeChanged;
             //Application.DocumentManager.DocumentActivated += (sender, args) => SetActiveDocument(args.Document);
 
             //ProcessingForm.CurrentChanged += (sender, args) => AutocadUtils.SelectObjects(args.Data.ObjectId, args.Data.ToolObjectId);
@@ -78,14 +77,14 @@ namespace CAM
                 ent.AddToCurrentSpace();
         }
 
-        //private static void DocumentManagerOnDocumentLockModeChanged(object sender, DocumentLockModeChangedEventArgs documentLockModeChangedEventArgs)
+        //private void DocumentManagerOnDocumentLockModeChanged(object sender, DocumentLockModeChangedEventArgs documentLockModeChangedEventArgs)
         //{
         //    if (documentLockModeChangedEventArgs.GlobalCommandName.ToUpper() == "QUIT")
         //    {
-        //        documentLockModeChangedEventArgs.Veto();
+        //        Acad.DeleteProcessLayer();
+        //        //_manager.SaveTechProsess();
+        //        //documentLockModeChangedEventArgs.Veto();
         //        Application.DocumentManager.DocumentLockModeChanged -= DocumentManagerOnDocumentLockModeChanged;
-        //        Здесь делаем, что нам надо перед закрытием
-        //                Close();
         //    }
         //}
 

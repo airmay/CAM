@@ -48,6 +48,8 @@ namespace CAM.Domain
             ProcessingArea = processingArea;
         }
 
+        internal void DeleteToolpath() => ProcessCommands = null;
+
         public abstract void BuildProcessing(ScemaLogicProcessBuilder builder);
 
 	    public IEnumerable<Curve> ToolpathCurves => ProcessCommands?.Select(p => p.ToolpathCurve).Where(p => p != null);

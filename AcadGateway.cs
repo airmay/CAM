@@ -15,25 +15,30 @@ namespace CAM
     /// </summary>
     public static class Acad
     {
+        public const string ProcessLayerName = "Обработка";
+
         public static Document Document => Application.DocumentManager.MdiActiveDocument;
 
         public static Database Database => Application.DocumentManager.MdiActiveDocument.Database;
 
         public static Editor Editor => Application.DocumentManager.MdiActiveDocument.Editor;
 
-        public static void WriteMessage(string message) => Editor.WriteMessage($"{message}\n");
+        public static void WriteMessage(string message) => Interaction.WriteLine($"{message}\n");
+
+        public static void Alert(string message) => Application.ShowAlertDialog(message);
 
         public static ObjectId GetObjectId(long handle) => Database.GetObjectId(false, new Handle(handle), 0);
 
         public static void SaveCurves(IEnumerable<Curve> entities)
         {
             App.LockAndExecute(() =>
-            {
-                string layer = "Обработка";
-                var layerId = DbHelper.GetLayerId(layer);
+            {                
+                var layerId = DbHelper.GetLayerId(ProcessLayerName);
                 entities.Select(p => { p.LayerId = layerId; return p; }).AddToCurrentSpace();
             });
         }
+
+        public static void ClearHighlighted() => _highlightedObjects = Array.Empty<ObjectId>();
 
         public static void DeleteCurves(IEnumerable<Curve> curves)
         {
@@ -75,10 +80,25 @@ namespace CAM
             Editor.UpdateScreen();
         }
 
-        #region XRecord methods
-        public static object LoadDocumentData(string dataKey)
+        public static void DeleteProcessLayer()
         {
-            using (Transaction tr = Database.TransactionManager.StartTransaction())
+            App.LockAndExecute(() =>
+            {
+                var layerTable = HostApplicationServices.WorkingDatabase.LayerTableId.QOpenForRead<SymbolTable>();
+                if (layerTable.Has(ProcessLayerName))
+                {
+                    HostApplicationServices.WorkingDatabase.Clayer = layerTable["0"];
+                    var ids = QuickSelection.SelectAll(FilterList.Create().Layer(ProcessLayerName));
+                    ids.QForEach(entity => entity.Erase());
+                    layerTable[ProcessLayerName].Erase();
+                }
+            });
+        }
+
+        #region XRecord methods
+        public static object LoadDocumentData(Document document, string dataKey)
+        {
+            using (Transaction tr = document.Database.TransactionManager.StartTransaction())
             using (DBDictionary dict = tr.GetObject(Database.NamedObjectsDictionaryId, OpenMode.ForRead) as DBDictionary)
                 if (dict.Contains(dataKey))
                     using (Xrecord xRecord = tr.GetObject(dict.GetAt(dataKey), OpenMode.ForRead) as Xrecord)
@@ -97,7 +117,7 @@ namespace CAM
             return null;
         }
 
-        public static void SaveDocumentData(object data, string dataKey)
+        public static void SaveDocumentData(Document document, object data, string dataKey)
         {
             const int kMaxChunkSize = 127;
             using (var resultBuffer = new ResultBuffer())
@@ -116,9 +136,9 @@ namespace CAM
                     }
                 }
 
-                using (DocumentLock acLckDoc = Document.LockDocument())
-                using (Transaction tr = Database.TransactionManager.StartTransaction())
-                using (DBDictionary dict = tr.GetObject(Database.NamedObjectsDictionaryId, OpenMode.ForWrite) as DBDictionary)
+                using (DocumentLock acLckDoc = document.LockDocument())
+                using (Transaction tr = document.Database.TransactionManager.StartTransaction())
+                using (DBDictionary dict = tr.GetObject(document.Database.NamedObjectsDictionaryId, OpenMode.ForWrite) as DBDictionary)
                 {
                     if (dict.Contains(dataKey))
                         using (var xrec = tr.GetObject(dict.GetAt(dataKey), OpenMode.ForWrite) as Xrecord)

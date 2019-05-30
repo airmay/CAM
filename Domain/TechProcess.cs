@@ -33,7 +33,9 @@ namespace CAM.Domain
         /// </summary>
         public List<TechOperation> TechOperations { get; } = new List<TechOperation>();
 
-	    public IEnumerable<Curve> ToolpathCurves => TechOperations.Where(p => p.ToolpathCurves != null).SelectMany(p => p.ToolpathCurves);
+        public IEnumerable<Curve> ToolpathCurves => TechOperations.Where(p => p.ToolpathCurves != null).SelectMany(p => p.ToolpathCurves);
+
+        public void DeleteToolpath() => TechOperations.ForEach(p => p.DeleteToolpath());
 
         /// <summary>
         /// Команды

@@ -29,8 +29,34 @@ namespace CAM
         public void SetActiveDocument(Document document)
         {
             if (!_documentTechProcessList.ContainsKey(document))
-                _documentTechProcessList[document] = LoadTechProsess() ?? new List<TechProcess>();
-            TechProcessView.SetTechProcessList(TechProcessList);
+            {
+                document.CommandWillStart += Document_CommandWillStart;
+                document.BeginDocumentClose += Document_BeginDocumentClose;
+                _documentTechProcessList[document] = LoadTechProsess(document) ?? new List<TechProcess>();
+            }
+            Acad.ClearHighlighted();
+            TechProcessView.Refresh(TechProcessList);
+        }
+
+        private void Document_BeginDocumentClose(object sender, DocumentBeginCloseEventArgs e)
+        {
+            var document = sender as Document;
+            document.CommandWillStart -= Document_CommandWillStart;
+            document.BeginDocumentClose -= Document_BeginDocumentClose;
+            _documentTechProcessList.Remove(document);
+            if (!_documentTechProcessList.Any())
+                TechProcessView.Refresh();
+        }
+
+        private void Document_CommandWillStart(object sender, CommandEventArgs e)
+        {
+            if (e.GlobalCommandName == "CLOSE" || e.GlobalCommandName == "QUIT")
+            {
+                _documentTechProcessList[sender as Document].ForEach(p => p.DeleteToolpath());
+                Acad.DeleteProcessLayer();
+                TechProcessView.SetCommands(null);
+                SaveTechProsess(sender as Document);
+            }
         }
 
         public TechProcess CreateTechProcess()
@@ -74,10 +100,12 @@ namespace CAM
         {
             try
             {
+                Acad.WriteMessage($"Запуск расчета обработки по техпроцессу {techProcess.Name}");
                 Acad.DeleteCurves(techProcess.ToolpathCurves);
                 techProcess.BuildProcessing();
                 Acad.SaveCurves(techProcess.ToolpathCurves);
                 TechProcessView.RefreshView();
+                Acad.WriteMessage($"Расчет обработки завершен");
             }
             catch (Exception e)
             {
@@ -91,7 +119,8 @@ namespace CAM
 
         public void SelectProcessCommand(ProcessCommand processCommand)
         {
-            Acad.SelectCurve(processCommand.ToolpathCurve);
+            if (processCommand != null)
+                Acad.SelectCurve(processCommand.ToolpathCurve);
         }
 
         public void SwapOuterSide(TechProcess techProcess, TechOperation techOperation)
@@ -109,11 +138,11 @@ namespace CAM
         /// <summary>
         /// Загрузить технологические процессы из файла чертежа
         /// </summary>
-        private List<TechProcess> LoadTechProsess()
+        private List<TechProcess> LoadTechProsess(Document document)
         {
             try
             {
-                var techProcessList = (List<TechProcess>)Acad.LoadDocumentData(DataKey);
+                var techProcessList = (List<TechProcess>)Acad.LoadDocumentData(document, DataKey);
                 if (techProcessList != null)
                 {
                     techProcessList.ForEach(tp =>
@@ -136,16 +165,15 @@ namespace CAM
             }
         }
 
-        public void SaveTechProsess()
+        public void SaveTechProsess(Document document)
         {
             try
             {
-                Acad.SaveDocumentData(TechProcessList, DataKey);
-                Interaction.WriteLine("Техпроцессы успешно сохранены в файле чертежа");
+                Acad.SaveDocumentData(document, TechProcessList, DataKey);
             }
             catch (Exception e)
             {
-                Application.ShowAlertDialog($"Ошибка при записи техпроцессов:\n{e.Message}");
+                Acad.Alert($"Ошибка при записи техпроцессов:\n{e.Message}");
             }
         }
 
