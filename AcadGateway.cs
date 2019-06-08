@@ -25,7 +25,11 @@ namespace CAM
 
         public static void WriteMessage(string message) => Interaction.WriteLine($"{message}\n");
 
-        public static void Alert(string message) => Application.ShowAlertDialog(message);
+        public static void Alert(string message)
+        {
+            WriteMessage(message);
+            Application.ShowAlertDialog(message);
+        }
 
         public static ObjectId GetObjectId(long handle) => Database.GetObjectId(false, new Handle(handle), 0);
 

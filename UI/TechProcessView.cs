@@ -30,6 +30,8 @@ namespace CAM.UI
 
             _camManager = camManager;
             _camManager.TechProcessView = this;
+
+            SetButtonsEnabled();
         }
 
         public void Refresh(List<TechProcess> techProcessList = null)
@@ -38,9 +40,13 @@ namespace CAM.UI
             techProcessList?.ForEach(CreateTechProcessNode);
             SetParamsViewsVisible();
             toolStrip1.Enabled = techProcessList != null;
+            SetButtonsEnabled();
         }
 
         private void SetParamsViewsVisible() => _techProcessParamsView.Visible = _paramsView.Visible = treeView.Nodes.Count > 0;
+
+        private void SetButtonsEnabled() => bRemove.Enabled = bMoveUpTechOperation.Enabled = bMoveDownTechOperation.Enabled = 
+            bSwapOuterSide.Enabled = bBuildProcessing.Enabled = bSendProgramm.Enabled = treeView.Nodes.Count > 0;
 
         private void CreateTechProcessNode(TechProcess techProcess)
 	    {
@@ -162,7 +168,8 @@ namespace CAM.UI
                     treeView.SelectedNode = techProcessNode.Nodes[techProcessNode.Nodes.Count - 1];
                 }
 		    }
-	    }
+            SetButtonsEnabled();
+        }
 
 	    private void EndEdit()
 	    {
@@ -246,6 +253,11 @@ namespace CAM.UI
         private void bSwapOuterSide_Click(object sender, EventArgs e)
         {
             _camManager.SwapOuterSide(treeView.SelectedNode?.Tag as TechProcess, treeView.SelectedNode?.Tag as TechOperation);
+        }
+
+        private void bSend_Click(object sender, EventArgs e)
+        {
+            _camManager.SendProgramm(CurrentTechProcess);
         }
     }
 }

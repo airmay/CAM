@@ -37,7 +37,14 @@
             this.tabPageCommands = new System.Windows.Forms.TabPage();
             this.dataGridViewCommand = new System.Windows.Forms.DataGridView();
             this.Number = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.codeDataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.MCode = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.param1DataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.param2DataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.param3DataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.param4DataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.param5DataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.processCommandBindingSource = new System.Windows.Forms.BindingSource(this.components);
             this.panel1 = new System.Windows.Forms.Panel();
             this.toolStrip1 = new System.Windows.Forms.ToolStrip();
             this.bCreateTechOperation = new System.Windows.Forms.ToolStripButton();
@@ -46,18 +53,11 @@
             this.bMoveDownTechOperation = new System.Windows.Forms.ToolStripButton();
             this.bCreateTechProcess = new System.Windows.Forms.ToolStripButton();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
+            this.bSwapOuterSide = new System.Windows.Forms.ToolStripButton();
             this.bBuildProcessing = new System.Windows.Forms.ToolStripButton();
             this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
-            this.bSave = new System.Windows.Forms.ToolStripButton();
+            this.bSendProgramm = new System.Windows.Forms.ToolStripButton();
             this.panel2 = new System.Windows.Forms.Panel();
-            this.codeDataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.param1DataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.param2DataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.param3DataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.param4DataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.param5DataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.processCommandBindingSource = new System.Windows.Forms.BindingSource(this.components);
-            this.bSwapOuterSide = new System.Windows.Forms.ToolStripButton();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
@@ -65,10 +65,10 @@
             this.tabControl.SuspendLayout();
             this.tabPageCommands.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridViewCommand)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.processCommandBindingSource)).BeginInit();
             this.panel1.SuspendLayout();
             this.toolStrip1.SuspendLayout();
             this.panel2.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.processCommandBindingSource)).BeginInit();
             this.SuspendLayout();
             // 
             // splitContainer1
@@ -173,14 +173,61 @@
             this.Number.DataPropertyName = "Number";
             this.Number.HeaderText = "Number";
             this.Number.Name = "Number";
-            this.Number.Width = 21;
+            this.Number.Width = 5;
+            // 
+            // codeDataGridViewTextBoxColumn
+            // 
+            this.codeDataGridViewTextBoxColumn.DataPropertyName = "GCode";
+            this.codeDataGridViewTextBoxColumn.HeaderText = "GCode";
+            this.codeDataGridViewTextBoxColumn.Name = "codeDataGridViewTextBoxColumn";
+            this.codeDataGridViewTextBoxColumn.Width = 5;
             // 
             // MCode
             // 
             this.MCode.DataPropertyName = "MCode";
             this.MCode.HeaderText = "MCode";
             this.MCode.Name = "MCode";
-            this.MCode.Width = 21;
+            this.MCode.Width = 5;
+            // 
+            // param1DataGridViewTextBoxColumn
+            // 
+            this.param1DataGridViewTextBoxColumn.DataPropertyName = "Param1";
+            this.param1DataGridViewTextBoxColumn.HeaderText = "Param1";
+            this.param1DataGridViewTextBoxColumn.Name = "param1DataGridViewTextBoxColumn";
+            this.param1DataGridViewTextBoxColumn.Width = 5;
+            // 
+            // param2DataGridViewTextBoxColumn
+            // 
+            this.param2DataGridViewTextBoxColumn.DataPropertyName = "Param2";
+            this.param2DataGridViewTextBoxColumn.HeaderText = "Param2";
+            this.param2DataGridViewTextBoxColumn.Name = "param2DataGridViewTextBoxColumn";
+            this.param2DataGridViewTextBoxColumn.Width = 5;
+            // 
+            // param3DataGridViewTextBoxColumn
+            // 
+            this.param3DataGridViewTextBoxColumn.DataPropertyName = "Param3";
+            this.param3DataGridViewTextBoxColumn.HeaderText = "Param3";
+            this.param3DataGridViewTextBoxColumn.Name = "param3DataGridViewTextBoxColumn";
+            this.param3DataGridViewTextBoxColumn.Width = 5;
+            // 
+            // param4DataGridViewTextBoxColumn
+            // 
+            this.param4DataGridViewTextBoxColumn.DataPropertyName = "Param4";
+            this.param4DataGridViewTextBoxColumn.HeaderText = "Param4";
+            this.param4DataGridViewTextBoxColumn.Name = "param4DataGridViewTextBoxColumn";
+            this.param4DataGridViewTextBoxColumn.Width = 5;
+            // 
+            // param5DataGridViewTextBoxColumn
+            // 
+            this.param5DataGridViewTextBoxColumn.DataPropertyName = "Param5";
+            this.param5DataGridViewTextBoxColumn.HeaderText = "Param5";
+            this.param5DataGridViewTextBoxColumn.Name = "param5DataGridViewTextBoxColumn";
+            this.param5DataGridViewTextBoxColumn.Width = 5;
+            // 
+            // processCommandBindingSource
+            // 
+            this.processCommandBindingSource.DataSource = typeof(CAM.Domain.ProcessCommand);
+            this.processCommandBindingSource.CurrentChanged += new System.EventHandler(this.processCommandBindingSource_CurrentChanged);
             // 
             // panel1
             // 
@@ -204,7 +251,7 @@
             this.bSwapOuterSide,
             this.bBuildProcessing,
             this.toolStripSeparator2,
-            this.bSave});
+            this.bSendProgramm});
             this.toolStrip1.Location = new System.Drawing.Point(0, 0);
             this.toolStrip1.Name = "toolStrip1";
             this.toolStrip1.Size = new System.Drawing.Size(312, 25);
@@ -266,6 +313,16 @@
             this.toolStripSeparator1.Name = "toolStripSeparator1";
             this.toolStripSeparator1.Size = new System.Drawing.Size(6, 25);
             // 
+            // bSwapOuterSide
+            // 
+            this.bSwapOuterSide.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.bSwapOuterSide.Image = global::CAM.Properties.Resources.layer_shape_line;
+            this.bSwapOuterSide.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.bSwapOuterSide.Name = "bSwapOuterSide";
+            this.bSwapOuterSide.Size = new System.Drawing.Size(23, 22);
+            this.bSwapOuterSide.Text = "Поменять внешнюю сторону";
+            this.bSwapOuterSide.Click += new System.EventHandler(this.bSwapOuterSide_Click);
+            // 
             // bBuildProcessing
             // 
             this.bBuildProcessing.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
@@ -281,15 +338,15 @@
             this.toolStripSeparator2.Name = "toolStripSeparator2";
             this.toolStripSeparator2.Size = new System.Drawing.Size(6, 25);
             // 
-            // bSave
+            // bSendProgramm
             // 
-            this.bSave.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.bSave.Image = global::CAM.Properties.Resources.disk;
-            this.bSave.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.bSave.Name = "bSave";
-            this.bSave.Size = new System.Drawing.Size(23, 22);
-            this.bSave.Text = "Сохранить обработку в файле чертежа";
-            this.bSave.Click += new System.EventHandler(this.bSave_Click);
+            this.bSendProgramm.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.bSendProgramm.Image = global::CAM.Properties.Resources.document__arrow;
+            this.bSendProgramm.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.bSendProgramm.Name = "bSendProgramm";
+            this.bSendProgramm.Size = new System.Drawing.Size(23, 22);
+            this.bSendProgramm.Text = "Отправить программу на станок";
+            this.bSendProgramm.Click += new System.EventHandler(this.bSend_Click);
             // 
             // panel2
             // 
@@ -299,63 +356,6 @@
             this.panel2.Name = "panel2";
             this.panel2.Size = new System.Drawing.Size(312, 711);
             this.panel2.TabIndex = 3;
-            // 
-            // codeDataGridViewTextBoxColumn
-            // 
-            this.codeDataGridViewTextBoxColumn.DataPropertyName = "GCode";
-            this.codeDataGridViewTextBoxColumn.HeaderText = "GCode";
-            this.codeDataGridViewTextBoxColumn.Name = "codeDataGridViewTextBoxColumn";
-            this.codeDataGridViewTextBoxColumn.Width = 21;
-            // 
-            // param1DataGridViewTextBoxColumn
-            // 
-            this.param1DataGridViewTextBoxColumn.DataPropertyName = "Param1";
-            this.param1DataGridViewTextBoxColumn.HeaderText = "Param1";
-            this.param1DataGridViewTextBoxColumn.Name = "param1DataGridViewTextBoxColumn";
-            this.param1DataGridViewTextBoxColumn.Width = 21;
-            // 
-            // param2DataGridViewTextBoxColumn
-            // 
-            this.param2DataGridViewTextBoxColumn.DataPropertyName = "Param2";
-            this.param2DataGridViewTextBoxColumn.HeaderText = "Param2";
-            this.param2DataGridViewTextBoxColumn.Name = "param2DataGridViewTextBoxColumn";
-            this.param2DataGridViewTextBoxColumn.Width = 21;
-            // 
-            // param3DataGridViewTextBoxColumn
-            // 
-            this.param3DataGridViewTextBoxColumn.DataPropertyName = "Param3";
-            this.param3DataGridViewTextBoxColumn.HeaderText = "Param3";
-            this.param3DataGridViewTextBoxColumn.Name = "param3DataGridViewTextBoxColumn";
-            this.param3DataGridViewTextBoxColumn.Width = 21;
-            // 
-            // param4DataGridViewTextBoxColumn
-            // 
-            this.param4DataGridViewTextBoxColumn.DataPropertyName = "Param4";
-            this.param4DataGridViewTextBoxColumn.HeaderText = "Param4";
-            this.param4DataGridViewTextBoxColumn.Name = "param4DataGridViewTextBoxColumn";
-            this.param4DataGridViewTextBoxColumn.Width = 21;
-            // 
-            // param5DataGridViewTextBoxColumn
-            // 
-            this.param5DataGridViewTextBoxColumn.DataPropertyName = "Param5";
-            this.param5DataGridViewTextBoxColumn.HeaderText = "Param5";
-            this.param5DataGridViewTextBoxColumn.Name = "param5DataGridViewTextBoxColumn";
-            this.param5DataGridViewTextBoxColumn.Width = 21;
-            // 
-            // processCommandBindingSource
-            // 
-            this.processCommandBindingSource.DataSource = typeof(CAM.Domain.ProcessCommand);
-            this.processCommandBindingSource.CurrentChanged += new System.EventHandler(this.processCommandBindingSource_CurrentChanged);
-            // 
-            // bSwapOuterSide
-            // 
-            this.bSwapOuterSide.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.bSwapOuterSide.Image = global::CAM.Properties.Resources.layer_shape_line;
-            this.bSwapOuterSide.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.bSwapOuterSide.Name = "bSwapOuterSide";
-            this.bSwapOuterSide.Size = new System.Drawing.Size(23, 22);
-            this.bSwapOuterSide.Text = "Поменять внешнюю сторону";
-            this.bSwapOuterSide.Click += new System.EventHandler(this.bSwapOuterSide_Click);
             // 
             // TechProcessView
             // 
@@ -372,12 +372,12 @@
             this.tabControl.ResumeLayout(false);
             this.tabPageCommands.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.dataGridViewCommand)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.processCommandBindingSource)).EndInit();
             this.panel1.ResumeLayout(false);
             this.panel1.PerformLayout();
             this.toolStrip1.ResumeLayout(false);
             this.toolStrip1.PerformLayout();
             this.panel2.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.processCommandBindingSource)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -412,7 +412,7 @@
         private System.Windows.Forms.DataGridViewTextBoxColumn param4DataGridViewTextBoxColumn;
         private System.Windows.Forms.DataGridViewTextBoxColumn param5DataGridViewTextBoxColumn;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
-        private System.Windows.Forms.ToolStripButton bSave;
         private System.Windows.Forms.ToolStripButton bSwapOuterSide;
+        private System.Windows.Forms.ToolStripButton bSendProgramm;
     }
 }

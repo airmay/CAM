@@ -57,7 +57,7 @@ namespace CAM.Domain
             Param5 = param5;
         }
 
-        public override string ToString() => $"{Number};{GCode};{MCode};{Param1};{Param2};{Param3};{Param4};{Param5};";
+        public string ProgrammLine => $"{Number};{GCode};{MCode};{Param1};{Param2};{Param3};{Param4};{Param5};";
 
         //public ProcessCommand(string name, string gCode, Curve toolpathCurve = null, params string[] @params)
         //{

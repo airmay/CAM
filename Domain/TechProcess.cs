@@ -55,6 +55,7 @@ namespace CAM.Domain
 
 	    public void BuildProcessing()
 	    {
+            Acad.WriteMessage($"Запуск расчета обработки по техпроцессу {Name}");
             Acad.DeleteCurves(ToolpathCurves);
             TechOperations.ForEach(p => p.ProcessCommands = null);
             ProcessCommands = null;
@@ -64,6 +65,7 @@ namespace CAM.Domain
             TechOperations.ForEach(p => p.BuildProcessing(builder));
 	        ProcessCommands = builder.FinishTechProcess();
             Acad.SaveCurves(ToolpathCurves);
+            Acad.WriteMessage($"Расчет обработки завершен");
         }
 
         public void ProcessBorders(BorderProcessingArea startBorder = null)
@@ -102,11 +104,5 @@ namespace CAM.Domain
 
         public SawingTechOperation[] CreateTechOperations(TechOperationType techOperationType, IEnumerable<Curve> curves) => curves.Select(p => GetFactory(techOperationType).Create(this, p)).ToArray();
 
-        public string GetProgramm()
-        {
-            var sb = new StringBuilder();
-            ProcessCommands.ForEach(p => sb.AppendLine(p.ToString()));
-            return sb.ToString();
-        }
     }
 }

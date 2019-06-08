@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Windows.Forms;
 using Autodesk.AutoCAD.ApplicationServices;
 using Autodesk.AutoCAD.DatabaseServices;
 using CAM.Domain;
@@ -74,7 +75,7 @@ namespace CAM
             if (curves.Any())
                 return techProcess.CreateTechOperations(techOperationType, curves);
 
-            Application.ShowAlertDialog($"Не выбраны элементы чертежа");
+            Acad.Alert($"Не выбраны элементы чертежа");
             return null;
         }
 
@@ -102,27 +103,37 @@ namespace CAM
         {
             try
             {
-                Acad.WriteMessage($"Запуск расчета обработки по техпроцессу {techProcess.Name}");
                 techProcess.BuildProcessing();
-                SaveProgramm(techProcess.GetProgramm());
-                TechProcessView.RefreshView();
-                Acad.WriteMessage($"Расчет обработки завершен");
             }
             catch (Exception e)
             {
-                Application.ShowAlertDialog(e.Message);
+                Acad.Alert(e.Message);
             }
-
-            //var programGenerator = new ScemaLogicProgramGenerator();
-            //var program = programGenerator.Generate(techProcess);
-            //ProgramGenerated?.Invoke(this, new ProgramEventArgs(program));
+            TechProcessView.RefreshView();
         }
 
-        private void SaveProgramm(string programm)
+        public void SendProgramm(TechProcess techProcess)
         {
-            var filePath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "programm.csv");
-            File.WriteAllText(filePath, programm);
-            Acad.WriteMessage("Программа сохранена в файл");
+            if (techProcess.ProcessCommands == null)
+            {
+                Acad.Alert("Программа не сформирована");
+                return;
+            }
+            var fileName = $"{techProcess.Name}.csv";                
+            var filePath = @"\\192.168.137.59\ssd\Automatico\"; //@"\\CATALINA\public\Программы станок\CodeRepository";
+            var programmLines = techProcess.ProcessCommands.Select(p => p.ProgrammLine).ToArray();
+            try
+            {
+                TechProcessView.Cursor = Cursors.WaitCursor;
+                File.WriteAllLines(Path.Combine(filePath, fileName), programmLines);
+                Acad.WriteMessage($"Файл {fileName} сохранен по адресу {filePath}");
+                TechProcessView.Cursor = Cursors.Default;
+            }
+            catch (Exception e)
+            {
+                TechProcessView.Cursor = Cursors.Default;
+                Acad.Alert($"Ошибка при записи файла программы: {e.Message}");
+            }
         }
 
         public void SelectProcessCommand(ProcessCommand processCommand)
@@ -168,7 +179,7 @@ namespace CAM
             }
             catch (Exception e)
             {
-                Application.ShowAlertDialog($"Ошибка при загрузке техпроцессов:\n{e.Message}");
+                Acad.Alert($"Ошибка при загрузке техпроцессов:\n{e.Message}");
                 return null;
             }
         }
