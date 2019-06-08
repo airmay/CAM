@@ -29,6 +29,21 @@ namespace CAM
 
         public static ObjectId GetObjectId(long handle) => Database.GetObjectId(false, new Handle(handle), 0);
 
+        public static double Length(this Curve curve)
+        {
+            switch (curve)
+            {
+                case Line line:
+                    return line.Length;
+
+                case Arc arc:
+                    return arc.Length;
+
+                default:
+                    throw new ArgumentException($"Некорректный тип кривой {curve.GetType()}");
+            }
+        }
+
         public static void SaveCurves(IEnumerable<Curve> entities)
         {
             App.LockAndExecute(() =>

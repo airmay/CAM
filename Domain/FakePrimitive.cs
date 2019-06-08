@@ -76,20 +76,20 @@ namespace CAM.Domain
                 curve.EndPoint = point;
         }
 
-        public static double Length(this Curve curve)
-        {
-            switch (curve)
-            {
-                case Line line:
-                    return line.Length;
+        //public static double Length(this Curve curve)
+        //{
+        //    switch (curve)
+        //    {
+        //        case Line line:
+        //            return line.Length;
 
-                case Arc arc:
-                    return arc.Length;
+        //        case Arc arc:
+        //            return arc.Length;
 
-                default:
-                    throw new ArgumentException($"Некорректный тип кривой {curve.GetType()}");
-            }
-        }
+        //        default:
+        //            throw new ArgumentException($"Некорректный тип кривой {curve.GetType()}");
+        //    }
+        //}
     }
 
     //   public class Line : Curve

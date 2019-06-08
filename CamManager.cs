@@ -101,9 +101,7 @@ namespace CAM
             try
             {
                 Acad.WriteMessage($"Запуск расчета обработки по техпроцессу {techProcess.Name}");
-                Acad.DeleteCurves(techProcess.ToolpathCurves);
                 techProcess.BuildProcessing();
-                Acad.SaveCurves(techProcess.ToolpathCurves);
                 TechProcessView.RefreshView();
                 Acad.WriteMessage($"Расчет обработки завершен");
             }

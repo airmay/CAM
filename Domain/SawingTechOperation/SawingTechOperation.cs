@@ -38,23 +38,24 @@ namespace CAM.Domain
             var indentSum = builder.CalcIndent(border.IsExactlyBegin, border.IsExactlyEnd, thickness);
 	        if (indentSum >= ProcessingArea.Curve.Length())
 	        {
-				// TODO Намечание
-		        //if (!(obj is ProcessObjectLine))
-			       // return;
-		        //double h;
-		        //Point3d pointC;
-		        //if (obj.IsBeginExactly && obj.IsEndExactly)
-		        //{
-			       // var l = obj.Length - 2 * ExactlyIncrease;
-			       // h = (obj.Diameter - Math.Sqrt(obj.Diameter * obj.Diameter - l * l)) / 2;
-			       // pointC = obj.ProcessCurve.GetPointAtParameter(obj.ProcessCurve.EndParam / 2);
-		        //}
-		        //else
-		        //{
-			       // h = obj.DepthAll;
-			       // pointC = obj.ProcessCurve.StartPoint + obj.ProcessCurve.GetFirstDerivative(0).GetNormal() * (obj.IsBeginExactly ? s : obj.Length - s);
-		        //}
-			}
+                throw new InvalidOperationException("Обработка невозможна");
+                // TODO Намечание
+                //if (!(obj is ProcessObjectLine))
+                // return;
+                //double h;
+                //Point3d pointC;
+                //if (obj.IsBeginExactly && obj.IsEndExactly)
+                //{
+                // var l = obj.Length - 2 * ExactlyIncrease;
+                // h = (obj.Diameter - Math.Sqrt(obj.Diameter * obj.Diameter - l * l)) / 2;
+                // pointC = obj.ProcessCurve.GetPointAtParameter(obj.ProcessCurve.EndParam / 2);
+                //}
+                //else
+                //{
+                // h = obj.DepthAll;
+                // pointC = obj.ProcessCurve.StartPoint + obj.ProcessCurve.GetFirstDerivative(0).GetNormal() * (obj.IsBeginExactly ? s : obj.Length - s);
+                //}
+            }
 
             bool oddPassCount = false;
             Calculate(false);
