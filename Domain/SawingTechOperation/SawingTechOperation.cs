@@ -82,8 +82,9 @@ namespace CAM.Domain
                 if (!modes.MoveNext())
                     throw new InvalidOperationException("Не заданы режимы обработки");
                 var mode = modes.Current;
-                modes.MoveNext();
-                var nextMode = modes.Current;
+                SawingMode nextMode = null;
+                if (modes.MoveNext())
+                    nextMode = modes.Current;
                 var z = TechOperationParams.IsFirstPassOnSurface ? -mode.DepthStep : 0;
                 do
                 {
@@ -91,8 +92,7 @@ namespace CAM.Domain
                     if (nextMode != null && z >= nextMode.Depth)
                     {
                         mode = nextMode;
-                        modes.MoveNext();
-                        nextMode = modes.Current;
+                        nextMode = modes.MoveNext() ?  modes.Current : null;
                     }
                     if (z > thickness)
                         z = thickness;

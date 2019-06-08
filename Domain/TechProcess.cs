@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using Autodesk.AutoCAD.ApplicationServices;
 using Autodesk.AutoCAD.DatabaseServices;
 using Dreambuild.AutoCAD;
@@ -100,5 +101,12 @@ namespace CAM.Domain
         }
 
         public SawingTechOperation[] CreateTechOperations(TechOperationType techOperationType, IEnumerable<Curve> curves) => curves.Select(p => GetFactory(techOperationType).Create(this, p)).ToArray();
+
+        public string GetProgramm()
+        {
+            var sb = new StringBuilder();
+            ProcessCommands.ForEach(p => sb.AppendLine(p.ToString()));
+            return sb.ToString();
+        }
     }
 }

@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Reflection;
 using Autodesk.AutoCAD.ApplicationServices;
 using Autodesk.AutoCAD.DatabaseServices;
 using CAM.Domain;
@@ -102,6 +104,7 @@ namespace CAM
             {
                 Acad.WriteMessage($"Запуск расчета обработки по техпроцессу {techProcess.Name}");
                 techProcess.BuildProcessing();
+                SaveProgramm(techProcess.GetProgramm());
                 TechProcessView.RefreshView();
                 Acad.WriteMessage($"Расчет обработки завершен");
             }
@@ -113,6 +116,13 @@ namespace CAM
             //var programGenerator = new ScemaLogicProgramGenerator();
             //var program = programGenerator.Generate(techProcess);
             //ProgramGenerated?.Invoke(this, new ProgramEventArgs(program));
+        }
+
+        private void SaveProgramm(string programm)
+        {
+            var filePath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "programm.csv");
+            File.WriteAllText(filePath, programm);
+            Acad.WriteMessage("Программа сохранена в файл");
         }
 
         public void SelectProcessCommand(ProcessCommand processCommand)
