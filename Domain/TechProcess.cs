@@ -55,7 +55,7 @@ namespace CAM.Domain
 
 	    public void BuildProcessing()
 	    {
-            Acad.WriteMessage($"Запуск расчета обработки по техпроцессу {Name}");
+            Acad.WriteMessage($"Выполняется расчет обработки по техпроцессу {Name} ...");
             Acad.DeleteCurves(ToolpathCurves);
             TechOperations.ForEach(p => p.ProcessCommands = null);
             ProcessCommands = null;

@@ -61,9 +61,9 @@ namespace CAM
 
         public static void DeleteCurves(IEnumerable<Curve> curves)
         {
-            var ids = curves.Select(p => p.ObjectId).ToArray();
-            if (ids.Any())
+            if (curves != null && curves.Any())
             {
+                var ids = curves.Select(p => p.ObjectId).ToArray();
                 _highlightedObjects = _highlightedObjects.Except(ids).ToArray();
                 App.LockAndExecute(() => ids.QForEach(p => p.Erase()));
             }

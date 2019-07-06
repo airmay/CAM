@@ -46,10 +46,11 @@ namespace CAM.Domain
         {
 	        _techProcessParams = techProcessParams;
             var name = "Setup";
-            CreateCommand(name, 97, 2, 1);
-            CreateCommand(name, 17, "XYCZ");
-            CreateCommand(name, 28, "XYCZ");
-            CreateCommand(name, 97, 6, _techProcessParams.ToolNumber);
+            CreateCommand(name, 98);
+            CreateCommand(name, 97, 2, feed: 1);
+            CreateCommand(name, 17, axis: "XYCZ");
+            CreateCommand(name, 28, axis: "XYCZ");
+            CreateCommand(name, 97, 6, feed: _techProcessParams.ToolNumber);
         }
 
         public void StartTechOperation(Curve curve, Corner corner)
@@ -124,38 +125,50 @@ namespace CAM.Domain
             double Calc(double angle) => ToDeg((Math.PI * 2.5 - angle) % Math.PI);
         }
 
-	    //public void SetTool(double x, double y, double c)
-	    //{
-	    //    string name = _currentPoint == Point3d.Origin ? CommandNames.InitialMove : CommandNames.Fast;
-	    //    Line line = null;
-	    //    var z = _techProcessParams.ZSafety;
-	    //    var destPoint = new Point3d(x, y, z);
-	    //    if (_currentPoint != Point3d.Origin)
-	    //    CreateCommand(name, "0", line, "XYC", 0, x, y, c);
-	    //    CreateCommand(name, "0", line, "XYZ", 0, x, y, z);
-	    //    if (_currentPoint == Point3d.Origin)
-	    //    {
-	    //        name = "Setup";
-	    //        CreateCommand(name, "97;7");
-	    //        CreateCommand(name, "97;8");
-	    //        CreateCommand(name, "97;3", param: _techProcessParams.Frequency);
-	    //    }
-	    //    else
-	    //    {
-	    //        line = new Line(_currentPoint, destPoint);
-	    //        line.ObjectId = new ObjectId(name);
-	    //        Entities.Add(line);
-	    //    }
-	    //    CreateCommand("Setup", "28", axis: "XYCZ");  // цикл
-	    //    _currentPoint = destPoint;
-	    //}
+        //public void SetTool(double x, double y, double c)
+        //{
+        //    string name = _currentPoint == Point3d.Origin ? CommandNames.InitialMove : CommandNames.Fast;
+        //    Line line = null;
+        //    var z = _techProcessParams.ZSafety;
+        //    var destPoint = new Point3d(x, y, z);
+        //    if (_currentPoint != Point3d.Origin)
+        //    CreateCommand(name, "0", line, "XYC", 0, x, y, c);
+        //    CreateCommand(name, "0", line, "XYZ", 0, x, y, z);
+        //    if (_currentPoint == Point3d.Origin)
+        //    {
+        //        name = "Setup";
+        //        CreateCommand(name, "97;7");
+        //        CreateCommand(name, "97;8");
+        //        CreateCommand(name, "97;3", param: _techProcessParams.Frequency);
+        //    }
+        //    else
+        //    {
+        //        line = new Line(_currentPoint, destPoint);
+        //        line.ObjectId = new ObjectId(name);
+        //        Entities.Add(line);
+        //    }
+        //    CreateCommand("Setup", "28", axis: "XYCZ");  // цикл
+        //    _currentPoint = destPoint;
+        //}
 
-	    private void CreateCommand(string name, int gCode, object mCode = null, int? param = null, Curve toolpathAcadObject = null,
-	        double? param3 = null, double? param4 = null, double? param5 = null, double? param6 = null) 
-            => (TechOperationCommands ?? ProcessCommands).Add(new ProcessCommand(name, ++_commandNumber, gCode.ToString(), mCode?.ToString(),
-                param?.ToString(), GetParam(param3), GetParam(param4), GetParam(param5), GetParam(param6), toolpathAcadObject));
+        private void CreateCommand(string name, int gCode, int? mCode = null, string axis = null, int? feed = null, double? x = null, double? y = null, double? param1 = null, double? param2 = null, Curve toolpathCurve = null)
+            => (TechOperationCommands ?? ProcessCommands).Add(new ProcessCommand()
+            {
+                ToolpathCurve = toolpathCurve,
+                Name = name,
+                Number = ++_commandNumber,
+                GCode = gCode,
+                MCode = mCode,
+                Axis = axis,
+                Feed = feed,
+                X = Round(x),
+                Y = Round(y),
+                Param1 = Round(param1),
+                Param2 = Round(param2)
+            });
 
-	    private static string GetParam(double? value, string paramName = null) => value.HasValue ? $" {paramName}{value:0.####}" : null;
+        //private static string GetParam(double? value, string paramName = null) => value.HasValue ? $" {paramName}{value:0.####}" : null;
+        private static double? Round(double? value) => value.HasValue ? (double?)Math.Round(value.Value, 4) : null;
 
         /// <summary>
         /// Завершение операции
@@ -163,7 +176,7 @@ namespace CAM.Domain
         /// <returns></returns>
         public List<ProcessCommand> FinishTechOperation()
         {
-            Move(CommandNames.Uplifting, 0, "XYZ", 0, z: _techProcessParams.ZSafety);
+            Move(CommandNames.Uplifting, 0, "XYZ", 0, _techProcessParams.ZSafety);
             ProcessCommands.AddRange(TechOperationCommands);
             var result = TechOperationCommands;
             TechOperationCommands = null;
@@ -187,14 +200,14 @@ namespace CAM.Domain
         /// <param name="z"></param>
         //public void Penetration(double z) => Move(CommandNames.Penetration, "1", "XYCZ", _techProcessParams.PenetrationRate, z: z);
 
-	    private void Move(string name, int code, string axis, int feed, double? x = null, double? y = null, double? c = null, double? z = null)
+	    private void Move(string name, int code, string axis, int feed, double z, double? x = null, double? y = null, double? c = null)
 	    {
 		    // TODO проверка совпадения точек
-		    var destPoint = new Point3d(x ?? _currentPoint.X, y ?? _currentPoint.Y, z ?? _currentPoint.Z);
+		    var destPoint = new Point3d(x ?? _currentPoint.X, y ?? _currentPoint.Y, z);
 		    var line = _currentPoint != Point3d.Origin
 			    ? new Line(_currentPoint, destPoint) { Color = Colors[name] }
 			    : null;
-		    CreateCommand(name, code, axis, feed, line, destPoint.X, destPoint.Y, destPoint.Z);
+		    CreateCommand(name, code, axis: axis, feed: feed, x: destPoint.X, y: destPoint.Y, param1: c ?? z, param2: c.HasValue ? (double?)z : null, toolpathCurve: line);
 		    _currentPoint = destPoint;
 	    }
 
@@ -210,7 +223,7 @@ namespace CAM.Domain
 	        if (!TechOperationCommands.Any())
 		        InitMove(toolpathCurve);
 
-	        Move(CommandNames.Penetration, 1, "XYCZ", _techProcessParams.PenetrationRate, toolpathCurve.GetPoint(_corner).X, toolpathCurve.GetPoint(_corner).Y, z: z);
+	        Move(CommandNames.Penetration, 1, "XYCZ", _techProcessParams.PenetrationRate, z, toolpathCurve.GetPoint(_corner).X, toolpathCurve.GetPoint(_corner).Y, CalcToolAngle(toolpathCurve, _corner));
 
 	        _corner = _corner.Swap();
             _currentPoint = toolpathCurve.GetPoint(_corner);
@@ -218,11 +231,11 @@ namespace CAM.Domain
             switch (toolpathCurve)
             {
                 case Line _:
-                    CreateCommand(CommandNames.Cutting, 1, "XYCZ", feed, toolpathCurve, _currentPoint.X, _currentPoint.Y, CalcToolAngle(toolpathCurve, _corner), _currentPoint.Z);
+                    CreateCommand(CommandNames.Cutting, 1, axis: "XYCZ", feed: feed, x: _currentPoint.X, y: _currentPoint.Y, param1: CalcToolAngle(toolpathCurve, _corner), param2: _currentPoint.Z, toolpathCurve: toolpathCurve);
                     break;
                 case Arc arc:
                     var code = _corner == Corner.Start ? 3 : 2; // TODO ?
-                    CreateCommand(CommandNames.Cutting, code, "XYCZ", feed, toolpathCurve, _currentPoint.X, _currentPoint.Y, arc.Center.X, arc.Center.Y);
+                    CreateCommand(CommandNames.Cutting, code, axis: "XYCZ", feed: feed, x: _currentPoint.X, y: _currentPoint.Y, param1: arc.Center.X, param2: arc.Center.Y, toolpathCurve: toolpathCurve);
                     break;
                 default:
                     throw new Exception($"Неподдерживаемый тип кривой {toolpathCurve.GetType()}");
@@ -234,17 +247,17 @@ namespace CAM.Domain
 		    var name = _currentPoint == Point3d.Origin ? CommandNames.InitialMove : CommandNames.Fast;
 		    var destPoint = _corner == Corner.Start ? toolpathCurve.StartPoint : toolpathCurve.EndPoint;
 
-		    CreateCommand(name, 0, "XYC", 0, null, destPoint.X, destPoint.Y, CalcToolAngle(toolpathCurve, _corner));
-		    Move(name, 0, "XYZ", 0, destPoint.X, destPoint.Y, _techProcessParams.ZSafety);
+		    CreateCommand(name, 0, axis: "XYC", feed: 0, x: destPoint.X, y: destPoint.Y, param1: CalcToolAngle(toolpathCurve, _corner));
+		    Move(name, 0, "XYZ", 0, _techProcessParams.ZSafety, destPoint.X, destPoint.Y);
 
 		    if (name == CommandNames.InitialMove)
 		    {
 			    name = "SetupTechOperation";
 			    CreateCommand(name, 97, 7);
 			    CreateCommand(name, 97, 8);
-			    CreateCommand(name, 97, 3, _techProcessParams.Frequency);
+			    CreateCommand(name, 97, 3, feed: _techProcessParams.Frequency);
 		    }
-		    CreateCommand("Cycle", 28, "XYCZ");  // цикл
+		    CreateCommand("Cycle", 28, axis: "XYCZ");  // цикл
 	    }
 
 		private static double ToDeg(double angle) => angle * 180 / Math.PI;

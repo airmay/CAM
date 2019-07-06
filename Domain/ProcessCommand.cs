@@ -1,63 +1,41 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Autodesk.AutoCAD.DatabaseServices;
 
 namespace CAM.Domain
 {
-    [Serializable]
     public class ProcessCommand
     {
         public int Number { get; set; }
 
         public string Name { get; set; }
 
-        public string GCode { get; set; }
+        public int GCode { get; set; }
 
-        public string MCode { get; set; }
+        public int? MCode { get; set; }
 
-        public string Param1 { get; set; }
+        public string Axis { get; set; }
 
-        public string Param2 { get; set; }
+        public int? Feed { get; set; }
 
-        public string Param3 { get; set; }
+        public double? X { get; set; }
 
-        public string Param4 { get; set; }
+        public double? Y { get; set; }
 
-        public string Param5 { get; set; }
+        public double? Param1 { get; set; }
 
-        //public string Param6 { get; set; }
+        public double? Param2 { get; set; }
 
         /// <summary>
         /// Идентификатор графического примитива автокада представляющего траекторию инструмента
         /// </summary>
-        public readonly ObjectId ToolpathCurveId;
+        public ObjectId ToolpathCurveId { get; set; }
 
         /// <summary>
         /// Графический примитив автокада представляющего траекторию инструмента
         /// </summary>
-        public readonly Curve ToolpathCurve;
+        public Curve ToolpathCurve { get; set; }
 
-        private List<string> par;
-        private string v;
-
-        public ProcessCommand(string name, int number, string gCode, string mCode, string param1, string param2, string param3, string param4, string param5, Curve toolpathCurve)
-        {
-            Name = name;
-            Number = number;
-            GCode = gCode;
-            MCode = mCode;
-            ToolpathCurve = toolpathCurve;
-            Param1 = param1;
-            Param2 = param2;
-            Param3 = param3;
-            Param4 = param4;
-            Param5 = param5;
-        }
-
-        public string ProgrammLine => $"{Number};{GCode};{MCode};{Param1};{Param2};{Param3};{Param4};{Param5};";
+        public string ProgrammLine => $"{Number};{GCode};{MCode};{Axis};{Feed};{X};{Y};{Param1};{Param2};";
 
         //public ProcessCommand(string name, string gCode, Curve toolpathCurve = null, params string[] @params)
         //{

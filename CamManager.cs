@@ -120,7 +120,8 @@ namespace CAM
                 return;
             }
             var fileName = $"{techProcess.Name}.csv";                
-            var filePath = @"\\192.168.137.59\ssd\Automatico\"; //@"\\CATALINA\public\Программы станок\CodeRepository";
+            //var filePath = @"\\192.168.137.59\ssd\Automatico\";
+            var filePath = @"\\CATALINA\public\Программы станок\CodeRepository";
             var programmLines = techProcess.ProcessCommands.Select(p => p.ProgrammLine).ToArray();
             try
             {
