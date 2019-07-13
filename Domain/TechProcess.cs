@@ -89,7 +89,7 @@ namespace CAM.Domain
             return factory;
         }
 
-        internal bool SetTool(string text)
+        public bool SetTool(string text)
         {
             var tool = _container.Tools.SingleOrDefault(p => p.Number.ToString() == text);
             if (tool != null)

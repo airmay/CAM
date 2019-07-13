@@ -38,8 +38,9 @@ namespace CAM.Domain
         {
 	        var sawingTechOperationParams = new SawingTechOperationParams()
 	        {
-		        Modes = Modes.ConvertAll(p => p.Clone())
-	        };
+		        Modes = Modes.ConvertAll(p => p.Clone()),
+                IsFirstPassOnSurface = IsFirstPassOnSurface
+            };
             return sawingTechOperationParams;
         }
     }

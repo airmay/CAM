@@ -114,7 +114,7 @@ namespace CAM.Domain
 			switch (curve)
             {
                 case Line line:
-                    return ToDeg((Math.PI * 2 - line.Angle) % Math.PI);
+                    return ToDeg((Math.PI * 2 - line.AngleRad()) % Math.PI);
                 case Arc arc:
 	                return corner == Corner.Start
 		                ? (arc.StartAngle - Math.PI / 2) % Math.PI == 0 ? 180 : Calc(arc.StartAngle)
@@ -234,7 +234,7 @@ namespace CAM.Domain
                     CreateCommand(CommandNames.Cutting, 1, axis: "XYCZ", feed: feed, x: _currentPoint.X, y: _currentPoint.Y, param1: CalcToolAngle(toolpathCurve, _corner), param2: _currentPoint.Z, toolpathCurve: toolpathCurve);
                     break;
                 case Arc arc:
-                    var code = _corner == Corner.Start ? 3 : 2; // TODO ?
+                    var code = _corner == Corner.Start ? 2 : 3;
                     CreateCommand(CommandNames.Cutting, code, axis: "XYCZ", feed: feed, x: _currentPoint.X, y: _currentPoint.Y, param1: arc.Center.X, param2: arc.Center.Y, toolpathCurve: toolpathCurve);
                     break;
                 default:

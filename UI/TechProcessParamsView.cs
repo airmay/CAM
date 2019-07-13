@@ -68,8 +68,8 @@ namespace CAM.UI
             if (e.Cancel)
             {
                 MessageBox.Show($"Инструмент '{edToolNumber.Text}' не найден", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                edToolNumber.SelectAll();
-                edToolNumber.Focus();
+                //edToolNumber.SelectAll();
+                //edToolNumber.Focus();
             }
         }
     }
