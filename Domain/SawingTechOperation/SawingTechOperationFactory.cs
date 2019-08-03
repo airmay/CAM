@@ -55,7 +55,8 @@ namespace CAM.Domain
 		        case Arc arc:
 			        return new SawingTechOperation(techProcess, new BorderProcessingArea(arc), SawingCurveTechOperationParams.Clone());
 		        default:
-			        throw new Exception($"Неподдерживаемый тип кривой {curve.GetType()}");
+                    Acad.Alert($"Неподдерживаемый тип кривой {curve.GetType()}");
+                    return null;
 	        }
         }
     }

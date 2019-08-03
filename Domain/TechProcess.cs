@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using Autodesk.AutoCAD.ApplicationServices;
 using Autodesk.AutoCAD.DatabaseServices;
 using Dreambuild.AutoCAD;
 
@@ -36,7 +34,11 @@ namespace CAM.Domain
 
         public IEnumerable<Curve> ToolpathCurves => TechOperations.Where(p => p.ToolpathCurves != null).SelectMany(p => p.ToolpathCurves);
 
-        public void DeleteToolpath() => TechOperations.ForEach(p => p.DeleteToolpath());
+        public void DeleteToolpath()
+        {
+            TechOperations.ForEach(p => p.DeleteToolpath());
+            ProcessCommands = null;
+        }
 
         /// <summary>
         /// Команды
@@ -46,7 +48,7 @@ namespace CAM.Domain
 
         public TechProcess(string name, CamContainer container)
         {
-            Name = name;
+            Name = name ?? throw new ArgumentNullException("TechProcessName");
             _container = container;
             TechProcessParams = container.TechProcessParams.Clone();
         }
@@ -102,7 +104,8 @@ namespace CAM.Domain
             return tool != null;
         }
 
-        public SawingTechOperation[] CreateTechOperations(TechOperationType techOperationType, IEnumerable<Curve> curves) => curves.Select(p => GetFactory(techOperationType).Create(this, p)).ToArray();
+        public SawingTechOperation[] CreateTechOperations(TechOperationType techOperationType, IEnumerable<Curve> curves) => 
+            curves.Select(p => GetFactory(techOperationType).Create(this, p)).Where(p => p != null).ToArray();
 
     }
 }

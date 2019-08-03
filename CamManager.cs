@@ -57,7 +57,7 @@ namespace CAM
             {
                 _documentTechProcessList[sender as Document].ForEach(p => p.DeleteToolpath());
                 Acad.DeleteProcessLayer();
-                TechProcessView.SetCommands(null);
+                TechProcessView.ClearCommandsView();
                 SaveTechProsess(sender as Document);
             }
         }
@@ -189,6 +189,7 @@ namespace CAM
         {
             try
             {
+                //  TODO проверить контрольную сумму перед сохранением
                 Acad.SaveDocumentData(document, TechProcessList, DataKey);
             }
             catch (Exception e)

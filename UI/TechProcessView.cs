@@ -1,13 +1,12 @@
-﻿using System;
+﻿using CAM.Domain;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
-using CAM.Domain;
-using System.Linq;
 
 namespace CAM.UI
 {
-	public partial class TechProcessView : UserControl
+    public partial class TechProcessView : UserControl
     {
 	    private CamManager _camManager;
         private readonly TechProcessParamsView _techProcessParamsView = new TechProcessParamsView { Dock = DockStyle.Fill, Visible = false };
@@ -28,6 +27,9 @@ namespace CAM.UI
             tabPageParams.Controls.Add(_techProcessParamsView);
             tabPageParams.Controls.Add(_paramsView);
 
+            dataGridViewCommand.DataSource = processCommandBindingSource;
+            processCommandBindingSource.DataSource = null;
+
             _camManager = camManager;
             _camManager.TechProcessView = this;
 
@@ -37,6 +39,7 @@ namespace CAM.UI
         public void Refresh(List<TechProcess> techProcessList = null)
         {
             treeView.Nodes.Clear();
+            ClearCommandsView();
             techProcessList?.ForEach(CreateTechProcessNode);
             SetParamsViewsVisible();
             toolStrip1.Enabled = techProcessList != null;
@@ -58,13 +61,7 @@ namespace CAM.UI
             SetParamsViewsVisible();
         }
 
-        public void SetCommands(List<ProcessCommand> commands)
-        {
-            if (commands == null)
-                processCommandBindingSource.Clear();
-            else
-                processCommandBindingSource.DataSource = commands;
-        }
+        public void ClearCommandsView() => processCommandBindingSource.DataSource = null;
 
         private void treeView_AfterSelect(object sender, TreeViewEventArgs e)
         {
@@ -78,7 +75,7 @@ namespace CAM.UI
 		        case TechProcess techProcess:
 					_techProcessParamsView.SetTechProcess(techProcess);
 			        _techProcessParamsView.BringToFront();
-                    SetCommands(techProcess.ProcessCommands);
+                    processCommandBindingSource.DataSource = techProcess.ProcessCommands;
                     _camManager.SelectTechProcess(techProcess);
 
 			        break;
@@ -107,7 +104,7 @@ namespace CAM.UI
 			                break;
 	                }
 			        _paramsView.BringToFront();
-                    SetCommands(techOperation.ProcessCommands);
+                    processCommandBindingSource.DataSource = techOperation.ProcessCommands;
                     _camManager.SelectTechOperation(techOperation);
 
                     break;
@@ -129,16 +126,17 @@ namespace CAM.UI
 
 	    private void treeView_AfterLabelEdit(object sender, NodeLabelEditEventArgs e)
 	    {
-		    switch (treeView.SelectedNode.Tag)
-		    {
-			    case TechProcess techProcess:
-				    techProcess.Name = e.Label;
-				    break;
-			    case TechOperation techOperation:
-				    techOperation.Name = e.Label;
-				    break;
-		    }
-	    }
+            e.Node.Text = e.Label;
+            switch (treeView.SelectedNode.Tag)
+            {
+                case TechProcess techProcess:
+                    techProcess.Name = e.Label;
+                    break;
+                case TechOperation techOperation:
+                    techOperation.Name = e.Label;
+                    break;
+            }
+        }
 
 	    #region Toolbar handlers
 

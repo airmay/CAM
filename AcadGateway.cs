@@ -33,21 +33,6 @@ namespace CAM
 
         public static ObjectId GetObjectId(long handle) => Database.GetObjectId(false, new Handle(handle), 0);
 
-        public static double Length(this Curve curve)
-        {
-            switch (curve)
-            {
-                case Line line:
-                    return line.Length;
-
-                case Arc arc:
-                    return arc.Length;
-
-                default:
-                    throw new ArgumentException($"Некорректный тип кривой {curve.GetType()}");
-            }
-        }
-
         public static void SaveCurves(IEnumerable<Curve> entities)
         {
             App.LockAndExecute(() =>
@@ -57,15 +42,17 @@ namespace CAM
             });
         }
 
-        public static void ClearHighlighted() => _highlightedObjects = Array.Empty<ObjectId>();
-
         public static void DeleteCurves(IEnumerable<Curve> curves)
         {
             if (curves != null && curves.Any())
             {
                 var ids = curves.Select(p => p.ObjectId).ToArray();
                 _highlightedObjects = _highlightedObjects.Except(ids).ToArray();
-                App.LockAndExecute(() => ids.QForEach(p => p.Erase()));
+                try
+                {
+                    App.LockAndExecute(() => ids.QForEach(p => p.Erase()));
+                }
+                catch { }
             }
         }
 
@@ -76,7 +63,11 @@ namespace CAM
             return ids.Any() ? ids.QOpenForRead<Curve>() : Array.Empty<Curve>();
         }
 
+        #region Select methods
+
         private static ObjectId[] _highlightedObjects = Array.Empty<ObjectId>();
+
+        public static void ClearHighlighted() => _highlightedObjects = Array.Empty<ObjectId>();
 
         public static void SelectCurve(Curve curve)
         {
@@ -97,7 +88,8 @@ namespace CAM
                 _highlightedObjects = objectIds;
             });
             Editor.UpdateScreen();
-        }
+        } 
+        #endregion
 
         public static void DeleteProcessLayer()
         {

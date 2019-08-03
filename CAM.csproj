@@ -83,14 +83,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AcadGateway.cs" />
-    <Compile Include="AssemblyLoader.cs" />
     <Compile Include="Bootstrapper.cs" />
-    <Compile Include="Context.cs" />
     <Compile Include="Domain\CamContainer.cs" />
     <Compile Include="Domain\CommandCode.cs" />
     <Compile Include="Domain\CommandNames.cs" />
     <Compile Include="Domain\Corner.cs" />
-    <Compile Include="Domain\FakePrimitive.cs" />
     <Compile Include="Domain\ProcessBuilder.cs" />
     <Compile Include="Domain\ProcessCommand.cs" />
     <Compile Include="Domain\ProcessingArea\ArcProcessingArea.cs" />
@@ -114,7 +111,6 @@
     <Compile Include="CamManager.cs" />
     <Compile Include="Domain\Tool.cs" />
     <Compile Include="Graph.cs" />
-    <Compile Include="IAcadGateway.cs" />
     <Compile Include="IListExtensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Domain\SawingTechOperation\SawingTechOperation.cs" />
@@ -124,7 +120,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <Compile Include="Side.cs" />
+    <Compile Include="Domain\Side.cs" />
     <Compile Include="UI\BorderProcessingAreaView.cs">
       <SubType>UserControl</SubType>
     </Compile>

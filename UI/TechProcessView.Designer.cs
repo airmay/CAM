@@ -36,14 +36,6 @@
             this.tabPageParams = new System.Windows.Forms.TabPage();
             this.tabPageCommands = new System.Windows.Forms.TabPage();
             this.dataGridViewCommand = new System.Windows.Forms.DataGridView();
-            this.Number = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.codeDataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.MCode = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.param1DataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.param2DataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.param3DataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.param4DataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.param5DataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.processCommandBindingSource = new System.Windows.Forms.BindingSource(this.components);
             this.panel1 = new System.Windows.Forms.Panel();
             this.toolStrip1 = new System.Windows.Forms.ToolStrip();
@@ -144,21 +136,10 @@
             // 
             // dataGridViewCommand
             // 
-            this.dataGridViewCommand.AutoGenerateColumns = false;
             this.dataGridViewCommand.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.AllCellsExceptHeader;
             this.dataGridViewCommand.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.dataGridViewCommand.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dataGridViewCommand.ColumnHeadersVisible = false;
-            this.dataGridViewCommand.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
-            this.Number,
-            this.codeDataGridViewTextBoxColumn,
-            this.MCode,
-            this.param1DataGridViewTextBoxColumn,
-            this.param2DataGridViewTextBoxColumn,
-            this.param3DataGridViewTextBoxColumn,
-            this.param4DataGridViewTextBoxColumn,
-            this.param5DataGridViewTextBoxColumn});
-            this.dataGridViewCommand.DataSource = this.processCommandBindingSource;
             this.dataGridViewCommand.Dock = System.Windows.Forms.DockStyle.Fill;
             this.dataGridViewCommand.EditMode = System.Windows.Forms.DataGridViewEditMode.EditOnEnter;
             this.dataGridViewCommand.Location = new System.Drawing.Point(3, 3);
@@ -167,62 +148,6 @@
             this.dataGridViewCommand.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.CellSelect;
             this.dataGridViewCommand.Size = new System.Drawing.Size(298, 404);
             this.dataGridViewCommand.TabIndex = 0;
-            // 
-            // Number
-            // 
-            this.Number.DataPropertyName = "Number";
-            this.Number.HeaderText = "Number";
-            this.Number.Name = "Number";
-            this.Number.Width = 5;
-            // 
-            // codeDataGridViewTextBoxColumn
-            // 
-            this.codeDataGridViewTextBoxColumn.DataPropertyName = "GCode";
-            this.codeDataGridViewTextBoxColumn.HeaderText = "GCode";
-            this.codeDataGridViewTextBoxColumn.Name = "codeDataGridViewTextBoxColumn";
-            this.codeDataGridViewTextBoxColumn.Width = 5;
-            // 
-            // MCode
-            // 
-            this.MCode.DataPropertyName = "MCode";
-            this.MCode.HeaderText = "MCode";
-            this.MCode.Name = "MCode";
-            this.MCode.Width = 5;
-            // 
-            // param1DataGridViewTextBoxColumn
-            // 
-            this.param1DataGridViewTextBoxColumn.DataPropertyName = "Param1";
-            this.param1DataGridViewTextBoxColumn.HeaderText = "Param1";
-            this.param1DataGridViewTextBoxColumn.Name = "param1DataGridViewTextBoxColumn";
-            this.param1DataGridViewTextBoxColumn.Width = 5;
-            // 
-            // param2DataGridViewTextBoxColumn
-            // 
-            this.param2DataGridViewTextBoxColumn.DataPropertyName = "Param2";
-            this.param2DataGridViewTextBoxColumn.HeaderText = "Param2";
-            this.param2DataGridViewTextBoxColumn.Name = "param2DataGridViewTextBoxColumn";
-            this.param2DataGridViewTextBoxColumn.Width = 5;
-            // 
-            // param3DataGridViewTextBoxColumn
-            // 
-            this.param3DataGridViewTextBoxColumn.DataPropertyName = "Param3";
-            this.param3DataGridViewTextBoxColumn.HeaderText = "Param3";
-            this.param3DataGridViewTextBoxColumn.Name = "param3DataGridViewTextBoxColumn";
-            this.param3DataGridViewTextBoxColumn.Width = 5;
-            // 
-            // param4DataGridViewTextBoxColumn
-            // 
-            this.param4DataGridViewTextBoxColumn.DataPropertyName = "Param4";
-            this.param4DataGridViewTextBoxColumn.HeaderText = "Param4";
-            this.param4DataGridViewTextBoxColumn.Name = "param4DataGridViewTextBoxColumn";
-            this.param4DataGridViewTextBoxColumn.Width = 5;
-            // 
-            // param5DataGridViewTextBoxColumn
-            // 
-            this.param5DataGridViewTextBoxColumn.DataPropertyName = "Param5";
-            this.param5DataGridViewTextBoxColumn.HeaderText = "Param5";
-            this.param5DataGridViewTextBoxColumn.Name = "param5DataGridViewTextBoxColumn";
-            this.param5DataGridViewTextBoxColumn.Width = 5;
             // 
             // processCommandBindingSource
             // 
@@ -403,9 +328,7 @@
         private System.Windows.Forms.TabPage tabPageCommands;
         private System.Windows.Forms.DataGridView dataGridViewCommand;
         private System.Windows.Forms.BindingSource processCommandBindingSource;
-        private System.Windows.Forms.DataGridViewTextBoxColumn Number;
         private System.Windows.Forms.DataGridViewTextBoxColumn codeDataGridViewTextBoxColumn;
-        private System.Windows.Forms.DataGridViewTextBoxColumn MCode;
         private System.Windows.Forms.DataGridViewTextBoxColumn param1DataGridViewTextBoxColumn;
         private System.Windows.Forms.DataGridViewTextBoxColumn param2DataGridViewTextBoxColumn;
         private System.Windows.Forms.DataGridViewTextBoxColumn param3DataGridViewTextBoxColumn;
