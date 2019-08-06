@@ -48,11 +48,7 @@ namespace CAM
             {
                 var ids = curves.Select(p => p.ObjectId).ToArray();
                 _highlightedObjects = _highlightedObjects.Except(ids).ToArray();
-                try
-                {
-                    App.LockAndExecute(() => ids.QForEach(p => p.Erase()));
-                }
-                catch { }
+                App.LockAndExecute(() => ids.QForEach(p => p.Erase()));
             }
         }
 

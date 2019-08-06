@@ -110,6 +110,7 @@
     <Compile Include="Domain\TechProcessParams.cs" />
     <Compile Include="CamManager.cs" />
     <Compile Include="Domain\Tool.cs" />
+    <Compile Include="Exceptions.cs" />
     <Compile Include="Graph.cs" />
     <Compile Include="IListExtensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

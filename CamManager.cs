@@ -101,14 +101,7 @@ namespace CAM
 
         public void BuildProcessing(TechProcess techProcess)
         {
-            try
-            {
-                techProcess.BuildProcessing();
-            }
-            catch (Exception e)
-            {
-                Acad.Alert(e.Message);
-            }
+            techProcess.BuildProcessing();
             TechProcessView.RefreshView();
         }
 

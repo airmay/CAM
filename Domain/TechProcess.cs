@@ -57,17 +57,24 @@ namespace CAM.Domain
 
 	    public void BuildProcessing()
 	    {
-            Acad.WriteMessage($"Выполняется расчет обработки по техпроцессу {Name} ...");
-            Acad.DeleteCurves(ToolpathCurves);
-            TechOperations.ForEach(p => p.ProcessCommands = null);
-            ProcessCommands = null;
-            TechOperations.ForEach(p => p.ProcessingArea.Curve = p.ProcessingArea.AcadObjectId.QOpenForRead<Curve>());
-            BorderProcessingArea.ProcessBorders(TechOperations.Select(p => p.ProcessingArea).OfType<BorderProcessingArea>().ToList());
-	        var builder = new ScemaLogicProcessBuilder(TechProcessParams);
-            TechOperations.ForEach(p => p.BuildProcessing(builder));
-	        ProcessCommands = builder.FinishTechProcess();
-            Acad.SaveCurves(ToolpathCurves);
-            Acad.WriteMessage($"Расчет обработки завершен");
+            try
+            {
+                Acad.WriteMessage($"Выполняется расчет обработки по техпроцессу {Name} ...");
+                Acad.DeleteCurves(ToolpathCurves);
+                DeleteToolpath();
+                TechOperations.ForEach(p => p.ProcessingArea.Curve = p.ProcessingArea.AcadObjectId.QOpenForRead<Curve>());
+                BorderProcessingArea.ProcessBorders(TechOperations.Select(p => p.ProcessingArea).OfType<BorderProcessingArea>().ToList());
+                var builder = new ScemaLogicProcessBuilder(TechProcessParams);
+                TechOperations.ForEach(p => p.BuildProcessing(builder));
+                ProcessCommands = builder.FinishTechProcess();
+                Acad.SaveCurves(ToolpathCurves);
+                Acad.WriteMessage($"Расчет обработки завершен");
+            }
+            catch (Exception ex)
+            {
+                DeleteToolpath();
+                Exceptions.HandleException(ex);
+            }
         }
 
         public void ProcessBorders(BorderProcessingArea startBorder = null)
