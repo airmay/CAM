@@ -17,9 +17,6 @@ namespace CAM.Domain
         /// </summary>
         public string Name { get; set; }
 
-        [NonSerialized]
-        private CamContainer _container;
-
         /// <summary>
         /// Параметры технологического процесса
         /// </summary>
@@ -46,28 +43,28 @@ namespace CAM.Domain
         [NonSerialized]
         public List<ProcessCommand> ProcessCommands;
 
-        public TechProcess(string name, CamContainer container)
+        public TechProcess(string name)
         {
             Name = name ?? throw new ArgumentNullException("TechProcessName");
-            _container = container;
-            TechProcessParams = container.TechProcessParams.Clone();
+            TechProcessParams = CamContainer.Instance.TechProcessParams.Clone();
         }
-
-        public void SetContainer(CamContainer container) => _container = container;
 
 	    public void BuildProcessing()
 	    {
             try
             {
                 Acad.WriteMessage($"Выполняется расчет обработки по техпроцессу {Name} ...");
+
                 Acad.DeleteCurves(ToolpathCurves);
                 DeleteToolpath();
                 TechOperations.ForEach(p => p.ProcessingArea.Curve = p.ProcessingArea.AcadObjectId.QOpenForRead<Curve>());
                 BorderProcessingArea.ProcessBorders(TechOperations.Select(p => p.ProcessingArea).OfType<BorderProcessingArea>().ToList());
+
                 var builder = new ScemaLogicProcessBuilder(TechProcessParams);
                 TechOperations.ForEach(p => p.BuildProcessing(builder));
                 ProcessCommands = builder.FinishTechProcess();
                 Acad.SaveCurves(ToolpathCurves);
+
                 Acad.WriteMessage($"Расчет обработки завершен");
             }
             catch (Exception ex)
@@ -90,7 +87,8 @@ namespace CAM.Domain
                 switch (techOperationType)
                 {
                     case TechOperationType.Sawing:
-                        factory = new SawingTechOperationFactory(_container.SawingLineTechOperationParams.Clone(), _container.SawingCurveTechOperationParams.Clone());
+                        factory = new SawingTechOperationFactory(CamContainer.Instance.SawingLineTechOperationParams.Clone(), 
+                            CamContainer.Instance.SawingCurveTechOperationParams.Clone());
                         break;
                 }
                 TechOperationFactorys[techOperationType] = factory;
@@ -100,7 +98,7 @@ namespace CAM.Domain
 
         public bool SetTool(string text)
         {
-            var tool = _container.Tools.SingleOrDefault(p => p.Number.ToString() == text);
+            var tool = CamContainer.Instance.Tools.SingleOrDefault(p => p.Number.ToString() == text);
             if (tool != null)
             {
                 TechProcessParams.ToolDiameter = tool.Diameter;

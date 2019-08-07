@@ -84,6 +84,7 @@
   <ItemGroup>
     <Compile Include="AcadGateway.cs" />
     <Compile Include="Bootstrapper.cs" />
+    <Compile Include="CamDocument.cs" />
     <Compile Include="Domain\CamContainer.cs" />
     <Compile Include="Domain\CommandCode.cs" />
     <Compile Include="Domain\CommandNames.cs" />

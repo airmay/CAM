@@ -59,6 +59,7 @@ namespace CAM.UI
 		    techProcessNode.ExpandAll();
 			treeView.SelectedNode = techProcessNode;
             SetParamsViewsVisible();
+            bRemove.Enabled = true;
         }
 
         public void ClearCommandsView() => processCommandBindingSource.DataSource = null;
@@ -193,6 +194,7 @@ namespace CAM.UI
 			    }
 			    treeView.SelectedNode.Remove();
                 SetParamsViewsVisible();
+                SetButtonsEnabled();
             }
         }
 

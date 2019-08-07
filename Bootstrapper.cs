@@ -16,8 +16,6 @@ namespace CAM
 {
     public class Bootstrapper : IExtensionApplication
     {
-        private CamContainer _container;
-
         public void Initialize()
         {
             Acad.WriteMessage($"Инициализация плагина. Версия сборки от {File.GetLastWriteTime(Assembly.GetExecutingAssembly().Location)}");
@@ -32,8 +30,6 @@ namespace CAM
 
             Application.DocumentManager.DocumentActivated += (sender, args) => manager.SetActiveDocument(args.Document);
 
-            _container = CamContainer.Load();
-            manager.Container = _container;
             manager.SetActiveDocument(Acad.Document);
 
             //PrepareTest();
@@ -90,7 +86,7 @@ namespace CAM
 
         public void Terminate()
         {
-            _container.Save();
+            CamContainer.SaveData();
             //SettingForm.RefreshSettings();
             //ProcessingParams.SaveDefault();
             //Settings.Save();

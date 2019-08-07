@@ -17,27 +17,22 @@ namespace CAM
     /// </summary>
     public class CamManager
     {
-        private const string DataKey = "TechProcessList";
-
-        public CamContainer Container { get; set; }
-
         public TechProcessView TechProcessView { get; set; }
 
-        private Dictionary<Document, List<TechProcess>> _documentTechProcessList = new Dictionary<Document, List<TechProcess>>();
+        private Dictionary<Document, CamDocument> _documents = new Dictionary<Document, CamDocument>();
 
-        private List<TechProcess> TechProcessList => _documentTechProcessList[Acad.Document];
-
-        //public EventHandler<ProgramEventArgs> ProgramGenerated;
+        private List<TechProcess> TechProcessList;
 
         public void SetActiveDocument(Document document)
         {
-            if (!_documentTechProcessList.ContainsKey(document))
+            if (!_documents.ContainsKey(document))
             {
                 document.CommandWillStart += Document_CommandWillStart;
                 document.BeginDocumentClose += Document_BeginDocumentClose;
-                _documentTechProcessList[document] = LoadTechProsess(document) ?? new List<TechProcess>();
+                _documents[document] = new CamDocument(document);
             }
             Acad.ClearHighlighted();
+            TechProcessList = _documents[document].TechProcessList;
             TechProcessView.Refresh(TechProcessList);
         }
 
@@ -46,8 +41,8 @@ namespace CAM
             var document = sender as Document;
             document.CommandWillStart -= Document_CommandWillStart;
             document.BeginDocumentClose -= Document_BeginDocumentClose;
-            _documentTechProcessList.Remove(document);
-            if (!_documentTechProcessList.Any())
+            _documents.Remove(document);
+            if (!_documents.Any())
                 TechProcessView.Refresh();
         }
 
@@ -55,16 +50,16 @@ namespace CAM
         {
             if (e.GlobalCommandName == "CLOSE" || e.GlobalCommandName == "QUIT")
             {
-                _documentTechProcessList[sender as Document].ForEach(p => p.DeleteToolpath());
+                _documents[sender as Document].TechProcessList.ForEach(p => p.DeleteToolpath());
                 Acad.DeleteProcessLayer();
                 TechProcessView.ClearCommandsView();
-                SaveTechProsess(sender as Document);
+                _documents[sender as Document].SaveTechProsess();
             }
         }
 
         public TechProcess CreateTechProcess()
         {
-            var techProcess = new TechProcess($"Обработка{TechProcessList.Count + 1}", Container);
+            var techProcess = new TechProcess($"Обработка{TechProcessList.Count + 1}");
             TechProcessList.Add(techProcess);
             return techProcess;
         }
@@ -146,61 +141,5 @@ namespace CAM
                 BuildProcessing(to.TechProcess);
             }
         }
-
-        #region Load/Save TechProsess
-        /// <summary>
-        /// Загрузить технологические процессы из файла чертежа
-        /// </summary>
-        private List<TechProcess> LoadTechProsess(Document document)
-        {
-            try
-            {
-                var techProcessList = (List<TechProcess>)Acad.LoadDocumentData(document, DataKey);
-                if (techProcessList != null)
-                {
-                    techProcessList.ForEach(tp =>
-                    {
-                        tp.SetContainer(Container);
-                        tp.TechOperations.ForEach(to =>
-                        {
-                            to.ProcessingArea.AcadObjectId = Acad.GetObjectId(to.ProcessingArea.Handle);
-                            to.TechProcess = tp;
-                        });
-                    });
-                    Interaction.WriteLine($"Загружены техпроцессы: {string.Join(", ", techProcessList.Select(p => p.Name))}");
-                }
-                return techProcessList;
-            }
-            catch (Exception e)
-            {
-                Acad.Alert($"Ошибка при загрузке техпроцессов:\n{e.Message}");
-                return null;
-            }
-        }
-
-        public void SaveTechProsess(Document document)
-        {
-            try
-            {
-                //  TODO проверить контрольную сумму перед сохранением
-                Acad.SaveDocumentData(document, TechProcessList, DataKey);
-            }
-            catch (Exception e)
-            {
-                Acad.Alert($"Ошибка при записи техпроцессов:\n{e.Message}");
-            }
-        }
-
-        #endregion    }
-
-        //public class ProgramEventArgs : EventArgs
-        //{
-        //    public string Program { get; set; }
-
-        //    public ProgramEventArgs(string program)
-        //    {
-        //        Program = program;
-        //    }
-        //}
     }
 }

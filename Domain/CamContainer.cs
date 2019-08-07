@@ -12,20 +12,24 @@ namespace CAM.Domain
     /// </summary>
     public class CamContainer
     {
-        private static readonly string _filePath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "cam_data.xml");
+        private static CamContainer _instance;
 
-        #region Methods
+        public static CamContainer Instance => _instance ?? (_instance = LoadData());
+
+        private static string GetFilePath => Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "cam_data.xml");
+
+        #region static methods
 
         /// <summary>
-        /// Загрузить данные их файла в контейнер
+        /// Загрузить данные из файла в контейнер
         /// </summary>
         /// <returns></returns>
-        public static CamContainer Load()
+        public static CamContainer LoadData()
         {
             var formatter = new XmlSerializer(typeof(CamContainer));
             try
             {
-                using (var fileStream = new FileStream(_filePath, FileMode.Open))
+                using (var fileStream = new FileStream(GetFilePath, FileMode.Open))
                     return (CamContainer)formatter.Deserialize(fileStream);
             }
             catch (Exception e)
@@ -44,22 +48,23 @@ namespace CAM.Domain
         /// <summary>
         /// Сохранить данные в файл
         /// </summary>
-        public void Save()
+        public static void SaveData()
         {
+            if (_instance == null) return;
+
             var formatter = new XmlSerializer(typeof(CamContainer));
             try
             {
-                using (var fileStream = new FileStream(_filePath, FileMode.Create))
-                    formatter.Serialize(fileStream, this);
+                using (var fileStream = new FileStream(GetFilePath, FileMode.Create))
+                    formatter.Serialize(fileStream, _instance);
             }
             catch (Exception e)
             {
-                Application.ShowAlertDialog($"Ошибка при сохранении данных в файл 'cam_data.xml':\n{e.Message}");
+                Acad.Alert($"Ошибка при сохранении данных в файл 'cam_data.xml':\n{e.Message}");
             }
         }
 
         #endregion
-
 
         public List<Tool> Tools { get; set; }
 
