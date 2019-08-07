@@ -58,12 +58,12 @@ namespace CAM
                             to.ProcessingArea.AcadObjectId = Acad.GetObjectId(to.ProcessingArea.Handle);
                             to.TechProcess = tp;
                         }));
-                    Acad.WriteMessage($"Загружены техпроцессы: {string.Join(", ", TechProcessList.Select(p => p.Name))}");
+                    Acad.Write($"Загружены техпроцессы: {string.Join(", ", TechProcessList.Select(p => p.Name))}");
                 }
             }
             catch (Exception e)
             {
-                Acad.Alert($"Ошибка при загрузке техпроцессов:\n{e.Message}");
+                Acad.Alert($"Ошибка при загрузке техпроцессов", e);
             }
         }
 
@@ -111,7 +111,7 @@ namespace CAM
             }
             catch (Exception e)
             {
-                Acad.Alert($"Ошибка при записи техпроцессов:\n{e.Message}");
+                Acad.Alert($"Ошибка при сохранении техпроцессов", e);
             }
         }
     }

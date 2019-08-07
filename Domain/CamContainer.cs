@@ -34,7 +34,7 @@ namespace CAM.Domain
             }
             catch (Exception e)
             {
-                Application.ShowAlertDialog($"Ошибка при загрузке данных из файла 'cam_data.xml' :\n{e.Message}");
+                Acad.Alert($"Ошибка при загрузке данных из файла 'cam_data.xml'", e);
                 return new CamContainer
                 {
                     Tools = new List<Tool>(),
@@ -60,7 +60,7 @@ namespace CAM.Domain
             }
             catch (Exception e)
             {
-                Acad.Alert($"Ошибка при сохранении данных в файл 'cam_data.xml':\n{e.Message}");
+                Acad.Alert($"Ошибка при сохранении данных в файл 'cam_data.xml'", e);
             }
         }
 

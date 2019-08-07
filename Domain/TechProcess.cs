@@ -53,7 +53,7 @@ namespace CAM.Domain
 	    {
             try
             {
-                Acad.WriteMessage($"Выполняется расчет обработки по техпроцессу {Name} ...");
+                Acad.Write($"Выполняется расчет обработки по техпроцессу {Name} ...");
 
                 Acad.DeleteCurves(ToolpathCurves);
                 DeleteToolpath();
@@ -65,12 +65,12 @@ namespace CAM.Domain
                 ProcessCommands = builder.FinishTechProcess();
                 Acad.SaveCurves(ToolpathCurves);
 
-                Acad.WriteMessage($"Расчет обработки завершен");
+                Acad.Write("Расчет обработки завершен");
             }
             catch (Exception ex)
             {
                 DeleteToolpath();
-                Exceptions.HandleException(ex);
+                Acad.Alert("Ошибка при выполнении расчета", ex);
             }
         }
 

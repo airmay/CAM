@@ -23,13 +23,22 @@ namespace CAM
 
         public static Editor Editor => Application.DocumentManager.MdiActiveDocument.Editor;
 
-        public static void WriteMessage(string message) => Interaction.WriteLine($"{message}\n");
-
-        public static void Alert(string message)
+        public static void Write(string message, Exception ex = null)
         {
-            WriteMessage(message);
-            Application.ShowAlertDialog(message);
+            var text = ex == null ? message : $"{message}: {ex.Message}";
+            Interaction.WriteLine($"{text}\n");
+            if (ex != null)
+                File.WriteAllText($@"\\CATALINA\public\Программы станок\CodeRepository\Logs\error_{DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss")}.log", $"{Acad.Document.Name}\n\n{message}\n\n{ex.FullMessage()}");
         }
+        public static void Write(Exception ex) => Write("Ошибка", ex);
+
+        public static void Alert(string message, Exception ex = null)
+        {
+            Write(message, ex);
+            Application.ShowAlertDialog(ex == null ? message : $"{message}: {ex.Message}");
+        }
+
+        public static void Alert(Exception ex) => Alert("Ошибка", ex);
 
         public static ObjectId GetObjectId(long handle) => Database.GetObjectId(false, new Handle(handle), 0);
 

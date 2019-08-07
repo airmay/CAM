@@ -18,7 +18,7 @@ namespace CAM
     {
         public void Initialize()
         {
-            Acad.WriteMessage($"Инициализация плагина. Версия сборки от {File.GetLastWriteTime(Assembly.GetExecutingAssembly().Location)}");
+            Acad.Write($"Инициализация плагина. Версия сборки от {File.GetLastWriteTime(Assembly.GetExecutingAssembly().Location)}");
 
              var manager = new CamManager();
 

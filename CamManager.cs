@@ -115,13 +115,13 @@ namespace CAM
             {
                 TechProcessView.Cursor = Cursors.WaitCursor;
                 File.WriteAllLines(Path.Combine(filePath, fileName), programmLines);
-                Acad.WriteMessage($"Файл {fileName} сохранен по адресу {filePath}");
+                Acad.Write($"Файл {fileName} сохранен по адресу {filePath}");
                 TechProcessView.Cursor = Cursors.Default;
             }
             catch (Exception e)
             {
                 TechProcessView.Cursor = Cursors.Default;
-                Acad.Alert($"Ошибка при записи файла программы: {e.Message}");
+                Acad.Alert($"Ошибка при записи файла программы", e);
             }
         }
 
