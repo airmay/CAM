@@ -177,6 +177,7 @@
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="UI\BorderProcessingAreaView.resx">
       <DependentUpon>BorderProcessingAreaView.cs</DependentUpon>
@@ -253,7 +254,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <None Include="cam_data.xml">
+    <None Include="settings.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>

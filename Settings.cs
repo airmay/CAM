@@ -16,7 +16,7 @@ namespace CAM
 
         public static Settings Instance => _instance ?? (_instance = Load());
 
-        private static string GetFilePath => Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "cam_data.xml");
+        private static string GetFilePath => Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "settings.xml");
 
         #region static methods
 
