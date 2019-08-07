@@ -86,7 +86,7 @@ namespace CAM
 
         public void Terminate()
         {
-            CamContainer.SaveData();
+            Settings.Save();
             //SettingForm.RefreshSettings();
             //ProcessingParams.SaveDefault();
             //Settings.Save();

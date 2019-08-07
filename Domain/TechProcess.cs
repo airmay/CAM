@@ -46,7 +46,7 @@ namespace CAM.Domain
         public TechProcess(string name)
         {
             Name = name ?? throw new ArgumentNullException("TechProcessName");
-            TechProcessParams = CamContainer.Instance.TechProcessParams.Clone();
+            TechProcessParams = Settings.Instance.TechProcessParams.Clone();
         }
 
 	    public void BuildProcessing()
@@ -87,8 +87,8 @@ namespace CAM.Domain
                 switch (techOperationType)
                 {
                     case TechOperationType.Sawing:
-                        factory = new SawingTechOperationFactory(CamContainer.Instance.SawingLineTechOperationParams.Clone(), 
-                            CamContainer.Instance.SawingCurveTechOperationParams.Clone());
+                        factory = new SawingTechOperationFactory(Settings.Instance.SawingLineTechOperationParams.Clone(), 
+                            Settings.Instance.SawingCurveTechOperationParams.Clone());
                         break;
                 }
                 TechOperationFactorys[techOperationType] = factory;
@@ -98,7 +98,7 @@ namespace CAM.Domain
 
         public bool SetTool(string text)
         {
-            var tool = CamContainer.Instance.Tools.SingleOrDefault(p => p.Number.ToString() == text);
+            var tool = Settings.Instance.Tools.SingleOrDefault(p => p.Number.ToString() == text);
             if (tool != null)
             {
                 TechProcessParams.ToolDiameter = tool.Diameter;

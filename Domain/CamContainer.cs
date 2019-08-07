@@ -1,5 +1,4 @@
-﻿using Autodesk.AutoCAD.ApplicationServices;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
@@ -10,11 +9,11 @@ namespace CAM.Domain
     /// <summary>
     /// Хранилище персистентных данных 
     /// </summary>
-    public class CamContainer
+    public class Settings
     {
-        private static CamContainer _instance;
+        private static Settings _instance;
 
-        public static CamContainer Instance => _instance ?? (_instance = LoadData());
+        public static Settings Instance => _instance ?? (_instance = Load());
 
         private static string GetFilePath => Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "cam_data.xml");
 
@@ -24,18 +23,18 @@ namespace CAM.Domain
         /// Загрузить данные из файла в контейнер
         /// </summary>
         /// <returns></returns>
-        public static CamContainer LoadData()
+        public static Settings Load()
         {
-            var formatter = new XmlSerializer(typeof(CamContainer));
+            var formatter = new XmlSerializer(typeof(Settings));
             try
             {
                 using (var fileStream = new FileStream(GetFilePath, FileMode.Open))
-                    return (CamContainer)formatter.Deserialize(fileStream);
+                    return (Settings)formatter.Deserialize(fileStream);
             }
             catch (Exception e)
             {
                 Acad.Alert($"Ошибка при загрузке данных из файла 'cam_data.xml'", e);
-                return new CamContainer
+                return new Settings
                 {
                     Tools = new List<Tool>(),
                     TechProcessParams = new TechProcessParams(),
@@ -48,11 +47,11 @@ namespace CAM.Domain
         /// <summary>
         /// Сохранить данные в файл
         /// </summary>
-        public static void SaveData()
+        public static void Save()
         {
             if (_instance == null) return;
 
-            var formatter = new XmlSerializer(typeof(CamContainer));
+            var formatter = new XmlSerializer(typeof(Settings));
             try
             {
                 using (var fileStream = new FileStream(GetFilePath, FileMode.Create))
