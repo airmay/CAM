@@ -127,7 +127,6 @@ namespace CAM.UI
 
 	    private void treeView_AfterLabelEdit(object sender, NodeLabelEditEventArgs e)
 	    {
-            e.Node.Text = e.Label;
             switch (treeView.SelectedNode.Tag)
             {
                 case TechProcess techProcess:
@@ -137,6 +136,7 @@ namespace CAM.UI
                     techOperation.Name = e.Label;
                     break;
             }
+            treeView.LabelEdit = false;
         }
 
 	    #region Toolbar handlers
@@ -258,6 +258,12 @@ namespace CAM.UI
         private void bSend_Click(object sender, EventArgs e)
         {
             _camManager.SendProgramm(CurrentTechProcess);
+        }
+
+        private void treeView_NodeMouseDoubleClick(object sender, TreeNodeMouseClickEventArgs e)
+        {
+            treeView.LabelEdit = true;
+            e.Node.BeginEdit();
         }
     }
 }

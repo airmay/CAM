@@ -36,7 +36,6 @@
             this.tabPageParams = new System.Windows.Forms.TabPage();
             this.tabPageCommands = new System.Windows.Forms.TabPage();
             this.dataGridViewCommand = new System.Windows.Forms.DataGridView();
-            this.processCommandBindingSource = new System.Windows.Forms.BindingSource(this.components);
             this.panel1 = new System.Windows.Forms.Panel();
             this.toolStrip1 = new System.Windows.Forms.ToolStrip();
             this.bCreateTechOperation = new System.Windows.Forms.ToolStripButton();
@@ -50,6 +49,7 @@
             this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
             this.bSendProgramm = new System.Windows.Forms.ToolStripButton();
             this.panel2 = new System.Windows.Forms.Panel();
+            this.processCommandBindingSource = new System.Windows.Forms.BindingSource(this.components);
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
@@ -57,10 +57,10 @@
             this.tabControl.SuspendLayout();
             this.tabPageCommands.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridViewCommand)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.processCommandBindingSource)).BeginInit();
             this.panel1.SuspendLayout();
             this.toolStrip1.SuspendLayout();
             this.panel2.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.processCommandBindingSource)).BeginInit();
             this.SuspendLayout();
             // 
             // splitContainer1
@@ -87,7 +87,6 @@
             this.treeView.HideSelection = false;
             this.treeView.ImageIndex = 0;
             this.treeView.ImageList = this.imageList;
-            this.treeView.LabelEdit = true;
             this.treeView.Location = new System.Drawing.Point(0, 0);
             this.treeView.Name = "treeView";
             this.treeView.SelectedImageIndex = 0;
@@ -95,6 +94,7 @@
             this.treeView.TabIndex = 0;
             this.treeView.AfterLabelEdit += new System.Windows.Forms.NodeLabelEditEventHandler(this.treeView_AfterLabelEdit);
             this.treeView.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.treeView_AfterSelect);
+            this.treeView.NodeMouseDoubleClick += new System.Windows.Forms.TreeNodeMouseClickEventHandler(this.treeView_NodeMouseDoubleClick);
             // 
             // imageList
             // 
@@ -148,11 +148,6 @@
             this.dataGridViewCommand.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.CellSelect;
             this.dataGridViewCommand.Size = new System.Drawing.Size(298, 404);
             this.dataGridViewCommand.TabIndex = 0;
-            // 
-            // processCommandBindingSource
-            // 
-            this.processCommandBindingSource.DataSource = typeof(CAM.Domain.ProcessCommand);
-            this.processCommandBindingSource.CurrentChanged += new System.EventHandler(this.processCommandBindingSource_CurrentChanged);
             // 
             // panel1
             // 
@@ -282,6 +277,11 @@
             this.panel2.Size = new System.Drawing.Size(312, 711);
             this.panel2.TabIndex = 3;
             // 
+            // processCommandBindingSource
+            // 
+            this.processCommandBindingSource.DataSource = typeof(CAM.Domain.ProcessCommand);
+            this.processCommandBindingSource.CurrentChanged += new System.EventHandler(this.processCommandBindingSource_CurrentChanged);
+            // 
             // TechProcessView
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -297,12 +297,12 @@
             this.tabControl.ResumeLayout(false);
             this.tabPageCommands.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.dataGridViewCommand)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.processCommandBindingSource)).EndInit();
             this.panel1.ResumeLayout(false);
             this.panel1.PerformLayout();
             this.toolStrip1.ResumeLayout(false);
             this.toolStrip1.PerformLayout();
             this.panel2.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.processCommandBindingSource)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
