@@ -1,10 +1,11 @@
-﻿using System;
+﻿using CAM.Domain;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using System.Xml.Serialization;
 
-namespace CAM.Domain
+namespace CAM
 {
     /// <summary>
     /// Хранилище персистентных данных 

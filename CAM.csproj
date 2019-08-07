@@ -85,7 +85,6 @@
     <Compile Include="AcadGateway.cs" />
     <Compile Include="Bootstrapper.cs" />
     <Compile Include="CamDocument.cs" />
-    <Compile Include="Domain\CamContainer.cs" />
     <Compile Include="Domain\CommandCode.cs" />
     <Compile Include="Domain\CommandNames.cs" />
     <Compile Include="Domain\Corner.cs" />
@@ -96,6 +95,7 @@
     <Compile Include="Domain\SawingTechOperation\ITechOperationFactory.cs" />
     <Compile Include="Domain\SawingTechOperation\SawingDefaultParams.cs" />
     <Compile Include="Domain\ScemaLogicProgramGenerator.cs" />
+    <Compile Include="Settings.cs" />
     <Compile Include="Domain\TechOperationType.cs" />
     <Compile Include="Domain\ITechOperation.cs" />
     <Compile Include="Domain\ProcessingArea\LineProcessingArea.cs" />
