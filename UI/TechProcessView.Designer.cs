@@ -136,6 +136,7 @@
             // 
             // dataGridViewCommand
             // 
+            this.dataGridViewCommand.AllowUserToResizeRows = false;
             this.dataGridViewCommand.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.AllCellsExceptHeader;
             this.dataGridViewCommand.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.dataGridViewCommand.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;

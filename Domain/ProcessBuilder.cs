@@ -152,15 +152,14 @@ namespace CAM.Domain
         //}
 
         private void CreateCommand(string name, int gCode, int? mCode = null, string axis = null, int? feed = null, double? x = null, double? y = null, double? param1 = null, double? param2 = null, Curve toolpathCurve = null)
-            => (TechOperationCommands ?? ProcessCommands).Add(new ProcessCommand()
+            => (TechOperationCommands ?? ProcessCommands).Add(new ProcessCommand(toolpathCurve)
             {
-                ToolpathCurve = toolpathCurve,
                 Name = name,
-                Number = ++_commandNumber,
-                GCode = gCode,
-                MCode = mCode,
+                Number = (++_commandNumber).ToString(),
+                GCode = gCode.ToString(),
+                MCode = mCode?.ToString(),
                 Axis = axis,
-                Feed = feed,
+                Feed = feed.ToString(),
                 X = Round(x),
                 Y = Round(y),
                 Param1 = Round(param1),
@@ -168,7 +167,7 @@ namespace CAM.Domain
             });
 
         //private static string GetParam(double? value, string paramName = null) => value.HasValue ? $" {paramName}{value:0.####}" : null;
-        private static double? Round(double? value) => value.HasValue ? (double?)Math.Round(value.Value, 4) : null;
+        private static string Round(double? value) => value.HasValue ? Math.Round(value.Value, 4).ToString() : null;
 
         /// <summary>
         /// Завершение операции

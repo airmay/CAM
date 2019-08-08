@@ -8,7 +8,7 @@ using System.Xml.Serialization;
 namespace CAM
 {
     /// <summary>
-    /// Хранилище персистентных данных 
+    /// Настройки
     /// </summary>
     public class Settings
     {

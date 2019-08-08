@@ -2,13 +2,10 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 using System.Windows.Forms;
 using Autodesk.AutoCAD.ApplicationServices;
-using Autodesk.AutoCAD.DatabaseServices;
 using CAM.Domain;
 using CAM.UI;
-using Dreambuild.AutoCAD;
 
 namespace CAM
 {
@@ -22,6 +19,7 @@ namespace CAM
         private Dictionary<Document, CamDocument> _documents = new Dictionary<Document, CamDocument>();
 
         private List<TechProcess> TechProcessList;
+        private TechProcess _currentTechProcess;
 
         public void SetActiveDocument(Document document)
         {
@@ -34,6 +32,7 @@ namespace CAM
             Acad.ClearHighlighted();
             TechProcessList = _documents[document].TechProcessList;
             TechProcessView.Refresh(TechProcessList);
+            _currentTechProcess = TechProcessList.FirstOrDefault();
         }
 
         private void Document_BeginDocumentClose(object sender, DocumentBeginCloseEventArgs e)
@@ -74,9 +73,17 @@ namespace CAM
             return null;
         }
 
-        internal void SelectTechProcess(TechProcess techProcess) => Acad.SelectObjectIds(techProcess.TechOperations.Select(p => p.ProcessingArea.AcadObjectId).ToArray());
+        internal void SelectTechProcess(TechProcess techProcess)
+        {
+            _currentTechProcess = techProcess;
+            Acad.SelectObjectIds(techProcess.TechOperations.Select(p => p.ProcessingArea.AcadObjectId).ToArray());
+        }
 
-        internal void SelectTechOperation(TechOperation techOperation) => Acad.SelectObjectIds(techOperation.ProcessingArea.AcadObjectId);
+        internal void SelectTechOperation(TechOperation techOperation)
+        {
+            _currentTechProcess = techOperation.TechProcess;
+            Acad.SelectObjectIds(techOperation.ProcessingArea.AcadObjectId);
+        }
 
         public bool MoveForwardTechOperation(TechOperation techOperation) => techOperation.TechProcess.TechOperations.SwapNext(techOperation);
 
@@ -100,36 +107,38 @@ namespace CAM
             TechProcessView.RefreshView();
         }
 
-        public void SendProgramm(TechProcess techProcess)
+        #region Program
+        public string[] GetProgramm() => _currentTechProcess?.ProcessCommands?.Select(p => p.GetProgrammLine()).ToArray();
+
+        public void SendProgramm() => SendProgram(GetProgramm());
+
+        internal void SendProgram(string[] lines)
         {
-            if (techProcess.ProcessCommands == null)
+            if (lines == null || !lines.Any())
             {
                 Acad.Alert("Программа не сформирована");
                 return;
             }
-            var fileName = $"{techProcess.Name}.csv";                
+            var fileName = $"{_currentTechProcess.Name}.csv";
             //var filePath = @"\\192.168.137.59\ssd\Automatico\";
             var filePath = @"\\CATALINA\public\Программы станок\CodeRepository";
-            var programmLines = techProcess.ProcessCommands.Select(p => p.ProgrammLine).ToArray();
+            var fullPath = Path.Combine(filePath, fileName);
             try
             {
                 TechProcessView.Cursor = Cursors.WaitCursor;
-                File.WriteAllLines(Path.Combine(filePath, fileName), programmLines);
-                Acad.Write($"Файл {fileName} сохранен по адресу {filePath}");
+                File.WriteAllLines(fullPath, lines);
+                Acad.Write($"Записан файл {fullPath}");
                 TechProcessView.Cursor = Cursors.Default;
             }
             catch (Exception e)
             {
                 TechProcessView.Cursor = Cursors.Default;
-                Acad.Alert($"Ошибка при записи файла программы", e);
+                Acad.Alert($"Ошибка при записи файла {fullPath}", e);
             }
-        }
+        } 
+        #endregion
 
-        public void SelectProcessCommand(ProcessCommand processCommand)
-        {
-            if (processCommand != null)
-                Acad.SelectCurve(processCommand.ToolpathCurve);
-        }
+        public void SelectProcessCommand(ProcessCommand processCommand) => Acad.SelectCurve(processCommand.GetToolpathCurve());
 
         public void SwapOuterSide(TechProcess techProcess, TechOperation techOperation)
         {

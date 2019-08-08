@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<CamContainer xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<Settings xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <Tools>
     <Tool>
       <Number>1</Number>
@@ -63,4 +63,4 @@
     </Modes>
     <IsFirstPassOnSurface>true</IsFirstPassOnSurface>
   </SawingCurveTechOperationParams>
-</CamContainer>
+</Settings>

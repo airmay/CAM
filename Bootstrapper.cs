@@ -20,13 +20,17 @@ namespace CAM
         {
             Acad.Write($"Инициализация плагина. Версия сборки от {File.GetLastWriteTime(Assembly.GetExecutingAssembly().Location)}");
 
-             var manager = new CamManager();
+            var manager = new CamManager();
 
             PaletteSet paletteSet = CreatePaletteSet();
-
-            //var techProcessView = new TechProcessView();
             paletteSet.Add("Объекты", new TechProcessView(manager));
-            paletteSet.Add("Программа", new ProgramView());
+            var programView = new ProgramView(manager);
+            var programmPalette = paletteSet.Add("Программа", programView);
+            paletteSet.PaletteActivated += (sender, args) =>
+            {
+                if (args.Activated.Name == "Программа")
+                    programView.SetProgram(manager.GetProgramm());
+            };
 
             Application.DocumentManager.DocumentActivated += (sender, args) => manager.SetActiveDocument(args.Document);
 

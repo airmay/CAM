@@ -1,52 +1,38 @@
-﻿using System;
-using Autodesk.AutoCAD.DatabaseServices;
+﻿using Autodesk.AutoCAD.DatabaseServices;
 
 namespace CAM.Domain
 {
     public class ProcessCommand
     {
-        public int Number { get; set; }
+        public string Number { get; set; }
 
         public string Name { get; set; }
 
-        public int GCode { get; set; }
+        public string GCode { get; set; }
 
-        public int? MCode { get; set; }
+        public string MCode { get; set; }
 
         public string Axis { get; set; }
 
-        public int? Feed { get; set; }
+        public string Feed { get; set; }
 
-        public double? X { get; set; }
+        public string X { get; set; }
 
-        public double? Y { get; set; }
+        public string Y { get; set; }
 
-        public double? Param1 { get; set; }
+        public string Param1 { get; set; }
 
-        public double? Param2 { get; set; }
+        public string Param2 { get; set; }
 
-        /// <summary>
-        /// Идентификатор графического примитива автокада представляющего траекторию инструмента
-        /// </summary>
-        public ObjectId ToolpathCurveId { get; set; }
+        public ProcessCommand(Curve toolpathCurve) => _toolpathCurve = toolpathCurve;
+
+        public Curve _toolpathCurve;
 
         /// <summary>
         /// Графический примитив автокада представляющего траекторию инструмента
         /// </summary>
-        public Curve ToolpathCurve { get; set; }
+        public Curve GetToolpathCurve() => _toolpathCurve;
 
-        public string ProgrammLine => $"{Number};{GCode};{MCode};{Axis};{Feed};{X};{Y};{Param1};{Param2};";
-
-        //public ProcessCommand(string name, string gCode, Curve toolpathCurve = null, params string[] @params)
-        //{
-        //    Name = name;
-        //    GCode = gCode;
-        //    ToolpathCurve = toolpathCurve;
-        //    Param1 = @params.Length > 0 ? @params[0] : null;
-        //    Param2 = @params.Length > 1 ? @params[1] : null;
-        //    Param3 = @params.Length > 2 ? @params[2] : null;
-        //    Param4 = @params.Length > 3 ? @params[3] : null;
-        //    Param5 = @params.Length > 4 ? @params[4] : null;
-        //}
+        public string GetProgrammLine() => $"{Number};{GCode};{MCode};{Axis};{Feed};{X};{Y};{Param1};{Param2};";
     }
 }

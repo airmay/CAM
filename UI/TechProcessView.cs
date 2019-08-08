@@ -238,16 +238,12 @@ namespace CAM.UI
 	        }
 	    }
 
-        private void bSave_Click(object sender, EventArgs e)
-        {
-            //_camManager.SaveTechProsess();
-        }
-
         #endregion
 
         private void processCommandBindingSource_CurrentChanged(object sender, EventArgs e)
         {
-            _camManager.SelectProcessCommand(processCommandBindingSource.Current as ProcessCommand);
+            if (processCommandBindingSource.Current != null)
+                _camManager.SelectProcessCommand(processCommandBindingSource.Current as ProcessCommand);
         }
 
         private void bSwapOuterSide_Click(object sender, EventArgs e)
@@ -257,7 +253,8 @@ namespace CAM.UI
 
         private void bSend_Click(object sender, EventArgs e)
         {
-            _camManager.SendProgramm(CurrentTechProcess);
+            dataGridViewCommand.EndEdit();
+            _camManager.SendProgramm();
         }
 
         private void treeView_NodeMouseDoubleClick(object sender, TreeNodeMouseClickEventArgs e)
