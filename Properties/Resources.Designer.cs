@@ -63,6 +63,16 @@ namespace CAM.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap application_dock {
+            get {
+                object obj = ResourceManager.GetObject("application_dock", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap arrow_down {
             get {
                 object obj = ResourceManager.GetObject("arrow_down", resourceCulture);
@@ -76,6 +86,16 @@ namespace CAM.Properties {
         internal static System.Drawing.Bitmap arrow_up {
             get {
                 object obj = ResourceManager.GetObject("arrow_up", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap cross {
+            get {
+                object obj = ResourceManager.GetObject("cross", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -176,6 +196,16 @@ namespace CAM.Properties {
         internal static System.Drawing.Bitmap gear__arrow {
             get {
                 object obj = ResourceManager.GetObject("gear__arrow", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap layer_resize {
+            get {
+                object obj = ResourceManager.GetObject("layer_resize", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

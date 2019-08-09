@@ -262,5 +262,11 @@ namespace CAM.UI
             treeView.LabelEdit = true;
             e.Node.BeginEdit();
         }
+
+        private void bClose_Click(object sender, EventArgs e)
+        {
+            Acad.Document.CloseAndDiscard();
+            Autodesk.AutoCAD.ApplicationServices.Application.Quit();
+        }
     }
 }

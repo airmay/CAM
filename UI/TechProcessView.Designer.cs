@@ -38,17 +38,18 @@
             this.dataGridViewCommand = new System.Windows.Forms.DataGridView();
             this.panel1 = new System.Windows.Forms.Panel();
             this.toolStrip1 = new System.Windows.Forms.ToolStrip();
+            this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
+            this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
+            this.panel2 = new System.Windows.Forms.Panel();
             this.bCreateTechOperation = new System.Windows.Forms.ToolStripButton();
             this.bRemove = new System.Windows.Forms.ToolStripButton();
             this.bMoveUpTechOperation = new System.Windows.Forms.ToolStripButton();
             this.bMoveDownTechOperation = new System.Windows.Forms.ToolStripButton();
             this.bCreateTechProcess = new System.Windows.Forms.ToolStripButton();
-            this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.bSwapOuterSide = new System.Windows.Forms.ToolStripButton();
             this.bBuildProcessing = new System.Windows.Forms.ToolStripButton();
-            this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
             this.bSendProgramm = new System.Windows.Forms.ToolStripButton();
-            this.panel2 = new System.Windows.Forms.Panel();
+            this.bClose = new System.Windows.Forms.ToolStripButton();
             this.processCommandBindingSource = new System.Windows.Forms.BindingSource(this.components);
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
@@ -172,12 +173,32 @@
             this.bSwapOuterSide,
             this.bBuildProcessing,
             this.toolStripSeparator2,
-            this.bSendProgramm});
+            this.bSendProgramm,
+            this.bClose});
             this.toolStrip1.Location = new System.Drawing.Point(0, 0);
             this.toolStrip1.Name = "toolStrip1";
             this.toolStrip1.Size = new System.Drawing.Size(312, 25);
             this.toolStrip1.TabIndex = 0;
             this.toolStrip1.Text = "toolStrip1";
+            // 
+            // toolStripSeparator1
+            // 
+            this.toolStripSeparator1.Name = "toolStripSeparator1";
+            this.toolStripSeparator1.Size = new System.Drawing.Size(6, 25);
+            // 
+            // toolStripSeparator2
+            // 
+            this.toolStripSeparator2.Name = "toolStripSeparator2";
+            this.toolStripSeparator2.Size = new System.Drawing.Size(6, 25);
+            // 
+            // panel2
+            // 
+            this.panel2.Controls.Add(this.splitContainer1);
+            this.panel2.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.panel2.Location = new System.Drawing.Point(0, 25);
+            this.panel2.Name = "panel2";
+            this.panel2.Size = new System.Drawing.Size(312, 711);
+            this.panel2.TabIndex = 3;
             // 
             // bCreateTechOperation
             // 
@@ -229,15 +250,10 @@
             this.bCreateTechProcess.Text = "Добавить техпроцесс";
             this.bCreateTechProcess.Click += new System.EventHandler(this.bCreateTechProcess_Click);
             // 
-            // toolStripSeparator1
-            // 
-            this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(6, 25);
-            // 
             // bSwapOuterSide
             // 
             this.bSwapOuterSide.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.bSwapOuterSide.Image = global::CAM.Properties.Resources.layer_shape_line;
+            this.bSwapOuterSide.Image = global::CAM.Properties.Resources.layer_resize;
             this.bSwapOuterSide.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.bSwapOuterSide.Name = "bSwapOuterSide";
             this.bSwapOuterSide.Size = new System.Drawing.Size(23, 22);
@@ -254,11 +270,6 @@
             this.bBuildProcessing.Text = "Рассчитать обработку";
             this.bBuildProcessing.Click += new System.EventHandler(this.bBuildProcessing_Click);
             // 
-            // toolStripSeparator2
-            // 
-            this.toolStripSeparator2.Name = "toolStripSeparator2";
-            this.toolStripSeparator2.Size = new System.Drawing.Size(6, 25);
-            // 
             // bSendProgramm
             // 
             this.bSendProgramm.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
@@ -269,14 +280,15 @@
             this.bSendProgramm.Text = "Отправить программу на станок";
             this.bSendProgramm.Click += new System.EventHandler(this.bSend_Click);
             // 
-            // panel2
+            // bClose
             // 
-            this.panel2.Controls.Add(this.splitContainer1);
-            this.panel2.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.panel2.Location = new System.Drawing.Point(0, 25);
-            this.panel2.Name = "panel2";
-            this.panel2.Size = new System.Drawing.Size(312, 711);
-            this.panel2.TabIndex = 3;
+            this.bClose.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.bClose.Image = global::CAM.Properties.Resources.cross;
+            this.bClose.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.bClose.Name = "bClose";
+            this.bClose.Size = new System.Drawing.Size(23, 22);
+            this.bClose.Text = "Закрыть Автокад";
+            this.bClose.Click += new System.EventHandler(this.bClose_Click);
             // 
             // processCommandBindingSource
             // 
@@ -338,5 +350,6 @@
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
         private System.Windows.Forms.ToolStripButton bSwapOuterSide;
         private System.Windows.Forms.ToolStripButton bSendProgramm;
+        private System.Windows.Forms.ToolStripButton bClose;
     }
 }

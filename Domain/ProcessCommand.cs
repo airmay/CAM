@@ -24,6 +24,8 @@ namespace CAM.Domain
 
         public string Param2 { get; set; }
 
+        public ProcessCommand() { }
+            
         public ProcessCommand(Curve toolpathCurve) => _toolpathCurve = toolpathCurve;
 
         public Curve _toolpathCurve;
