@@ -6,7 +6,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Runtime.Serialization.Formatters.Binary;
 
 namespace CAM
 {
@@ -15,8 +14,6 @@ namespace CAM
     /// </summary>
     public static class Acad
     {
-        public const string ProcessLayerName = "Обработка";
-
         public static Document Document => Application.DocumentManager.MdiActiveDocument;
 
         public static Database Database => Application.DocumentManager.MdiActiveDocument.Database;
@@ -44,11 +41,7 @@ namespace CAM
 
         public static void SaveCurves(IEnumerable<Curve> entities)
         {
-            App.LockAndExecute(() =>
-            {                
-                var layerId = DbHelper.GetLayerId(ProcessLayerName);
-                entities.Select(p => { p.LayerId = layerId; return p; }).AddToCurrentSpace();
-            });
+            App.LockAndExecute(() => entities.Select(p => { p.LayerId = ProcessLayer.Value; return p; }).AddToCurrentSpace());
         }
 
         public static void DeleteCurves(IEnumerable<Curve> curves)
@@ -86,17 +79,27 @@ namespace CAM
         {
             App.LockAndExecute(() =>
             {
-                if (_highlightedObjects.Any())
-                    Interaction.UnhighlightObjects(_highlightedObjects);
-                if (objectIds.Any())
-                    Interaction.HighlightObjects(objectIds);
+                try
+                {
+                    if (_highlightedObjects.Any())
+                        Interaction.UnhighlightObjects(_highlightedObjects);
+                    if (objectIds.Any())
+                        Interaction.HighlightObjects(objectIds);
+                }
+                catch { }
                 _highlightedObjects = objectIds;
             });
             Editor.UpdateScreen();
-        } 
+        }
         #endregion
 
-        public static void DeleteProcessLayer()
+        #region Layers
+        public const string ProcessLayerName = "Обработка";
+        public static Lazy<ObjectId> ProcessLayer = new Lazy<ObjectId>(() => DbHelper.GetLayerId(ProcessLayerName));
+        public const string HatchLayerName = "Штриховка";
+        public static Lazy<ObjectId> HatchLayer = new Lazy<ObjectId>(() => GetHatchLayerId());
+
+        public static void DeleteAll()
         {
             App.LockAndExecute(() =>
             {
@@ -108,7 +111,33 @@ namespace CAM
                     ids.QForEach(entity => entity.Erase());
                     layerTable[ProcessLayerName].Erase();
                 }
+                if (layerTable.Has(HatchLayerName))
+                {
+                    HostApplicationServices.WorkingDatabase.Clayer = layerTable["0"];
+                    var ids = QuickSelection.SelectAll(FilterList.Create().Layer(HatchLayerName));
+                    ids.QForEach(entity => entity.Erase());
+                    layerTable[HatchLayerName].Erase();
+                }
             });
         }
+
+        public static ObjectId GetHatchLayerId()
+        {
+            var layerId = DbHelper.GetLayerId(HatchLayerName);
+            layerId.QOpenForWrite<LayerTableRecord>(layer => layer.Transparency = new Autodesk.AutoCAD.Colors.Transparency(255 * (100 - 70) / 100));
+            return layerId;
+        }
+
+        public static void DeleteHatch()
+        {
+            App.LockAndExecute(() =>
+            {
+                var ids = QuickSelection.SelectAll(FilterList.Create().Layer(HatchLayerName));
+                if (ids.Any())
+                    ids.QForEach(entity => entity.Erase());
+            });
+        }
+
+        #endregion
     }
 }

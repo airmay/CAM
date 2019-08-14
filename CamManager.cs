@@ -18,7 +18,7 @@ namespace CAM
 
         private Dictionary<Document, CamDocument> _documents = new Dictionary<Document, CamDocument>();
 
-        private List<TechProcess> TechProcessList;
+        public List<TechProcess> TechProcessList;
         private TechProcess _currentTechProcess;
 
         public void SetActiveDocument(Document document)
@@ -50,7 +50,7 @@ namespace CAM
             if (e.GlobalCommandName == "CLOSE" || e.GlobalCommandName == "QUIT")
             {
                 _documents[sender as Document].TechProcessList.ForEach(p => p.DeleteToolpath());
-                Acad.DeleteProcessLayer();
+                Acad.DeleteAll();
                 TechProcessView.ClearCommandsView();
                 _documents[sender as Document].SaveTechProsess();
             }
@@ -91,6 +91,7 @@ namespace CAM
 
         public void DeleteTechProcess(TechProcess techProcess)
         {
+            Acad.DeleteHatch();
             Acad.DeleteCurves(techProcess.ToolpathCurves);
             TechProcessList.Remove(techProcess);
         }
@@ -146,8 +147,8 @@ namespace CAM
             if (to?.ProcessingArea is BorderProcessingArea border)
             {
                 border.OuterSide = border.OuterSide.Swap();
-                to.TechProcess.ProcessBorders(border);
-                BuildProcessing(to.TechProcess);
+                to.TechProcess.BuildProcessing(border);
+                TechProcessView.RefreshView();
             }
         }
     }
