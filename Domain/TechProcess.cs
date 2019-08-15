@@ -118,7 +118,6 @@ namespace CAM.Domain
                 fixedSideBorder = null;
                 if (startBorder.OuterSide == Side.None)
                     CalcOuterSide(startBorder);
-                var sign = startBorder.OuterSide == Side.Left ? 1 : -1;
                 var contour = CalcBordersChain(Corner.End);
                 if (borders.Contains(startBorder))
                 {
@@ -129,6 +128,7 @@ namespace CAM.Domain
                     contour = contourBack;
                     borders.Remove(startBorder);
                 }
+                var sign = startBorder.OuterSide == Side.Left ? 1 : -1;
                 Graph.CreateHatch(contour, sign);
             }
 

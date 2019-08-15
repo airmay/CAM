@@ -18,7 +18,7 @@ namespace CAM
 
         private Dictionary<Document, CamDocument> _documents = new Dictionary<Document, CamDocument>();
 
-        public List<TechProcess> TechProcessList;
+        private List<TechProcess> TechProcessList;
         private TechProcess _currentTechProcess;
 
         public void SetActiveDocument(Document document)
