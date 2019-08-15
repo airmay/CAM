@@ -14,6 +14,8 @@ namespace CAM
     /// </summary>
     public static class Graph
     {
+        internal static double DegToRad(double angle) => angle * Math.PI / 180;
+
         public static double Length(this Curve curve)
         {
             switch (curve)
@@ -25,7 +27,22 @@ namespace CAM
                     return arc.Length;
 
                 default:
-                    throw new ArgumentException($"Некорректный тип кривой {curve.GetType()}");
+                    throw new ArgumentException($"Тип кривой не поддерживается: {curve.GetType()}");
+            }
+        }
+
+        public static Vector2d GetTangent(this Curve curve, Point3d point = default)
+        {
+            switch (curve)
+            {
+                case Line line:
+                    return new Vector2d(line.Delta.X, line.Delta.Y).GetNormal();
+
+                case Arc arc:
+                    return new Vector2d(point.X - arc.Center.X, point.Y - arc.Center.Y).GetNormal().GetPerpendicularVector();
+
+                default:
+                    throw new ArgumentException($"Тип кривой не поддерживается: {curve.GetType()}");
             }
         }
 
@@ -46,6 +63,8 @@ namespace CAM
             else
                 curve.EndPoint = point;
         }
+
+        public static Vector2d GetVector2d(this Line line) => new Vector2d(line.Delta.X, line.Delta.Y);
 
         public static double AngleRad(this Line line) => Math.Round(line.Angle, 6);
 
@@ -102,7 +121,7 @@ namespace CAM
                 hatch.Normal = new Vector3d(0, 0, 1);
                 hatch.Elevation = 0.0;
                 hatch.Associative = false;
-                hatch.PatternScale = 5;
+                hatch.PatternScale = 4;
                 hatch.SetHatchPattern(HatchPatternType.PreDefined, "ANSI31");
                 //hatch.PatternAngle = angle; // PatternAngle has to be after SetHatchPattern(). This is AutoCAD .NET SDK violating Framework Design Guidelines, which requires properties to be set in arbitrary order.
                 hatch.HatchStyle = HatchStyle.Outer;

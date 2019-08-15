@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Autodesk.AutoCAD.DatabaseServices;
+using Autodesk.AutoCAD.Geometry;
 using Dreambuild.AutoCAD;
 
 namespace CAM.Domain
@@ -148,7 +149,7 @@ namespace CAM.Domain
                         ? border.IsExactly(corner)
                         : (!nextBorder.IsAutoExactly(nextCorner)
                             ? nextBorder.IsExactly(nextCorner)
-                            : CalcIsExactly(border, corner, nextBorder, nextCorner));
+                            : CalcIsExactly(border, corner, nextBorder, nextCorner, point));
                     border.IsExactly(corner) = nextBorder.IsExactly(nextCorner) = isExactly;
 
                     if (nextBorder == startBorder) // цикл
@@ -165,44 +166,14 @@ namespace CAM.Domain
                 return contour;
             }
 
-            bool CalcIsExactly(BorderProcessingArea border, Corner corner, BorderProcessingArea nextBorder, Corner nextCorner)
+            bool CalcIsExactly(BorderProcessingArea border, Corner corner, BorderProcessingArea nextBorder, Corner nextCorner, Point3d point)
             {
-                // TODO  угол касательной
-                switch (border.Curve)
-                {
-                    case Line line:
-                        bool isLeftTurn;
-                        switch (nextBorder.Curve)
-                        {
-                            case Line nextLine:
-                                var angleDiff = nextLine.Angle - line.Angle;
-                                if (Math.Abs(angleDiff) < Consts.Epsilon)
-                                    return false;
-                                isLeftTurn = Math.Sin(angleDiff) > 0;
-                                var isLeftOuterSide = border.OuterSide == Side.Left;
-                                var isNextStartPoint = nextCorner == Corner.Start;
-                                return isLeftTurn ^ isLeftOuterSide ^ isNextStartPoint;
-
-                            case Arc nextArc:
-                                var angleTan = nextCorner == Corner.Start
-                                    ? nextArc.StartAngle + Math.PI / 2
-                                    : nextArc.EndAngle - Math.PI / 2;
-                                angleDiff = angleTan - line.Angle;
-                                isLeftTurn = Math.Abs(angleDiff) > Consts.Epsilon
-                                    ? Math.Sin(angleDiff) > 0
-                                    : nextCorner == Corner.Start;
-                                var isRightProcessSide = border.OuterSide == Side.Right;
-                                return isLeftTurn ^ isRightProcessSide;
-                        }
-
-                        break;
-                    case Arc arc:
-                        if (nextBorder.Curve is Line)
-                            return CalcIsExactly(nextBorder, nextCorner, border, corner);
-                        break;
-                }
-
-                throw new InvalidOperationException("CalcIsExactly throw Error");
+                var v1 = border.Curve.GetTangent(point);
+                var v2 = nextBorder.Curve.GetTangent(point);
+                var isLeftTurn = v1.MinusPiToPiAngleTo(v2) > Consts.Epsilon;
+                var isLeftOuterSide = border.OuterSide == Side.Left;
+                var isNextStartPoint = nextCorner == Corner.Start;
+                return isLeftTurn ^ isLeftOuterSide ^ isNextStartPoint;
             }
 
             void CalcOuterSide(BorderProcessingArea border)
