@@ -41,7 +41,11 @@ namespace CAM
 
         public static void SaveCurves(IEnumerable<Curve> entities)
         {
-            App.LockAndExecute(() => entities.Select(p => { p.LayerId = ProcessLayer.Value; return p; }).AddToCurrentSpace());
+            App.LockAndExecute(() =>
+            {
+                var layerId = GetProcessLayerId();
+                entities.Select(p => { p.LayerId = layerId; return p; }).AddToCurrentSpace();
+            });
         }
 
         public static void DeleteCurves(IEnumerable<Curve> curves)
@@ -95,9 +99,21 @@ namespace CAM
 
         #region Layers
         public const string ProcessLayerName = "Обработка";
-        public static Lazy<ObjectId> ProcessLayer = new Lazy<ObjectId>(() => DbHelper.GetLayerId(ProcessLayerName));
+
+        public static ObjectId GetProcessLayerId() => DbHelper.GetLayerId(ProcessLayerName);
+
         public const string HatchLayerName = "Штриховка";
-        public static Lazy<ObjectId> HatchLayer = new Lazy<ObjectId>(() => GetHatchLayerId());
+
+        public static ObjectId GetHatchLayerId()
+        {
+            var layerId = DbHelper.GetSymbolTableRecord(HostApplicationServices.WorkingDatabase.LayerTableId, HatchLayerName, ObjectId.Null);
+            if (layerId == ObjectId.Null)
+            {
+                layerId = DbHelper.GetLayerId(HatchLayerName);
+                layerId.QOpenForWrite<LayerTableRecord>(layer => layer.Transparency = new Autodesk.AutoCAD.Colors.Transparency(255 * (100 - 70) / 100));
+            }
+            return layerId;
+        }
 
         public static void DeleteAll()
         {
@@ -119,13 +135,6 @@ namespace CAM
                     layerTable[HatchLayerName].Erase();
                 }
             });
-        }
-
-        public static ObjectId GetHatchLayerId()
-        {
-            var layerId = DbHelper.GetLayerId(HatchLayerName);
-            layerId.QOpenForWrite<LayerTableRecord>(layer => layer.Transparency = new Autodesk.AutoCAD.Colors.Transparency(255 * (100 - 70) / 100));
-            return layerId;
         }
 
         public static void DeleteHatch()

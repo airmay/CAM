@@ -107,6 +107,7 @@ namespace CAM
                             }
                         tr.Commit();
                     }
+                    _hash = newHash;
                 }
             }
             catch (Exception e)

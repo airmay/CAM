@@ -47,7 +47,7 @@ namespace CAM
 
         private void Document_CommandWillStart(object sender, CommandEventArgs e)
         {
-            if (e.GlobalCommandName == "CLOSE" || e.GlobalCommandName == "QUIT")
+            if (e.GlobalCommandName == "CLOSE" || e.GlobalCommandName == "QUIT" || e.GlobalCommandName == "QSAVE" || e.GlobalCommandName == "SAVEAS")
             {
                 _documents[sender as Document].TechProcessList.ForEach(p => p.DeleteToolpath());
                 Acad.DeleteAll();

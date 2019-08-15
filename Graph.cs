@@ -116,7 +116,7 @@ namespace CAM
                 space.AppendEntity(hatch);
                 trans.AddNewlyCreatedDBObject(hatch, true);
 
-                hatch.LayerId = Acad.HatchLayer.Value;
+                hatch.LayerId = Acad.GetHatchLayerId();
                 hatch.SetDatabaseDefaults();
                 hatch.Normal = new Vector3d(0, 0, 1);
                 hatch.Elevation = 0.0;
