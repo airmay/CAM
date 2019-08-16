@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Xml.Serialization;
 
@@ -12,13 +13,13 @@ namespace CAM
     /// </summary>
     public class Settings
     {
+        #region static
         private static Settings _instance;
 
         public static Settings Instance => _instance ?? (_instance = Load());
 
         private static string GetFilePath => Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "settings.xml");
 
-        #region static methods
 
         /// <summary>
         /// Загрузить данные из файла в контейнер
@@ -66,6 +67,28 @@ namespace CAM
 
         #endregion
 
+        #region Machines
+        public Machine[] Machines { get; set; } = new Machine[]
+        {
+            new Machine
+            {
+                Type = MachineType.ScemaLogic,
+                ProgramPath = @"\\CATALINA\public\Программы станок\CodeRepository"
+                // @"\\192.168.137.59\ssd\Automatico\";
+            }
+        };
+
+        public static Machine GetMachineSettings(MachineType type) => Instance.Machines.Single(p => p.Type == type);
+
+        public class Machine
+        {
+            public MachineType Type { get; set; }
+
+            public string ProgramPath { get; set; }
+        }
+
+        #endregion
+
         public List<Tool> Tools { get; set; }
 
         public TechProcessParams TechProcessParams { get; set; }
@@ -74,7 +97,7 @@ namespace CAM
 
         public SawingTechOperationParams SawingLineTechOperationParams { get; set; }
 
-        public SawingTechOperationParams SawingCurveTechOperationParams { get; set; } 
+        public SawingTechOperationParams SawingCurveTechOperationParams { get; set; }
 
         #endregion
     }

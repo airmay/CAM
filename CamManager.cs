@@ -121,8 +121,7 @@ namespace CAM
                 return;
             }
             var fileName = $"{_currentTechProcess.Name}.csv";
-            //var filePath = @"\\192.168.137.59\ssd\Automatico\";
-            var filePath = @"\\CATALINA\public\Программы станок\CodeRepository";
+            var filePath = Settings.GetMachineSettings(_currentTechProcess.TechProcessParams.Machine).ProgramPath;
             var fullPath = Path.Combine(filePath, fileName);
             try
             {

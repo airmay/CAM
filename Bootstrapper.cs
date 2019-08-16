@@ -43,7 +43,7 @@ namespace CAM
 
         public void Terminate()
         {
-            //Settings.Save();
+            Settings.Save();
         }
     }
 }

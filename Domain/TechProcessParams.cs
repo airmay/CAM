@@ -8,7 +8,7 @@ namespace CAM.Domain
     [Serializable]
     public class TechProcessParams
 	{
-		public Machine Machine { get; set; }
+		public MachineType Machine { get; set; }
 
 		public Material Material { get; set; }
 
@@ -57,7 +57,7 @@ namespace CAM.Domain
 		Гранит
 	}
 
-	public enum Machine
+	public enum MachineType
 	{
 		ScemaLogic,
 

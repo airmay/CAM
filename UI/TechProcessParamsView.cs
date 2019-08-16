@@ -20,7 +20,7 @@ namespace CAM.UI
         {
             InitializeComponent();
 
-	        cbMachine.DataSource = Enum.GetValues(typeof(Machine));
+	        cbMachine.DataSource = Enum.GetValues(typeof(MachineType));
 			cbMaterial.DataSource = Enum.GetValues(typeof(Material));
         }
 
