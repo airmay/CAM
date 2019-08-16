@@ -88,12 +88,12 @@
     <Compile Include="Domain\CommandCode.cs" />
     <Compile Include="Domain\CommandNames.cs" />
     <Compile Include="Domain\Corner.cs" />
-    <Compile Include="Domain\ProcessBuilder.cs" />
     <Compile Include="Domain\ProcessCommand.cs" />
     <Compile Include="Domain\ProcessingArea\ArcProcessingArea.cs" />
     <Compile Include="Domain\ProcessingArea\BorderProcessingArea.cs" />
     <Compile Include="Domain\SawingTechOperation\ITechOperationFactory.cs" />
     <Compile Include="Domain\SawingTechOperation\SawingDefaultParams.cs" />
+    <Compile Include="Domain\ScemaLogicProcessBuilder.cs" />
     <Compile Include="Domain\ScemaLogicProgramGenerator.cs" />
     <Compile Include="Settings.cs" />
     <Compile Include="Domain\TechOperationType.cs" />
