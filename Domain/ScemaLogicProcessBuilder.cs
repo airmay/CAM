@@ -1,10 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Security.Policy;
-using System.Text;
-using System.Threading.Tasks;
-using Autodesk.AutoCAD.ApplicationServices;
 using Autodesk.AutoCAD.Colors;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
@@ -32,7 +28,7 @@ namespace CAM.Domain
             [CommandNames.Fast] = Color.FromColor(System.Drawing.Color.Crimson)
         };
         private Curve _curve;
-        private Point3d _currentPoint = Point3d.Origin;
+        private Point3d _currentPoint = Algorithms.NullPoint3d;
         private Corner _corner;
 	    private double _startIndent;
 	    private double _endIndent;
@@ -42,10 +38,11 @@ namespace CAM.Domain
         private List<ProcessCommand> ProcessCommands { get; } = new List<ProcessCommand>();
         private List<ProcessCommand> TechOperationCommands { get; set; }
 
-	    public ScemaLogicProcessBuilder(TechProcessParams techProcessParams)
+        #region Start/Stop
+        public ScemaLogicProcessBuilder(TechProcessParams techProcessParams)
         {
-	        _techProcessParams = techProcessParams;
-            var name = "Setup";
+            _techProcessParams = techProcessParams;
+            var name = "";
             CreateCommand(name, 98);
             CreateCommand(name, 97, 2, feed: 1);
             CreateCommand(name, 17, axis: "XYCZ");
@@ -60,96 +57,97 @@ namespace CAM.Domain
             TechOperationCommands = new List<ProcessCommand>();
         }
 
-        private static Curve CreateToolpathCurve(Curve curve, double offset, double z, double startIndent, double endIndent)
-	    {
-		    var toolpathCurve = curve.GetOffsetCurves(offset)[0] as Curve; //, z)[0];
-            //var copy = entity.Clone() as Entity;
-            toolpathCurve.TransformBy(Matrix3d.Displacement(Vector3d.ZAxis * z));
+        /// <summary>
+        /// Завершение операции
+        /// </summary>
+        /// <returns></returns>
+        public List<ProcessCommand> FinishTechOperation()
+        {
+            Move(CommandNames.Uplifting, 0, "XYZ", 0, _techProcessParams.ZSafety);
+            ProcessCommands.AddRange(TechOperationCommands);
+            var result = TechOperationCommands;
+            TechOperationCommands = null;
+            return result;
+        }
+
+        public List<ProcessCommand> FinishTechProcess()
+        {
+            var name = "";
+            CreateCommand(name, 97, 9);
+            CreateCommand(name, 97, 10);
+            CreateCommand(name, 97, 5);
+            CreateCommand(name, 97, 30);
+
+            return ProcessCommands;
+        }
+        #endregion
+
+        /// <summary>
+        /// Рабочий ход
+        /// </summary>
+        /// <param name="z"></param>
+        /// <param name="offset"></param>
+        /// <param name="feed"></param>
+        public void Cutting(int feed, double z = 0, double offset = 0)
+        {
+            var toolpathCurve = CreateToolpathCurve(_curve, offset + _compensation, z, _startIndent, _endIndent);
+            var destPoint = toolpathCurve.GetPoint(_corner);
+            if (!TechOperationCommands.Any())
+                InitMove();
+
+            Move(CommandNames.Penetration, 1, "XYCZ", _techProcessParams.PenetrationRate, z, destPoint.X, destPoint.Y, CalcToolAngle(toolpathCurve, destPoint));
+
+            _corner = _corner.Swap();
+            _currentPoint = toolpathCurve.GetPoint(_corner);
 
             switch (toolpathCurve)
             {
-                case Line line:
-                    line.StartPoint = line.GetPointAtDist(startIndent);
-                    line.EndPoint = line.GetPointAtDist(line.Length - endIndent);
+                case Line _:
+                    CreateCommand(CommandNames.Cutting, 1, axis: "XYCZ", feed: feed, x: _currentPoint.X, y: _currentPoint.Y, param1: CalcToolAngle(toolpathCurve, _currentPoint), param2: _currentPoint.Z, toolpathCurve: toolpathCurve);
                     break;
-
                 case Arc arc:
-                    arc.StartAngle = arc.StartAngle + startIndent / ((Arc)curve).Radius;
-                    arc.EndAngle = arc.EndAngle - endIndent / ((Arc)curve).Radius;
-
-                    if ((arc.StartAngle >= 0.5 * Math.PI && arc.StartAngle < 1.5 * Math.PI) ^ (arc.EndAngle > 0.5 * Math.PI && arc.EndAngle <= 1.5 * Math.PI))
-                        throw new InvalidOperationException($"Обработка дуги невозможна - дуга пересекает угол 90 или 270 градусов. Текущие углы: начальный {ToDeg(arc.StartAngle)}, конечный {ToDeg(arc.EndAngle)}");
-                    
+                    var code = _corner == Corner.Start ? 2 : 3;
+                    CreateCommand(CommandNames.Cutting, code, axis: "XYCZ", feed: feed, x: _currentPoint.X, y: _currentPoint.Y, param1: arc.Center.X, param2: arc.Center.Y, toolpathCurve: toolpathCurve);
                     break;
-            }
-            toolpathCurve.Color = Colors[CommandNames.Cutting];
-            return toolpathCurve;
-	    }
-
-	    //private double[] CalcToolAngles(Curve curve)
-     //   {
-     //       var angles = new double[2];
-     //       switch (curve)
-     //       {
-     //           case Line line:
-     //               angles[0] = angles[1] = ToDeg((Math.PI * 2 - line.Angle) % Math.PI);
-     //               break;
-     //           case Arc arc:
-					//if (arc.StartAngle < Math.PI / 2 && arc.EndAngle > Math.PI / 2 || arc.StartAngle < Math.PI * 3 / 2 && arc.EndAngle > Math.PI * 3 / 2)
-					//	throw new Exception($"Обработка дуги невозможна - дуга пересекает угол 90 или 270 градусов. Текущие углы: начальный {ToDeg(arc.StartAngle)}, конечный {ToDeg(arc.EndAngle)}");
-
-					//angles[(int)Corner.Start] = (arc.StartAngle - Math.PI / 2) % Math.PI == 0 ? 180 : Calc(arc.StartAngle);
-     //               angles[(int)Corner.End] = Calc(arc.EndAngle);
-     //               break;
-     //           default:
-     //               throw new Exception($"Неподдерживаемый тип кривой {curve.GetType()}");
-     //       }
-     //       return angles;
-
-     //       double Calc(double angle) => ToDeg((Math.PI * 2.5 - angle) % Math.PI);
-     //   }
-
-	    private static double CalcToolAngle(Curve curve, Corner corner)
-        {
-			switch (curve)
-            {
-                case Line line:
-                    return ToDeg((Math.PI * 2 - line.AngleRad()) % Math.PI);
-                case Arc arc:
-	                return corner == Corner.Start
-		                ? (arc.StartAngle - Math.PI / 2) % Math.PI == 0 ? 180 : Calc(arc.StartAngle)
-		                : Calc(arc.EndAngle);
                 default:
-                    throw new Exception($"Неподдерживаемый тип кривой {curve.GetType()}");
+                    throw new Exception($"Неподдерживаемый тип кривой {toolpathCurve.GetType()}");
             }
-            double Calc(double angle) => ToDeg((Math.PI * 2.5 - angle) % Math.PI);
+
+            void InitMove()
+            {
+                var name = _currentPoint.IsNull() ? CommandNames.InitialMove : CommandNames.Fast;
+                CreateCommand(name, 0, axis: "XYC", feed: 0, x: destPoint.X, y: destPoint.Y, param1: CalcToolAngle(toolpathCurve, destPoint));
+                Move(name, 0, "XYZ", 0, _techProcessParams.ZSafety, destPoint.X, destPoint.Y);
+
+                if (name == CommandNames.InitialMove)
+                {
+                    name = "";
+                    CreateCommand(name, 97, 7);
+                    CreateCommand(name, 97, 8);
+                    CreateCommand(name, 97, 3, feed: _techProcessParams.Frequency);
+                }
+                CreateCommand("Цикл", 28, axis: "XYCZ");  // цикл
+            }
         }
 
-        //public void SetTool(double x, double y, double c)
-        //{
-        //    string name = _currentPoint == Point3d.Origin ? CommandNames.InitialMove : CommandNames.Fast;
-        //    Line line = null;
-        //    var z = _techProcessParams.ZSafety;
-        //    var destPoint = new Point3d(x, y, z);
-        //    if (_currentPoint != Point3d.Origin)
-        //    CreateCommand(name, "0", line, "XYC", 0, x, y, c);
-        //    CreateCommand(name, "0", line, "XYZ", 0, x, y, z);
-        //    if (_currentPoint == Point3d.Origin)
-        //    {
-        //        name = "Setup";
-        //        CreateCommand(name, "97;7");
-        //        CreateCommand(name, "97;8");
-        //        CreateCommand(name, "97;3", param: _techProcessParams.Frequency);
-        //    }
-        //    else
-        //    {
-        //        line = new Line(_currentPoint, destPoint);
-        //        line.ObjectId = new ObjectId(name);
-        //        Entities.Add(line);
-        //    }
-        //    CreateCommand("Setup", "28", axis: "XYCZ");  // цикл
-        //    _currentPoint = destPoint;
-        //}
+        private static double CalcToolAngle(Curve curve, Point3d point)
+        {
+            var tangent = curve.GetTangent(point);
+            if (!curve.IsUpward())
+                tangent = tangent.Negate();
+            return Graph.ToDeg(Math.PI - Graph.Round(tangent.Angle));
+        }
+
+        private void Move(string name, int code, string axis, int feed, double z, double? x = null, double? y = null, double? c = null)
+        {
+            // TODO проверка совпадения точек
+            var destPoint = new Point3d(x ?? _currentPoint.X, y ?? _currentPoint.Y, z);
+            var line = !_currentPoint.IsNull()
+                ? new Line(_currentPoint, destPoint) { Color = Colors[name] }
+                : null;
+            CreateCommand(name, code, axis: axis, feed: feed, x: destPoint.X, y: destPoint.Y, param1: c ?? z, param2: c.HasValue ? (double?)z : null, toolpathCurve: line);
+            _currentPoint = destPoint;
+        }
 
         private void CreateCommand(string name, int gCode, int? mCode = null, string axis = null, int? feed = null, double? x = null, double? y = null, double? param1 = null, double? param2 = null, Curve toolpathCurve = null)
             => (TechOperationCommands ?? ProcessCommands).Add(new ProcessCommand(toolpathCurve)
@@ -169,120 +167,43 @@ namespace CAM.Domain
         //private static string GetParam(double? value, string paramName = null) => value.HasValue ? $" {paramName}{value:0.####}" : null;
         private static string Round(double? value) => value.HasValue ? Math.Round(value.Value, 4).ToString() : null;
 
-        /// <summary>
-        /// Завершение операции
-        /// </summary>
-        /// <returns></returns>
-        public List<ProcessCommand> FinishTechOperation()
-        {
-            Move(CommandNames.Uplifting, 0, "XYZ", 0, _techProcessParams.ZSafety);
-            ProcessCommands.AddRange(TechOperationCommands);
-            var result = TechOperationCommands;
-            TechOperationCommands = null;
-            return result;
-        }
-
-        public List<ProcessCommand> FinishTechProcess()
-        {
-            var name = "End";
-            CreateCommand(name, 97, 9);
-            CreateCommand(name, 97, 10);
-            CreateCommand(name, 97, 5);
-            CreateCommand(name, 97, 30);
-
-            return ProcessCommands;
-        }
-
-        /// <summary>
-        /// Заглубление
-        /// </summary>
-        /// <param name="z"></param>
-        //public void Penetration(double z) => Move(CommandNames.Penetration, "1", "XYCZ", _techProcessParams.PenetrationRate, z: z);
-
-	    private void Move(string name, int code, string axis, int feed, double z, double? x = null, double? y = null, double? c = null)
+        private static Curve CreateToolpathCurve(Curve curve, double offset, double z, double startIndent, double endIndent)
 	    {
-		    // TODO проверка совпадения точек
-		    var destPoint = new Point3d(x ?? _currentPoint.X, y ?? _currentPoint.Y, z);
-		    var line = _currentPoint != Point3d.Origin
-			    ? new Line(_currentPoint, destPoint) { Color = Colors[name] }
-			    : null;
-		    CreateCommand(name, code, axis: axis, feed: feed, x: destPoint.X, y: destPoint.Y, param1: c ?? z, param2: c.HasValue ? (double?)z : null, toolpathCurve: line);
-		    _currentPoint = destPoint;
-	    }
-
-	    /// <summary>
-        /// Рабочий ход
-        /// </summary>
-        /// <param name="z"></param>
-        /// <param name="offset"></param>
-        /// <param name="feed"></param>
-        public void Cutting(int feed, double z = 0, double offset = 0)
-        {
-	        var toolpathCurve = CreateToolpathCurve(_curve, offset + _compensation, z, _startIndent, _endIndent);
-	        if (!TechOperationCommands.Any())
-		        InitMove(toolpathCurve);
-
-	        Move(CommandNames.Penetration, 1, "XYCZ", _techProcessParams.PenetrationRate, z, toolpathCurve.GetPoint(_corner).X, toolpathCurve.GetPoint(_corner).Y, CalcToolAngle(toolpathCurve, _corner));
-
-	        _corner = _corner.Swap();
-            _currentPoint = toolpathCurve.GetPoint(_corner);
+		    var toolpathCurve = curve.GetOffsetCurves(offset)[0] as Curve; //, z)[0];
+            //var copy = entity.Clone() as Entity;
+            toolpathCurve.TransformBy(Matrix3d.Displacement(Vector3d.ZAxis * z));
 
             switch (toolpathCurve)
             {
-                case Line _:
-                    CreateCommand(CommandNames.Cutting, 1, axis: "XYCZ", feed: feed, x: _currentPoint.X, y: _currentPoint.Y, param1: CalcToolAngle(toolpathCurve, _corner), param2: _currentPoint.Z, toolpathCurve: toolpathCurve);
+                case Line line:
+                    line.StartPoint = line.GetPointAtDist(startIndent);
+                    line.EndPoint = line.GetPointAtDist(line.Length - endIndent);
                     break;
+
                 case Arc arc:
-                    var code = _corner == Corner.Start ? 2 : 3;
-                    CreateCommand(CommandNames.Cutting, code, axis: "XYCZ", feed: feed, x: _currentPoint.X, y: _currentPoint.Y, param1: arc.Center.X, param2: arc.Center.Y, toolpathCurve: toolpathCurve);
+                    arc.StartAngle = arc.StartAngle + startIndent / ((Arc)curve).Radius;
+                    arc.EndAngle = arc.EndAngle - endIndent / ((Arc)curve).Radius;
+                    var deltaStart = arc.StartPoint.X - arc.Center.X;
+                    var deltaEnd = arc.EndPoint.X - arc.Center.X;
+                    // if ((arc.StartAngle >= 0.5 * Math.PI && arc.StartAngle < 1.5 * Math.PI) ^ (arc.EndAngle > 0.5 * Math.PI && arc.EndAngle <= 1.5 * Math.PI))
+                    if ((Math.Abs(deltaStart) > Consts.Epsilon && Math.Abs(deltaEnd) > Consts.Epsilon && (deltaStart > 0 ^ deltaEnd > 0)) || (arc.TotalAngle > Math.PI + Consts.Epsilon))
+                        throw new InvalidOperationException(
+                            $"Обработка дуги невозможна - дуга пересекает угол 90 или 270 градусов. Текущие углы: начальный {Graph.ToDeg(arc.StartAngle)}, конечный {Graph.ToDeg(arc.EndAngle)}");                  
                     break;
-                default:
-                    throw new Exception($"Неподдерживаемый тип кривой {toolpathCurve.GetType()}");
             }
+            toolpathCurve.Color = Colors[CommandNames.Cutting];
+            return toolpathCurve;
+	    }
+
+        public double CalcCompensation(Side outerSide, double depth)
+        {
+            var offset = 0d;
+            if (_curve.IsUpward() ^ outerSide == Side.Left)
+                offset = _techProcessParams.ToolThickness;
+            if (_curve is Arc arc && outerSide == Side.Left)
+                offset += arc.Radius - Math.Sqrt(arc.Radius * arc.Radius - depth * (_techProcessParams.ToolDiameter - depth));
+            return _compensation = outerSide == Side.Left ^ _curve is Arc ? offset : -offset;
         }
-
-	    private void InitMove(Curve toolpathCurve)
-	    {
-		    var name = _currentPoint == Point3d.Origin ? CommandNames.InitialMove : CommandNames.Fast;
-		    var destPoint = _corner == Corner.Start ? toolpathCurve.StartPoint : toolpathCurve.EndPoint;
-
-		    CreateCommand(name, 0, axis: "XYC", feed: 0, x: destPoint.X, y: destPoint.Y, param1: CalcToolAngle(toolpathCurve, _corner));
-		    Move(name, 0, "XYZ", 0, _techProcessParams.ZSafety, destPoint.X, destPoint.Y);
-
-		    if (name == CommandNames.InitialMove)
-		    {
-			    name = "SetupTechOperation";
-			    CreateCommand(name, 97, 7);
-			    CreateCommand(name, 97, 8);
-			    CreateCommand(name, 97, 3, feed: _techProcessParams.Frequency);
-		    }
-		    CreateCommand("Cycle", 28, axis: "XYCZ");  // цикл
-	    }
-
-		private static double ToDeg(double angle) => angle * 180 / Math.PI;
-
-	    public double CalcCompensation(Side outerSide, double depth)
-	    {
-		    var hasToolOffset = false;
-		    var d = 0D;
-
-		    switch (_curve)
-		    {
-			    case Line line:
-					hasToolOffset = (line.Angle > 0 && line.Angle <= Math.PI) ^ (outerSide == Side.Left);
-					break;
-			    case Arc arc:
-                    var angle = (arc.GetPointAtDist(arc.Length/2) - arc.Center).ToVector2d().Angle;
-                    hasToolOffset = (angle >= 0.5 * Math.PI && angle < 1.5 * Math.PI) ^ (outerSide == Side.Right);
-                    //hasToolOffset = (arc.StartAngle >= 0.5 * Math.PI && arc.StartAngle < 1.5 * Math.PI) ^ (outerSide == Side.Right);
-				    if (outerSide == Side.Left)
-					    d = arc.Radius - Math.Sqrt(arc.Radius * arc.Radius - depth * (_techProcessParams.ToolDiameter - depth));
-				    break;
-		    }
-		    double sign = outerSide == Side.Left ^ _curve is Arc ? 1 : -1;
-
-		    return _compensation = sign * ((hasToolOffset ? _techProcessParams.ToolThickness : 0) + d);
-	    }
 
 	    public double CalcIndent(bool isExactlyBegin, bool isExactlyEnd, int depth)
 	    {

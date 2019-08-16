@@ -1,6 +1,4 @@
-﻿using Autodesk.AutoCAD.ApplicationServices;
-using Autodesk.AutoCAD.DatabaseServices;
-using Autodesk.AutoCAD.EditorInput;
+﻿using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
 using CAM.Domain;
 using Dreambuild.AutoCAD;
@@ -14,36 +12,27 @@ namespace CAM
     /// </summary>
     public static class Graph
     {
-        internal static double DegToRad(double angle) => angle * Math.PI / 180;
+        internal static double ToRad(double angle) => angle * Math.PI / 180;
 
-        public static double Length(this Curve curve)
+        internal static double ToDeg(double angle) => angle * 180 / Math.PI;
+
+        internal static double Round(this double val) => Math.Round(val, 6);
+
+        public static double Length(this Curve curve) => curve.GetDistanceAtParameter(curve.EndParam) - curve.GetDistanceAtParameter(curve.StartParam);
+
+        public static Vector2d GetTangent(this Curve curve, Point3d point) => curve.GetFirstDerivative(point).ToVector2d();
+
+        /// <summary>
+        /// Кривая направлена вверх
+        /// </summary>
+        /// <param name="curve"></param>
+        /// <returns></returns>
+        public static bool IsUpward(this Curve curve)
         {
-            switch (curve)
-            {
-                case Line line:
-                    return line.Length;
-
-                case Arc arc:
-                    return arc.Length;
-
-                default:
-                    throw new ArgumentException($"Тип кривой не поддерживается: {curve.GetType()}");
-            }
-        }
-
-        public static Vector2d GetTangent(this Curve curve, Point3d point = default)
-        {
-            switch (curve)
-            {
-                case Line line:
-                    return new Vector2d(line.Delta.X, line.Delta.Y).GetNormal();
-
-                case Arc arc:
-                    return new Vector2d(point.X - arc.Center.X, point.Y - arc.Center.Y).GetNormal().GetPerpendicularVector();
-
-                default:
-                    throw new ArgumentException($"Тип кривой не поддерживается: {curve.GetType()}");
-            }
+            var tangent = curve.GetTangent(curve.StartPoint);
+            return Math.Abs(tangent.Y) > Consts.Epsilon
+                ? tangent.Y > 0
+                : tangent.X > 0;
         }
 
         public static Point3d GetPoint(this Curve curve, Corner corner) => corner == Corner.Start ? curve.StartPoint : curve.EndPoint;

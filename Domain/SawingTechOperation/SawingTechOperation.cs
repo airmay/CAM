@@ -1,10 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Autodesk.AutoCAD.DatabaseServices;
 
 namespace CAM.Domain
 {
@@ -59,19 +54,12 @@ namespace CAM.Domain
 
             bool oddPassCount = false;
             Calculate(false);
-            Corner startCorner = Corner.Start;
-            switch (ProcessingArea.Curve)
-            {
-                case Line line:
-                    startCorner = (line.Angle > 0 && line.Angle <= Math.PI) ^ oddPassCount ? Corner.End : Corner.Start;
-                    break;
 
-                case Arc arc:
-                    startCorner = (arc.StartAngle >= 0.5 * Math.PI && arc.StartAngle < 1.5 * Math.PI) ^ oddPassCount ? Corner.Start : Corner.End;
-                    break;
-            }
+            var startCorner = ProcessingArea.Curve.IsUpward() ^ oddPassCount ? Corner.End : Corner.Start;
+
             builder.StartTechOperation(ProcessingArea.Curve, startCorner);
             TechOperationParams.Compensation = builder.CalcCompensation(border.OuterSide, thickness);
+
             Calculate(true);
 
             ProcessCommands = builder.FinishTechOperation();
