@@ -92,7 +92,7 @@ namespace CAM.UI
 			        if (_borderProcessingAreaView != null)
 			        {
 				        _borderProcessingAreaView.Visible = techOperation.ProcessingArea is BorderProcessingArea;
-				        if (_borderProcessingAreaView.Visible)
+				        if (techOperation.ProcessingArea is BorderProcessingArea)
 					        _borderProcessingAreaView.SetDataSource(techOperation.ProcessingArea as BorderProcessingArea);
 			        }
 

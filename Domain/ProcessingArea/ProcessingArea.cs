@@ -62,15 +62,15 @@ namespace CAM.Domain
         /// Изменение обрабатываемой области
         /// </summary>
         /// <param name="curve">Графический примитива автокада представляющий область</param>
-        public void Modify(Curve curve)
-        {
-            //Contract.
-            if (curve.ObjectId != AcadObjectId)
-                throw new ArgumentException("Обрабатываемая область не соответствует полученной кривой");
+        //public void Modify(Curve curve)
+        //{
+        //    //Contract.
+        //    if (curve.ObjectId != AcadObjectId)
+        //        throw new ArgumentException("Обрабатываемая область не соответствует полученной кривой");
 
-            //Set(curve);
-            var h = curve.Handle;
-        }
+        //    //Set(curve);
+        //    var h = curve.Handle;
+        //}
 
         /// <summary>
         /// Заполнение параметров обрабатываемой области в соответствии с полученной кривой

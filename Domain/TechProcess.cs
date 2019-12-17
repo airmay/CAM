@@ -161,15 +161,15 @@ namespace CAM.Domain
                 }
 
                 // свободный конец цепочки
-                if (!borders.Contains(border) && border.IsAutoExactly(corner))
+                if (border.IsAutoExactly(corner))
                     border.IsExactly(corner) = false;
                 return contour;
             }
 
             bool CalcIsExactly(BorderProcessingArea border, Corner corner, BorderProcessingArea nextBorder, Corner nextCorner, Point3d point)
             {
-                var v1 = border.Curve.GetTangent(point);
-                var v2 = nextBorder.Curve.GetTangent(point);
+                var v1 = border.Curve.GetTangent(corner);
+                var v2 = nextBorder.Curve.GetTangent(nextCorner);
                 var isLeftTurn = v1.MinusPiToPiAngleTo(v2) > Consts.Epsilon;
                 var isLeftOuterSide = border.OuterSide == Side.Left;
                 var isNextStartPoint = nextCorner == Corner.Start;

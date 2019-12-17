@@ -18,10 +18,20 @@ namespace CAM.UI
 			InitializeComponent();
 		}
 
-		public void SetDataSource(BorderProcessingArea dataSource)
-		{
-			borderProcessingAreaBindingSource.DataSource = dataSource;
+        public void SetDataSource(BorderProcessingArea dataSource)
+        {
+            borderProcessingAreaBindingSource.DataSource = dataSource;
             borderProcessingAreaBindingSource.ResetBindings(false);
-		}
-	}
+        }
+
+        private void cbExactlyBegin_CheckedChanged(object sender, EventArgs e)
+        {
+            cbAutoExactlyBegin.Checked = false;
+        }
+
+        private void cbExactlyEnd_CheckedChanged(object sender, EventArgs e)
+        {
+            cbAutoExactlyEnd.Checked = false;
+        }
+    }
 }

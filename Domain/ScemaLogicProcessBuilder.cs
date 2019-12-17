@@ -95,7 +95,7 @@ namespace CAM.Domain
             if (!TechOperationCommands.Any())
                 InitMove();
 
-            Move(CommandNames.Penetration, 1, "XYCZ", _techProcessParams.PenetrationRate, z, destPoint.X, destPoint.Y, CalcToolAngle(toolpathCurve, destPoint));
+            Move(CommandNames.Penetration, 1, "XYCZ", _techProcessParams.PenetrationRate, z, destPoint.X, destPoint.Y, CalcToolAngle(toolpathCurve, _corner));
 
             _corner = _corner.Swap();
             _currentPoint = toolpathCurve.GetPoint(_corner);
@@ -103,7 +103,7 @@ namespace CAM.Domain
             switch (toolpathCurve)
             {
                 case Line _:
-                    CreateCommand(CommandNames.Cutting, 1, axis: "XYCZ", feed: feed, x: _currentPoint.X, y: _currentPoint.Y, param1: CalcToolAngle(toolpathCurve, _currentPoint), param2: _currentPoint.Z, toolpathCurve: toolpathCurve);
+                    CreateCommand(CommandNames.Cutting, 1, axis: "XYCZ", feed: feed, x: _currentPoint.X, y: _currentPoint.Y, param1: CalcToolAngle(toolpathCurve, _corner), param2: _currentPoint.Z, toolpathCurve: toolpathCurve);
                     break;
                 case Arc arc:
                     var code = _corner == Corner.Start ? 2 : 3;
@@ -116,7 +116,7 @@ namespace CAM.Domain
             void InitMove()
             {
                 var name = _currentPoint.IsNull() ? CommandNames.InitialMove : CommandNames.Fast;
-                CreateCommand(name, 0, axis: "XYC", feed: 0, x: destPoint.X, y: destPoint.Y, param1: CalcToolAngle(toolpathCurve, destPoint));
+                CreateCommand(name, 0, axis: "XYC", feed: 0, x: destPoint.X, y: destPoint.Y, param1: CalcToolAngle(toolpathCurve, _corner));
                 Move(name, 0, "XYZ", 0, _techProcessParams.ZSafety, destPoint.X, destPoint.Y);
 
                 if (name == CommandNames.InitialMove)
@@ -130,9 +130,9 @@ namespace CAM.Domain
             }
         }
 
-        private static double CalcToolAngle(Curve curve, Point3d point)
+        private static double CalcToolAngle(Curve curve, Corner corner)
         {
-            var tangent = curve.GetTangent(point);
+            var tangent = curve.GetTangent(corner);
             if (!curve.IsUpward())
                 tangent = tangent.Negate();
             return Graph.ToDeg(Math.PI - Graph.Round(tangent.Angle));

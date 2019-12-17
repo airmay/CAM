@@ -20,7 +20,9 @@ namespace CAM
 
         public static double Length(this Curve curve) => curve.GetDistanceAtParameter(curve.EndParam) - curve.GetDistanceAtParameter(curve.StartParam);
 
-        public static Vector2d GetTangent(this Curve curve, Point3d point) => curve.GetFirstDerivative(point).ToVector2d();
+        public static Vector2d GetTangent(this Curve curve, double param) => curve.GetFirstDerivative(param).ToVector2d();
+
+        public static Vector2d GetTangent(this Curve curve, Corner corner) => curve.GetTangent(corner == Corner.Start ? curve.StartParam : curve.EndParam);
 
         /// <summary>
         /// Кривая направлена вверх
@@ -29,7 +31,7 @@ namespace CAM
         /// <returns></returns>
         public static bool IsUpward(this Curve curve)
         {
-            var tangent = curve.GetTangent(curve.StartPoint);
+            var tangent = curve.GetTangent(curve.StartParam);
             return Math.Abs(tangent.Y) > Consts.Epsilon
                 ? tangent.Y > 0
                 : tangent.X > 0;
@@ -38,12 +40,12 @@ namespace CAM
         public static Point3d GetPoint(this Curve curve, Corner corner) => corner == Corner.Start ? curve.StartPoint : curve.EndPoint;
 
         public static Corner GetCorner(this Curve curve, Point3d point) =>
-            point == curve.StartPoint ? Corner.Start : (point == curve.EndPoint ? Corner.End : throw new ArgumentException("Некорректный параметр метода GetCorner"));
+            point == curve.StartPoint ? Corner.Start : (point == curve.EndPoint ? Corner.End : throw new ArgumentException($"Ошибка GetCorner: Точка {point} не принадлежит кривой {curve}"));
 
         public static bool HasPoint(this Curve curve, Point3d point) => point == curve.StartPoint || point == curve.EndPoint;
 
         public static Point3d NextPoint(this Curve curve, Point3d point) =>
-            point == curve.StartPoint ? curve.EndPoint : (point == curve.EndPoint ? curve.StartPoint : throw new ArgumentException("Некорректный параметр метода NextPoint"));
+            point == curve.StartPoint ? curve.EndPoint : (point == curve.EndPoint ? curve.StartPoint : throw new ArgumentException($"Ошибка NextPoint: Точка {point} не принадлежит кривой {curve}"));
 
         public static void SetPoint(this Curve curve, Corner corner, Point3d point)
         {
