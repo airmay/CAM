@@ -30,10 +30,10 @@
 		{
             this.components = new System.ComponentModel.Container();
             this.cbExactlyEnd = new System.Windows.Forms.CheckBox();
-            this.borderProcessingAreaBindingSource = new System.Windows.Forms.BindingSource(this.components);
             this.cbExactlyBegin = new System.Windows.Forms.CheckBox();
             this.cbAutoExactlyEnd = new System.Windows.Forms.CheckBox();
             this.cbAutoExactlyBegin = new System.Windows.Forms.CheckBox();
+            this.borderProcessingAreaBindingSource = new System.Windows.Forms.BindingSource(this.components);
             ((System.ComponentModel.ISupportInitialize)(this.borderProcessingAreaBindingSource)).BeginInit();
             this.SuspendLayout();
             // 
@@ -47,11 +47,7 @@
             this.cbExactlyEnd.TabIndex = 6;
             this.cbExactlyEnd.Text = "Конец точно";
             this.cbExactlyEnd.UseVisualStyleBackColor = true;
-            this.cbExactlyEnd.CheckedChanged += new System.EventHandler(this.cbExactlyEnd_CheckedChanged);
-            // 
-            // borderProcessingAreaBindingSource
-            // 
-            this.borderProcessingAreaBindingSource.DataSource = typeof(CAM.Domain.BorderProcessingArea);
+            this.cbExactlyEnd.Click += new System.EventHandler(this.cbExactlyEnd_Click);
             // 
             // cbExactlyBegin
             // 
@@ -63,7 +59,7 @@
             this.cbExactlyBegin.TabIndex = 4;
             this.cbExactlyBegin.Text = "Начало точно";
             this.cbExactlyBegin.UseVisualStyleBackColor = true;
-            this.cbExactlyBegin.CheckedChanged += new System.EventHandler(this.cbExactlyBegin_CheckedChanged);
+            this.cbExactlyBegin.Click += new System.EventHandler(this.cbExactlyBegin_Click);
             // 
             // cbAutoExactlyEnd
             // 
@@ -86,6 +82,10 @@
             this.cbAutoExactlyBegin.TabIndex = 5;
             this.cbAutoExactlyBegin.Text = "Авто";
             this.cbAutoExactlyBegin.UseVisualStyleBackColor = true;
+            // 
+            // borderProcessingAreaBindingSource
+            // 
+            this.borderProcessingAreaBindingSource.DataSource = typeof(CAM.Domain.BorderProcessingArea);
             // 
             // BorderProcessingAreaView
             // 

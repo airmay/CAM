@@ -24,12 +24,12 @@ namespace CAM.UI
             borderProcessingAreaBindingSource.ResetBindings(false);
         }
 
-        private void cbExactlyBegin_CheckedChanged(object sender, EventArgs e)
+        private void cbExactlyBegin_Click(object sender, EventArgs e)
         {
             cbAutoExactlyBegin.Checked = false;
         }
 
-        private void cbExactlyEnd_CheckedChanged(object sender, EventArgs e)
+        private void cbExactlyEnd_Click(object sender, EventArgs e)
         {
             cbAutoExactlyEnd.Checked = false;
         }
