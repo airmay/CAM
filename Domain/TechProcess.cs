@@ -18,6 +18,8 @@ namespace CAM.Domain
         /// </summary>
         public string Name { get; set; }
 
+        private Settings _settings;
+
         /// <summary>
         /// Параметры технологического процесса
         /// </summary>
@@ -44,10 +46,11 @@ namespace CAM.Domain
         [NonSerialized]
         public List<ProcessCommand> ProcessCommands;
 
-        public TechProcess(string name)
+        public TechProcess(string name, Settings settings)
         {
             Name = name ?? throw new ArgumentNullException("TechProcessName");
-            TechProcessParams = Settings.Instance.TechProcessParams.Clone();
+            _settings = settings;
+            TechProcessParams = _settings.TechProcessParams.Clone();
         }
 
         public void BuildProcessing(BorderProcessingArea startBorder = null)
@@ -69,8 +72,7 @@ namespace CAM.Domain
                 switch (techOperationType)
                 {
                     case TechOperationType.Sawing:
-                        factory = new SawingTechOperationFactory(Settings.Instance.SawingLineTechOperationParams.Clone(), 
-                            Settings.Instance.SawingCurveTechOperationParams.Clone());
+                        factory = new SawingTechOperationFactory(_settings.SawingLineTechOperationParams.Clone(), _settings.SawingCurveTechOperationParams.Clone());
                         break;
                 }
                 TechOperationFactorys[techOperationType] = factory;
@@ -80,7 +82,7 @@ namespace CAM.Domain
 
         public bool SetTool(string text)
         {
-            var tool = Settings.Instance.Tools.SingleOrDefault(p => p.Number.ToString() == text);
+            var tool = _settings.Tools.SingleOrDefault(p => p.Number.ToString() == text);
             if (tool != null)
             {
                 TechProcessParams.ToolDiameter = tool.Diameter;

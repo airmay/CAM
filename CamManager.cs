@@ -13,13 +13,14 @@ namespace CAM
     public class CamManager : IExtensionApplication
     {
         private Dictionary<Document, CamDocument> _documents = new Dictionary<Document, CamDocument>();
-
+        private Settings _settings;
         private CamPaletteSet _camPaletteSet;
 
         public void Initialize()
         {
             Acad.Write($"Инициализация плагина. Версия сборки от {File.GetLastWriteTime(Assembly.GetExecutingAssembly().Location)}");
 
+            _settings = Settings.Load();
             _camPaletteSet = new CamPaletteSet();
 
             //var manager = new CamManager();
@@ -55,7 +56,7 @@ namespace CAM
             {
                 document.CommandWillStart += Document_CommandWillStart;
                 document.BeginDocumentClose += Document_BeginDocumentClose;
-                _documents[document] = new CamDocument(document);
+                _documents[document] = new CamDocument(document, _settings);
                 TechProcessLoader.LoadTechProsess(_documents[document]);
             }
             _camPaletteSet.SetCamDocument(_documents[document]);
@@ -85,7 +86,7 @@ namespace CAM
 
         public void Terminate()
         {
-            Settings.Save();
+            Settings.Save(_settings);
         }
     }
 }

@@ -1,11 +1,9 @@
 ﻿using Autodesk.AutoCAD.ApplicationServices;
-using Autodesk.AutoCAD.DatabaseServices;
 using CAM.Domain;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Runtime.Serialization.Formatters.Binary;
 
 namespace CAM
 {
@@ -14,15 +12,17 @@ namespace CAM
         public readonly Document Document;
         public int Hash;
         public List<TechProcess> TechProcessList { get; set; } = new List<TechProcess>();
+        private Settings _settings;
 
-        public CamDocument(Document document)
+        public CamDocument(Document document, Settings settings)
         {
             Document = document;
+            _settings = settings;
         }
 
         public TechProcess CreateTechProcess()
         {
-            var techProcess = new TechProcess($"Обработка{TechProcessList.Count + 1}");
+            var techProcess = new TechProcess($"Обработка{TechProcessList.Count + 1}", _settings);
             TechProcessList.Add(techProcess);
             return techProcess;
         }
@@ -97,7 +97,7 @@ namespace CAM
                 return;
             }
             var fileName = $"{techProcess.Name}.csv";
-            var filePath = Settings.GetMachineSettings(techProcess.TechProcessParams.Machine).ProgramPath;
+            var filePath = _settings.GetMachineSettings(techProcess.TechProcessParams.Machine).ProgramPath;
             var fullPath = Path.Combine(filePath, fileName);
             try
             {

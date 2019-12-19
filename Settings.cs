@@ -14,12 +14,8 @@ namespace CAM
     public class Settings
     {
         #region static
-        private static Settings _instance;
-
-        public static Settings Instance => _instance ?? (_instance = Load());
 
         private static string GetFilePath => Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "settings.xml");
-
 
         /// <summary>
         /// Загрузить данные из файла в контейнер
@@ -35,7 +31,7 @@ namespace CAM
             }
             catch (Exception e)
             {
-                Acad.Alert($"Ошибка при загрузке данных из файла 'cam_data.xml'", e);
+                Acad.Alert($"Ошибка при загрузке настроек из файла {GetFilePath}", e);
                 return new Settings
                 {
                     Tools = new List<Tool>(),
@@ -49,19 +45,17 @@ namespace CAM
         /// <summary>
         /// Сохранить данные в файл
         /// </summary>
-        public static void Save()
+        public static void Save(Settings settings)
         {
-            if (_instance == null) return;
-
             var formatter = new XmlSerializer(typeof(Settings));
             try
             {
                 using (var fileStream = new FileStream(GetFilePath, FileMode.Create))
-                    formatter.Serialize(fileStream, _instance);
+                    formatter.Serialize(fileStream, settings);
             }
             catch (Exception e)
             {
-                Acad.Alert($"Ошибка при сохранении данных в файл 'cam_data.xml'", e);
+                Acad.Alert($"Ошибка при сохранении настроек в файл {GetFilePath}", e);
             }
         }
 
@@ -78,7 +72,7 @@ namespace CAM
             }
         };
 
-        public static Machine GetMachineSettings(MachineType type) => Instance.Machines.Single(p => p.Type == type);
+        public Machine GetMachineSettings(MachineType type) => Machines.Single(p => p.Type == type);
 
         public class Machine
         {
