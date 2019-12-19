@@ -10,7 +10,7 @@ using System.Reflection;
 
 namespace CAM
 {
-    public class Bootstrapper : IExtensionApplication
+    public class CamManager : IExtensionApplication
     {
         private Dictionary<Document, CamDocument> _documents = new Dictionary<Document, CamDocument>();
 

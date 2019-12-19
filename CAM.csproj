@@ -83,8 +83,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AcadGateway.cs" />
-    <Compile Include="Bootstrapper.cs" />
     <Compile Include="CamDocument.cs" />
+    <Compile Include="CamManager.cs" />
     <Compile Include="TechProcessLoader.cs" />
     <Compile Include="UI\CamPaletteSet.cs" />
     <Compile Include="Domain\CommandCode.cs" />
