@@ -54,5 +54,8 @@ namespace CAM.Domain
 
 	    public IEnumerable<Curve> ToolpathCurves => ProcessCommands?.Select(p => p.GetToolpathCurve()).Where(p => p != null);
 
-	}
+        public bool MoveDown() => TechProcess.TechOperations.SwapNext(this);
+
+        public bool MoveUp() => TechProcess.TechOperations.SwapPrev(this);
+    }
 }

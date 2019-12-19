@@ -8,7 +8,8 @@ namespace CAM.UI
 {
     public partial class TechProcessView : UserControl
     {
-	    private CamManager _camManager;
+	    private CamDocument _camDocument;
+
         private readonly TechProcessParamsView _techProcessParamsView = new TechProcessParamsView { Dock = DockStyle.Fill, Visible = false };
         private readonly UserControl _paramsView = new UserControl { Dock = DockStyle.Fill, Visible = false };
 	    private readonly Dictionary<Type, Control> _paramsViews = new Dictionary<Type, Control>();
@@ -18,7 +19,7 @@ namespace CAM.UI
 
 	    private static TreeNode CreateTechOperationNode(TechOperation techOperation) => new TreeNode(techOperation.Name, 1, 1) {Tag = techOperation};
 
-        public TechProcessView(CamManager camManager)
+        public TechProcessView()
         {
             InitializeComponent();
 
@@ -30,19 +31,18 @@ namespace CAM.UI
             dataGridViewCommand.DataSource = processCommandBindingSource;
             processCommandBindingSource.DataSource = null;
 
-            _camManager = camManager;
-            _camManager.TechProcessView = this;
-
             SetButtonsEnabled();
         }
 
-        public void Refresh(List<TechProcess> techProcessList = null)
+        public void SetCamDocument(CamDocument camDocument)
         {
+            _camDocument = camDocument;
+
             treeView.Nodes.Clear();
+            _camDocument?.TechProcessList.ForEach(CreateTechProcessNode);
             ClearCommandsView();
-            techProcessList?.ForEach(CreateTechProcessNode);
             SetParamsViewsVisible();
-            toolStrip1.Enabled = techProcessList != null;
+            toolStrip1.Enabled = _camDocument != null;
             SetButtonsEnabled();
         }
 
@@ -77,7 +77,7 @@ namespace CAM.UI
 					_techProcessParamsView.SetTechProcess(techProcess);
 			        _techProcessParamsView.BringToFront();
                     processCommandBindingSource.DataSource = techProcess.ProcessCommands;
-                    _camManager.SelectTechProcess(techProcess);
+                    _camDocument.SelectTechProcess(techProcess);
 
 			        break;
 
@@ -106,7 +106,7 @@ namespace CAM.UI
 	                }
 			        _paramsView.BringToFront();
                     processCommandBindingSource.DataSource = techOperation.ProcessCommands;
-                    _camManager.SelectTechOperation(techOperation);
+                    _camDocument.SelectTechOperation(techOperation);
 
                     break;
             }
@@ -145,7 +145,7 @@ namespace CAM.UI
 	    {
 		    EndEdit();
 		    if (MessageBox.Show("Создать новый техпроцесс обработки изделия?", "Подтверждение", MessageBoxButtons.YesNo, MessageBoxIcon.Question, MessageBoxDefaultButton.Button2) == DialogResult.Yes)
-			    CreateTechProcessNode(_camManager.CreateTechProcess());
+			    CreateTechProcessNode(_camDocument.CreateTechProcess());
 	    }
 
 	    private void bCreateTechOperation_Click(object sender, EventArgs e)
@@ -153,14 +153,14 @@ namespace CAM.UI
 		    EndEdit();
 		    if (treeView.Nodes.Count == 0)
 		    {
-			    var techProcess = _camManager.CreateTechProcess();
-			    _camManager.CreateTechOperations(techProcess, TechOperationType.Sawing);
+			    var techProcess = _camDocument.CreateTechProcess();
+                _camDocument.CreateTechOperations(techProcess, TechOperationType.Sawing);
 			    CreateTechProcessNode(techProcess);
 		    }
 		    else
 		    {
 			    var techProcessNode = treeView.SelectedNode.Parent ?? treeView.SelectedNode;
-			    var techOperations = _camManager.CreateTechOperations(CurrentTechProcess, TechOperationType.Sawing);
+			    var techOperations = _camDocument.CreateTechOperations(CurrentTechProcess, TechOperationType.Sawing);
                 if (techOperations != null)
                 {
                     techProcessNode.Nodes.AddRange(Array.ConvertAll(techOperations, CreateTechOperationNode));
@@ -186,10 +186,10 @@ namespace CAM.UI
 			    switch (treeView.SelectedNode.Tag)
 			    {
 				    case TechProcess techProcess:
-					    _camManager.DeleteTechProcess(techProcess);
+                        _camDocument.DeleteTechProcess(techProcess);
 					    break;
 				    case TechOperation techOperation:
-					    _camManager.DeleteTechOperation(techOperation);
+                        _camDocument.DeleteTechOperation(techOperation);
 					    break;
 			    }
 			    treeView.SelectedNode.Remove();
@@ -213,7 +213,7 @@ namespace CAM.UI
 		    if (treeView.SelectedNode.Tag is TechOperation techOperation)
 		    {
 			    EndEdit();
-			    if (_camManager.MoveBackwardTechOperation(techOperation))
+			    if (techOperation.MoveUp())
 				    MoveSelectedNode(-1);
 		    }
 	    }
@@ -223,7 +223,7 @@ namespace CAM.UI
 		    if (treeView.SelectedNode.Tag is TechOperation techOperation)
 		    {
 			    EndEdit();
-			    if (_camManager.MoveForwardTechOperation(techOperation))
+			    if (techOperation.MoveDown())
 				    MoveSelectedNode(1);
 		    }
 	    }
@@ -234,7 +234,8 @@ namespace CAM.UI
 	        {
                 //var view = GetParamsView<SawingParamsView>();
                 treeView.Focus();
-                _camManager.BuildProcessing(CurrentTechProcess);
+                _camDocument.BuildProcessing(CurrentTechProcess);
+                RefreshView();
 	        }
 	    }
 
@@ -243,18 +244,19 @@ namespace CAM.UI
         private void processCommandBindingSource_CurrentChanged(object sender, EventArgs e)
         {
             if (processCommandBindingSource.Current != null)
-                _camManager.SelectProcessCommand(processCommandBindingSource.Current as ProcessCommand);
+                _camDocument.SelectProcessCommand(processCommandBindingSource.Current as ProcessCommand);
         }
 
         private void bSwapOuterSide_Click(object sender, EventArgs e)
         {
-            _camManager.SwapOuterSide(treeView.SelectedNode?.Tag as TechProcess, treeView.SelectedNode?.Tag as TechOperation);
+            _camDocument.SwapOuterSide(treeView.SelectedNode?.Tag as TechProcess, treeView.SelectedNode?.Tag as TechOperation);
+            RefreshView();
         }
 
         private void bSend_Click(object sender, EventArgs e)
         {
             dataGridViewCommand.EndEdit();
-            _camManager.SendProgramm();
+            _camDocument.SendProgram(CurrentTechProcess);
         }
 
         private void treeView_NodeMouseDoubleClick(object sender, TreeNodeMouseClickEventArgs e)
@@ -265,7 +267,7 @@ namespace CAM.UI
 
         private void bClose_Click(object sender, EventArgs e)
         {
-            Acad.Document.CloseAndDiscard();
+            Acad.ActiveDocument.CloseAndDiscard();
             Autodesk.AutoCAD.ApplicationServices.Application.Quit();
         }
     }

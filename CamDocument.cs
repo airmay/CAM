@@ -11,108 +11,102 @@ namespace CAM
 {
     public class CamDocument
     {
-        private const string DataKey = "TechProcessList";
-        
-        private int _hash = 0;
-
-        private readonly Document _document;
-
+        public readonly Document Document;
+        public int Hash;
         public List<TechProcess> TechProcessList { get; set; } = new List<TechProcess>();
 
         public CamDocument(Document document)
         {
-            _document = document;
-            LoadTechProsess();
+            Document = document;
         }
 
-        /// <summary>
-        /// Загрузить технологические процессы из файла чертежа
-        /// </summary>
-        private void LoadTechProsess()
+        public TechProcess CreateTechProcess()
+        {
+            var techProcess = new TechProcess($"Обработка{TechProcessList.Count + 1}");
+            TechProcessList.Add(techProcess);
+            return techProcess;
+        }
+
+        public TechOperation[] CreateTechOperations(TechProcess techProcess, TechOperationType techOperationType)
+        {
+            var curves = Acad.GetSelectedCurves();
+            if (curves.Any())
+                return techProcess.CreateTechOperations(techOperationType, curves);
+
+            Acad.Alert($"Не выбраны элементы чертежа");
+            return null;
+        }
+
+        public void DeleteTechProcess(TechProcess techProcess)
+        {
+            Acad.DeleteHatch();
+            Acad.DeleteCurves(techProcess.ToolpathCurves);
+            TechProcessList.Remove(techProcess);
+        }
+
+        public void DeleteTechOperation(TechOperation techOperation)
+        {
+            Acad.DeleteCurves(techOperation.ToolpathCurves);
+            techOperation.TechProcess.TechOperations.Remove(techOperation);
+        }
+
+        public void SelectTechProcess(TechProcess techProcess) => Acad.SelectObjectIds(techProcess.TechOperations.Select(p => p.ProcessingArea.AcadObjectId).ToArray());
+
+        public void SelectTechOperation(TechOperation techOperation) => Acad.SelectObjectIds(techOperation.ProcessingArea.AcadObjectId);
+
+        public void SelectProcessCommand(ProcessCommand processCommand) => Acad.SelectCurve(processCommand.GetToolpathCurve());
+
+        public void BuildProcessing(TechProcess techProcess, BorderProcessingArea startBorder = null)
         {
             try
             {
-                using (Transaction tr = _document.Database.TransactionManager.StartTransaction())
-                using (DBDictionary dict = tr.GetObject(Acad.Database.NamedObjectsDictionaryId, OpenMode.ForRead) as DBDictionary)
-                    if (dict.Contains(DataKey))
-                        using (Xrecord xRecord = tr.GetObject(dict.GetAt(DataKey), OpenMode.ForRead) as Xrecord)
-                        using (ResultBuffer resultBuffer = xRecord.Data)
-                        using (MemoryStream stream = new MemoryStream())
-                        {
-                            _hash = resultBuffer.ToString().GetHashCode();
-                            foreach (var typedValue in resultBuffer)
-                            {
-                                var datachunk = Convert.FromBase64String((string)typedValue.Value);
-                                stream.Write(datachunk, 0, datachunk.Length);
-                            }
-                            stream.Position = 0;
-                            var formatter = new BinaryFormatter();
-                            TechProcessList = (List<TechProcess>)formatter.Deserialize(stream);
-                        }
+                Acad.Write($"Выполняется расчет обработки по техпроцессу {techProcess.Name} ...");
 
-                if (TechProcessList != null)
-                {
-                    TechProcessList.ForEach(tp =>
-                        tp.TechOperations.ForEach(to =>
-                        {
-                            to.ProcessingArea.AcadObjectId = Acad.GetObjectId(to.ProcessingArea.Handle);
-                            to.TechProcess = tp;
-                        }));
-                    Acad.Write($"Загружены техпроцессы: {string.Join(", ", TechProcessList.Select(p => p.Name))}");
-                }
+                Acad.DeleteHatch();
+                Acad.DeleteCurves(techProcess.ToolpathCurves);
+
+                techProcess.BuildProcessing(startBorder);
+
+                Acad.SaveCurves(techProcess.ToolpathCurves);
+
+                Acad.Write("Расчет обработки завершен");
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                Acad.Alert($"Ошибка при загрузке техпроцессов", e);
+                techProcess.DeleteToolpath();
+                Acad.Alert("Ошибка при выполнении расчета", ex);
             }
         }
 
-        public void SaveTechProsess()
+        public void SwapOuterSide(TechProcess techProcess, TechOperation techOperation)
         {
-            if (_hash == 0 && !TechProcessList.Any()) return;
+            var to = techOperation ?? techProcess?.TechOperations?.FirstOrDefault();
+            if (to?.ProcessingArea is BorderProcessingArea border)
+            {
+                border.OuterSide = border.OuterSide.Swap();
+                BuildProcessing(to.TechProcess, border);
+            }
+        }
+
+        public void SendProgram(TechProcess techProcess)
+        {
+            var contents = techProcess?.ProcessCommands?.Select(p => p.GetProgrammLine()).ToArray();
+            if (contents == null || !contents.Any())
+            {
+                Acad.Alert("Программа не сформирована");
+                return;
+            }
+            var fileName = $"{techProcess.Name}.csv";
+            var filePath = Settings.GetMachineSettings(techProcess.TechProcessParams.Machine).ProgramPath;
+            var fullPath = Path.Combine(filePath, fileName);
             try
             {
-                const int kMaxChunkSize = 127;
-                using (var resultBuffer = new ResultBuffer())
-                {
-                    using (MemoryStream stream = new MemoryStream())
-                    {
-                        BinaryFormatter formatter = new BinaryFormatter();
-                        formatter.Serialize(stream, TechProcessList);
-                        stream.Position = 0;
-                        for (int i = 0; i < stream.Length; i += kMaxChunkSize)
-                        {
-                            int length = (int)Math.Min(stream.Length - i, kMaxChunkSize);
-                            byte[] datachunk = new byte[length];
-                            stream.Read(datachunk, 0, length);
-                            resultBuffer.Add(new TypedValue((int)DxfCode.Text, Convert.ToBase64String(datachunk)));
-                        }
-                    }
-                    var newHash = resultBuffer.ToString().GetHashCode();
-                    if (newHash == _hash) return;
-
-                    using (DocumentLock acLckDoc = _document.LockDocument())
-                    using (Transaction tr = _document.Database.TransactionManager.StartTransaction())
-                    using (DBDictionary dict = tr.GetObject(_document.Database.NamedObjectsDictionaryId, OpenMode.ForWrite) as DBDictionary)
-                    {
-                        if (dict.Contains(DataKey))
-                            using (var xrec = tr.GetObject(dict.GetAt(DataKey), OpenMode.ForWrite) as Xrecord)
-                                xrec.Data = resultBuffer;
-                        else
-                            using (var xrec = new Xrecord { Data = resultBuffer })
-                            {
-                                dict.SetAt(DataKey, xrec);
-                                tr.AddNewlyCreatedDBObject(xrec, true);
-                                //xrec.ObjectClosed += new ObjectClosedEventHandler(OnDataModified);
-                            }
-                        tr.Commit();
-                    }
-                    _hash = newHash;
-                }
+                File.WriteAllLines(fullPath, contents);
+                Acad.Write($"Создан файл {fullPath}");
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                Acad.Alert($"Ошибка при сохранении техпроцессов", e);
+                Acad.Alert($"Ошибка при записи файла {fullPath}", ex);
             }
         }
     }

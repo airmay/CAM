@@ -56,7 +56,7 @@ namespace CAM
         public static void HandleException(Exception exception)
         {
             Acad.Alert($"Ошибка: {exception.Message}");
-            File.WriteAllText($@"\\CATALINA\public\Программы станок\CodeRepository\Logs\error_{DateTime.Now.ToString("yyyy-MM-dd_hh-m-ss")}.log", $"{Acad.Document.Name}\n\n{exception}");
+            File.WriteAllText($@"\\US-CATALINA3\public\Программы станок\CodeRepository\Logs\error_{DateTime.Now.ToString("yyyy-MM-dd_hh-m-ss")}.log", $"{Acad.ActiveDocument.Name}\n\n{exception}");
         }
 
         public static bool NotFatal(this Exception ex)

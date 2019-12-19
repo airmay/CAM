@@ -73,7 +73,7 @@ namespace CAM
             new Machine
             {
                 Type = MachineType.ScemaLogic,
-                ProgramPath = @"\\CATALINA\public\Программы станок\CodeRepository"
+                ProgramPath = @"\\US-CATALINA3\public\Программы станок\CodeRepository"
                 // @"\\192.168.137.59\ssd\Automatico\";
             }
         };

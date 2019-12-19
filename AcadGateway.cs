@@ -14,7 +14,7 @@ namespace CAM
     /// </summary>
     public static class Acad
     {
-        public static Document Document => Application.DocumentManager.MdiActiveDocument;
+        public static Document ActiveDocument => Application.DocumentManager.MdiActiveDocument;
 
         public static Database Database => Application.DocumentManager.MdiActiveDocument.Database;
 
@@ -25,7 +25,7 @@ namespace CAM
             var text = ex == null ? message : $"{message}: {ex.Message}";
             Interaction.WriteLine($"{text}\n");
             if (ex != null)
-                File.WriteAllText($@"\\CATALINA\public\Программы станок\CodeRepository\Logs\error_{DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss")}.log", $"{Acad.Document.Name}\n\n{message}\n\n{ex.FullMessage()}");
+                File.WriteAllText($@"\\US-CATALINA3\public\Программы станок\CodeRepository\Logs\error_{DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss")}.log", $"{Acad.ActiveDocument.Name}\n\n{message}\n\n{ex.FullMessage()}");
         }
         public static void Write(Exception ex) => Write("Ошибка", ex);
 
@@ -119,6 +119,7 @@ namespace CAM
         {
             App.LockAndExecute(() =>
             {
+                ClearHighlighted();
                 var layerTable = HostApplicationServices.WorkingDatabase.LayerTableId.QOpenForRead<SymbolTable>();
                 if (layerTable.Has(ProcessLayerName))
                 {

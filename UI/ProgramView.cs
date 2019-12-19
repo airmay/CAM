@@ -12,19 +12,20 @@ namespace CAM.UI
 {
     public partial class ProgramView : UserControl
     {
-	    private CamManager _camManager;
+        private CamDocument _camDocument;
 
-        public ProgramView(CamManager camManager)
+        public ProgramView()
         {
             InitializeComponent();
-            _camManager = camManager;
         }
 
-        public void SetProgram(string[] lines) => textBox.Lines = lines;
+        public void SetCamDocument(CamDocument camDocument) => _camDocument = camDocument;
+
+        //public void RefreshView() => textBox.Lines = _camDocument.GetProgramm();
 
         private void bSendProgram_Click(object sender, EventArgs e)
         {
-            _camManager.SendProgram(textBox.Lines);
+            //_camDocument.SendProgram(textBox.Lines);
         }
     }
 }

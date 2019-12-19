@@ -85,6 +85,8 @@
     <Compile Include="AcadGateway.cs" />
     <Compile Include="Bootstrapper.cs" />
     <Compile Include="CamDocument.cs" />
+    <Compile Include="TechProcessLoader.cs" />
+    <Compile Include="UI\CamPaletteSet.cs" />
     <Compile Include="Domain\CommandCode.cs" />
     <Compile Include="Domain\CommandNames.cs" />
     <Compile Include="Domain\Corner.cs" />
@@ -109,7 +111,6 @@
     <Compile Include="Domain\SawingTechOperation\SawingTechOperationParams.cs" />
     <Compile Include="Domain\TechOperation.cs" />
     <Compile Include="Domain\TechProcessParams.cs" />
-    <Compile Include="CamManager.cs" />
     <Compile Include="Domain\Tool.cs" />
     <Compile Include="Exceptions.cs" />
     <Compile Include="Graph.cs" />

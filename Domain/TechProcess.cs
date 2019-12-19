@@ -52,30 +52,14 @@ namespace CAM.Domain
 
         public void BuildProcessing(BorderProcessingArea startBorder = null)
         {
-            try
-            {
-                Acad.Write($"Выполняется расчет обработки по техпроцессу {Name} ...");
+            DeleteToolpath();
+            TechOperations.ForEach(p => p.ProcessingArea.Curve = p.ProcessingArea.AcadObjectId.QOpenForRead<Curve>());
 
-                Acad.DeleteHatch();
-                Acad.DeleteCurves(ToolpathCurves);
+            ProcessBorders(TechOperations.Select(p => p.ProcessingArea).OfType<BorderProcessingArea>().ToList(), startBorder);
 
-                DeleteToolpath();
-                TechOperations.ForEach(p => p.ProcessingArea.Curve = p.ProcessingArea.AcadObjectId.QOpenForRead<Curve>());
-
-                ProcessBorders(TechOperations.Select(p => p.ProcessingArea).OfType<BorderProcessingArea>().ToList(), startBorder);
-
-                var builder = new ScemaLogicProcessBuilder(TechProcessParams);
-                TechOperations.ForEach(p => p.BuildProcessing(builder));
-                ProcessCommands = builder.FinishTechProcess();
-                Acad.SaveCurves(ToolpathCurves);
-
-                Acad.Write("Расчет обработки завершен");
-            }
-            catch (Exception ex)
-            {
-                DeleteToolpath();
-                Acad.Alert("Ошибка при выполнении расчета", ex);
-            }
+            var builder = new ScemaLogicProcessBuilder(TechProcessParams);
+            TechOperations.ForEach(p => p.BuildProcessing(builder));
+            ProcessCommands = builder.FinishTechProcess();
         }
 
         public ITechOperationFactory GetFactory(TechOperationType techOperationType)

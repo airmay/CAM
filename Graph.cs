@@ -63,69 +63,76 @@ namespace CAM
 
         public static void CreateHatch(List<Curve> contour, int sign)
         {
-            var start = contour.Count > 1
-                ? contour[1].HasPoint(contour[0].EndPoint) ? contour[0].StartPoint : contour[0].EndPoint
-                : contour[0].StartPoint;
+            try
+            {
+                var start = contour.Count > 1
+                    ? contour[1].HasPoint(contour[0].EndPoint) ? contour[0].StartPoint : contour[0].EndPoint
+                    : contour[0].StartPoint;
 
-            var polyline = new Polyline();
-            var next = start;
-            var i = 0;
-            foreach (var curve in contour)
-            {
-                var bulge = curve is Arc ? Algorithms.GetArcBulge(curve as Arc, next) : 0;
-                polyline.AddVertexAt(i++, next.ToPoint2d(), bulge, 0, 0);
-                next = curve.NextPoint(next);
-            }
-            polyline.Closed = next == start;
-            Polyline offsetPolyline = null;
-            var offset = sign * 40;
-            if (!polyline.Closed)
-            {
-                polyline.AddVertexAt(i, next.ToPoint2d(), 0, 0, 0);
-                offsetPolyline = polyline.GetOffsetCurves(offset)[0] as Polyline;
-                offsetPolyline.ReverseCurve();
-                polyline.JoinPolyline(offsetPolyline);
-                polyline.SetBulgeAt(polyline.NumberOfVertices - 1, 0);
-                polyline.Closed = true;
-                offsetPolyline = null;
-            }
-            else
-                offsetPolyline = polyline.GetOffsetCurves(offset)[0] as Polyline;
-
-            using (var doclock = Acad.Document.LockDocument())
-            using (var trans = Acad.Database.TransactionManager.StartTransaction())
-            {
-                var space = (BlockTableRecord)trans.GetObject(Acad.Database.CurrentSpaceId, OpenMode.ForWrite, false);
-                space.AppendEntity(polyline);
-                trans.AddNewlyCreatedDBObject(polyline, true);
-                if (offsetPolyline != null)
+                var polyline = new Polyline();
+                var next = start;
+                var i = 0;
+                foreach (var curve in contour)
                 {
-                    space.AppendEntity(offsetPolyline);
-                    trans.AddNewlyCreatedDBObject(offsetPolyline, true);
+                    var bulge = curve is Arc ? Algorithms.GetArcBulge(curve as Arc, next) : 0;
+                    polyline.AddVertexAt(i++, next.ToPoint2d(), bulge, 0, 0);
+                    next = curve.NextPoint(next);
                 }
-                var hatch = new Hatch();
-                space.AppendEntity(hatch);
-                trans.AddNewlyCreatedDBObject(hatch, true);
+                polyline.Closed = next == start;
+                Polyline offsetPolyline = null;
+                var offset = sign * 40;
+                if (!polyline.Closed)
+                {
+                    polyline.AddVertexAt(i, next.ToPoint2d(), 0, 0, 0);
+                    offsetPolyline = polyline.GetOffsetCurves(offset)[0] as Polyline;
+                    offsetPolyline.ReverseCurve();
+                    polyline.JoinPolyline(offsetPolyline);
+                    polyline.SetBulgeAt(polyline.NumberOfVertices - 1, 0);
+                    polyline.Closed = true;
+                    offsetPolyline = null;
+                }
+                else
+                    offsetPolyline = polyline.GetOffsetCurves(offset)[0] as Polyline;
 
-                hatch.LayerId = Acad.GetHatchLayerId();
-                hatch.SetDatabaseDefaults();
-                hatch.Normal = new Vector3d(0, 0, 1);
-                hatch.Elevation = 0.0;
-                hatch.Associative = false;
-                hatch.PatternScale = 4;
-                hatch.SetHatchPattern(HatchPatternType.PreDefined, "ANSI31");
-                //hatch.PatternAngle = angle; // PatternAngle has to be after SetHatchPattern(). This is AutoCAD .NET SDK violating Framework Design Guidelines, which requires properties to be set in arbitrary order.
-                hatch.HatchStyle = HatchStyle.Outer;
-                hatch.AppendLoop(HatchLoopTypes.External, new ObjectIdCollection(new[] { polyline.ObjectId }));
-                if (offsetPolyline != null)
-                    hatch.AppendLoop(HatchLoopTypes.External, new ObjectIdCollection(new[] { offsetPolyline.ObjectId }));
+                using (var doclock = Acad.ActiveDocument.LockDocument())
+                using (var trans = Acad.Database.TransactionManager.StartTransaction())
+                {
+                    var space = (BlockTableRecord)trans.GetObject(Acad.Database.CurrentSpaceId, OpenMode.ForWrite, false);
+                    space.AppendEntity(polyline);
+                    trans.AddNewlyCreatedDBObject(polyline, true);
+                    if (offsetPolyline != null)
+                    {
+                        space.AppendEntity(offsetPolyline);
+                        trans.AddNewlyCreatedDBObject(offsetPolyline, true);
+                    }
+                    var hatch = new Hatch();
+                    space.AppendEntity(hatch);
+                    trans.AddNewlyCreatedDBObject(hatch, true);
 
-                hatch.EvaluateHatch(true);
+                    hatch.LayerId = Acad.GetHatchLayerId();
+                    hatch.SetDatabaseDefaults();
+                    hatch.Normal = new Vector3d(0, 0, 1);
+                    hatch.Elevation = 0.0;
+                    hatch.Associative = false;
+                    hatch.PatternScale = 4;
+                    hatch.SetHatchPattern(HatchPatternType.PreDefined, "ANSI31");
+                    //hatch.PatternAngle = angle; // PatternAngle has to be after SetHatchPattern(). This is AutoCAD .NET SDK violating Framework Design Guidelines, which requires properties to be set in arbitrary order.
+                    hatch.HatchStyle = HatchStyle.Outer;
+                    hatch.AppendLoop(HatchLoopTypes.External, new ObjectIdCollection(new[] { polyline.ObjectId }));
+                    if (offsetPolyline != null)
+                        hatch.AppendLoop(HatchLoopTypes.External, new ObjectIdCollection(new[] { offsetPolyline.ObjectId }));
 
-                polyline.Erase();
-                offsetPolyline?.Erase();
+                    hatch.EvaluateHatch(true);
 
-                trans.Commit();
+                    polyline.Erase();
+                    offsetPolyline?.Erase();
+
+                    trans.Commit();
+                }
+            }
+            catch (Exception ex)
+            {
+                Acad.Alert("Ошибка при построении штриховки", ex);
             }
         }
     }
