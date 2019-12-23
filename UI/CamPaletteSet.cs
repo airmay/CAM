@@ -26,6 +26,10 @@ namespace CAM.UI
             };
 
             paletteSet.Add("Объекты", _techProcessView);
+
+            paletteSet.Add("Притягивание", new PullingView());
+
+
             //var programmPalette = paletteSet.Add("Программа", _programView);
             //paletteSet.PaletteActivated += (sender, args) =>
             //{

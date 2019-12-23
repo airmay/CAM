@@ -18,6 +18,7 @@ namespace CAM.Domain
         /// </summary>
         public string Name { get; set; }
 
+        [NonSerialized]
         private Settings _settings;
 
         /// <summary>

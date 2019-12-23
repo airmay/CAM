@@ -136,6 +136,12 @@
     <Compile Include="UI\ProgramView.Designer.cs">
       <DependentUpon>ProgramView.cs</DependentUpon>
     </Compile>
+    <Compile Include="UI\PullingView.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="UI\PullingView.Designer.cs">
+      <DependentUpon>PullingView.cs</DependentUpon>
+    </Compile>
     <Compile Include="UI\SawingModesView.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -185,6 +191,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="UI\ProgramView.resx">
       <DependentUpon>ProgramView.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UI\PullingView.resx">
+      <DependentUpon>PullingView.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="UI\SawingModesView.resx">
       <DependentUpon>SawingModesView.cs</DependentUpon>

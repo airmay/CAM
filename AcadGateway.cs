@@ -58,7 +58,7 @@ namespace CAM
             }
         }
 
-        public static IEnumerable<Curve> GetSelectedCurves() => OpenForRead(Interaction.GetPickSet());
+        public static Curve[] GetSelectedCurves() => OpenForRead(Interaction.GetPickSet());
 
         public static Curve[] OpenForRead(IEnumerable<ObjectId> ids)
         {
