@@ -27,7 +27,7 @@ namespace CAM
             return techProcess;
         }
 
-        public TechOperation[] CreateTechOperations(TechProcess techProcess, TechOperationType techOperationType)
+        public ITechOperation[] CreateTechOperations(TechProcess techProcess, TechOperationType techOperationType)
         {
             var curves = Acad.GetSelectedCurves();
             if (curves.Any())

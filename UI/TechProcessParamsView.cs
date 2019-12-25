@@ -41,8 +41,8 @@ namespace CAM.UI
 			{
 				case "Распиловка":
 					var view = GetParamsView<SawingParamsDefaultView>();
-                    var factory = (SawingTechOperationFactory)_techProcess.GetFactory(TechOperationType.Sawing);
-                    view.SetFactory(factory);
+                    var par = _techProcess.GetTechOperationParams(TechOperationType.Sawing);
+                    view.SetFactory(par);
 
                     break;
 			}

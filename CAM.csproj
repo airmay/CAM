@@ -85,6 +85,7 @@
     <Compile Include="AcadGateway.cs" />
     <Compile Include="CamDocument.cs" />
     <Compile Include="CamManager.cs" />
+    <Compile Include="Domain\TechOperationFactory.cs" />
     <Compile Include="TechProcessLoader.cs" />
     <Compile Include="UI\CamPaletteSet.cs" />
     <Compile Include="Domain\CommandCode.cs" />
@@ -93,7 +94,7 @@
     <Compile Include="Domain\ProcessCommand.cs" />
     <Compile Include="Domain\ProcessingArea\ArcProcessingArea.cs" />
     <Compile Include="Domain\ProcessingArea\BorderProcessingArea.cs" />
-    <Compile Include="Domain\SawingTechOperation\ITechOperationFactory.cs" />
+    <Compile Include="Domain\ITechOperationFactory.cs" />
     <Compile Include="Domain\SawingTechOperation\SawingDefaultParams.cs" />
     <Compile Include="Domain\ScemaLogicProcessBuilder.cs" />
     <Compile Include="Domain\ScemaLogicProgramGenerator.cs" />

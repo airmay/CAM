@@ -13,33 +13,25 @@ namespace CAM.Domain
     [Serializable]
     public class TechProcess
     {
+        private readonly TechOperationFactory _techOperationFactory;
+
+        [NonSerialized]
+        private Settings _settings;
+
         /// <summary>
         /// Наименование
         /// </summary>
         public string Name { get; set; }
-
-        [NonSerialized]
-        private Settings _settings;
 
         /// <summary>
         /// Параметры технологического процесса
         /// </summary>
         public TechProcessParams TechProcessParams { get; set; }
 
-        private Dictionary<TechOperationType, ITechOperationFactory> TechOperationFactorys = new Dictionary<TechOperationType, ITechOperationFactory>();
-
         /// <summary>
         /// Список технологических операций процесса
         /// </summary>
         public List<TechOperation> TechOperations { get; } = new List<TechOperation>();
-
-        public IEnumerable<Curve> ToolpathCurves => TechOperations.Where(p => p.ToolpathCurves != null).SelectMany(p => p.ToolpathCurves);
-
-        public void DeleteToolpath()
-        {
-            TechOperations.ForEach(p => p.DeleteToolpath());
-            ProcessCommands = null;
-        }
 
         /// <summary>
         /// Команды
@@ -52,6 +44,7 @@ namespace CAM.Domain
             Name = name ?? throw new ArgumentNullException("TechProcessName");
             _settings = settings;
             TechProcessParams = _settings.TechProcessParams.Clone();
+            _techOperationFactory = new TechOperationFactory(settings);
         }
 
         public void BuildProcessing(BorderProcessingArea startBorder = null)
@@ -66,20 +59,15 @@ namespace CAM.Domain
             ProcessCommands = builder.FinishTechProcess();
         }
 
-        public ITechOperationFactory GetFactory(TechOperationType techOperationType)
+        public IEnumerable<Curve> ToolpathCurves => TechOperations.Where(p => p.ToolpathCurves != null).SelectMany(p => p.ToolpathCurves);
+
+        public void DeleteToolpath()
         {
-            if (!TechOperationFactorys.TryGetValue(techOperationType, out ITechOperationFactory factory))
-            {
-                switch (techOperationType)
-                {
-                    case TechOperationType.Sawing:
-                        factory = new SawingTechOperationFactory(_settings.SawingLineTechOperationParams.Clone(), _settings.SawingCurveTechOperationParams.Clone());
-                        break;
-                }
-                TechOperationFactorys[techOperationType] = factory;
-            }
-            return factory;
+            TechOperations.ForEach(p => p.DeleteToolpath());
+            ProcessCommands = null;
         }
+
+        public object GetTechOperationParams(TechOperationType techOperationType) => _techOperationFactory.GetTechOperationParams(techOperationType);
 
         public bool SetTool(string text)
         {
@@ -94,8 +82,8 @@ namespace CAM.Domain
             return tool != null;
         }
 
-        public SawingTechOperation[] CreateTechOperations(TechOperationType techOperationType, IEnumerable<Curve> curves) => 
-            curves.Select(p => GetFactory(techOperationType).Create(this, p)).Where(p => p != null).ToArray();
+        public ITechOperation[] CreateTechOperations(TechOperationType techOperationType, IEnumerable<Curve> curves) => 
+            curves.Select(p => _techOperationFactory.Create(this, techOperationType, p)).Where(p => p != null).ToArray();
 
         private void ProcessBorders(List<BorderProcessingArea> borders, BorderProcessingArea fixedSideBorder = null)
         {

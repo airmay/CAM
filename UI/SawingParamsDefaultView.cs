@@ -20,7 +20,7 @@ namespace CAM.UI
             InitializeComponent();
         }
 
-        public void SetFactory(SawingTechOperationFactory factory)
+        public void SetParams(object factory)
         {
             _sawingTechOperationParams = new List<SawingMode>[] { factory.SawingLineTechOperationParams.Modes, factory.SawingCurveTechOperationParams.Modes };
             sawingModesView.sawingModesBindingSource.DataSource = _sawingTechOperationParams[0];

@@ -17,7 +17,7 @@ namespace CAM.UI
 
 	    private TechProcess CurrentTechProcess => (treeView.SelectedNode?.Parent ?? treeView.SelectedNode)?.Tag as TechProcess;
 
-	    private static TreeNode CreateTechOperationNode(TechOperation techOperation) => new TreeNode(techOperation.Name, 1, 1) {Tag = techOperation};
+	    private static TreeNode CreateTechOperationNode(ITechOperation techOperation) => new TreeNode(techOperation.Name, 1, 1) {Tag = techOperation};
 
         public TechProcessView()
         {

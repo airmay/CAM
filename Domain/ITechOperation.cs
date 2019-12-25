@@ -5,7 +5,7 @@ namespace CAM.Domain
     /// <summary>
     /// Интрефейс технологической операции
     /// </summary>
-    internal interface ITechOperation
+    public interface ITechOperation
     {
         /// <summary>
         /// Наименование

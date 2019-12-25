@@ -1,10 +1,5 @@
 ﻿using Autodesk.AutoCAD.DatabaseServices;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
 
 namespace CAM.Domain
 {
@@ -14,24 +9,22 @@ namespace CAM.Domain
     [Serializable]
     public class SawingTechOperationFactory : ITechOperationFactory
     {
-	    /// <summary>
-	    /// Вид технологической операции
-	    /// </summary>
-	    public TechOperationType TechOperationType { get; } = TechOperationType.Sawing;
+        /// <summary>
+        /// Вид технологической операции
+        /// </summary>
+        public TechOperationType TechOperationType { get; } = TechOperationType.Sawing;
 
-		public SawingTechOperationParams SawingLineTechOperationParams { get; }
+        [NonSerialized]
+        private readonly Settings _settings;
 
-	    public SawingTechOperationParams SawingCurveTechOperationParams { get; }
+        private SawingDefaultParams _params;
 
-		/// <summary>
-		/// Конструктор фабрики
-		/// </summary>
-		/// <param name="sawingLineTechOperationParams">Параметры по-умолчанию технологической операции "Распиловка по прямой"</param>
-		/// <param name="sawingCurveTechOperationParams">Параметры по-умолчанию технологической операции "Распиловка по дуге"</param>
-		public SawingTechOperationFactory(SawingTechOperationParams sawingLineTechOperationParams, SawingTechOperationParams sawingCurveTechOperationParams)
+        /// <summary>
+        /// Конструктор фабрики
+        /// </summary>
+        public SawingTechOperationFactory(Settings settings)
         {
-            SawingLineTechOperationParams = sawingLineTechOperationParams;
-            SawingCurveTechOperationParams = sawingCurveTechOperationParams;
+            _settings = settings;
         }
 
 	    /// <summary>
@@ -40,24 +33,20 @@ namespace CAM.Domain
 	    /// <param name="techProcess"></param>
 	    /// <param name="curve">Графическая кривая представляющая область обработки</param>
 	    /// <returns>Технологическая операцию</returns>
-	    public SawingTechOperation Create(TechProcess techProcess, Curve curve)
+	    public ITechOperation Create(TechProcess techProcess, Curve curve)
         {
-	        //if ((entity.Layer != "0" && ((Entity)dbObject).Layer != "Êàìåíü")
-	        //{
-	        //    AutocadUtils.ShowError("Îáúåêò íå â ñëîå \"0\" èëè \"Êàìåíü\"");
-	        //    continue;
-	        //}
-	        // TODO Проверка слоя при добавлении
-	        switch (curve)
-	        {
-		        case Line line:
-			        return new SawingTechOperation(techProcess, new BorderProcessingArea(line), SawingLineTechOperationParams.Clone());
-		        case Arc arc:
-			        return new SawingTechOperation(techProcess, new BorderProcessingArea(arc), SawingCurveTechOperationParams.Clone());
-		        default:
-                    Acad.Alert($"Неподдерживаемый тип кривой {curve.GetType()}");
-                    return null;
-	        }
+            var techOperationParams = curve is Line
+                ? _params?.SawingLineTechOperationParams ?? _settings.SawingLineTechOperationParams
+                : _params?.SawingCurveTechOperationParams ?? _settings.SawingCurveTechOperationParams;
+
+            return new SawingTechOperation(techProcess, new BorderProcessingArea(curve), techOperationParams.Clone());
         }
+
+        public object GetTechOperationParams() => _params ?? (
+                _params = new SawingDefaultParams
+                {
+                    SawingLineTechOperationParams = _settings.SawingLineTechOperationParams.Clone(),
+                    SawingCurveTechOperationParams = _settings.SawingCurveTechOperationParams.Clone()
+                });
     }
 }

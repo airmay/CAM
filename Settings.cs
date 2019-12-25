@@ -93,6 +93,9 @@ namespace CAM
 
         public SawingTechOperationParams SawingCurveTechOperationParams { get; set; }
 
+//        public SawingDefaultParams SawingDefaultParams { get; set; }
+
+
         #endregion
     }
 }
