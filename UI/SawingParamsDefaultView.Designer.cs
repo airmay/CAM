@@ -53,9 +53,9 @@
             this.cbTrajectoryType.Items.AddRange(new object[] {
             "Прямолинейная",
             "Криволинейная"});
-            this.cbTrajectoryType.Location = new System.Drawing.Point(81, 3);
+            this.cbTrajectoryType.Location = new System.Drawing.Point(91, 3);
             this.cbTrajectoryType.Name = "cbTrajectoryType";
-            this.cbTrajectoryType.Size = new System.Drawing.Size(274, 21);
+            this.cbTrajectoryType.Size = new System.Drawing.Size(257, 21);
             this.cbTrajectoryType.TabIndex = 1;
             this.cbTrajectoryType.SelectedIndexChanged += new System.EventHandler(this.cbTrajectoryType_SelectedIndexChanged);
             // 

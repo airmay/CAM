@@ -10,17 +10,17 @@ namespace CAM.Domain
     /// <summary>
     /// Распиловка по дуге
     /// </summary>
-    public class SawingArcTechOperation : SawingTechOperation
-    {
-        /// <summary>
-        /// Обрабатываемая область
-        /// </summary>
-        //public ArcProcessingArea processingArea { get; }
+    //public class SawingArcTechOperation : SawingTechOperation
+    //{
+    //    /// <summary>
+    //    /// Обрабатываемая область
+    //    /// </summary>
+    //    //public ArcProcessingArea processingArea { get; }
 
        
-        public SawingArcTechOperation(TechProcess techProcess, ArcProcessingArea processingArea, SawingTechOperationParams techOperationParams)
-             : base(techProcess, processingArea, techOperationParams)
-        {
-        }
-    }
+    //    public SawingArcTechOperation(TechProcess techProcess, ArcProcessingArea processingArea, SawingTechOperationParams techOperationParams)
+    //         : base(techProcess, processingArea, techOperationParams)
+    //    {
+    //    }
+    //}
 }

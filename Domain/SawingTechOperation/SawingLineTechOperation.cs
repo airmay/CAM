@@ -10,16 +10,16 @@ namespace CAM.Domain
     /// <summary>
     /// Распиловка по прямой
     /// </summary>
-    public class SawingLineTechOperation : SawingTechOperation
-    {
-        /// <summary>
-        /// Обрабатываемая область
-        /// </summary>
-        //public LineProcessingArea processingArea { get; }
+    //public class SawingLineTechOperation : SawingTechOperation
+    //{
+    //    /// <summary>
+    //    /// Обрабатываемая область
+    //    /// </summary>
+    //    //public LineProcessingArea processingArea { get; }
 
-        public SawingLineTechOperation(TechProcess techProcess, LineProcessingArea processingArea, SawingTechOperationParams techOperationParams)
-             : base(techProcess, processingArea, techOperationParams)
-        {
-        }
-    }
+    //    public SawingLineTechOperation(TechProcess techProcess, LineProcessingArea processingArea, SawingTechOperationParams techOperationParams)
+    //         : base(techProcess, processingArea, techOperationParams)
+    //    {
+    //    }
+    //}
 }

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using Autodesk.AutoCAD.DatabaseServices;
+using System.Collections.Generic;
 
 namespace CAM.Domain
 {
@@ -7,6 +8,16 @@ namespace CAM.Domain
     /// </summary>
     public interface ITechOperation
     {
+        ProcessingType Type { get; }
+
+        TechProcess TechProcess { get; set; }
+
+        object Params { get; }
+
+        ProcessingArea ProcessingArea { get; }
+
+        List<ProcessCommand> ProcessCommands { get; }
+
         /// <summary>
         /// Наименование
         /// </summary>
@@ -17,5 +28,13 @@ namespace CAM.Domain
         /// </summary>
         /// <returns></returns>
         void BuildProcessing(ScemaLogicProcessBuilder builder);
+
+        void DeleteToolpath();
+
+        IEnumerable<Curve> ToolpathCurves { get; }
+
+        bool MoveDown();
+
+        bool MoveUp();
     }
 }

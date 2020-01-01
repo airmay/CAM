@@ -1,17 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Drawing;
-using System.Data;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using CAM.Domain;
 
 namespace CAM.UI
 {
-    public partial class SawingParamsDefaultView : UserControl
+    [DefaultParamsView(ProcessingType.Sawing)]
+    public partial class SawingParamsDefaultView : ParamsView
     {
         private List<SawingMode>[] _sawingTechOperationParams;
 
@@ -20,9 +15,10 @@ namespace CAM.UI
             InitializeComponent();
         }
 
-        public void SetParams(object factory)
+        public override void SetParams(object @params)
         {
-            _sawingTechOperationParams = new List<SawingMode>[] { factory.SawingLineTechOperationParams.Modes, factory.SawingCurveTechOperationParams.Modes };
+            var sawingDefaultParams = (SawingDefaultParams)@params;
+            _sawingTechOperationParams = new List<SawingMode>[] { sawingDefaultParams.SawingLineTechOperationParams.Modes, sawingDefaultParams.SawingCurveTechOperationParams.Modes };
             sawingModesView.sawingModesBindingSource.DataSource = _sawingTechOperationParams[0];
             cbTrajectoryType.SelectedIndex = 0;
         }

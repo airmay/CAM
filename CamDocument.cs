@@ -27,11 +27,11 @@ namespace CAM
             return techProcess;
         }
 
-        public ITechOperation[] CreateTechOperations(TechProcess techProcess, TechOperationType techOperationType)
+        public ITechOperation[] CreateTechOperations(TechProcess techProcess, ProcessingType processingType)
         {
             var curves = Acad.GetSelectedCurves();
             if (curves.Any())
-                return techProcess.CreateTechOperations(techOperationType, curves);
+                return techProcess.CreateTechOperations(processingType, curves);
 
             Acad.Alert($"Не выбраны элементы чертежа");
             return null;
@@ -44,7 +44,7 @@ namespace CAM
             TechProcessList.Remove(techProcess);
         }
 
-        public void DeleteTechOperation(TechOperation techOperation)
+        public void DeleteTechOperation(TechOperationBase techOperation)
         {
             Acad.DeleteCurves(techOperation.ToolpathCurves);
             techOperation.TechProcess.TechOperations.Remove(techOperation);
@@ -52,7 +52,7 @@ namespace CAM
 
         public void SelectTechProcess(TechProcess techProcess) => Acad.SelectObjectIds(techProcess.TechOperations.Select(p => p.ProcessingArea.AcadObjectId).ToArray());
 
-        public void SelectTechOperation(TechOperation techOperation) => Acad.SelectObjectIds(techOperation.ProcessingArea.AcadObjectId);
+        public void SelectTechOperation(ITechOperation techOperation) => Acad.SelectObjectIds(techOperation.ProcessingArea.AcadObjectId);
 
         public void SelectProcessCommand(ProcessCommand processCommand) => Acad.SelectCurve(processCommand.GetToolpathCurve());
 
@@ -78,7 +78,7 @@ namespace CAM
             }
         }
 
-        public void SwapOuterSide(TechProcess techProcess, TechOperation techOperation)
+        public void SwapOuterSide(TechProcess techProcess, TechOperationBase techOperation)
         {
             var to = techOperation ?? techProcess?.TechOperations?.FirstOrDefault();
             if (to?.ProcessingArea is BorderProcessingArea border)

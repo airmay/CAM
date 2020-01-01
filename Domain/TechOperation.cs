@@ -11,18 +11,24 @@ namespace CAM.Domain
     /// Базовая технологическая операция
     /// </summary>
     [Serializable]
-    public abstract class TechOperation : ITechOperation
+    public abstract class TechOperationBase : ITechOperation
     {
         /// <summary>
-        /// Вид технологической операции
+        /// Вид обработки
         /// </summary>
-        public abstract TechOperationType Type { get; }
+        public abstract ProcessingType Type { get; }
 
         /// <summary>
         /// Технологический процесс обработки
         /// </summary>
         [NonSerialized]
-        public TechProcess TechProcess;
+        private TechProcess _techProcess;
+
+        public TechProcess TechProcess
+        {
+            get => _techProcess;
+            set => _techProcess = value;
+        }
 
         /// <summary>
         /// Обрабатываемая область
@@ -38,19 +44,22 @@ namespace CAM.Domain
         /// Команды
         /// </summary>
         [NonSerialized]
-        public List<ProcessCommand> ProcessCommands;
+        protected List<ProcessCommand> _processCommands;
 
-        protected TechOperation(TechProcess techProcess, ProcessingArea processingArea)
+        public List<ProcessCommand> ProcessCommands => _processCommands;
+
+        public abstract object Params { get; }
+
+        public TechOperationBase(TechProcess techProcess, ProcessingArea processingArea)
         {
-            TechProcess = techProcess;
+            _techProcess = techProcess;
             TechProcess.TechOperations.Add(this);
-
             ProcessingArea = processingArea;
         }
 
-        internal void DeleteToolpath() => ProcessCommands = null;
-
         public abstract void BuildProcessing(ScemaLogicProcessBuilder builder);
+
+        public void DeleteToolpath() => _processCommands = null;
 
 	    public IEnumerable<Curve> ToolpathCurves => ProcessCommands?.Select(p => p.GetToolpathCurve()).Where(p => p != null);
 

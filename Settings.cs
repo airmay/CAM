@@ -23,9 +23,9 @@ namespace CAM
         /// <returns></returns>
         public static Settings Load()
         {
-            var formatter = new XmlSerializer(typeof(Settings));
             try
             {
+                var formatter = new XmlSerializer(typeof(Settings));
                 using (var fileStream = new FileStream(GetFilePath, FileMode.Open))
                     return (Settings)formatter.Deserialize(fileStream);
             }
@@ -86,6 +86,11 @@ namespace CAM
         public List<Tool> Tools { get; set; }
 
         public TechProcessParams TechProcessParams { get; set; }
+
+        //public Dictionary<ProcessingType, IProcessingParams> GetProcessingParams() => new Dictionary<ProcessingType, IProcessingParams> { { ProcessingType.Sawing, new SawingDefaultParams{
+        //    SawingCurveTechOperationParams = this.SawingCurveTechOperationParams,
+        //    SawingLineTechOperationParams = this.SawingLineTechOperationParams
+        //} } };
 
         #region TechOperationParams
 

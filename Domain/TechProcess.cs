@@ -13,7 +13,7 @@ namespace CAM.Domain
     [Serializable]
     public class TechProcess
     {
-        private readonly TechOperationFactory _techOperationFactory;
+        //private readonly TechOperationFactory _techOperationFactory;
 
         [NonSerialized]
         private Settings _settings;
@@ -31,7 +31,7 @@ namespace CAM.Domain
         /// <summary>
         /// Список технологических операций процесса
         /// </summary>
-        public List<TechOperation> TechOperations { get; } = new List<TechOperation>();
+        public List<ITechOperation> TechOperations { get; } = new List<ITechOperation>();
 
         /// <summary>
         /// Команды
@@ -39,12 +39,37 @@ namespace CAM.Domain
         [NonSerialized]
         public List<ProcessCommand> ProcessCommands;
 
+        public ProcessingType? ProcessingType => _techOperationFactory?.ProcessingType;
+
+        //public ProcessingType ProcessingType;
+
+        //public IProcessor Processor => ProcessorContainer.GetProcessor(ProcessingType);
+
+        public object TechOperationParams => _techOperationFactory.GetTechOperationParams();
+
+        private ITechOperationFactory _techOperationFactory;
+
         public TechProcess(string name, Settings settings)
         {
             Name = name ?? throw new ArgumentNullException("TechProcessName");
             _settings = settings;
             TechProcessParams = _settings.TechProcessParams.Clone();
-            _techOperationFactory = new TechOperationFactory(settings);
+        }
+
+        public void SetProcessingType(ProcessingType? processingType)
+        {
+            _techOperationFactory = processingType != null ? TechOperationFactoryProvider.CreateFactory(processingType.Value, _settings) : null;
+            //ProcessingType = processingType;
+        }
+
+        public void Init(Settings settings)
+        {
+            _settings = settings;
+            TechOperations.ForEach(to =>
+            {
+                to.ProcessingArea.AcadObjectId = Acad.GetObjectId(to.ProcessingArea.Handle);
+                to.TechProcess = this;
+            });
         }
 
         public void BuildProcessing(BorderProcessingArea startBorder = null)
@@ -67,8 +92,6 @@ namespace CAM.Domain
             ProcessCommands = null;
         }
 
-        public object GetTechOperationParams(TechOperationType techOperationType) => _techOperationFactory.GetTechOperationParams(techOperationType);
-
         public bool SetTool(string text)
         {
             var tool = _settings.Tools.SingleOrDefault(p => p.Number.ToString() == text);
@@ -82,8 +105,15 @@ namespace CAM.Domain
             return tool != null;
         }
 
-        public ITechOperation[] CreateTechOperations(TechOperationType techOperationType, IEnumerable<Curve> curves) => 
-            curves.Select(p => _techOperationFactory.Create(this, techOperationType, p)).Where(p => p != null).ToArray();
+        public ITechOperation[] CreateTechOperations(ProcessingType type, IEnumerable<Curve> curves)
+        {
+            if (_techOperationFactory == null)
+            {
+                Acad.Alert("Укажите вид обработки");
+                return null;
+            }
+            return curves.Select(p => _techOperationFactory.Create(this, p)).Where(p => p != null).ToArray();
+        }
 
         private void ProcessBorders(List<BorderProcessingArea> borders, BorderProcessingArea fixedSideBorder = null)
         {

@@ -48,7 +48,7 @@ namespace CAM.UI
 
         private void SetParamsViewsVisible() => _techProcessParamsView.Visible = _paramsView.Visible = treeView.Nodes.Count > 0;
 
-        private void SetButtonsEnabled() => bRemove.Enabled = bMoveUpTechOperation.Enabled = bMoveDownTechOperation.Enabled = 
+        private void SetButtonsEnabled() => bCreateTechOperation.Enabled = bRemove.Enabled = bMoveUpTechOperation.Enabled = bMoveDownTechOperation.Enabled = 
             bSwapOuterSide.Enabled = bBuildProcessing.Enabled = bSendProgramm.Enabled = treeView.Nodes.Count > 0;
 
         private void CreateTechProcessNode(TechProcess techProcess)
@@ -59,6 +59,7 @@ namespace CAM.UI
 		    techProcessNode.ExpandAll();
 			treeView.SelectedNode = techProcessNode;
             SetParamsViewsVisible();
+            bCreateTechOperation.Enabled = true;
             bRemove.Enabled = true;
         }
 
@@ -81,7 +82,7 @@ namespace CAM.UI
 
 			        break;
 
-		        case TechOperation techOperation:
+		        case ITechOperation techOperation:
 
 			        if (techOperation.ProcessingArea is BorderProcessingArea && _borderProcessingAreaView == null)
 			        {
@@ -96,14 +97,7 @@ namespace CAM.UI
 					        _borderProcessingAreaView.SetDataSource(techOperation.ProcessingArea as BorderProcessingArea);
 			        }
 
-			        switch (techOperation)
-	                {
-		                case SawingTechOperation sawingTechOperation:
-			                var view = GetParamsView<SawingParamsView>();
-			                view.SetDataSource(sawingTechOperation.TechOperationParams);
-
-			                break;
-	                }
+                    ParamsViewContainer.SetParamsView(techOperation.Type, techOperation.Params, _paramsView);
 			        _paramsView.BringToFront();
                     processCommandBindingSource.DataSource = techOperation.ProcessCommands;
                     _camDocument.SelectTechOperation(techOperation);
@@ -112,19 +106,6 @@ namespace CAM.UI
             }
         }
 
-        private T GetParamsView<T>() where T : Control, new()
-	    {
-		    if (!_paramsViews.TryGetValue(typeof(T), out var view))
-		    {
-			    view = new T { Dock = DockStyle.Fill };
-				_paramsViews.Add(typeof(T), view);
-				_paramsView.Controls.Add(view);
-		    }
-            view.BringToFront();
-
-			return (T)view;
-	    }
-
 	    private void treeView_AfterLabelEdit(object sender, NodeLabelEditEventArgs e)
 	    {
             switch (treeView.SelectedNode.Tag)
@@ -132,7 +113,7 @@ namespace CAM.UI
                 case TechProcess techProcess:
                     techProcess.Name = e.Label;
                     break;
-                case TechOperation techOperation:
+                case TechOperationBase techOperation:
                     techOperation.Name = e.Label;
                     break;
             }
@@ -154,13 +135,13 @@ namespace CAM.UI
 		    if (treeView.Nodes.Count == 0)
 		    {
 			    var techProcess = _camDocument.CreateTechProcess();
-                _camDocument.CreateTechOperations(techProcess, TechOperationType.Sawing);
+                _camDocument.CreateTechOperations(techProcess, ProcessingType.Sawing);
 			    CreateTechProcessNode(techProcess);
 		    }
 		    else
 		    {
 			    var techProcessNode = treeView.SelectedNode.Parent ?? treeView.SelectedNode;
-			    var techOperations = _camDocument.CreateTechOperations(CurrentTechProcess, TechOperationType.Sawing);
+			    var techOperations = _camDocument.CreateTechOperations(CurrentTechProcess, ProcessingType.Sawing);
                 if (techOperations != null)
                 {
                     techProcessNode.Nodes.AddRange(Array.ConvertAll(techOperations, CreateTechOperationNode));
@@ -188,7 +169,7 @@ namespace CAM.UI
 				    case TechProcess techProcess:
                         _camDocument.DeleteTechProcess(techProcess);
 					    break;
-				    case TechOperation techOperation:
+				    case TechOperationBase techOperation:
                         _camDocument.DeleteTechOperation(techOperation);
 					    break;
 			    }
@@ -210,7 +191,7 @@ namespace CAM.UI
 
 	    private void bMoveUpTechOperation_Click(object sender, EventArgs e)
 	    {
-		    if (treeView.SelectedNode.Tag is TechOperation techOperation)
+		    if (treeView.SelectedNode.Tag is TechOperationBase techOperation)
 		    {
 			    EndEdit();
 			    if (techOperation.MoveUp())
@@ -220,7 +201,7 @@ namespace CAM.UI
 
 	    private void bMoveDownTechOperation_Click(object sender, EventArgs e)
 	    {
-		    if (treeView.SelectedNode.Tag is TechOperation techOperation)
+		    if (treeView.SelectedNode.Tag is TechOperationBase techOperation)
 		    {
 			    EndEdit();
 			    if (techOperation.MoveDown())
@@ -232,7 +213,6 @@ namespace CAM.UI
 	    {
 	        if (CurrentTechProcess != null)
 	        {
-                //var view = GetParamsView<SawingParamsView>();
                 treeView.Focus();
                 _camDocument.BuildProcessing(CurrentTechProcess);
                 RefreshView();
@@ -249,7 +229,7 @@ namespace CAM.UI
 
         private void bSwapOuterSide_Click(object sender, EventArgs e)
         {
-            _camDocument.SwapOuterSide(treeView.SelectedNode?.Tag as TechProcess, treeView.SelectedNode?.Tag as TechOperation);
+            _camDocument.SwapOuterSide(treeView.SelectedNode?.Tag as TechProcess, treeView.SelectedNode?.Tag as TechOperationBase);
             RefreshView();
         }
 

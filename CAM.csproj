@@ -85,7 +85,21 @@
     <Compile Include="AcadGateway.cs" />
     <Compile Include="CamDocument.cs" />
     <Compile Include="CamManager.cs" />
+    <Compile Include="Domain\DefaultParamsViewAttribute.cs" />
+    <Compile Include="Domain\ParamsViewAttribute.cs" />
+    <Compile Include="Domain\ParamsViewContainer.cs" />
+    <Compile Include="Domain\ProcessingType.cs" />
+    <Compile Include="Domain\Profiling\ProfilingFactory.cs" />
+    <Compile Include="Domain\Profiling\ProfilingParamsView.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Domain\Profiling\ProfilingParamsView.Designer.cs">
+      <DependentUpon>ProfilingParamsView.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Domain\Profiling\ProfilingTechOperation.cs" />
+    <Compile Include="Domain\SawingTechOperation\TechOperationTypeAttribute.cs" />
     <Compile Include="Domain\TechOperationFactory.cs" />
+    <Compile Include="Domain\TechOperationFactoryProvider.cs" />
     <Compile Include="TechProcessLoader.cs" />
     <Compile Include="UI\CamPaletteSet.cs" />
     <Compile Include="Domain\CommandCode.cs" />
@@ -130,6 +144,12 @@
     </Compile>
     <Compile Include="UI\BorderProcessingAreaView.Designer.cs">
       <DependentUpon>BorderProcessingAreaView.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UI\ParamsView.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="UI\ParamsView.Designer.cs">
+      <DependentUpon>ParamsView.cs</DependentUpon>
     </Compile>
     <Compile Include="UI\ProgramView.cs">
       <SubType>UserControl</SubType>
@@ -182,6 +202,9 @@
     <None Include="Properties\DataSources\CAM.Domain.SawingTechOperationParams.datasource" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Domain\Profiling\ProfilingParamsView.resx">
+      <DependentUpon>ProfilingParamsView.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>

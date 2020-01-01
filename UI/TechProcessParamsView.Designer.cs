@@ -72,23 +72,20 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.cbTechOperation.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cbTechOperation.FormattingEnabled = true;
-            this.cbTechOperation.Items.AddRange(new object[] {
-            "Распиловка",
-            "Профилирование"});
-            this.cbTechOperation.Location = new System.Drawing.Point(81, 0);
+            this.cbTechOperation.Location = new System.Drawing.Point(91, 0);
             this.cbTechOperation.Name = "cbTechOperation";
-            this.cbTechOperation.Size = new System.Drawing.Size(232, 21);
+            this.cbTechOperation.Size = new System.Drawing.Size(225, 21);
             this.cbTechOperation.TabIndex = 6;
-            this.cbTechOperation.SelectedIndexChanged += new System.EventHandler(this.cbTechOperation_SelectedIndexChanged);
+            this.cbTechOperation.SelectionChangeCommitted += new System.EventHandler(this.cbTechOperation_SelectionChangeCommitted);
             // 
             // label3
             // 
             this.label3.AutoSize = true;
             this.label3.Location = new System.Drawing.Point(3, 3);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(76, 13);
+            this.label3.Size = new System.Drawing.Size(82, 13);
             this.label3.TabIndex = 5;
-            this.label3.Text = "Тех.операция";
+            this.label3.Text = "Вид обработки";
             // 
             // cbMachine
             // 
@@ -97,10 +94,11 @@
             this.cbMachine.DataBindings.Add(new System.Windows.Forms.Binding("SelectedItem", this.techProcessParamsBindingSource, "Machine", true));
             this.cbMachine.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cbMachine.FormattingEnabled = true;
-            this.cbMachine.Location = new System.Drawing.Point(87, 3);
+            this.cbMachine.Location = new System.Drawing.Point(94, 3);
             this.cbMachine.Name = "cbMachine";
-            this.cbMachine.Size = new System.Drawing.Size(232, 21);
+            this.cbMachine.Size = new System.Drawing.Size(234, 21);
             this.cbMachine.TabIndex = 0;
+            this.cbMachine.SelectionChangeCommitted += new System.EventHandler(this.cbMachine_SelectionChangeCommitted);
             // 
             // techProcessParamsBindingSource
             // 
@@ -114,9 +112,9 @@
             this.cbMaterial.DataBindings.Add(new System.Windows.Forms.Binding("SelectedItem", this.techProcessParamsBindingSource, "Material", true));
             this.cbMaterial.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cbMaterial.FormattingEnabled = true;
-            this.cbMaterial.Location = new System.Drawing.Point(84, 19);
+            this.cbMaterial.Location = new System.Drawing.Point(91, 19);
             this.cbMaterial.Name = "cbMaterial";
-            this.cbMaterial.Size = new System.Drawing.Size(223, 21);
+            this.cbMaterial.Size = new System.Drawing.Size(225, 21);
             this.cbMaterial.TabIndex = 0;
             // 
             // lbMaterial
@@ -149,7 +147,7 @@
             this.gbTool.Controls.Add(this.lbToolNumber);
             this.gbTool.Location = new System.Drawing.Point(3, 109);
             this.gbTool.Name = "gbTool";
-            this.gbTool.Size = new System.Drawing.Size(316, 89);
+            this.gbTool.Size = new System.Drawing.Size(325, 89);
             this.gbTool.TabIndex = 2;
             this.gbTool.TabStop = false;
             this.gbTool.Text = "Инструмент";
@@ -159,10 +157,10 @@
             this.edThickness.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.edThickness.DataBindings.Add(new System.Windows.Forms.Binding("Text", this.techProcessParamsBindingSource, "ToolThickness", true));
-            this.edThickness.Location = new System.Drawing.Point(84, 63);
+            this.edThickness.Location = new System.Drawing.Point(91, 63);
             this.edThickness.Multiline = true;
             this.edThickness.Name = "edThickness";
-            this.edThickness.Size = new System.Drawing.Size(223, 20);
+            this.edThickness.Size = new System.Drawing.Size(225, 20);
             this.edThickness.TabIndex = 2;
             // 
             // label2
@@ -179,10 +177,10 @@
             this.edDiameter.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.edDiameter.DataBindings.Add(new System.Windows.Forms.Binding("Text", this.techProcessParamsBindingSource, "ToolDiameter", true));
-            this.edDiameter.Location = new System.Drawing.Point(84, 41);
+            this.edDiameter.Location = new System.Drawing.Point(91, 41);
             this.edDiameter.Multiline = true;
             this.edDiameter.Name = "edDiameter";
-            this.edDiameter.Size = new System.Drawing.Size(223, 20);
+            this.edDiameter.Size = new System.Drawing.Size(225, 20);
             this.edDiameter.TabIndex = 1;
             // 
             // label1
@@ -199,9 +197,9 @@
             this.edToolNumber.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.edToolNumber.DataBindings.Add(new System.Windows.Forms.Binding("Text", this.techProcessParamsBindingSource, "ToolNumber", true));
-            this.edToolNumber.Location = new System.Drawing.Point(84, 19);
+            this.edToolNumber.Location = new System.Drawing.Point(91, 19);
             this.edToolNumber.Name = "edToolNumber";
-            this.edToolNumber.Size = new System.Drawing.Size(223, 20);
+            this.edToolNumber.Size = new System.Drawing.Size(225, 20);
             this.edToolNumber.TabIndex = 0;
             this.edToolNumber.Validating += new System.ComponentModel.CancelEventHandler(this.edToolNumber_Validating);
             // 
@@ -221,10 +219,10 @@
             this.gbTechOperationParams.Dock = System.Windows.Forms.DockStyle.Fill;
             this.gbTechOperationParams.Location = new System.Drawing.Point(0, 278);
             this.gbTechOperationParams.Name = "gbTechOperationParams";
-            this.gbTechOperationParams.Size = new System.Drawing.Size(322, 485);
+            this.gbTechOperationParams.Size = new System.Drawing.Size(331, 485);
             this.gbTechOperationParams.TabIndex = 7;
             this.gbTechOperationParams.TabStop = false;
-            this.gbTechOperationParams.Text = "Параметры тех. операциий";
+            this.gbTechOperationParams.Text = "Параметры обработки";
             // 
             // panel2
             // 
@@ -233,7 +231,7 @@
             this.panel2.Dock = System.Windows.Forms.DockStyle.Top;
             this.panel2.Location = new System.Drawing.Point(3, 16);
             this.panel2.Name = "panel2";
-            this.panel2.Size = new System.Drawing.Size(316, 21);
+            this.panel2.Size = new System.Drawing.Size(325, 21);
             this.panel2.TabIndex = 7;
             // 
             // panel1
@@ -242,7 +240,7 @@
             this.panel1.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.panel1.Location = new System.Drawing.Point(3, 453);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(316, 29);
+            this.panel1.Size = new System.Drawing.Size(325, 29);
             this.panel1.TabIndex = 0;
             this.panel1.Visible = false;
             // 
@@ -265,7 +263,7 @@
             this.gbBillet.Controls.Add(this.lbMaterial);
             this.gbBillet.Location = new System.Drawing.Point(3, 30);
             this.gbBillet.Name = "gbBillet";
-            this.gbBillet.Size = new System.Drawing.Size(316, 73);
+            this.gbBillet.Size = new System.Drawing.Size(325, 73);
             this.gbBillet.TabIndex = 1;
             this.gbBillet.TabStop = false;
             this.gbBillet.Text = "Заготовка";
@@ -280,10 +278,10 @@
             this.edBilletThickness.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.Suggest;
             this.edBilletThickness.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.CustomSource;
             this.edBilletThickness.DataBindings.Add(new System.Windows.Forms.Binding("Text", this.techProcessParamsBindingSource, "BilletThickness", true));
-            this.edBilletThickness.Location = new System.Drawing.Point(84, 42);
+            this.edBilletThickness.Location = new System.Drawing.Point(91, 42);
             this.edBilletThickness.Multiline = true;
             this.edBilletThickness.Name = "edBilletThickness";
-            this.edBilletThickness.Size = new System.Drawing.Size(222, 20);
+            this.edBilletThickness.Size = new System.Drawing.Size(224, 20);
             this.edBilletThickness.TabIndex = 1;
             // 
             // label4
@@ -300,10 +298,10 @@
             this.edFrequency.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.edFrequency.DataBindings.Add(new System.Windows.Forms.Binding("Text", this.techProcessParamsBindingSource, "Frequency", true));
-            this.edFrequency.Location = new System.Drawing.Point(87, 204);
+            this.edFrequency.Location = new System.Drawing.Point(94, 204);
             this.edFrequency.Multiline = true;
             this.edFrequency.Name = "edFrequency";
-            this.edFrequency.Size = new System.Drawing.Size(223, 20);
+            this.edFrequency.Size = new System.Drawing.Size(225, 20);
             this.edFrequency.TabIndex = 3;
             // 
             // label5
@@ -320,10 +318,10 @@
             this.edZSafety.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.edZSafety.DataBindings.Add(new System.Windows.Forms.Binding("Text", this.techProcessParamsBindingSource, "ZSafety", true));
-            this.edZSafety.Location = new System.Drawing.Point(87, 249);
+            this.edZSafety.Location = new System.Drawing.Point(94, 249);
             this.edZSafety.Multiline = true;
             this.edZSafety.Name = "edZSafety";
-            this.edZSafety.Size = new System.Drawing.Size(223, 20);
+            this.edZSafety.Size = new System.Drawing.Size(225, 20);
             this.edZSafety.TabIndex = 5;
             // 
             // label6
@@ -340,10 +338,10 @@
             this.edPenetrationRate.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.edPenetrationRate.DataBindings.Add(new System.Windows.Forms.Binding("Text", this.techProcessParamsBindingSource, "PenetrationRate", true));
-            this.edPenetrationRate.Location = new System.Drawing.Point(87, 226);
+            this.edPenetrationRate.Location = new System.Drawing.Point(94, 226);
             this.edPenetrationRate.Multiline = true;
             this.edPenetrationRate.Name = "edPenetrationRate";
-            this.edPenetrationRate.Size = new System.Drawing.Size(222, 20);
+            this.edPenetrationRate.Size = new System.Drawing.Size(224, 20);
             this.edPenetrationRate.TabIndex = 4;
             // 
             // label7
@@ -370,7 +368,7 @@
             this.pParams.Dock = System.Windows.Forms.DockStyle.Top;
             this.pParams.Location = new System.Drawing.Point(0, 0);
             this.pParams.Name = "pParams";
-            this.pParams.Size = new System.Drawing.Size(322, 278);
+            this.pParams.Size = new System.Drawing.Size(331, 278);
             this.pParams.TabIndex = 15;
             // 
             // TechProcessParamsView
@@ -382,7 +380,7 @@
             this.Controls.Add(this.gbTechOperationParams);
             this.Controls.Add(this.pParams);
             this.Name = "TechProcessParamsView";
-            this.Size = new System.Drawing.Size(322, 763);
+            this.Size = new System.Drawing.Size(331, 763);
             ((System.ComponentModel.ISupportInitialize)(this.techProcessParamsBindingSource)).EndInit();
             this.gbTool.ResumeLayout(false);
             this.gbTool.PerformLayout();

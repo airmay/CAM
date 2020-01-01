@@ -7,22 +7,24 @@ namespace CAM.Domain
     /// Технологическая операция "Распиловка"
     /// </summary>
     [Serializable]
-    public class SawingTechOperation : TechOperation
+    public class SawingTechOperation : TechOperationBase
     {
-		/// <summary>
+        /// <summary>
         /// Вид технологической операции
         /// </summary>
-        public override TechOperationType Type { get; } = TechOperationType.Sawing;
+        public override ProcessingType Type => ProcessingType.Sawing;
 
-	    /// <summary>
+        /// <summary>
         /// Параметры технологической операции
         /// </summary>
-        public SawingTechOperationParams TechOperationParams { get; }
+        public SawingTechOperationParams SawingParams { get; }
 
-	    public SawingTechOperation(TechProcess techProcess, ProcessingArea processingArea, SawingTechOperationParams techOperationParams)
+        public override object Params => SawingParams;
+
+        public SawingTechOperation(TechProcess techProcess, ProcessingArea processingArea, SawingTechOperationParams sawingParams)
             : base(techProcess, processingArea)
         {
-            TechOperationParams = techOperationParams;
+            SawingParams = sawingParams;
             Name = $"Распил { processingArea }";
         }
 
@@ -31,8 +33,8 @@ namespace CAM.Domain
             int thickness = TechProcess.TechProcessParams.BilletThickness;
             BorderProcessingArea border = ((BorderProcessingArea)ProcessingArea);
             var indentSum = builder.CalcIndent(border.IsExactlyBegin, border.IsExactlyEnd, thickness);
-	        if (indentSum >= ProcessingArea.Curve.Length())
-	        {
+            if (indentSum >= ProcessingArea.Curve.Length())
+            {
                 throw new InvalidOperationException("Обработка невозможна");
                 // TODO Намечание
                 //if (!(obj is ProcessObjectLine))
@@ -58,29 +60,29 @@ namespace CAM.Domain
             var startCorner = ProcessingArea.Curve.IsUpward() ^ oddPassCount ? Corner.End : Corner.Start;
 
             builder.StartTechOperation(ProcessingArea.Curve, startCorner);
-            TechOperationParams.Compensation = builder.CalcCompensation(border.OuterSide, thickness);
+            SawingParams.Compensation = builder.CalcCompensation(border.OuterSide, thickness);
 
             Calculate(true);
 
-            ProcessCommands = builder.FinishTechOperation();
+            _processCommands = builder.FinishTechOperation();
 
             void Calculate(bool buildMode)
             {
-                var modes = TechOperationParams.Modes.OrderBy(p => p.Depth).GetEnumerator();
+                var modes = SawingParams.Modes.OrderBy(p => p.Depth).GetEnumerator();
                 if (!modes.MoveNext())
                     throw new InvalidOperationException("Не заданы режимы обработки");
                 var mode = modes.Current;
                 SawingMode nextMode = null;
                 if (modes.MoveNext())
                     nextMode = modes.Current;
-                var z = TechOperationParams.IsFirstPassOnSurface ? -mode.DepthStep : 0;
+                var z = SawingParams.IsFirstPassOnSurface ? -mode.DepthStep : 0;
                 do
                 {
                     z += mode.DepthStep;
                     if (nextMode != null && z >= nextMode.Depth)
                     {
                         mode = nextMode;
-                        nextMode = modes.MoveNext() ?  modes.Current : null;
+                        nextMode = modes.MoveNext() ? modes.Current : null;
                     }
                     if (z > thickness)
                         z = thickness;
@@ -93,5 +95,5 @@ namespace CAM.Domain
                 modes.Dispose();
             }
         }
-	}
+    }
 }

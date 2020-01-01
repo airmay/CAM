@@ -5,12 +5,13 @@ namespace CAM.Domain
 {
 	public interface ITechOperationFactory
 	{
-		/// <summary>
-		/// Вид технологической операции
-		/// </summary>
-		TechOperationType TechOperationType { get; }
+        ProcessingType ProcessingType { get; }
 
-        object GetTechOperationParams();
+        /// <summary>
+        /// Получает параметры по-умолчанию для тех операции
+        /// </summary>
+        /// <returns></returns>
+		object GetTechOperationParams();
 
         /// <summary>
         /// Создает технологическую операцию
@@ -18,6 +19,6 @@ namespace CAM.Domain
         /// <param name="techProcess"></param>
         /// <param name="curve">Графическая кривая представляющая область обработки</param>
         /// <returns>Технологическая операцию</returns>
-        ITechOperation Create(TechProcess techProcess, Curve curve);
+        TechOperationBase Create(TechProcess techProcess, Curve curve);
 	}
 }

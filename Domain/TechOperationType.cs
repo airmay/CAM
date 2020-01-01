@@ -11,6 +11,8 @@ namespace CAM.Domain
     /// </summary>
     public enum TechOperationType
     {
+        None,
+
         /// <summary>
         /// Распиловка
         /// </summary>
