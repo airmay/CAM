@@ -1,6 +1,4 @@
-﻿using CAM.Domain;
-
-namespace CAM.UI
+﻿namespace CAM.TechOperations.Sawing
 {
     [ParamsView(ProcessingType.Sawing)]
     public partial class SawingParamsView : ParamsView

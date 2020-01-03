@@ -1,4 +1,4 @@
-﻿namespace CAM.UI
+﻿namespace CAM.TechOperations.Sawing
 {
     partial class SawingModesView
     {
@@ -82,7 +82,7 @@
             // 
             // sawingModesBindingSource
             // 
-            this.sawingModesBindingSource.DataSource = typeof(CAM.Domain.SawingMode);
+            this.sawingModesBindingSource.DataSource = typeof(SawingMode);
             // 
             // SawingModesView
             // 

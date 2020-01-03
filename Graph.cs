@@ -1,6 +1,5 @@
 ﻿using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
-using CAM.Domain;
 using Dreambuild.AutoCAD;
 using System;
 using System.Collections.Generic;

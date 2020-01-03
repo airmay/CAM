@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace CAM.Domain
+namespace CAM
 {
     /// <summary>
     /// Параметры технологического процесса обработки

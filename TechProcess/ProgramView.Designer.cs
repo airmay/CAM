@@ -1,4 +1,4 @@
-﻿namespace CAM.UI
+﻿namespace CAM
 {
     partial class ProgramView
     {

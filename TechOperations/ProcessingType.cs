@@ -1,4 +1,4 @@
-﻿namespace CAM.Domain
+﻿namespace CAM
 {
     public enum ProcessingType
     {

@@ -4,10 +4,10 @@ using System.ComponentModel;
 using System.Data;
 using System.Linq;
 using System.Windows.Forms;
-using CAM.Domain;
 using System.Reflection;
+using CAM.TechOperations;
 
-namespace CAM.UI
+namespace CAM
 {
     public partial class TechProcessParamsView : UserControl
     {

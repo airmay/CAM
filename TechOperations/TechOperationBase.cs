@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Autodesk.AutoCAD.DatabaseServices;
 
-namespace CAM.Domain
+namespace CAM
 {
     /// <summary>
     /// Базовая технологическая операция
@@ -59,6 +57,7 @@ namespace CAM.Domain
             _techProcess = techProcess;
             _techProcess.TechOperations.Add(this);
             ProcessingArea = processingArea;
+            Name = processingArea.ToString();
         }
 
         public abstract void BuildProcessing(ScemaLogicProcessBuilder builder);

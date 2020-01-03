@@ -1,10 +1,9 @@
-﻿using CAM.Domain;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
 
-namespace CAM.UI
+namespace CAM
 {
     public partial class TechProcessView : UserControl
     {

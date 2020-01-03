@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
 
-namespace CAM.Domain
+namespace CAM.TechOperations.Sawing
 {
     /// <summary>
     /// Технологическая операция "Распиловка"
@@ -25,7 +25,6 @@ namespace CAM.Domain
             : base(techProcess, processingArea)
         {
             SawingParams = sawingParams;
-            Name = $"Распил { processingArea }";
         }
 
         public override void BuildProcessing(ScemaLogicProcessBuilder builder)

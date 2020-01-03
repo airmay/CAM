@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Autodesk.AutoCAD.DatabaseServices;
+﻿using Autodesk.AutoCAD.DatabaseServices;
 
-namespace CAM.Domain.Profiling
+namespace CAM.TechOperations.Profiling
 {
     [Processing(ProcessingType.Profiling, MachineType.ScemaLogic, "Профилирование")]
     public class ProfilingFactory : ITechOperationFactory

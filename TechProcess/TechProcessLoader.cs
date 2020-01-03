@@ -1,6 +1,5 @@
 ﻿using Autodesk.AutoCAD.ApplicationServices;
 using Autodesk.AutoCAD.DatabaseServices;
-using CAM.Domain;
 using System;
 using System.Collections.Generic;
 using System.IO;

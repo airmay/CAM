@@ -1,4 +1,4 @@
-﻿namespace CAM.UI
+﻿namespace CAM
 {
     partial class TechProcessParamsView
     {
@@ -102,7 +102,7 @@
             // 
             // techProcessParamsBindingSource
             // 
-            this.techProcessParamsBindingSource.DataSource = typeof(CAM.Domain.TechProcessParams);
+            this.techProcessParamsBindingSource.DataSource = typeof(TechProcessParams);
             // 
             // cbMaterial
             // 

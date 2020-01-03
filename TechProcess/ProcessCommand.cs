@@ -1,6 +1,6 @@
 ﻿using Autodesk.AutoCAD.DatabaseServices;
 
-namespace CAM.Domain
+namespace CAM
 {
     public class ProcessCommand
     {

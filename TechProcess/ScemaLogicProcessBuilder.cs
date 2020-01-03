@@ -6,7 +6,7 @@ using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
 using Dreambuild.AutoCAD;
 
-namespace CAM.Domain
+namespace CAM
 {
     /// <summary>
     /// Генератор команд процесса обработки

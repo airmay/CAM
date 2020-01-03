@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Text;
 
-namespace CAM.Domain
+namespace CAM
 {
     /// <summary>
     /// Генератор программы для станка типа ScemaLogic

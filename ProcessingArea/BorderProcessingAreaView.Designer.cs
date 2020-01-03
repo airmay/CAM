@@ -1,4 +1,4 @@
-﻿namespace CAM.UI
+﻿namespace CAM
 {
 	partial class BorderProcessingAreaView
 	{
@@ -85,7 +85,7 @@
             // 
             // borderProcessingAreaBindingSource
             // 
-            this.borderProcessingAreaBindingSource.DataSource = typeof(CAM.Domain.BorderProcessingArea);
+            this.borderProcessingAreaBindingSource.DataSource = typeof(BorderProcessingArea);
             // 
             // BorderProcessingAreaView
             // 

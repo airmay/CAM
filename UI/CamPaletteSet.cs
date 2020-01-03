@@ -1,13 +1,8 @@
 ﻿using Autodesk.AutoCAD.Windows;
 using CAM.UI;
-using System;
-using System.Collections.Generic;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace CAM.UI
+namespace CAM
 {
     public class CamPaletteSet
     {

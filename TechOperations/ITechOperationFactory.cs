@@ -1,7 +1,6 @@
-﻿using System.Collections.Generic;
-using Autodesk.AutoCAD.DatabaseServices;
+﻿using Autodesk.AutoCAD.DatabaseServices;
 
-namespace CAM.Domain
+namespace CAM
 {
 	public interface ITechOperationFactory
 	{

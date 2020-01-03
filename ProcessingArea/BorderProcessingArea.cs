@@ -1,7 +1,7 @@
 ﻿using System;
 using Autodesk.AutoCAD.DatabaseServices;
 
-namespace CAM.Domain
+namespace CAM
 {
     [Serializable]
     public class BorderProcessingArea : ProcessingArea

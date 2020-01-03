@@ -1,4 +1,4 @@
-﻿namespace CAM.UI
+﻿namespace CAM
 {
     partial class TechProcessView
     {
@@ -292,7 +292,7 @@
             // 
             // processCommandBindingSource
             // 
-            this.processCommandBindingSource.DataSource = typeof(CAM.Domain.ProcessCommand);
+            this.processCommandBindingSource.DataSource = typeof(ProcessCommand);
             this.processCommandBindingSource.CurrentChanged += new System.EventHandler(this.processCommandBindingSource_CurrentChanged);
             // 
             // TechProcessView

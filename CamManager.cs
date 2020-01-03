@@ -1,9 +1,7 @@
 ﻿using Autodesk.AutoCAD.ApplicationServices;
 using Autodesk.AutoCAD.Runtime;
-using Autodesk.AutoCAD.Windows;
 using CAM.UI;
 using System.Collections.Generic;
-using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -88,7 +86,8 @@ namespace CAM
 
         public void Terminate()
         {
-            Settings.Save(_settings);
+            //Settings.Save(_settings);
+            // TODO fix
         }
     }
 }

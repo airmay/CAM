@@ -1,5 +1,4 @@
 ﻿using Autodesk.AutoCAD.ApplicationServices;
-using CAM.Domain;
 using System;
 using System.Collections.Generic;
 using System.IO;

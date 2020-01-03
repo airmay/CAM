@@ -1,4 +1,4 @@
-﻿namespace CAM.UI
+﻿namespace CAM.TechOperations.Sawing
 {
     partial class SawingParamsDefaultView
     {
@@ -31,7 +31,7 @@
             this.panel1 = new System.Windows.Forms.Panel();
             this.cbTrajectoryType = new System.Windows.Forms.ComboBox();
             this.lbTrajectoryType = new System.Windows.Forms.Label();
-            this.sawingModesView = new CAM.UI.SawingModesView();
+            this.sawingModesView = new SawingModesView();
             this.panel1.SuspendLayout();
             this.SuspendLayout();
             // 

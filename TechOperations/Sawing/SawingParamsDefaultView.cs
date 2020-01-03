@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Windows.Forms;
-using CAM.Domain;
 
-namespace CAM.UI
+namespace CAM.TechOperations.Sawing
 {
     [DefaultParamsView(ProcessingType.Sawing)]
     public partial class SawingParamsDefaultView : ParamsView

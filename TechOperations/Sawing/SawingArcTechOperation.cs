@@ -5,19 +5,20 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CAM.Domain
+namespace CAM.TechOperations.Sawing
 {
     /// <summary>
-    /// Распиловка по прямой
+    /// Распиловка по дуге
     /// </summary>
-    //public class SawingLineTechOperation : SawingTechOperation
+    //public class SawingArcTechOperation : SawingTechOperation
     //{
     //    /// <summary>
     //    /// Обрабатываемая область
     //    /// </summary>
-    //    //public LineProcessingArea processingArea { get; }
+    //    //public ArcProcessingArea processingArea { get; }
 
-    //    public SawingLineTechOperation(TechProcess techProcess, LineProcessingArea processingArea, SawingTechOperationParams techOperationParams)
+       
+    //    public SawingArcTechOperation(TechProcess techProcess, ArcProcessingArea processingArea, SawingTechOperationParams techOperationParams)
     //         : base(techProcess, processingArea, techOperationParams)
     //    {
     //    }

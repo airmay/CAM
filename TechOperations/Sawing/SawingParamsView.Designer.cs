@@ -1,4 +1,4 @@
-﻿namespace CAM.UI
+﻿namespace CAM.TechOperations.Sawing
 {
     partial class SawingParamsView
     {
@@ -32,7 +32,7 @@
             this.edCompensation = new System.Windows.Forms.TextBox();
             this.lbCompensation = new System.Windows.Forms.Label();
             this.gbSawingModes = new System.Windows.Forms.GroupBox();
-            this.sawingModesView = new CAM.UI.SawingModesView();
+            this.sawingModesView = new SawingModesView();
             this.pSawingModesButton = new System.Windows.Forms.Panel();
             this.bLoadSawingModes = new System.Windows.Forms.Button();
             this.bSaveSawingModes = new System.Windows.Forms.Button();
@@ -123,7 +123,7 @@
             // 
             // sawingParamsBindingSource
             // 
-            this.sawingParamsBindingSource.DataSource = typeof(CAM.Domain.SawingTechOperationParams);
+            this.sawingParamsBindingSource.DataSource = typeof(SawingTechOperationParams);
             // 
             // SawingParamsView
             // 

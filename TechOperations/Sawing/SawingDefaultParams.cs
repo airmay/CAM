@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace CAM.Domain
+namespace CAM.TechOperations.Sawing
 {
     /// <summary>
     /// Параметры по-умолчанию технологической операция "Распиловка"

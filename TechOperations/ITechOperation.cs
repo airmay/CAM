@@ -1,7 +1,7 @@
 ﻿using Autodesk.AutoCAD.DatabaseServices;
 using System.Collections.Generic;
 
-namespace CAM.Domain
+namespace CAM
 {
     /// <summary>
     /// Интрефейс технологической операции

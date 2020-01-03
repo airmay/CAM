@@ -1,9 +1,9 @@
-﻿using System;
+﻿using CAM.TechOperations;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-
-namespace CAM.Domain
+namespace CAM
 {
     public static class TechOperationFactoryProvider
     {
