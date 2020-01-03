@@ -85,51 +85,51 @@
     <Compile Include="AcadGateway.cs" />
     <Compile Include="CamDocument.cs" />
     <Compile Include="CamManager.cs" />
-    <Compile Include="TechOperations\DefaultParamsViewAttribute.cs" />
-    <Compile Include="TechOperations\ParamsViewAttribute.cs" />
-    <Compile Include="TechOperations\ParamsViewContainer.cs" />
-    <Compile Include="TechOperations\ProcessingType.cs" />
-    <Compile Include="TechOperations\Profiling\ProfilingFactory.cs" />
-    <Compile Include="TechOperations\Profiling\ProfilingParamsView.cs">
+    <Compile Include="TechOperation\DefaultParamsViewAttribute.cs" />
+    <Compile Include="TechOperation\ParamsViewAttribute.cs" />
+    <Compile Include="TechOperation\ParamsViewContainer.cs" />
+    <Compile Include="TechOperation\ProcessingType.cs" />
+    <Compile Include="TechOperation\Profiling\ProfilingFactory.cs" />
+    <Compile Include="TechOperation\Profiling\ProfilingParamsView.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="TechOperations\Profiling\ProfilingParamsView.Designer.cs">
+    <Compile Include="TechOperation\Profiling\ProfilingParamsView.Designer.cs">
       <DependentUpon>ProfilingParamsView.cs</DependentUpon>
     </Compile>
-    <Compile Include="TechOperations\Profiling\ProfilingTechOperation.cs" />
-    <Compile Include="TechOperations\TechOperationTypeAttribute.cs" />
-    <Compile Include="TechOperations\TechOperationBase.cs" />
-    <Compile Include="TechOperations\TechOperationFactoryProvider.cs" />
+    <Compile Include="TechOperation\Profiling\ProfilingTechOperation.cs" />
+    <Compile Include="TechOperation\TechOperationTypeAttribute.cs" />
+    <Compile Include="TechOperation\TechOperationBase.cs" />
+    <Compile Include="TechOperation\TechOperationFactoryProvider.cs" />
     <Compile Include="TechProcess\TechProcessLoader.cs" />
-    <Compile Include="UI\CamPaletteSet.cs" />
+    <Compile Include="PaletteSet\CamPaletteSet.cs" />
     <Compile Include="TechProcess\CommandCode.cs" />
     <Compile Include="TechProcess\CommandNames.cs" />
     <Compile Include="TechProcess\Corner.cs" />
     <Compile Include="TechProcess\ProcessCommand.cs" />
     <Compile Include="ProcessingArea\ArcProcessingArea.cs" />
     <Compile Include="ProcessingArea\BorderProcessingArea.cs" />
-    <Compile Include="TechOperations\ITechOperationFactory.cs" />
-    <Compile Include="TechOperations\Sawing\SawingDefaultParams.cs" />
+    <Compile Include="TechOperation\ITechOperationFactory.cs" />
+    <Compile Include="TechOperation\Sawing\SawingDefaultParams.cs" />
     <Compile Include="TechProcess\ScemaLogicProcessBuilder.cs" />
     <Compile Include="TechProcess\ScemaLogicProgramGenerator.cs" />
     <Compile Include="Settings.cs" />
-    <Compile Include="TechOperations\ITechOperation.cs" />
+    <Compile Include="TechOperation\ITechOperation.cs" />
     <Compile Include="ProcessingArea\LineProcessingArea.cs" />
     <Compile Include="ProcessingArea\ProcessingArea.cs" />
     <Compile Include="ProcessingArea\ProcessingAreaFactory.cs" />
     <Compile Include="ProcessingArea\ProcessingAreaType.cs" />
-    <Compile Include="TechOperations\Sawing\SawingArcTechOperation.cs" />
-    <Compile Include="TechOperations\Sawing\SawingMode.cs" />
-    <Compile Include="TechOperations\Sawing\SawingLineTechOperation.cs" />
-    <Compile Include="TechOperations\Sawing\SawingTechOperationFactory.cs" />
-    <Compile Include="TechOperations\Sawing\SawingTechOperationParams.cs" />
+    <Compile Include="TechOperation\Sawing\SawingArcTechOperation.cs" />
+    <Compile Include="TechOperation\Sawing\SawingMode.cs" />
+    <Compile Include="TechOperation\Sawing\SawingLineTechOperation.cs" />
+    <Compile Include="TechOperation\Sawing\SawingTechOperationFactory.cs" />
+    <Compile Include="TechOperation\Sawing\SawingTechOperationParams.cs" />
     <Compile Include="TechProcess\TechProcessParams.cs" />
     <Compile Include="TechProcess\Tool.cs" />
-    <Compile Include="Exceptions.cs" />
+    <Compile Include="Utils\Exceptions.cs" />
     <Compile Include="Graph.cs" />
-    <Compile Include="IListExtensions.cs" />
+    <Compile Include="Utils\IListExtensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="TechOperations\Sawing\SawingTechOperation.cs" />
+    <Compile Include="TechOperation\Sawing\SawingTechOperation.cs" />
     <Compile Include="TechProcess\TechProcess.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
@@ -143,10 +143,10 @@
     <Compile Include="ProcessingArea\BorderProcessingAreaView.Designer.cs">
       <DependentUpon>BorderProcessingAreaView.cs</DependentUpon>
     </Compile>
-    <Compile Include="TechOperations\ParamsView.cs">
+    <Compile Include="TechOperation\ParamsView.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="TechOperations\ParamsView.Designer.cs">
+    <Compile Include="TechOperation\ParamsView.Designer.cs">
       <DependentUpon>ParamsView.cs</DependentUpon>
     </Compile>
     <Compile Include="TechProcess\ProgramView.cs">
@@ -155,28 +155,28 @@
     <Compile Include="TechProcess\ProgramView.Designer.cs">
       <DependentUpon>ProgramView.cs</DependentUpon>
     </Compile>
-    <Compile Include="UI\PullingView.cs">
+    <Compile Include="PaletteSet\PullingView.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="UI\PullingView.Designer.cs">
+    <Compile Include="PaletteSet\PullingView.Designer.cs">
       <DependentUpon>PullingView.cs</DependentUpon>
     </Compile>
-    <Compile Include="TechOperations\Sawing\SawingModesView.cs">
+    <Compile Include="TechOperation\Sawing\SawingModesView.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="TechOperations\Sawing\SawingModesView.Designer.cs">
+    <Compile Include="TechOperation\Sawing\SawingModesView.Designer.cs">
       <DependentUpon>SawingModesView.cs</DependentUpon>
     </Compile>
-    <Compile Include="TechOperations\Sawing\SawingParamsDefaultView.cs">
+    <Compile Include="TechOperation\Sawing\SawingParamsDefaultView.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="TechOperations\Sawing\SawingParamsDefaultView.Designer.cs">
+    <Compile Include="TechOperation\Sawing\SawingParamsDefaultView.Designer.cs">
       <DependentUpon>SawingParamsDefaultView.cs</DependentUpon>
     </Compile>
-    <Compile Include="TechOperations\Sawing\SawingParamsView.cs">
+    <Compile Include="TechOperation\Sawing\SawingParamsView.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="TechOperations\Sawing\SawingParamsView.Designer.cs">
+    <Compile Include="TechOperation\Sawing\SawingParamsView.Designer.cs">
       <DependentUpon>SawingParamsView.cs</DependentUpon>
     </Compile>
     <Compile Include="TechProcess\TechProcessParamsView.cs">
@@ -200,7 +200,7 @@
     <None Include="Properties\DataSources\CAM.Domain.SawingTechOperationParams.datasource" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="TechOperations\Profiling\ProfilingParamsView.resx">
+    <EmbeddedResource Include="TechOperation\Profiling\ProfilingParamsView.resx">
       <DependentUpon>ProfilingParamsView.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
@@ -214,16 +214,16 @@
     <EmbeddedResource Include="TechProcess\ProgramView.resx">
       <DependentUpon>ProgramView.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="UI\PullingView.resx">
+    <EmbeddedResource Include="PaletteSet\PullingView.resx">
       <DependentUpon>PullingView.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="TechOperations\Sawing\SawingModesView.resx">
+    <EmbeddedResource Include="TechOperation\Sawing\SawingModesView.resx">
       <DependentUpon>SawingModesView.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="TechOperations\Sawing\SawingParamsDefaultView.resx">
+    <EmbeddedResource Include="TechOperation\Sawing\SawingParamsDefaultView.resx">
       <DependentUpon>SawingParamsDefaultView.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="TechOperations\Sawing\SawingParamsView.resx">
+    <EmbeddedResource Include="TechOperation\Sawing\SawingParamsView.resx">
       <DependentUpon>SawingParamsView.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="TechProcess\TechProcessParamsView.resx">

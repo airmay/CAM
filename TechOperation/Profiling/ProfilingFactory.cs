@@ -1,6 +1,6 @@
 ﻿using Autodesk.AutoCAD.DatabaseServices;
 
-namespace CAM.TechOperations.Profiling
+namespace CAM.TechOperation.Profiling
 {
     [Processing(ProcessingType.Profiling, MachineType.ScemaLogic, "Профилирование")]
     public class ProfilingFactory : ITechOperationFactory

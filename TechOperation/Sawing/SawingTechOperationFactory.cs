@@ -1,7 +1,7 @@
 ﻿using Autodesk.AutoCAD.DatabaseServices;
 using System;
 
-namespace CAM.TechOperations.Sawing
+namespace CAM.TechOperation.Sawing
 {
     /// <summary>
     /// Фабрика для создания технологических операций "Распиловка"

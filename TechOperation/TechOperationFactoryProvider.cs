@@ -1,4 +1,4 @@
-﻿using CAM.TechOperations;
+﻿using CAM.TechOperation;
 using System;
 using System.Collections.Generic;
 using System.Linq;

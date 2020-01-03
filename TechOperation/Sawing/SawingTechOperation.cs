@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
 
-namespace CAM.TechOperations.Sawing
+namespace CAM.TechOperation.Sawing
 {
     /// <summary>
     /// Технологическая операция "Распиловка"

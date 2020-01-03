@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace CAM.TechOperations
+namespace CAM.TechOperation
 {
     public class ProcessingAttribute : Attribute
     {

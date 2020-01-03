@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace CAM.TechOperations.Profiling
+namespace CAM.TechOperation.Profiling
 {
     public class ProfilingTechOperation : TechOperationBase
     {

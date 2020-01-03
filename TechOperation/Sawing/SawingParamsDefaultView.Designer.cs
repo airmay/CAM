@@ -1,4 +1,4 @@
-﻿namespace CAM.TechOperations.Sawing
+﻿namespace CAM.TechOperation.Sawing
 {
     partial class SawingParamsDefaultView
     {

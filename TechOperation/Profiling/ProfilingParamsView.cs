@@ -1,4 +1,4 @@
-﻿namespace CAM.TechOperations.Profiling
+﻿namespace CAM.TechOperation.Profiling
 {
     [DefaultParamsView(ProcessingType.Profiling)]
     public partial class ProfilingParamsView : ParamsView

@@ -5,7 +5,7 @@ using System.Data;
 using System.Linq;
 using System.Windows.Forms;
 using System.Reflection;
-using CAM.TechOperations;
+using CAM.TechOperation;
 
 namespace CAM
 {

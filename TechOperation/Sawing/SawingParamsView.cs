@@ -1,4 +1,4 @@
-﻿namespace CAM.TechOperations.Sawing
+﻿namespace CAM.TechOperation.Sawing
 {
     [ParamsView(ProcessingType.Sawing)]
     public partial class SawingParamsView : ParamsView

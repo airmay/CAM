@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace CAM.TechOperations.Sawing
+namespace CAM.TechOperation.Sawing
 {
     /// <summary>
     /// Режим распиловки
