@@ -16,7 +16,7 @@ namespace CAM.Domain
 
         ProcessingArea ProcessingArea { get; }
 
-        List<ProcessCommand> ProcessCommands { get; }
+        List<ProcessCommand> ProcessCommands { get; set; }
 
         /// <summary>
         /// Наименование
@@ -29,12 +29,6 @@ namespace CAM.Domain
         /// <returns></returns>
         void BuildProcessing(ScemaLogicProcessBuilder builder);
 
-        void DeleteToolpath();
-
         IEnumerable<Curve> ToolpathCurves { get; }
-
-        bool MoveDown();
-
-        bool MoveUp();
     }
 }

@@ -98,6 +98,7 @@
     </Compile>
     <Compile Include="TechOperations\Profiling\ProfilingTechOperation.cs" />
     <Compile Include="TechOperations\SawingTechOperation\TechOperationTypeAttribute.cs" />
+    <Compile Include="TechOperations\TechOperationBase.cs" />
     <Compile Include="TechOperations\TechOperationFactory.cs" />
     <Compile Include="TechOperations\TechOperationFactoryProvider.cs" />
     <Compile Include="TechProcess\TechProcessLoader.cs" />
@@ -123,7 +124,6 @@
     <Compile Include="TechOperations\SawingTechOperation\SawingLineTechOperation.cs" />
     <Compile Include="TechOperations\SawingTechOperation\SawingTechOperationFactory.cs" />
     <Compile Include="TechOperations\SawingTechOperation\SawingTechOperationParams.cs" />
-    <Compile Include="TechOperations\TechOperation.cs" />
     <Compile Include="TechProcess\TechProcessParams.cs" />
     <Compile Include="TechProcess\Tool.cs" />
     <Compile Include="Exceptions.cs" />

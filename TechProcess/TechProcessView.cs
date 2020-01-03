@@ -194,7 +194,7 @@ namespace CAM.UI
 		    if (treeView.SelectedNode.Tag is TechOperationBase techOperation)
 		    {
 			    EndEdit();
-			    if (techOperation.MoveUp())
+			    if (techOperation.TechProcess.TechOperationMoveUp(techOperation))
 				    MoveSelectedNode(-1);
 		    }
 	    }
@@ -204,7 +204,7 @@ namespace CAM.UI
 		    if (treeView.SelectedNode.Tag is TechOperationBase techOperation)
 		    {
 			    EndEdit();
-			    if (techOperation.MoveDown())
+			    if (techOperation.TechProcess.TechOperationMoveDown(techOperation))
 				    MoveSelectedNode(1);
 		    }
 	    }

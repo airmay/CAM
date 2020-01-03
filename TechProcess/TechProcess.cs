@@ -88,7 +88,7 @@ namespace CAM.Domain
 
         public void DeleteToolpath()
         {
-            TechOperations.ForEach(p => p.DeleteToolpath());
+            TechOperations.ForEach(p => p.ProcessCommands = null);
             ProcessCommands = null;
         }
 
@@ -114,6 +114,10 @@ namespace CAM.Domain
             }
             return curves.Select(p => _techOperationFactory.Create(this, p)).Where(p => p != null).ToArray();
         }
+
+        public bool TechOperationMoveDown(ITechOperation techOperation) => TechOperations.SwapNext(techOperation);
+
+        public bool TechOperationMoveUp(ITechOperation techOperation) => TechOperations.SwapPrev(techOperation);
 
         private void ProcessBorders(List<BorderProcessingArea> borders, BorderProcessingArea fixedSideBorder = null)
         {

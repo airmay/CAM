@@ -19,6 +19,11 @@ namespace CAM.Domain
         public abstract ProcessingType Type { get; }
 
         /// <summary>
+        /// Наименование
+        /// </summary>
+        public string Name { get; set; }
+
+        /// <summary>
         /// Технологический процесс обработки
         /// </summary>
         [NonSerialized]
@@ -36,35 +41,29 @@ namespace CAM.Domain
         public ProcessingArea ProcessingArea { get; }
 
         /// <summary>
-        /// Наименование
-        /// </summary>
-        public string Name { get; set; }
-
-        /// <summary>
         /// Команды
         /// </summary>
         [NonSerialized]
-        protected List<ProcessCommand> _processCommands;
+        private List<ProcessCommand> _processCommands;
 
-        public List<ProcessCommand> ProcessCommands => _processCommands;
+        public List<ProcessCommand> ProcessCommands
+        {
+            get => _processCommands;
+            set => _processCommands = value;
+        }
 
         public abstract object Params { get; }
 
         public TechOperationBase(TechProcess techProcess, ProcessingArea processingArea)
         {
             _techProcess = techProcess;
-            TechProcess.TechOperations.Add(this);
+            _techProcess.TechOperations.Add(this);
             ProcessingArea = processingArea;
         }
 
         public abstract void BuildProcessing(ScemaLogicProcessBuilder builder);
 
-        public void DeleteToolpath() => _processCommands = null;
-
 	    public IEnumerable<Curve> ToolpathCurves => ProcessCommands?.Select(p => p.GetToolpathCurve()).Where(p => p != null);
 
-        public bool MoveDown() => TechProcess.TechOperations.SwapNext(this);
-
-        public bool MoveUp() => TechProcess.TechOperations.SwapPrev(this);
     }
 }

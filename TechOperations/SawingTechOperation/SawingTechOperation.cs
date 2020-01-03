@@ -64,7 +64,7 @@ namespace CAM.Domain
 
             Calculate(true);
 
-            _processCommands = builder.FinishTechOperation();
+            ProcessCommands = builder.FinishTechOperation();
 
             void Calculate(bool buildMode)
             {
