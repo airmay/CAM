@@ -1,4 +1,6 @@
 ﻿using Autodesk.AutoCAD.ApplicationServices;
+using Autodesk.AutoCAD.DatabaseServices;
+using Dreambuild.AutoCAD;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -64,7 +66,12 @@ namespace CAM
                 Acad.DeleteHatch();
                 Acad.DeleteCurves(techProcess.ToolpathCurves);
 
-                techProcess.BuildProcessing(startBorder);
+                techProcess.DeleteToolpath();
+                techProcess.TechOperations.ForEach(p => p.ProcessingArea.Curve = p.ProcessingArea.AcadObjectId.QOpenForRead<Curve>());
+                BorderProcessingArea.ProcessBorders(techProcess.TechOperations.Select(p => p.ProcessingArea).OfType<BorderProcessingArea>().ToList(), startBorder);
+
+                var builder = new ScemaLogicProcessBuilder();
+                builder.BuildProcessing(techProcess);
 
                 Acad.SaveCurves(techProcess.ToolpathCurves);
 

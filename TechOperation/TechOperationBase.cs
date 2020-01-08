@@ -62,7 +62,9 @@ namespace CAM
 
         public abstract void BuildProcessing(ScemaLogicProcessBuilder builder);
 
-	    public IEnumerable<Curve> ToolpathCurves => ProcessCommands?.Select(p => p.GetToolpathCurve()).Where(p => p != null);
+        public abstract List<CuttingParams> GetCuttingParams();
+
+        public IEnumerable<Curve> ToolpathCurves => ProcessCommands?.Select(p => p.GetToolpathCurve()).Where(p => p != null);
 
     }
 }

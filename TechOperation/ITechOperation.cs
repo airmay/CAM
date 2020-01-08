@@ -30,5 +30,8 @@ namespace CAM
         void BuildProcessing(ScemaLogicProcessBuilder builder);
 
         IEnumerable<Curve> ToolpathCurves { get; }
+
+        List<CuttingParams> GetCuttingParams();
+
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace CAM.TechOperation.Profiling
 {
@@ -13,6 +14,11 @@ namespace CAM.TechOperation.Profiling
         public override object Params => throw new NotImplementedException();
 
         public override void BuildProcessing(ScemaLogicProcessBuilder builder)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override List<CuttingParams> GetCuttingParams()
         {
             throw new NotImplementedException();
         }
