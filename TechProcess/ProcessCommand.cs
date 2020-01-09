@@ -4,7 +4,7 @@ namespace CAM
 {
     public class ProcessCommand
     {
-        public string Number { get; set; }
+        public int Number { get; set; }
 
         public string Name { get; set; }
 
@@ -24,8 +24,6 @@ namespace CAM
 
         public string Param2 { get; set; }
 
-        public ProcessCommand() { }
-            
         public ProcessCommand(Curve toolpathCurve) => _toolpathCurve = toolpathCurve;
 
         public Curve _toolpathCurve;

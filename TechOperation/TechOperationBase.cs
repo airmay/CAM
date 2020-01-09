@@ -60,11 +60,8 @@ namespace CAM
             Name = processingArea.ToString();
         }
 
-        public abstract void BuildProcessing(ScemaLogicProcessBuilder builder);
-
         public abstract List<CuttingParams> GetCuttingParams();
 
         public IEnumerable<Curve> ToolpathCurves => ProcessCommands?.Select(p => p.GetToolpathCurve()).Where(p => p != null);
-
     }
 }

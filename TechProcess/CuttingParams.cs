@@ -21,6 +21,6 @@ namespace CAM
 
         public Side ToolSide { get; set; }
         
-        public int Z { get; set; }
+        public int DepthAll { get; set; }
     }
 }

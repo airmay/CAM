@@ -102,6 +102,7 @@
     <Compile Include="TechOperation\TechOperationFactoryProvider.cs" />
     <Compile Include="TechProcess\CuttingMode.cs" />
     <Compile Include="TechProcess\CuttingParams.cs" />
+    <Compile Include="TechProcess\ScemaLogicCommandGenerator.cs" />
     <Compile Include="TechProcess\TechProcessLoader.cs" />
     <Compile Include="PaletteSet\CamPaletteSet.cs" />
     <Compile Include="TechProcess\CommandCode.cs" />

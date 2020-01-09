@@ -70,8 +70,7 @@ namespace CAM
                 techProcess.TechOperations.ForEach(p => p.ProcessingArea.Curve = p.ProcessingArea.AcadObjectId.QOpenForRead<Curve>());
                 BorderProcessingArea.ProcessBorders(techProcess.TechOperations.Select(p => p.ProcessingArea).OfType<BorderProcessingArea>().ToList(), startBorder);
 
-                var builder = new ScemaLogicProcessBuilder();
-                builder.BuildProcessing(techProcess);
+                ScemaLogicProcessBuilder.BuildProcessing(techProcess);
 
                 Acad.SaveCurves(techProcess.ToolpathCurves);
 

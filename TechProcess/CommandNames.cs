@@ -11,5 +11,6 @@
         public const string Uplifting = "Поднятие";
         public const string Penetration = "Заглубление";
         public const string Cutting = "Рабочий ход";
+        public const string Cycle = "Цикл";
     }
 }
