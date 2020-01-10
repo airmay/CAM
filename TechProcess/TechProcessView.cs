@@ -223,7 +223,7 @@ namespace CAM
         private void processCommandBindingSource_CurrentChanged(object sender, EventArgs e)
         {
             if (processCommandBindingSource.Current != null)
-                _camDocument.SelectProcessCommand(processCommandBindingSource.Current as ProcessCommand);
+                _camDocument.SelectProcessCommand(CurrentTechProcess, processCommandBindingSource.Current as ProcessCommand);
         }
 
         private void bSwapOuterSide_Click(object sender, EventArgs e)

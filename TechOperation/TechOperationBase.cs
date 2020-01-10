@@ -62,6 +62,6 @@ namespace CAM
 
         public abstract List<CuttingParams> GetCuttingParams();
 
-        public IEnumerable<Curve> ToolpathCurves => ProcessCommands?.Select(p => p.GetToolpathCurve()).Where(p => p != null);
+        public IEnumerable<Curve> ToolpathCurves => ProcessCommands?.Select(p => p.ToolpathCurve).Where(p => p != null);
     }
 }

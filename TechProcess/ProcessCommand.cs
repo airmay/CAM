@@ -1,4 +1,5 @@
 ﻿using Autodesk.AutoCAD.DatabaseServices;
+using Autodesk.AutoCAD.Geometry;
 
 namespace CAM
 {
@@ -24,15 +25,16 @@ namespace CAM
 
         public string Param2 { get; set; }
 
-        public ProcessCommand(Curve toolpathCurve) => _toolpathCurve = toolpathCurve;
-
-        public Curve _toolpathCurve;
-
         /// <summary>
         /// Графический примитив автокада представляющего траекторию инструмента
         /// </summary>
-        public Curve GetToolpathCurve() => _toolpathCurve;
+        public Curve ToolpathCurve;
+
+        public Point3d? EndPoint;
+
+        public double? ToolAngle;
 
         public string GetProgrammLine() => $"{Number};{GCode};{MCode};{Axis};{Feed};{X};{Y};{Param1};{Param2};";
+
     }
 }

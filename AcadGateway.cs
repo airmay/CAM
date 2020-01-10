@@ -1,6 +1,9 @@
 ﻿using Autodesk.AutoCAD.ApplicationServices;
+using Autodesk.AutoCAD.Colors;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.EditorInput;
+using Autodesk.AutoCAD.Geometry;
+using Autodesk.AutoCAD.GraphicsInterface;
 using Dreambuild.AutoCAD;
 using System;
 using System.Collections.Generic;
@@ -57,6 +60,61 @@ namespace CAM
                 App.LockAndExecute(() => ids.QForEach(p => p.Erase()));
             }
         }
+
+        #region ToolModel
+        public static void DrawToolModel(ToolModel toolModel, Point3d? endPoint, double? toolAngle)
+        {
+            if (endPoint == null)
+                return;
+            var mat = Matrix3d.Displacement(toolModel.Origin.GetVectorTo(endPoint.Value)) * Matrix3d.Rotation(Graph.ToRad(toolModel.Angle - toolAngle.Value), Vector3d.ZAxis, toolModel.Origin);
+            foreach (var item in toolModel.GetCurves())
+            {
+                item.TransformBy(mat);
+                TransientManager.CurrentTransientManager.UpdateTransient(item, new IntegerCollection());
+            }
+            toolModel.Origin = endPoint.Value;
+            toolModel.Angle = toolAngle.Value;
+            Editor.UpdateScreen();
+        }
+
+        public static ToolModel CreateToolModel(double diameter, double thickness)
+        {
+            using (var doclock = Application.DocumentManager.MdiActiveDocument.LockDocument())
+            {
+                using (Transaction tr = Database.TransactionManager.StartTransaction())
+                {
+                    var color = Color.FromColorIndex(ColorMethod.ByColor, 131);
+                    var center = new Point3d(0, 0, diameter/2);
+                    var toolModel = new ToolModel
+                    {
+                        Circle0 = new Circle(center, Vector3d.YAxis, diameter/2) { Color = color },
+                        Circle1 = new Circle(center - Vector3d.YAxis * thickness, Vector3d.YAxis, diameter/2) { Color = color },
+                        Axis = new Line(center, center + Vector3d.YAxis * diameter/4),
+                        Origin = Point3d.Origin,
+                        Angle = 0
+                    };
+                    foreach (var item in toolModel.GetCurves())
+                        TransientManager.CurrentTransientManager.AddTransient(item, TransientDrawingMode.Main, 128, new IntegerCollection());
+                    tr.Commit();
+                    return toolModel;
+                }
+            }
+        }
+
+        public static void DeleteToolModel(ToolModel toolModel)
+        {
+            if (toolModel == null)
+                return;
+            using (var doclock = Application.DocumentManager.MdiActiveDocument.LockDocument())
+            using (Transaction tr = Database.TransactionManager.StartTransaction())
+                foreach (var item in toolModel.GetCurves())
+                {
+                    TransientManager.CurrentTransientManager.EraseTransient(item, new IntegerCollection());
+                    item.Dispose();
+                }
+        }
+
+        #endregion
 
         public static Curve[] GetSelectedCurves() => OpenForRead(Interaction.GetPickSet());
 

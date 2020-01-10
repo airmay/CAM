@@ -39,13 +39,12 @@ namespace CAM
         [NonSerialized]
         public List<ProcessCommand> ProcessCommands;
 
+        [NonSerialized]
+        public ToolModel ToolModel;
+
         public ProcessingType? ProcessingType => _techOperationFactory?.ProcessingType;
 
-        //public ProcessingType ProcessingType;
-
-        //public IProcessor Processor => ProcessorContainer.GetProcessor(ProcessingType);
-
-        public object TechOperationParams => _techOperationFactory.GetTechOperationParams();
+         public object TechOperationParams => _techOperationFactory.GetTechOperationParams();
 
         private ITechOperationFactory _techOperationFactory;
 
@@ -59,7 +58,6 @@ namespace CAM
         public void SetProcessingType(ProcessingType? processingType)
         {
             _techOperationFactory = processingType != null ? TechOperationFactoryProvider.CreateFactory(processingType.Value, _settings) : null;
-            //ProcessingType = processingType;
         }
 
         public void Init(Settings settings)
@@ -71,18 +69,6 @@ namespace CAM
                 to.TechProcess = this;
             });
         }
-
-        //public void BuildProcessing(BorderProcessingArea startBorder = null)
-        //{
-        //    DeleteToolpath();
-        //    TechOperations.ForEach(p => p.ProcessingArea.Curve = p.ProcessingArea.AcadObjectId.QOpenForRead<Curve>());
-
-        //    BorderProcessingArea.ProcessBorders(TechOperations.Select(p => p.ProcessingArea).OfType<BorderProcessingArea>().ToList(), startBorder);
-
-        //    var builder = new ScemaLogicProcessBuilder(TechProcessParams);
-        //    TechOperations.ForEach(p => p.BuildProcessing(builder));
-        //    ProcessCommands = builder.FinishTechProcess();
-        //}
 
         public IEnumerable<Curve> ToolpathCurves => TechOperations.Where(p => p.ToolpathCurves != null).SelectMany(p => p.ToolpathCurves);
 

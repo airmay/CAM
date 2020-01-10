@@ -42,10 +42,6 @@ namespace CAM
                         point = Scheduling(cuttingParams.Curve.StartPoint, cuttingParams.Curve.EndPoint, cuttingParams.IsExactlyBegin, cuttingParams.IsExactlyEnd, cuttingParams.DepthAll, compensation);
                     else
                         point = Cutting(techOperationGenerator, point, cuttingParams, compensation, techProcessParams);
-
-                    var dest = new Point3d(point.X, point.Y, techProcessParams.ZSafety);
-                    techOperationGenerator.Uplifting(CreateToolpath(point, dest, Colors[CommandNames.Uplifting]));
-                    point = dest;
                 }
                 techProcessGenerator.AddCommands(techOperationGenerator);
                 techOperation.ProcessCommands = techOperationGenerator.GetCommands();
@@ -61,12 +57,14 @@ namespace CAM
 
             bool oddPassCount = passList.Count() % 2 == 1;
             var corner = cuttingParams.Curve.IsUpward() ^ oddPassCount ? Corner.End : Corner.Start;
+            Point3d point;
+            double angle = 0;
 
             foreach (var pass in passList)
             {
-                var toolpathCurve = CreateToolpath(cuttingParams.Curve, compensation, pass.Key, techProcessParams.ToolDiameter, cuttingParams.IsExactlyBegin, cuttingParams.IsExactlyBegin);
-                var point = toolpathCurve.GetPoint(corner);
-                var angle = CalcToolAngle(toolpathCurve, corner);
+                var toolpathCurve = CreateToolpath(cuttingParams.Curve, compensation, pass.Key, techProcessParams.ToolDiameter, cuttingParams.IsExactlyBegin, cuttingParams.IsExactlyEnd);
+                point = toolpathCurve.GetPoint(corner);
+                angle = CalcToolAngle(toolpathCurve, corner);
 
                 if (passList.IndexOf(pass) == 0)
                 {
@@ -84,7 +82,10 @@ namespace CAM
                 currentPoint = toolpathCurve.GetPoint(corner);
                 generator.Cutting(toolpathCurve, pass.Value, currentPoint, angle);
             }
-            return currentPoint;
+            point = new Point3d(currentPoint.X, currentPoint.Y, techProcessParams.ZSafety);
+            generator.Uplifting(CreateToolpath(currentPoint, point, Colors[CommandNames.Uplifting]), angle);
+
+            return point;
         }
 
         private static Point3d Scheduling(Point3d startPoint, Point3d endPoint, bool isExactlyBegin, bool isExactlyEnd, int depth, double compensation)

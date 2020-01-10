@@ -128,6 +128,7 @@
     <Compile Include="TechOperation\Sawing\SawingTechOperationParams.cs" />
     <Compile Include="TechProcess\TechProcessParams.cs" />
     <Compile Include="TechProcess\Tool.cs" />
+    <Compile Include="TechProcess\ToolModel.cs" />
     <Compile Include="Utils\Exceptions.cs" />
     <Compile Include="Graph.cs" />
     <Compile Include="Utils\IListExtensions.cs" />

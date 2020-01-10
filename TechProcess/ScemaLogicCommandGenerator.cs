@@ -56,7 +56,7 @@ namespace CAM
         public void InitialMove(Point3d point, double angle, int frequency)
         {
             CreateCommand(CommandNames.InitialMove, 0, axis: "XYC", feed: 0, x: point.X, y: point.Y, param1: angle);
-            CreateCommand(CommandNames.InitialMove, 0, axis: "XYZ", feed: 0, x: point.X, y: point.Y, param1: point.Z);
+            CreateCommand(CommandNames.InitialMove, 0, axis: "XYZ", feed: 0, x: point.X, y: point.Y, param1: point.Z, endPoint: point, toolAngle: angle);
             CreateCommand("", 97, 7);
             CreateCommand("", 97, 8);
             CreateCommand("", 97, 3, feed: frequency);
@@ -71,7 +71,7 @@ namespace CAM
         public void Fast(Line line, double angle)
         {
             CreateCommand(CommandNames.Fast, 0, axis: "XYC", feed: 0, x: line.EndPoint.X, y: line.EndPoint.Y, param1: angle);
-            CreateCommand(CommandNames.Fast, 0, axis: "XYZ", feed: 0, x: line.EndPoint.X, y: line.EndPoint.Y, param1: line.EndPoint.Z, toolpathCurve: line);
+            CreateCommand(CommandNames.Fast, 0, axis: "XYZ", feed: 0, x: line.EndPoint.X, y: line.EndPoint.Y, param1: line.EndPoint.Z, toolpathCurve: line, endPoint: line.EndPoint, toolAngle: angle);
             CreateCommand(CommandNames.Cycle, 28, axis: "XYCZ");
         }
 
@@ -82,13 +82,13 @@ namespace CAM
         /// <param name="feed"></param>
         /// <param name="angle"></param>
         public void Penetration(Line line, int feed, double angle) => 
-            CreateCommand(CommandNames.Penetration, 1, axis: "XYCZ", feed: feed, x: line.EndPoint.X, y: line.EndPoint.Y, param1: angle, param2: line.EndPoint.Z, toolpathCurve: line);
+            CreateCommand(CommandNames.Penetration, 1, axis: "XYCZ", feed: feed, x: line.EndPoint.X, y: line.EndPoint.Y, param1: angle, param2: line.EndPoint.Z, toolpathCurve: line, endPoint: line.EndPoint, toolAngle: angle);
 
         /// <summary>
         /// Поднятие
         /// </summary>
         /// <param name="line"></param>
-        public void Uplifting(Line line) => CreateCommand(CommandNames.Uplifting, 0, axis: "XYZ", feed: 0, x: line.EndPoint.X, y: line.EndPoint.Y, param1: line.EndPoint.Z, toolpathCurve: line);
+        public void Uplifting(Line line, double angle) => CreateCommand(CommandNames.Uplifting, 0, axis: "XYZ", feed: 0, x: line.EndPoint.X, y: line.EndPoint.Y, param1: line.EndPoint.Z, toolpathCurve: line, endPoint: line.EndPoint, toolAngle: angle);
 
         /// <summary>
         /// Рабочий ход
@@ -101,19 +101,20 @@ namespace CAM
             switch (curve)
             {
                 case Line _:
-                    CreateCommand(CommandNames.Cutting, 1, axis: "XYCZ", feed: feed, x: point.X, y: point.Y, param1: angle, param2: point.Z, toolpathCurve: curve);
+                    CreateCommand(CommandNames.Cutting, 1, axis: "XYCZ", feed: feed, x: point.X, y: point.Y, param1: angle, param2: point.Z, toolpathCurve: curve, endPoint: point, toolAngle: angle);
                     break;
                 case Arc arc:
                     var code = point == curve.StartPoint ? 2 : 3;
-                    CreateCommand(CommandNames.Cutting, code, axis: "XYCZ", feed: feed, x: point.X, y: point.Y, param1: arc.Center.X, param2: arc.Center.Y, toolpathCurve: curve);
+                    CreateCommand(CommandNames.Cutting, code, axis: "XYCZ", feed: feed, x: point.X, y: point.Y, param1: arc.Center.X, param2: arc.Center.Y, toolpathCurve: curve, endPoint: point, toolAngle: angle);
                     break;
                 default:
                     throw new Exception($"Неподдерживаемый тип кривой {curve.GetType()}");
             }
         }
 
-        private void CreateCommand(string name, int gCode, int? mCode = null, string axis = null, int? feed = null, double? x = null, double? y = null, double? param1 = null, double? param2 = null, Curve toolpathCurve = null)
-            => _commands.Add(new ProcessCommand(toolpathCurve)
+        private void CreateCommand(string name, int gCode, int? mCode = null, string axis = null, int? feed = null, double? x = null, double? y = null, 
+            double? param1 = null, double? param2 = null, Curve toolpathCurve = null, Point3d? endPoint = null, double? toolAngle = null)
+            => _commands.Add(new ProcessCommand
             {
                 Name = name,
                 GCode = gCode.ToString(),
@@ -123,7 +124,10 @@ namespace CAM
                 X = Round(x),
                 Y = Round(y),
                 Param1 = Round(param1),
-                Param2 = Round(param2)
+                Param2 = Round(param2),
+                ToolpathCurve = toolpathCurve,
+                EndPoint = endPoint,
+                ToolAngle = toolAngle
             });
 
         private static string Round(double? value) => value.HasValue ? Math.Round(value.Value, 4).ToString() : null;

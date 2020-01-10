@@ -55,7 +55,13 @@ namespace CAM
 
         public void SelectTechOperation(ITechOperation techOperation) => Acad.SelectObjectIds(techOperation.ProcessingArea.AcadObjectId);
 
-        public void SelectProcessCommand(ProcessCommand processCommand) => Acad.SelectCurve(processCommand.GetToolpathCurve());
+        public void SelectProcessCommand(TechProcess techProcess, ProcessCommand processCommand)
+        {
+            Acad.SelectCurve(processCommand.ToolpathCurve);
+            if (techProcess.ToolModel == null && processCommand.EndPoint != null)
+                techProcess.ToolModel = Acad.CreateToolModel(techProcess.TechProcessParams.ToolDiameter, techProcess.TechProcessParams.ToolThickness);
+            Acad.DrawToolModel(techProcess.ToolModel, processCommand.EndPoint, processCommand.ToolAngle);
+        }
 
         public void BuildProcessing(TechProcess techProcess, BorderProcessingArea startBorder = null)
         {
@@ -64,6 +70,8 @@ namespace CAM
                 Acad.Write($"Выполняется расчет обработки по техпроцессу {techProcess.Name} ...");
 
                 Acad.DeleteHatch();
+                Acad.DeleteToolModel(techProcess.ToolModel);
+                techProcess.ToolModel = null;
                 Acad.DeleteCurves(techProcess.ToolpathCurves);
 
                 techProcess.DeleteToolpath();
