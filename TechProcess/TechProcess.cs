@@ -65,7 +65,7 @@ namespace CAM
             _settings = settings;
             TechOperations.ForEach(to =>
             {
-                to.ProcessingArea.AcadObjectId = Acad.GetObjectId(to.ProcessingArea.Handle);
+                to.ProcessingArea.AcadObjectIds = Acad.GetObjectIds(to.ProcessingArea.Handles);
                 to.TechProcess = this;
             });
         }
@@ -91,14 +91,14 @@ namespace CAM
             return tool != null;
         }
 
-        public ITechOperation[] CreateTechOperations(ProcessingType type, IEnumerable<Curve> curves)
+        public ITechOperation[] CreateTechOperations(ProcessingType type, Curve[] curves)
         {
             if (_techOperationFactory == null)
             {
                 Acad.Alert("Укажите вид обработки");
                 return null;
             }
-            return curves.Select(p => _techOperationFactory.Create(this, p)).Where(p => p != null).ToArray();
+            return _techOperationFactory.Create(this, curves);
         }
 
         public bool TechOperationMoveDown(ITechOperation techOperation) => TechOperations.SwapNext(techOperation);

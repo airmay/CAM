@@ -8,18 +8,18 @@ namespace CAM
     /// Обрабатываемая область
     /// </summary>
     [Serializable]
-    public abstract class ProcessingArea
+    public class ProcessingArea
     {
-        public long Handle { get; set; }
+        public long[] Handles { get; set; }
 
         /// <summary>
         /// Идентификатор графического примитива автокада
         /// </summary>
         [NonSerialized]
-        public ObjectId AcadObjectId;
+        public ObjectId[] AcadObjectIds;
 
         [NonSerialized]
-        public Curve Curve;
+        public Curve[] Curves;
 
         /// <summary>
         /// Тип обрабатываемой области
@@ -29,27 +29,27 @@ namespace CAM
         /// <summary>
         /// Начальная точка кривой
         /// </summary>
-        public Point3d StartPoint { get { return Curve.StartPoint; } }
+        public Point3d StartPoint { get { return Curves[0].StartPoint; } }
 
         /// <summary>
         /// Конечная точка кривой
         /// </summary>
-        public Point3d EndPoint { get { return Curve.EndPoint; } }
+        public Point3d EndPoint { get { return Curves[0].EndPoint; } }
 
         /// <summary>
         /// Длина
         /// </summary>
-        public double Length { get { return Curve.Length(); } }
+        public double Length { get { return Curves[0].Length(); } }
 
         /// <summary>
         /// Конструктор
         /// </summary>
         /// <param name="curve">Графический примитива автокада представляющий область</param>
-        protected ProcessingArea(Curve curve)
+        public ProcessingArea(Curve[] curves)
         {
-            Curve = curve;
-            AcadObjectId = curve.ObjectId;
-            Handle = curve.Handle.Value;
+            Curves = curves;
+            AcadObjectIds = Array.ConvertAll(curves, p => p.ObjectId);
+            Handles = Array.ConvertAll(curves, p => p.Handle.Value);
             //Set(curve);
         }
 
@@ -81,14 +81,14 @@ namespace CAM
 
 	    public override string ToString()
 	    {
-		    switch (Curve)
+		    switch (Curves[0])
 		    {
 			    case Line _:
 				    return $"Прямая L{ Math.Round(Length) }";
 				case Arc _:
 				    return $"Дуга L{ Math.Round(Length) }";
 				default:
-					return $"{Curve.GetType()} L{ Math.Round(Length) }";
+					return $"{Curves[0].GetType()} L{ Math.Round(Length) }";
 		    }
 	    }
 	}

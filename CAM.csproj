@@ -97,6 +97,24 @@
       <DependentUpon>ProfilingParamsView.cs</DependentUpon>
     </Compile>
     <Compile Include="TechOperation\Profiling\ProfilingTechOperation.cs" />
+    <Compile Include="TechOperation\Tactile\CuttingType.cs" />
+    <Compile Include="TechOperation\Tactile\Pass.cs" />
+    <Compile Include="TechOperation\Tactile\TactileDefaultParamsView.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="TechOperation\Tactile\TactileDefaultParamsView.Designer.cs">
+      <DependentUpon>TactileDefaultParamsView.cs</DependentUpon>
+    </Compile>
+    <Compile Include="TechOperation\Tactile\TactileFactory.cs" />
+    <Compile Include="TechOperation\Tactile\TactileParams.cs" />
+    <Compile Include="TechOperation\Tactile\TactileParamsView.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="TechOperation\Tactile\TactileParamsView.Designer.cs">
+      <DependentUpon>TactileParamsView.cs</DependentUpon>
+    </Compile>
+    <Compile Include="TechOperation\Tactile\TactileTechOperanion.cs" />
+    <Compile Include="TechOperation\Tactile\TactileType.cs" />
     <Compile Include="TechOperation\TechOperationTypeAttribute.cs" />
     <Compile Include="TechOperation\TechOperationBase.cs" />
     <Compile Include="TechOperation\TechOperationFactoryProvider.cs" />
@@ -215,6 +233,12 @@
     <EmbeddedResource Include="ProcessingArea\BorderProcessingAreaView.resx">
       <DependentUpon>BorderProcessingAreaView.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="TechOperation\Tactile\TactileDefaultParamsView.resx">
+      <DependentUpon>TactileDefaultParamsView.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="TechOperation\Tactile\TactileParamsView.resx">
+      <DependentUpon>TactileParamsView.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="TechProcess\ProgramView.resx">
       <DependentUpon>ProgramView.cs</DependentUpon>
     </EmbeddedResource>
@@ -239,6 +263,8 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Properties\DataSources\CAM.Domain.TechProcessParams.datasource" />
+    <None Include="Properties\DataSources\CAM.TechOperation.Tactile.TactileDefaultParams.datasource" />
+    <None Include="Properties\DataSources\CAM.TechOperation.Tactile.TactileParams.datasource" />
     <None Include="Resources\arrow-090_.png" />
   </ItemGroup>
   <ItemGroup>

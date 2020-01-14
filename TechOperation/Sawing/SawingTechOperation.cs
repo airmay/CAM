@@ -31,7 +31,7 @@ namespace CAM.TechOperation.Sawing
         {
             return new List<CuttingParams> { new CuttingParams
             {
-                Curve = ProcessingArea.Curve,
+                Curve = ProcessingArea.Curves[0],
                 CuttingModes = SawingParams.Modes.ConvertAll(p => new CuttingMode { Depth = p.Depth, DepthStep = p.DepthStep, Feed = p.Feed}),
                 IsZeroPass = SawingParams.IsFirstPassOnSurface,
                 IsExactlyBegin = ((BorderProcessingArea)ProcessingArea).IsExactlyBegin,

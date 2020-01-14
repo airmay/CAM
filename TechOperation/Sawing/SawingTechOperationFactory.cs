@@ -1,5 +1,6 @@
 ﻿using Autodesk.AutoCAD.DatabaseServices;
 using System;
+using System.Collections.Generic;
 
 namespace CAM.TechOperation.Sawing
 {
@@ -34,18 +35,23 @@ namespace CAM.TechOperation.Sawing
         /// <param name="techProcess"></param>
         /// <param name="curve">Графическая кривая представляющая область обработки</param>
         /// <returns>Технологическая операцию</returns>
-        public TechOperationBase Create(TechProcess techProcess, Curve curve)
+        public ITechOperation[] Create(TechProcess techProcess, Curve[] curves)
         {
-            if (!(curve is Line || curve is Arc))
+            List<ITechOperation> techOperations = new List<ITechOperation>();
+            foreach (var curve in curves)
             {
-                Acad.Alert("Операция Распиловка выполняется на объектах типа Отрезок и Дуга");
-                return null;
-            }
-            var techOperationParams = curve is Line
-                ? _sawingTechOperationParams.SawingLineTechOperationParams
-                : _sawingTechOperationParams.SawingCurveTechOperationParams;
+                if (curve is Line || curve is Arc)
+                {
+                    var techOperationParams = curve is Line
+                        ? _sawingTechOperationParams.SawingLineTechOperationParams
+                        : _sawingTechOperationParams.SawingCurveTechOperationParams;
 
-            return new SawingTechOperation(techProcess, new BorderProcessingArea(curve), techOperationParams.Clone());
+                    techOperations.Add(new SawingTechOperation(techProcess, new BorderProcessingArea(curve), techOperationParams.Clone()));
+                }
+                else
+                    Acad.Alert($"Операция Распиловка не поддерживается на объектах типа {curve}");
+            }
+            return techOperations.ToArray();
         }
     }
 }

@@ -13,7 +13,7 @@ namespace CAM
         /// </summary>
         //public override ProcessingAreaType Type { get; } = ProcessingAreaType.Line;
 
-        public LineProcessingArea(Curve curve) : base(curve)
+        public LineProcessingArea(Curve curve) : base(new Curve[] { curve })
         {
         }
 

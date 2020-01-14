@@ -23,16 +23,18 @@ namespace CAM
         /// <returns></returns>
         public static Settings Load()
         {
+            Settings settings;
             try
             {
                 var formatter = new XmlSerializer(typeof(Settings));
                 using (var fileStream = new FileStream(GetFilePath, FileMode.Open))
-                    return (Settings)formatter.Deserialize(fileStream);
+                    settings = (Settings)formatter.Deserialize(fileStream);
+
             }
             catch (Exception e)
             {
                 Acad.Alert($"Ошибка при загрузке настроек из файла {GetFilePath}", e);
-                return new Settings
+                settings = new Settings
                 {
                     Tools = new List<Tool>(),
                     TechProcessParams = new TechProcessParams(),
@@ -40,6 +42,9 @@ namespace CAM
                     SawingCurveTechOperationParams = new SawingTechOperationParams()
                 };
             }
+            if (settings.TactileParams == null)
+                settings.TactileParams = TechOperation.Tactile.TactileParams.GetDefault();
+            return settings;
         }
 
         /// <summary>
@@ -98,7 +103,9 @@ namespace CAM
 
         public SawingTechOperationParams SawingCurveTechOperationParams { get; set; }
 
-//        public SawingDefaultParams SawingDefaultParams { get; set; }
+        public TechOperation.Tactile.TactileParams TactileParams { get; set; }
+
+        //        public SawingDefaultParams SawingDefaultParams { get; set; }
 
 
         #endregion

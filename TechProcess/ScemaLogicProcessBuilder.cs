@@ -53,20 +53,18 @@ namespace CAM
 
         public static Point3d Cutting(ScemaLogicCommandGenerator generator, Point3d currentPoint, CuttingParams cuttingParams, double compensation, TechProcessParams techProcessParams)
         {
-            var passList = GetPassList(cuttingParams.CuttingModes, cuttingParams.DepthAll, cuttingParams.IsZeroPass);
-
-            bool oddPassCount = passList.Count() % 2 == 1;
-            var corner = cuttingParams.Curve.IsUpward() ^ oddPassCount ? Corner.End : Corner.Start;
+            var toolpathList = cuttingParams.ToolpathList ?? CreateToolpathList(cuttingParams, compensation, techProcessParams);
+            var corner = cuttingParams.StartCorner;
             Point3d point;
             double angle = 0;
 
-            foreach (var pass in passList)
+            foreach (var toolpath in toolpathList)
             {
-                var toolpathCurve = CreateToolpath(cuttingParams.Curve, compensation, pass.Key, techProcessParams.ToolDiameter, cuttingParams.IsExactlyBegin, cuttingParams.IsExactlyEnd);
+                var toolpathCurve = toolpath.Key;
                 point = toolpathCurve.GetPoint(corner);
                 angle = CalcToolAngle(toolpathCurve, corner);
 
-                if (passList.IndexOf(pass) == 0)
+                if (toolpathList.IndexOf(toolpath) == 0)
                 {
                     var dest = new Point3d(point.X, point.Y, techProcessParams.ZSafety);
                     if (currentPoint.IsNull())
@@ -80,12 +78,23 @@ namespace CAM
                 corner = corner.Swap();
                 angle = CalcToolAngle(toolpathCurve, corner);
                 currentPoint = toolpathCurve.GetPoint(corner);
-                generator.Cutting(toolpathCurve, pass.Value, currentPoint, angle);
+                generator.Cutting(toolpathCurve, toolpath.Value, currentPoint, angle);
             }
             point = new Point3d(currentPoint.X, currentPoint.Y, techProcessParams.ZSafety);
             generator.Uplifting(CreateToolpath(currentPoint, point, Colors[CommandNames.Uplifting]), angle);
 
             return point;
+        }
+
+        private static List<KeyValuePair<Curve, int>> CreateToolpathList(CuttingParams cuttingParams, double compensation, TechProcessParams techProcessParams)
+        {
+            var passList = GetPassList(cuttingParams.CuttingModes, cuttingParams.DepthAll, cuttingParams.IsZeroPass);
+
+            bool oddPassCount = passList.Count() % 2 == 1;
+            cuttingParams.StartCorner = cuttingParams.Curve.IsUpward() ^ oddPassCount ? Corner.End : Corner.Start;
+
+            return passList.ConvertAll(p => new KeyValuePair<Curve, int>(
+                CreateToolpath(cuttingParams.Curve, compensation, p.Key, techProcessParams.ToolDiameter, cuttingParams.IsExactlyBegin, cuttingParams.IsExactlyEnd), p.Value));
         }
 
         private static Point3d Scheduling(Point3d startPoint, Point3d endPoint, bool isExactlyBegin, bool isExactlyEnd, int depth, double compensation)

@@ -78,8 +78,8 @@
             // splitContainer1.Panel2
             // 
             this.splitContainer1.Panel2.Controls.Add(this.tabControl);
-            this.splitContainer1.Size = new System.Drawing.Size(312, 711);
-            this.splitContainer1.SplitterDistance = 271;
+            this.splitContainer1.Size = new System.Drawing.Size(312, 675);
+            this.splitContainer1.SplitterDistance = 155;
             this.splitContainer1.TabIndex = 0;
             // 
             // treeView
@@ -91,7 +91,7 @@
             this.treeView.Location = new System.Drawing.Point(0, 0);
             this.treeView.Name = "treeView";
             this.treeView.SelectedImageIndex = 0;
-            this.treeView.Size = new System.Drawing.Size(312, 271);
+            this.treeView.Size = new System.Drawing.Size(312, 155);
             this.treeView.TabIndex = 0;
             this.treeView.AfterLabelEdit += new System.Windows.Forms.NodeLabelEditEventHandler(this.treeView_AfterLabelEdit);
             this.treeView.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.treeView_AfterSelect);
@@ -111,15 +111,16 @@
             this.tabControl.Location = new System.Drawing.Point(0, 0);
             this.tabControl.Name = "tabControl";
             this.tabControl.SelectedIndex = 0;
-            this.tabControl.Size = new System.Drawing.Size(312, 436);
+            this.tabControl.Size = new System.Drawing.Size(312, 516);
             this.tabControl.TabIndex = 0;
             // 
             // tabPageParams
             // 
+            this.tabPageParams.AutoScroll = true;
             this.tabPageParams.Location = new System.Drawing.Point(4, 22);
             this.tabPageParams.Name = "tabPageParams";
             this.tabPageParams.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPageParams.Size = new System.Drawing.Size(304, 410);
+            this.tabPageParams.Size = new System.Drawing.Size(304, 490);
             this.tabPageParams.TabIndex = 0;
             this.tabPageParams.Text = "Параметры";
             this.tabPageParams.UseVisualStyleBackColor = true;
@@ -130,7 +131,7 @@
             this.tabPageCommands.Location = new System.Drawing.Point(4, 22);
             this.tabPageCommands.Name = "tabPageCommands";
             this.tabPageCommands.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPageCommands.Size = new System.Drawing.Size(304, 410);
+            this.tabPageCommands.Size = new System.Drawing.Size(304, 721);
             this.tabPageCommands.TabIndex = 1;
             this.tabPageCommands.Text = "Программа";
             this.tabPageCommands.UseVisualStyleBackColor = true;
@@ -148,7 +149,7 @@
             this.dataGridViewCommand.Name = "dataGridViewCommand";
             this.dataGridViewCommand.RowHeadersVisible = false;
             this.dataGridViewCommand.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.CellSelect;
-            this.dataGridViewCommand.Size = new System.Drawing.Size(298, 404);
+            this.dataGridViewCommand.Size = new System.Drawing.Size(298, 715);
             this.dataGridViewCommand.TabIndex = 0;
             // 
             // panel1
@@ -287,12 +288,12 @@
             this.panel2.Dock = System.Windows.Forms.DockStyle.Fill;
             this.panel2.Location = new System.Drawing.Point(0, 25);
             this.panel2.Name = "panel2";
-            this.panel2.Size = new System.Drawing.Size(312, 711);
+            this.panel2.Size = new System.Drawing.Size(312, 675);
             this.panel2.TabIndex = 3;
             // 
             // processCommandBindingSource
             // 
-            this.processCommandBindingSource.DataSource = typeof(ProcessCommand);
+            this.processCommandBindingSource.DataSource = typeof(CAM.ProcessCommand);
             this.processCommandBindingSource.CurrentChanged += new System.EventHandler(this.processCommandBindingSource_CurrentChanged);
             // 
             // TechProcessView
@@ -302,7 +303,7 @@
             this.Controls.Add(this.panel2);
             this.Controls.Add(this.panel1);
             this.Name = "TechProcessView";
-            this.Size = new System.Drawing.Size(312, 736);
+            this.Size = new System.Drawing.Size(312, 700);
             this.splitContainer1.Panel1.ResumeLayout(false);
             this.splitContainer1.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).EndInit();

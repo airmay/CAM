@@ -1,4 +1,5 @@
 ﻿using Autodesk.AutoCAD.DatabaseServices;
+using System.Collections.Generic;
 
 namespace CAM.TechOperation.Profiling
 {
@@ -14,9 +15,9 @@ namespace CAM.TechOperation.Profiling
         {
         }
 
-        public TechOperationBase Create(TechProcess techProcess, Curve curve)
+        public ITechOperation[] Create(TechProcess techProcess, Curve[] curves)
         {
-            return new ProfilingTechOperation(techProcess, new BorderProcessingArea(curve));
+            return new[] { new ProfilingTechOperation(techProcess, new BorderProcessingArea(curves[0])) };
         }
 
         public object GetTechOperationParams()

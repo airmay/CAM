@@ -22,5 +22,9 @@ namespace CAM
         public Side ToolSide { get; set; }
         
         public int DepthAll { get; set; }
+
+        public List<KeyValuePair<Curve, int>> ToolpathList { get; set; }
+
+        public Corner StartCorner { get; set; }
     }
 }

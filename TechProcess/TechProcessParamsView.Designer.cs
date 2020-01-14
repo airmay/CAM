@@ -45,8 +45,6 @@
             this.lbToolNumber = new System.Windows.Forms.Label();
             this.gbTechOperationParams = new System.Windows.Forms.GroupBox();
             this.panel2 = new System.Windows.Forms.Panel();
-            this.panel1 = new System.Windows.Forms.Panel();
-            this.bApply = new System.Windows.Forms.Button();
             this.gbBillet = new System.Windows.Forms.GroupBox();
             this.edBilletThickness = new System.Windows.Forms.TextBox();
             this.label4 = new System.Windows.Forms.Label();
@@ -61,7 +59,6 @@
             this.gbTool.SuspendLayout();
             this.gbTechOperationParams.SuspendLayout();
             this.panel2.SuspendLayout();
-            this.panel1.SuspendLayout();
             this.gbBillet.SuspendLayout();
             this.pParams.SuspendLayout();
             this.SuspendLayout();
@@ -102,7 +99,7 @@
             // 
             // techProcessParamsBindingSource
             // 
-            this.techProcessParamsBindingSource.DataSource = typeof(TechProcessParams);
+            this.techProcessParamsBindingSource.DataSource = typeof(CAM.TechProcessParams);
             // 
             // cbMaterial
             // 
@@ -214,12 +211,12 @@
             // 
             // gbTechOperationParams
             // 
+            this.gbTechOperationParams.AutoSize = true;
             this.gbTechOperationParams.Controls.Add(this.panel2);
-            this.gbTechOperationParams.Controls.Add(this.panel1);
             this.gbTechOperationParams.Dock = System.Windows.Forms.DockStyle.Fill;
             this.gbTechOperationParams.Location = new System.Drawing.Point(0, 278);
             this.gbTechOperationParams.Name = "gbTechOperationParams";
-            this.gbTechOperationParams.Size = new System.Drawing.Size(331, 485);
+            this.gbTechOperationParams.Size = new System.Drawing.Size(331, 222);
             this.gbTechOperationParams.TabIndex = 7;
             this.gbTechOperationParams.TabStop = false;
             this.gbTechOperationParams.Text = "Параметры обработки";
@@ -233,25 +230,6 @@
             this.panel2.Name = "panel2";
             this.panel2.Size = new System.Drawing.Size(325, 21);
             this.panel2.TabIndex = 7;
-            // 
-            // panel1
-            // 
-            this.panel1.Controls.Add(this.bApply);
-            this.panel1.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.panel1.Location = new System.Drawing.Point(3, 453);
-            this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(325, 29);
-            this.panel1.TabIndex = 0;
-            this.panel1.Visible = false;
-            // 
-            // bApply
-            // 
-            this.bApply.Location = new System.Drawing.Point(3, 3);
-            this.bApply.Name = "bApply";
-            this.bApply.Size = new System.Drawing.Size(75, 23);
-            this.bApply.TabIndex = 0;
-            this.bApply.Text = "Применить";
-            this.bApply.UseVisualStyleBackColor = true;
             // 
             // gbBillet
             // 
@@ -380,19 +358,19 @@
             this.Controls.Add(this.gbTechOperationParams);
             this.Controls.Add(this.pParams);
             this.Name = "TechProcessParamsView";
-            this.Size = new System.Drawing.Size(331, 763);
+            this.Size = new System.Drawing.Size(331, 500);
             ((System.ComponentModel.ISupportInitialize)(this.techProcessParamsBindingSource)).EndInit();
             this.gbTool.ResumeLayout(false);
             this.gbTool.PerformLayout();
             this.gbTechOperationParams.ResumeLayout(false);
             this.panel2.ResumeLayout(false);
             this.panel2.PerformLayout();
-            this.panel1.ResumeLayout(false);
             this.gbBillet.ResumeLayout(false);
             this.gbBillet.PerformLayout();
             this.pParams.ResumeLayout(false);
             this.pParams.PerformLayout();
             this.ResumeLayout(false);
+            this.PerformLayout();
 
         }
 
@@ -411,8 +389,6 @@
         private System.Windows.Forms.ComboBox cbTechOperation;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.GroupBox gbTechOperationParams;
-        private System.Windows.Forms.Panel panel1;
-        private System.Windows.Forms.Button bApply;
 		private System.Windows.Forms.GroupBox gbBillet;
 		private System.Windows.Forms.TextBox edBilletThickness;
 		private System.Windows.Forms.Label label4;
@@ -425,5 +401,5 @@
 		private System.Windows.Forms.Panel pParams;
 		private System.Windows.Forms.BindingSource techProcessParamsBindingSource;
 		private System.Windows.Forms.Panel panel2;
-	}
+    }
 }

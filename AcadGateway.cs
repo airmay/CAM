@@ -40,7 +40,7 @@ namespace CAM
 
         public static void Alert(Exception ex) => Alert("Ошибка", ex);
 
-        public static ObjectId GetObjectId(long handle) => Database.GetObjectId(false, new Handle(handle), 0);
+        public static ObjectId[] GetObjectIds(long[] handles) => Array.ConvertAll(handles, p => Database.GetObjectId(false, new Handle(p), 0));
 
         public static void SaveCurves(IEnumerable<Curve> entities)
         {

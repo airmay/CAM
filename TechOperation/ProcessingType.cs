@@ -10,6 +10,8 @@
         /// <summary>
         /// Профилирование
         /// </summary>
-        Profiling
+        Profiling,
+
+        Tactile
     }
 }

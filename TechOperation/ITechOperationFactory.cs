@@ -18,6 +18,6 @@ namespace CAM
         /// <param name="techProcess"></param>
         /// <param name="curve">Графическая кривая представляющая область обработки</param>
         /// <returns>Технологическая операцию</returns>
-        TechOperationBase Create(TechProcess techProcess, Curve curve);
+        ITechOperation[] Create(TechProcess techProcess, Curve[] curves);
 	}
 }

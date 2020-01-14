@@ -96,7 +96,7 @@ namespace CAM
 					        _borderProcessingAreaView.SetDataSource(techOperation.ProcessingArea as BorderProcessingArea);
 			        }
 
-                    ParamsViewContainer.SetParamsView(techOperation.Type, techOperation.Params, _paramsView);
+                    ParamsViewContainer.SetParamsView(techOperation.Type, techOperation, _paramsView);
 			        _paramsView.BringToFront();
                     processCommandBindingSource.DataSource = techOperation.ProcessCommands;
                     _camDocument.SelectTechOperation(techOperation);

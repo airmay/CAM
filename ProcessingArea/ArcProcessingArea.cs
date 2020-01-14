@@ -27,7 +27,7 @@ namespace CAM
         /// Конструктор
         /// </summary>
         /// <param name="curve">Дуга</param>
-        public ArcProcessingArea(Curve curve) : base(curve)
+        public ArcProcessingArea(Curve curve) : base(new Curve[] { curve })
         {
             //Set(curve);
         }

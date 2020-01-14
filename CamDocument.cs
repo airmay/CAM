@@ -41,6 +41,7 @@ namespace CAM
         public void DeleteTechProcess(TechProcess techProcess)
         {
             Acad.DeleteHatch();
+            Acad.DeleteToolModel(techProcess.ToolModel);
             Acad.DeleteCurves(techProcess.ToolpathCurves);
             TechProcessList.Remove(techProcess);
         }
@@ -51,9 +52,9 @@ namespace CAM
             techOperation.TechProcess.TechOperations.Remove(techOperation);
         }
 
-        public void SelectTechProcess(TechProcess techProcess) => Acad.SelectObjectIds(techProcess.TechOperations.Select(p => p.ProcessingArea.AcadObjectId).ToArray());
+        public void SelectTechProcess(TechProcess techProcess) => Acad.SelectObjectIds(techProcess.TechOperations.SelectMany(p => p.ProcessingArea.AcadObjectIds).ToArray());
 
-        public void SelectTechOperation(ITechOperation techOperation) => Acad.SelectObjectIds(techOperation.ProcessingArea.AcadObjectId);
+        public void SelectTechOperation(ITechOperation techOperation) => Acad.SelectObjectIds(techOperation.ProcessingArea.AcadObjectIds.ToArray());
 
         public void SelectProcessCommand(TechProcess techProcess, ProcessCommand processCommand)
         {
@@ -75,7 +76,7 @@ namespace CAM
                 Acad.DeleteCurves(techProcess.ToolpathCurves);
 
                 techProcess.DeleteToolpath();
-                techProcess.TechOperations.ForEach(p => p.ProcessingArea.Curve = p.ProcessingArea.AcadObjectId.QOpenForRead<Curve>());
+                techProcess.TechOperations.ForEach(p => p.ProcessingArea.Curves = p.ProcessingArea.AcadObjectIds.QOpenForRead<Curve>());
                 BorderProcessingArea.ProcessBorders(techProcess.TechOperations.Select(p => p.ProcessingArea).OfType<BorderProcessingArea>().ToList(), startBorder);
 
                 ScemaLogicProcessBuilder.BuildProcessing(techProcess);

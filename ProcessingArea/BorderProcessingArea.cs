@@ -14,9 +14,11 @@ namespace CAM
         /// Пограничная обрабатываемая область
         /// </summary>
         /// <param name="curve"></param>
-        public BorderProcessingArea(Curve curve) : base(curve)
+        public BorderProcessingArea(Curve curve) : base(new Curve[] { curve })
         {
         }
+
+        public Curve Curve => Curves[0];
 
         public Side OuterSide { get; set; }
 
