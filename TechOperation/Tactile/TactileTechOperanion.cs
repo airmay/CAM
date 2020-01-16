@@ -40,11 +40,11 @@ namespace CAM.TechOperation.Tactile
                 TactileParams.PassList.Add(new Pass(i * periodWidth + x, CuttingType.Finishing));
         }
 
-        public override List<CuttingParams> GetCuttingParams()
+        public override List<CuttingSet> GetCutting()
         {
             if (TactileParams.PassList == null)
                 CalcPassList();
-            var cuttingParamsList = new List<CuttingParams>();
+            var cuttingSets = new List<CuttingSet>();
             var points = ProcessingArea.Curves.Select(p => p.StartPoint).Concat(ProcessingArea.Curves.Select(p => p.EndPoint)).Distinct();
             var xMin = points.Min(p => p.X);
             var basePoint = points.Where(p => p.X == xMin).OrderBy(p => p.Y).First();
@@ -58,7 +58,7 @@ namespace CAM.TechOperation.Tactile
             if (TactileParams.Type.Contains("Диагональные"))
                 ray.UnitDir = ray.UnitDir.RotateBy(Math.PI / 4, -Vector3d.ZAxis);
 
-            cuttingParamsList.Add(Calc(basePoint, ray, TactileParams.FeedRoughing1, TactileParams.FeedFinishing1));
+            cuttingSets.Add(CalcCuttingSet(basePoint, ray, TactileParams.FeedRoughing1, TactileParams.FeedFinishing1));
 
             if (TactileParams.Type.Contains("квадраты"))
             {
@@ -68,19 +68,19 @@ namespace CAM.TechOperation.Tactile
                     basePoint = basePoint2;
                     ray.UnitDir = -ray.UnitDir;
                 }
-                cuttingParamsList.Add(Calc(basePoint, ray, TactileParams.FeedRoughing2, TactileParams.FeedFinishing2));
+                cuttingSets.Add(CalcCuttingSet(basePoint, ray, TactileParams.FeedRoughing2, TactileParams.FeedFinishing2));
             }
-            return cuttingParamsList;
+            return cuttingSets;
         }
 
-        private CuttingParams Calc(Point3d basePoint, Ray ray, int feedRoughing, int feedFinishing)
+        private CuttingSet CalcCuttingSet(Point3d basePoint, Ray ray, int feedRoughing, int feedFinishing)
         {
             var passDir = ray.UnitDir.GetPerpendicularVector();
             var pt = new List<Point3d>();
             double offset = TactileParams.TopStart == 0 ? TactileParams.TopWidth : TactileParams.TopStart - TactileParams.GutterWidth;
             bool cuttingFlag = false;
             
-            var toolpathList = new List<KeyValuePair<Curve, int>>();
+            var cuttingPassList = new List<CuttingPass>();
             do
             {
                 foreach (var pass in TactileParams.PassList)
@@ -98,7 +98,7 @@ namespace CAM.TechOperation.Tactile
                     {
                         var vector = (pt[1] - pt[0]).GetNormal() * TactileParams.Departure;
                         var line = NoDraw.Line(pt[0] - vector - Vector3d.ZAxis * TactileParams.Depth, pt[1] + vector - Vector3d.ZAxis * TactileParams.Depth);
-                        toolpathList.Add(new KeyValuePair<Curve, int>(line, pass.CuttingType == "Гребенка" ? feedRoughing : feedFinishing));
+                        cuttingPassList.Add(new CuttingPass(line, pass.CuttingType == "Гребенка" ? feedRoughing : feedFinishing));
                         cuttingFlag = true;
                     }
                 }
@@ -106,11 +106,10 @@ namespace CAM.TechOperation.Tactile
             }
             while (pt.Count != 0 || !cuttingFlag);
 
-            return new CuttingParams
+            return new CuttingSet
             {
-                ToolpathList = toolpathList,
-                StartCorner = Corner.Start,
-                Transition = TactileParams.Transition
+                Cuttings = cuttingPassList,
+                StartCorner = Corner.Start
             };
         }
     }

@@ -10,13 +10,7 @@ namespace CAM
     /// </summary>
     public class ScemaLogicCommandGenerator
     {
-        private List<ProcessCommand> _commands { get; } = new List<ProcessCommand>();
-
-        public List<ProcessCommand> GetCommands() => new List<ProcessCommand>(_commands);
-
-        public void AddCommands(ScemaLogicCommandGenerator generator) => _commands.AddRange(generator.GetCommands());
-
-        public void ClearCommands() => _commands.Clear();
+        public List<ProcessCommand> Commands { get; } = new List<ProcessCommand>();
 
         /// <summary>
         /// Запуск станка
@@ -44,7 +38,7 @@ namespace CAM
             CreateCommand(name, 97, 30);
 
             int number = 0;
-            _commands.ForEach(p => p.Number = ++number);
+            Commands.ForEach(p => p.Number = ++number);
         }
 
         /// <summary>
@@ -117,7 +111,7 @@ namespace CAM
 
         private void CreateCommand(string name, int gCode, int? mCode = null, string axis = null, int? feed = null, double? x = null, double? y = null, 
             double? param1 = null, double? param2 = null, Curve toolpathCurve = null, Point3d? endPoint = null, double? toolAngle = null)
-            => _commands.Add(new ProcessCommand
+            => Commands.Add(new ProcessCommand
             {
                 Name = name,
                 GCode = gCode.ToString(),

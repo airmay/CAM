@@ -141,14 +141,15 @@
             this.dataGridViewCommand.AllowUserToResizeRows = false;
             this.dataGridViewCommand.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.AllCellsExceptHeader;
             this.dataGridViewCommand.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.dataGridViewCommand.ClipboardCopyMode = System.Windows.Forms.DataGridViewClipboardCopyMode.EnableWithoutHeaderText;
             this.dataGridViewCommand.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dataGridViewCommand.ColumnHeadersVisible = false;
             this.dataGridViewCommand.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.dataGridViewCommand.EditMode = System.Windows.Forms.DataGridViewEditMode.EditOnEnter;
             this.dataGridViewCommand.Location = new System.Drawing.Point(3, 3);
+            this.dataGridViewCommand.MultiSelect = false;
             this.dataGridViewCommand.Name = "dataGridViewCommand";
             this.dataGridViewCommand.RowHeadersVisible = false;
-            this.dataGridViewCommand.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.CellSelect;
+            this.dataGridViewCommand.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
             this.dataGridViewCommand.Size = new System.Drawing.Size(298, 484);
             this.dataGridViewCommand.TabIndex = 0;
             // 

@@ -13,7 +13,7 @@ namespace CAM.TechOperation.Profiling
 
         public override object Params => throw new NotImplementedException();
 
-        public override List<CuttingParams> GetCuttingParams()
+        public override List<CuttingSet> GetCutting()
         {
             throw new NotImplementedException();
         }

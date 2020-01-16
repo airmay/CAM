@@ -60,7 +60,7 @@ namespace CAM
             Name = name;
         }
 
-        public abstract List<CuttingParams> GetCuttingParams();
+        public abstract List<CuttingSet> GetCutting();
 
         public IEnumerable<Curve> ToolpathCurves => ProcessCommands?.Select(p => p.ToolpathCurve).Where(p => p != null);
     }

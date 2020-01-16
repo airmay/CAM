@@ -25,7 +25,7 @@ namespace CAM
 
         IEnumerable<Curve> ToolpathCurves { get; }
 
-        List<CuttingParams> GetCuttingParams();
+        List<CuttingSet> GetCutting();
 
     }
 }

@@ -26,39 +26,35 @@ namespace CAM
 
         public static void BuildProcessing(TechProcess techProcess)
         {
-            var techProcessParams = techProcess.TechProcessParams;
             var techProcessGenerator = new ScemaLogicCommandGenerator();
-            techProcessGenerator.StartMachine(techProcessParams.ToolNumber);
+            techProcessGenerator.StartMachine(techProcess.TechProcessParams.ToolNumber);
             var point = Algorithms.NullPoint3d;
-            var techOperationGenerator = new ScemaLogicCommandGenerator();
 
             foreach (var techOperation in techProcess.TechOperations)
             {
-                foreach (var cuttingParams in techOperation.GetCuttingParams())
-                {
-                    var toolpathList = cuttingParams.ToolpathList ?? CreateToolpathList(cuttingParams, techProcessParams);
-                    point = Cutting(techOperationGenerator, point, toolpathList, cuttingParams.StartCorner, techProcessParams, cuttingParams.Transition);
-                }
-                techProcessGenerator.AddCommands(techOperationGenerator);
-                techOperation.ProcessCommands = techOperationGenerator.GetCommands();
-                techOperationGenerator.ClearCommands();
+                var techOperationGenerator = new ScemaLogicCommandGenerator();
+                point = techOperation.GetCutting().Aggregate(point, (p, cuttingSet) => Cutting(techOperationGenerator, p, cuttingSet, techProcess.TechProcessParams));
+
+                techProcessGenerator.Commands.AddRange(techOperationGenerator.Commands);
+                techOperation.ProcessCommands = techOperationGenerator.Commands;
             }
             techProcessGenerator.StopMachine();
-            techProcess.ProcessCommands = techProcessGenerator.GetCommands();
+            techProcess.ProcessCommands = techProcessGenerator.Commands;
         }
 
-        public static Point3d Cutting(ScemaLogicCommandGenerator generator, Point3d currentPoint, List<KeyValuePair<Curve, int>> toolpathList, Corner corner, TechProcessParams techProcessParams, int transition)
+        public static Point3d Cutting(ScemaLogicCommandGenerator generator, Point3d currentPoint, CuttingSet cuttingSet, TechProcessParams techProcessParams)
         {
             Point3d point;
             double angle = 0;
+            var corner = cuttingSet.StartCorner;
 
-            foreach (var toolpath in toolpathList)
+            foreach (var cuttingPass in cuttingSet.Cuttings)
             {
-                var toolpathCurve = toolpath.Key;
+                var toolpathCurve = cuttingPass.Toolpath;
                 point = toolpathCurve.GetPoint(corner);
                 angle = CalcToolAngle(toolpathCurve, corner);
 
-                if (toolpathList.IndexOf(toolpath) == 0)
+                if (cuttingSet.Cuttings.IndexOf(cuttingPass) == 0)
                 {
                     var dest = new Point3d(point.X, point.Y, techProcessParams.ZSafety);
                     if (currentPoint.IsNull())
@@ -68,14 +64,14 @@ namespace CAM
                     currentPoint = dest;
                 }
                 if (currentPoint.Z == point.Z)
-                    generator.Transition(CreateToolpath(currentPoint, point, Colors[CommandNames.Transition]), transition, angle);
+                    generator.Transition(CreateToolpath(currentPoint, point, Colors[CommandNames.Transition]), techProcessParams.PenetrationRate, angle);
                 else
                     generator.Penetration(CreateToolpath(currentPoint, point, Colors[CommandNames.Penetration]), techProcessParams.PenetrationRate, angle);
 
                 corner = corner.Swap();
                 angle = CalcToolAngle(toolpathCurve, corner);
                 currentPoint = toolpathCurve.GetPoint(corner);
-                generator.Cutting(toolpathCurve, toolpath.Value, currentPoint, angle);
+                generator.Cutting(toolpathCurve, cuttingPass.Feed, currentPoint, angle);
                 toolpathCurve.Color = Colors[CommandNames.Cutting];
             }
             point = new Point3d(currentPoint.X, currentPoint.Y, techProcessParams.ZSafety);
@@ -84,7 +80,7 @@ namespace CAM
             return point;
         }
 
-        private static List<KeyValuePair<Curve, int>> CreateToolpathList(CuttingParams cuttingParams, TechProcessParams techProcessParams)
+        public static CuttingSet CalcCuttingSet(CuttingParams cuttingParams, TechProcessParams techProcessParams)
         {
             var compensation = CalcCompensation(cuttingParams.Curve, cuttingParams.ToolSide, cuttingParams.DepthAll, techProcessParams.ToolThickness, techProcessParams.ToolDiameter);
 
@@ -96,11 +92,12 @@ namespace CAM
 
             var passList = GetPassList(cuttingParams.CuttingModes, cuttingParams.DepthAll, cuttingParams.IsZeroPass);
 
-            bool oddPassCount = passList.Count() % 2 == 1;
-            cuttingParams.StartCorner = cuttingParams.Curve.IsUpward() ^ oddPassCount ? Corner.End : Corner.Start;
-
-            return passList.ConvertAll(p => new KeyValuePair<Curve, int>(
-                CreateToolpath(cuttingParams.Curve, compensation, p.Key, techProcessParams.ToolDiameter, cuttingParams.IsExactlyBegin, cuttingParams.IsExactlyEnd), p.Value));
+            return new CuttingSet
+            {
+                Cuttings = passList.ConvertAll(p => new CuttingPass(
+                      CreateToolpath(cuttingParams.Curve, compensation, p.Key, techProcessParams.ToolDiameter, cuttingParams.IsExactlyBegin, cuttingParams.IsExactlyEnd), p.Value)),
+                StartCorner = cuttingParams.Curve.IsUpward() ^ (passList.Count() % 2 == 1) ? Corner.End : Corner.Start
+            };
         }
 
         private static Point3d Scheduling(Point3d startPoint, Point3d endPoint, bool isExactlyBegin, bool isExactlyEnd, int depth, double compensation)

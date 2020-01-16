@@ -27,9 +27,9 @@ namespace CAM.TechOperation.Sawing
             SawingParams = sawingParams;
         }
 
-        public override List<CuttingParams> GetCuttingParams()
+        public override List<CuttingSet> GetCutting()
         {
-            return new List<CuttingParams> { new CuttingParams
+            var par = new CuttingParams
             {
                 Curve = ProcessingArea.Curves[0],
                 CuttingModes = SawingParams.Modes.ConvertAll(p => new CuttingMode { Depth = p.Depth, DepthStep = p.DepthStep, Feed = p.Feed}),
@@ -38,7 +38,8 @@ namespace CAM.TechOperation.Sawing
                 IsExactlyEnd = ((BorderProcessingArea)ProcessingArea).IsExactlyEnd,
                 ToolSide = ((BorderProcessingArea)ProcessingArea).OuterSide,
                 DepthAll = TechProcess.TechProcessParams.BilletThickness
-            } };
+            };
+            return new List<CuttingSet> { ScemaLogicProcessBuilder.CalcCuttingSet(par, TechProcess.TechProcessParams) };
         }
     }
 }
