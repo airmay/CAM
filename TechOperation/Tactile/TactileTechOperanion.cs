@@ -76,7 +76,7 @@ namespace CAM.TechOperation.Tactile
         private CuttingSet CalcCuttingSet(Point3d basePoint, Ray ray, int feedRoughing, int feedFinishing)
         {
             var passDir = ray.UnitDir.GetPerpendicularVector();
-            var pt = new List<Point3d>();
+            var points = new List<Point3d>();
             double offset = TactileParams.TopStart == 0 ? TactileParams.TopWidth : TactileParams.TopStart - TactileParams.GutterWidth;
             bool cuttingFlag = false;
             
@@ -86,25 +86,25 @@ namespace CAM.TechOperation.Tactile
                 foreach (var pass in TactileParams.PassList)
                 {
                     ray.BasePoint = basePoint + passDir * (offset + pass.Pos);
-                    pt.Clear();
+                    points.Clear();
                     foreach (var curve in ProcessingArea.Curves)
                     {
                         var intersectPoints = new Point3dCollection();
                         ray.IntersectWith(curve, Intersect.ExtendThis, intersectPoints, 0, 0);
                         if (intersectPoints.Count == 1)
-                            pt.Add(intersectPoints[0]);
+                            points.Add(intersectPoints[0]);
                     }
-                    if (pt.Count == 2)
+                    if (points.Count == 2)
                     {
-                        var vector = (pt[1] - pt[0]).GetNormal() * TactileParams.Departure;
-                        var line = NoDraw.Line(pt[0] - vector - Vector3d.ZAxis * TactileParams.Depth, pt[1] + vector - Vector3d.ZAxis * TactileParams.Depth);
+                        var vector = (points[1] - points[0]).GetNormal() * TactileParams.Departure;
+                        var line = NoDraw.Line(points[0] - vector - Vector3d.ZAxis * TactileParams.Depth, points[1] + vector - Vector3d.ZAxis * TactileParams.Depth);
                         cuttingPassList.Add(new CuttingPass(line, pass.CuttingType == "Гребенка" ? feedRoughing : feedFinishing));
                         cuttingFlag = true;
                     }
                 }
                 offset += TactileParams.GutterWidth + TactileParams.TopWidth;
             }
-            while (pt.Count != 0 || !cuttingFlag);
+            while (points.Count != 0 || !cuttingFlag);
 
             return new CuttingSet
             {
