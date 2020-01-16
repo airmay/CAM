@@ -31,6 +31,10 @@ namespace CAM
             processCommandBindingSource.DataSource = null;
 
             SetButtonsEnabled();
+
+#if DEBUG
+            bClose.Visible = true;
+#endif
         }
 
         public void SetCamDocument(CamDocument camDocument)
@@ -172,7 +176,8 @@ namespace CAM
                         _camDocument.DeleteTechOperation(techOperation);
 					    break;
 			    }
-			    treeView.SelectedNode.Remove();
+                ClearCommandsView();
+                treeView.SelectedNode.Remove();
                 SetParamsViewsVisible();
                 SetButtonsEnabled();
             }

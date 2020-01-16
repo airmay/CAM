@@ -47,7 +47,12 @@ namespace CAM.TechOperation.Tactile
                 TopWidth = 50,
                 GutterWidth = 50,
                 Depth = 20,
-                Departure = 150
+                Departure = 150,
+                FeedRoughing1 = 2000,
+                FeedFinishing1 = 3000,
+                FeedRoughing2 = 3500,
+                FeedFinishing2 = 4500,
+                Transition = 450
             };
         }
     }

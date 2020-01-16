@@ -131,7 +131,7 @@
             this.tabPageCommands.Location = new System.Drawing.Point(4, 22);
             this.tabPageCommands.Name = "tabPageCommands";
             this.tabPageCommands.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPageCommands.Size = new System.Drawing.Size(304, 721);
+            this.tabPageCommands.Size = new System.Drawing.Size(304, 490);
             this.tabPageCommands.TabIndex = 1;
             this.tabPageCommands.Text = "Программа";
             this.tabPageCommands.UseVisualStyleBackColor = true;
@@ -149,7 +149,7 @@
             this.dataGridViewCommand.Name = "dataGridViewCommand";
             this.dataGridViewCommand.RowHeadersVisible = false;
             this.dataGridViewCommand.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.CellSelect;
-            this.dataGridViewCommand.Size = new System.Drawing.Size(298, 715);
+            this.dataGridViewCommand.Size = new System.Drawing.Size(298, 484);
             this.dataGridViewCommand.TabIndex = 0;
             // 
             // panel1
@@ -280,6 +280,7 @@
             this.bClose.Name = "bClose";
             this.bClose.Size = new System.Drawing.Size(23, 22);
             this.bClose.Text = "Закрыть Автокад";
+            this.bClose.Visible = false;
             this.bClose.Click += new System.EventHandler(this.bClose_Click);
             // 
             // panel2

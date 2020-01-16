@@ -21,8 +21,8 @@ namespace CAM.TechOperation.Sawing
 
         public override object Params => SawingParams;
 
-        public SawingTechOperation(TechProcess techProcess, ProcessingArea processingArea, SawingTechOperationParams sawingParams)
-            : base(techProcess, processingArea)
+        public SawingTechOperation(TechProcess techProcess, ProcessingArea processingArea, SawingTechOperationParams sawingParams, string name)
+            : base(techProcess, processingArea, name)
         {
             SawingParams = sawingParams;
         }

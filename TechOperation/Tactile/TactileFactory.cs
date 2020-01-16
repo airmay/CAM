@@ -1,6 +1,5 @@
 ﻿using Autodesk.AutoCAD.DatabaseServices;
 using System;
-using System.Linq;
 
 namespace CAM.TechOperation.Tactile
 {
@@ -14,6 +13,8 @@ namespace CAM.TechOperation.Tactile
         public ProcessingType ProcessingType => ProcessingType.Tactile;
 
         private readonly TactileParams _tactileParams;
+
+        private int _techOperationsNumber;
 
         public object GetTechOperationParams() => _tactileParams;
 
@@ -33,12 +34,12 @@ namespace CAM.TechOperation.Tactile
         /// <returns>Технологическая операцию</returns>
         public ITechOperation[] Create(TechProcess techProcess, Curve[] curves)
         {
-            if (curves.Length != 4 || !curves.All(p => p is Line))
+            if (curves.Length < 2)
             {
-                Acad.Alert("Операция Тактилка выполняется на 4 объектах типа Отрезок");
+                Acad.Alert("Укажите все объекты контура плитки");
                 return null;
             }
-            return new[] { new TactileTechOperanion(techProcess, new ProcessingArea(curves), _tactileParams.Clone()) };
+            return new[] { new TactileTechOperanion(techProcess, new ProcessingArea(curves), _tactileParams.Clone(), "Тактилка" + ++_techOperationsNumber)};
         }
     }
 }

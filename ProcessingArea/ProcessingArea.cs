@@ -84,11 +84,11 @@ namespace CAM
 		    switch (Curves[0])
 		    {
 			    case Line _:
-				    return $"Прямая L{ Math.Round(Length) }";
+				    return "Прямая";
 				case Arc _:
-				    return $"Дуга L{ Math.Round(Length) }";
+				    return "Дуга";
 				default:
-					return $"{Curves[0].GetType()} L{ Math.Round(Length) }";
+					return Curves[0].GetType().ToString();
 		    }
 	    }
 	}

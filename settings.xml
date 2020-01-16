@@ -1,5 +1,11 @@
 <?xml version="1.0"?>
 <Settings xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <Machines>
+    <Machine>
+      <Type>ScemaLogic</Type>
+      <ProgramPath>\\US-CATALINA3\public\Программы станок\CodeRepository</ProgramPath>
+    </Machine>
+  </Machines>
   <Tools>
     <Tool>
       <Number>1</Number>
@@ -63,4 +69,17 @@
     </Modes>
     <IsFirstPassOnSurface>true</IsFirstPassOnSurface>
   </SawingCurveTechOperationParams>
+  <TactileParams>
+    <Type>Прямые полосы</Type>
+    <TopStart>50</TopStart>
+    <TopWidth>50</TopWidth>
+    <GutterWidth>50</GutterWidth>
+    <Depth>20</Depth>
+    <Departure>150</Departure>
+    <FeedRoughing1>2000</FeedRoughing1>
+    <FeedFinishing1>3000</FeedFinishing1>
+    <FeedRoughing2>3500</FeedRoughing2>
+    <FeedFinishing2>4500</FeedFinishing2>
+    <Transition>450</Transition>
+  </TactileParams>
 </Settings>

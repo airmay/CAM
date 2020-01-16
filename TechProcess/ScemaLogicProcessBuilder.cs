@@ -20,7 +20,8 @@ namespace CAM
             [CommandNames.Cutting] = Color.FromColor(System.Drawing.Color.Green),
             [CommandNames.Uplifting] = Color.FromColor(System.Drawing.Color.Blue),
             [CommandNames.Penetration] = Color.FromColor(System.Drawing.Color.Yellow),
-            [CommandNames.Fast] = Color.FromColor(System.Drawing.Color.Crimson)
+            [CommandNames.Fast] = Color.FromColor(System.Drawing.Color.Crimson),
+            [CommandNames.Transition] = Color.FromColor(System.Drawing.Color.Yellow)
         };
 
         public static void BuildProcessing(TechProcess techProcess)
@@ -35,13 +36,8 @@ namespace CAM
             {
                 foreach (var cuttingParams in techOperation.GetCuttingParams())
                 {
-                    var compensation = CalcCompensation(cuttingParams.Curve, cuttingParams.ToolSide, cuttingParams.DepthAll, techProcessParams.ToolThickness, techProcessParams.ToolDiameter);
-
-                    var sumIndent = CalcIndent(techProcessParams.ToolDiameter, cuttingParams.DepthAll) * (Convert.ToInt32(cuttingParams.IsExactlyBegin) + Convert.ToInt32(cuttingParams.IsExactlyEnd));
-                    if (sumIndent >= cuttingParams.Curve.Length())
-                        point = Scheduling(cuttingParams.Curve.StartPoint, cuttingParams.Curve.EndPoint, cuttingParams.IsExactlyBegin, cuttingParams.IsExactlyEnd, cuttingParams.DepthAll, compensation);
-                    else
-                        point = Cutting(techOperationGenerator, point, cuttingParams, compensation, techProcessParams);
+                    var toolpathList = cuttingParams.ToolpathList ?? CreateToolpathList(cuttingParams, techProcessParams);
+                    point = Cutting(techOperationGenerator, point, toolpathList, cuttingParams.StartCorner, techProcessParams, cuttingParams.Transition);
                 }
                 techProcessGenerator.AddCommands(techOperationGenerator);
                 techOperation.ProcessCommands = techOperationGenerator.GetCommands();
@@ -51,10 +47,8 @@ namespace CAM
             techProcess.ProcessCommands = techProcessGenerator.GetCommands();
         }
 
-        public static Point3d Cutting(ScemaLogicCommandGenerator generator, Point3d currentPoint, CuttingParams cuttingParams, double compensation, TechProcessParams techProcessParams)
+        public static Point3d Cutting(ScemaLogicCommandGenerator generator, Point3d currentPoint, List<KeyValuePair<Curve, int>> toolpathList, Corner corner, TechProcessParams techProcessParams, int transition)
         {
-            var toolpathList = cuttingParams.ToolpathList ?? CreateToolpathList(cuttingParams, compensation, techProcessParams);
-            var corner = cuttingParams.StartCorner;
             Point3d point;
             double angle = 0;
 
@@ -73,12 +67,16 @@ namespace CAM
                         generator.Fast(CreateToolpath(currentPoint, dest, Colors[CommandNames.Fast]), angle);
                     currentPoint = dest;
                 }
-                generator.Penetration(CreateToolpath(currentPoint, point, Colors[CommandNames.Penetration]), techProcessParams.PenetrationRate, angle);
+                if (currentPoint.Z == point.Z)
+                    generator.Transition(CreateToolpath(currentPoint, point, Colors[CommandNames.Transition]), transition, angle);
+                else
+                    generator.Penetration(CreateToolpath(currentPoint, point, Colors[CommandNames.Penetration]), techProcessParams.PenetrationRate, angle);
 
                 corner = corner.Swap();
                 angle = CalcToolAngle(toolpathCurve, corner);
                 currentPoint = toolpathCurve.GetPoint(corner);
                 generator.Cutting(toolpathCurve, toolpath.Value, currentPoint, angle);
+                toolpathCurve.Color = Colors[CommandNames.Cutting];
             }
             point = new Point3d(currentPoint.X, currentPoint.Y, techProcessParams.ZSafety);
             generator.Uplifting(CreateToolpath(currentPoint, point, Colors[CommandNames.Uplifting]), angle);
@@ -86,8 +84,16 @@ namespace CAM
             return point;
         }
 
-        private static List<KeyValuePair<Curve, int>> CreateToolpathList(CuttingParams cuttingParams, double compensation, TechProcessParams techProcessParams)
+        private static List<KeyValuePair<Curve, int>> CreateToolpathList(CuttingParams cuttingParams, TechProcessParams techProcessParams)
         {
+            var compensation = CalcCompensation(cuttingParams.Curve, cuttingParams.ToolSide, cuttingParams.DepthAll, techProcessParams.ToolThickness, techProcessParams.ToolDiameter);
+
+            var sumIndent = CalcIndent(techProcessParams.ToolDiameter, cuttingParams.DepthAll) * (Convert.ToInt32(cuttingParams.IsExactlyBegin) + Convert.ToInt32(cuttingParams.IsExactlyEnd));
+            //if (sumIndent >= cuttingParams.Curve.Length())
+            //    point = Scheduling(cuttingParams.Curve.StartPoint, cuttingParams.Curve.EndPoint, cuttingParams.IsExactlyBegin, cuttingParams.IsExactlyEnd, cuttingParams.DepthAll, compensation);
+            //else
+            //    point = Cutting(techOperationGenerator, point, cuttingParams, compensation, techProcessParams);
+
             var passList = GetPassList(cuttingParams.CuttingModes, cuttingParams.DepthAll, cuttingParams.IsZeroPass);
 
             bool oddPassCount = passList.Count() % 2 == 1;
@@ -161,7 +167,6 @@ namespace CAM
                             $"Обработка дуги невозможна - дуга пересекает угол 90 или 270 градусов. Текущие углы: начальный {Graph.ToDeg(arc.StartAngle)}, конечный {Graph.ToDeg(arc.EndAngle)}");
                     break;
             }
-            toolpathCurve.Color = Colors[CommandNames.Cutting];
             return toolpathCurve;
         }
 
@@ -198,7 +203,10 @@ namespace CAM
             var tangent = curve.GetTangent(corner);
             if (!curve.IsUpward())
                 tangent = tangent.Negate();
-            return Graph.ToDeg(Math.PI - Graph.Round(tangent.Angle));
+            var angle = Graph.ToDeg(Math.PI - Graph.Round(tangent.Angle));
+            if (curve is Line && angle == 180)
+                angle = 0;
+            return angle;
         }
 
         private static double CalcCompensation(Curve curve, Side toolSide, double depth, double toolThickness, double toolDiameter)

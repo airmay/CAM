@@ -84,6 +84,9 @@ namespace CAM
         public void Penetration(Line line, int feed, double angle) => 
             CreateCommand(CommandNames.Penetration, 1, axis: "XYCZ", feed: feed, x: line.EndPoint.X, y: line.EndPoint.Y, param1: angle, param2: line.EndPoint.Z, toolpathCurve: line, endPoint: line.EndPoint, toolAngle: angle);
 
+        public void Transition(Line line, int feed, double angle) =>
+            CreateCommand(CommandNames.Transition, 1, axis: "XYCZ", feed: feed, x: line.EndPoint.X, y: line.EndPoint.Y, param1: angle, param2: line.EndPoint.Z, toolpathCurve: line, endPoint: line.EndPoint, toolAngle: angle);
+
         /// <summary>
         /// Поднятие
         /// </summary>

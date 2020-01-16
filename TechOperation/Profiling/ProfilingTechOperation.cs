@@ -5,7 +5,7 @@ namespace CAM.TechOperation.Profiling
 {
     public class ProfilingTechOperation : TechOperationBase
     {
-        public ProfilingTechOperation(TechProcess techProcess, ProcessingArea processingArea) : base(techProcess, processingArea)
+        public ProfilingTechOperation(TechProcess techProcess, ProcessingArea processingArea, string name) : base(techProcess, processingArea, name)
         {
         }
 

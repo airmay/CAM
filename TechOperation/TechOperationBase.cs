@@ -52,12 +52,12 @@ namespace CAM
 
         public abstract object Params { get; }
 
-        public TechOperationBase(TechProcess techProcess, ProcessingArea processingArea)
+        public TechOperationBase(TechProcess techProcess, ProcessingArea processingArea, string name)
         {
             _techProcess = techProcess;
             _techProcess.TechOperations.Add(this);
             ProcessingArea = processingArea;
-            Name = processingArea.ToString();
+            Name = name;
         }
 
         public abstract List<CuttingParams> GetCuttingParams();

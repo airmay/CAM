@@ -44,7 +44,7 @@ namespace CAM
 
         public ProcessingType? ProcessingType => _techOperationFactory?.ProcessingType;
 
-         public object TechOperationParams => _techOperationFactory.GetTechOperationParams();
+        public object TechOperationParams => _techOperationFactory.GetTechOperationParams();
 
         private ITechOperationFactory _techOperationFactory;
 

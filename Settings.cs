@@ -43,7 +43,10 @@ namespace CAM
                 };
             }
             if (settings.TactileParams == null)
+            {
                 settings.TactileParams = TechOperation.Tactile.TactileParams.GetDefault();
+                Save(settings);
+            }
             return settings;
         }
 

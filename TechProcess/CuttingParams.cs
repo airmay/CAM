@@ -26,5 +26,8 @@ namespace CAM
         public List<KeyValuePair<Curve, int>> ToolpathList { get; set; }
 
         public Corner StartCorner { get; set; }
+
+        public int Transition { get; set; }
+
     }
 }

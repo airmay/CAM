@@ -15,6 +15,8 @@ namespace CAM.TechOperation.Sawing
 
         private readonly SawingDefaultParams _sawingTechOperationParams;
 
+        private int _techOperationsNumber;
+
         public object GetTechOperationParams() => _sawingTechOperationParams;
 
         /// <summary>
@@ -45,8 +47,8 @@ namespace CAM.TechOperation.Sawing
                     var techOperationParams = curve is Line
                         ? _sawingTechOperationParams.SawingLineTechOperationParams
                         : _sawingTechOperationParams.SawingCurveTechOperationParams;
-
-                    techOperations.Add(new SawingTechOperation(techProcess, new BorderProcessingArea(curve), techOperationParams.Clone()));
+                    var processingArea = new BorderProcessingArea(curve);
+                    techOperations.Add(new SawingTechOperation(techProcess, processingArea, techOperationParams.Clone(), processingArea.ToString() + ++_techOperationsNumber));
                 }
                 else
                     Acad.Alert($"Операция Распиловка не поддерживается на объектах типа {curve}");
