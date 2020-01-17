@@ -45,7 +45,7 @@ namespace CAM.TechOperation.Tactile
             if (TactileParams.PassList == null)
                 CalcPassList();
             var cuttingSets = new List<CuttingSet>();
-            var points = ProcessingArea.Curves.Select(p => p.StartPoint).Concat(ProcessingArea.Curves.Select(p => p.EndPoint)).Distinct();
+            var points = ProcessingArea.Curves.SelectMany(p => new[] { p.StartPoint, p.EndPoint }).Distinct();
             var xMin = points.Min(p => p.X);
             var basePoint = points.Where(p => p.X == xMin).OrderBy(p => p.Y).First();
             var basePoint2 = ProcessingArea.Curves.Where(p => p.HasPoint(basePoint)).OrderBy(p => Math.Abs(p.StartPoint.Y - p.EndPoint.Y)).First().NextPoint(basePoint);

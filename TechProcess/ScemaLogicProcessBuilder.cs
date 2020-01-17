@@ -89,6 +89,7 @@ namespace CAM
             //    point = Scheduling(cuttingParams.Curve.StartPoint, cuttingParams.Curve.EndPoint, cuttingParams.IsExactlyBegin, cuttingParams.IsExactlyEnd, cuttingParams.DepthAll, compensation);
             //else
             //    point = Cutting(techOperationGenerator, point, cuttingParams, compensation, techProcessParams);
+            CreateGash(cuttingParams.Curve, cuttingParams.ToolSide, techProcessParams.ToolThickness, cuttingParams.DepthAll, techProcessParams.ToolDiameter, cuttingParams.IsExactlyBegin, cuttingParams.IsExactlyEnd);
 
             var passList = GetPassList(cuttingParams.CuttingModes, cuttingParams.DepthAll, cuttingParams.IsZeroPass);
 
@@ -217,5 +218,41 @@ namespace CAM
         }
 
         private static double CalcIndent(double toolDiam, double depth) => Math.Sqrt(depth * (toolDiam - depth)) + CornerIndentIncrease;
+
+        private static void CreateGash(Curve curve, Side toolSide, double offset, double depth, double toolDiam, bool isExactlyBegin, bool isExactlyEnd)
+        {
+            if (isExactlyBegin && isExactlyEnd)
+                return;
+            var gashLength = Math.Sqrt(depth * (toolDiam - depth));
+            List<Curve> gashCurves = new List<Curve>();
+            if (toolSide == Side.Right ^ curve is Arc)
+                offset = -offset;
+            if (!isExactlyBegin)
+            {
+                var p1 = curve.StartPoint.ToPoint2d();
+                var normal = curve.GetFirstDerivative(curve.StartParam).GetNormal().ToVector2d();
+                var p2 = p1 - normal * gashLength;
+                var offsetVector = normal.GetPerpendicularVector() * offset * (toolSide == Side.Left ? 1 : -1);
+                var gashCurve = new Polyline();
+                gashCurve.AddVertexAt(0, p1, 0, 0, 0);
+                gashCurve.AddVertexAt(0, p2, 0, 0, 0);
+                gashCurve.AddVertexAt(0, p2 + offsetVector, 0, 0, 0);
+                gashCurve.AddVertexAt(0, p1 + offsetVector, 0, 0, 0);
+                Acad.SaveGash(gashCurve);
+            }
+            if (!isExactlyEnd)
+            {
+                var p1 = curve.EndPoint.ToPoint2d();
+                var normal = curve.GetFirstDerivative(curve.EndPoint).GetNormal().ToVector2d();
+                var p2 = p1 + normal * gashLength;
+                var offsetVector = normal.GetPerpendicularVector() * offset * (toolSide == Side.Left ? 1 : -1);
+                var gashCurve = new Polyline();
+                gashCurve.AddVertexAt(0, p1, 0, 0, 0);
+                gashCurve.AddVertexAt(0, p2, 0, 0, 0);
+                gashCurve.AddVertexAt(0, p2 + offsetVector, 0, 0, 0);
+                gashCurve.AddVertexAt(0, p1 + offsetVector, 0, 0, 0);
+                Acad.SaveGash(gashCurve);
+            }
+        }
     }
 }

@@ -157,10 +157,10 @@ namespace CAM
 
         #region Layers
         public const string ProcessLayerName = "Обработка";
+        public const string HatchLayerName = "Штриховка";
+        public const string GashLayerName = "Запилы";
 
         public static ObjectId GetProcessLayerId() => DbHelper.GetLayerId(ProcessLayerName);
-
-        public const string HatchLayerName = "Штриховка";
 
         public static ObjectId GetHatchLayerId()
         {
@@ -193,19 +193,49 @@ namespace CAM
                     ids.QForEach(entity => entity.Erase());
                     layerTable[HatchLayerName].Erase();
                 }
+                if (layerTable.Has(GashLayerName))
+                {
+                    HostApplicationServices.WorkingDatabase.Clayer = layerTable["0"];
+                    var ids = QuickSelection.SelectAll(FilterList.Create().Layer(GashLayerName));
+                    ids.QForEach(entity => entity.Erase());
+                    layerTable[GashLayerName].Erase();
+                }
             });
         }
 
-        public static void DeleteHatch()
+        public static void DeleteExtraObjects(IEnumerable<Curve> curves, ToolModel toolModel)
         {
-            App.LockAndExecute(() =>
+            DeleteCurves(curves);
+            DeleteByLayer(HatchLayerName);
+            DeleteByLayer(GashLayerName);
+            DeleteToolModel(toolModel);
+        }
+
+        public static void DeleteByLayer(string layerName)
+        {
+            App.LockAndExecute(() => 
             {
-                var ids = QuickSelection.SelectAll(FilterList.Create().Layer(HatchLayerName));
+                var ids = QuickSelection.SelectAll(FilterList.Create().Layer(layerName));
                 if (ids.Any())
                     ids.QForEach(entity => entity.Erase());
             });
         }
-
         #endregion
+
+        public static void SaveGash(Curve entity)
+        {
+            App.LockAndExecute(() =>
+            {
+                var layerId = DbHelper.GetSymbolTableRecord(HostApplicationServices.WorkingDatabase.LayerTableId, GashLayerName, ObjectId.Null);
+                if (layerId == ObjectId.Null)
+                {
+                    layerId = DbHelper.GetLayerId(GashLayerName);
+                    layerId.QOpenForWrite<LayerTableRecord>(layer => layer.Color = Autodesk.AutoCAD.Colors.Color.FromColorIndex(ColorMethod.ByColor, 210));
+                }
+                entity.LayerId = layerId;
+                entity.AddToCurrentSpace();
+            });
+        }
+
     }
 }

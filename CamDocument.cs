@@ -40,9 +40,7 @@ namespace CAM
 
         public void DeleteTechProcess(TechProcess techProcess)
         {
-            Acad.DeleteHatch();
-            Acad.DeleteToolModel(techProcess.ToolModel);
-            Acad.DeleteCurves(techProcess.ToolpathCurves);
+            Acad.DeleteExtraObjects(techProcess.ToolpathCurves, techProcess.ToolModel);
             TechProcessList.Remove(techProcess);
         }
 
@@ -70,12 +68,10 @@ namespace CAM
             {
                 Acad.Write($"Выполняется расчет обработки по техпроцессу {techProcess.Name} ...");
 
-                Acad.DeleteHatch();
-                Acad.DeleteToolModel(techProcess.ToolModel);
+                Acad.DeleteExtraObjects(techProcess.ToolpathCurves, techProcess.ToolModel); 
                 techProcess.ToolModel = null;
-                Acad.DeleteCurves(techProcess.ToolpathCurves);
 
-                techProcess.DeleteToolpath();
+                techProcess.DeleteProcessCommands();
                 techProcess.TechOperations.ForEach(p => p.ProcessingArea.Curves = p.ProcessingArea.AcadObjectIds.QOpenForRead<Curve>());
                 BorderProcessingArea.ProcessBorders(techProcess.TechOperations.Select(p => p.ProcessingArea).OfType<BorderProcessingArea>().ToList(), startBorder);
 
@@ -87,7 +83,7 @@ namespace CAM
             }
             catch (Exception ex)
             {
-                techProcess.DeleteToolpath();
+                techProcess.DeleteProcessCommands();
                 Acad.Alert("Ошибка при выполнении расчета", ex);
             }
         }

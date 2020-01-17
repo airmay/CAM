@@ -72,7 +72,7 @@ namespace CAM
 
         public IEnumerable<Curve> ToolpathCurves => TechOperations.Where(p => p.ToolpathCurves != null).SelectMany(p => p.ToolpathCurves);
 
-        public void DeleteToolpath()
+        public void DeleteProcessCommands()
         {
             TechOperations.ForEach(p => p.ProcessCommands = null);
             ProcessCommands = null;
