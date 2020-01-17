@@ -51,14 +51,8 @@ namespace CAM.UI
             Line guide = guideId.QOpenForRead<Line>();
             Line side = sideId.QOpenForRead<Line>();
 
-            var guideVector = guide.GetVector2d();
-            var sideVector = side.GetVector2d();
-
-            var objCenter = objectIds.GetCenter().ToPoint2d();
-            var objVector = objCenter - side.StartPoint.ToPoint2d();
-            var isObjLeft = sideVector.MinusPiToPiAngleTo(objVector) > 0;
-
-            var normalVector = guide.GetVector2d().GetNormal().GetPerpendicularVector().ToVector3d() * dist;
+            var isObjLeft = !side.IsTurnRight(objectIds.GetCenter());
+            var normalVector = guide.Delta.GetNormal().GetPerpendicularVector() * dist;
 
             if (cbMove.Checked)
             {
@@ -93,10 +87,8 @@ namespace CAM.UI
 
             Matrix3d CalcMatrix(Point3d point)
             {
-                var ptVector = point.ToPoint2d() - guide.StartPoint.ToPoint2d();
-                var isPointLeft = guideVector.MinusPiToPiAngleTo(ptVector) > 0;
-
-                var rotAngle = sideVector.ZeroTo2PiAngleTo((isObjLeft ^ isPointLeft) ? guideVector.Negate() : guideVector);
+                var isPointLeft = !guide.IsTurnRight(point);
+                var rotAngle = side.GetVector2d().ZeroTo2PiAngleTo((isObjLeft ^ isPointLeft) ? guide.GetVector2d().Negate() : guide.GetVector2d());
                 var rotCenter = side.StartPoint;
                 var rotationMatrix = Matrix3d.Rotation(rotAngle, Vector3d.ZAxis, rotCenter);
 

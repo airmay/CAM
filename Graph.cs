@@ -60,6 +60,16 @@ namespace CAM
 
         public static double AngleDeg(this Line line) => Math.Round(line.Angle * 180 / Math.PI, 6);
 
+        private static bool IsTurnRight(Point3d px, Point3d py, Point3d pz)
+        {
+            double num = 0;
+            num = ((pz.Y - py.Y) * (py.X - px.X)) - ((py.Y - px.Y) * (pz.X - py.X));
+            return (num < 0f);
+        }
+
+        public static bool IsTurnRight(this Line line, Point3d point) => IsTurnRight(line.StartPoint, line.EndPoint, point);
+
+
         public static void CreateHatch(List<Curve> contour, int sign)
         {
             try
