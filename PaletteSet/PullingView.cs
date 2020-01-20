@@ -15,9 +15,12 @@ namespace CAM.UI
             InitializeComponent();
         }
 
+        private bool _isPullingActive = false;
+
         private void bPulling_Click(object sender, EventArgs e)
         {
-            double.TryParse(tbDist.Text, out double dist);
+            if (_isPullingActive)
+                return;
 
             var objectIds = Interaction.GetPickSet();
             if (objectIds.Length == 0)
@@ -25,67 +28,75 @@ namespace CAM.UI
                 Acad.Alert($"Выделите притягиваемые кривые");
                 return;
             }
+            lPulling.Text = $"Включен режим притягивания {objectIds.Length} объектов";
+
             Acad.Editor.SetImpliedSelection(Array.Empty<ObjectId>());
             App.LockAndExecute(() => Interaction.HighlightObjects(objectIds));
             Acad.Write($"Выполняется притягивание {objectIds.Length} объектов");
-            Interaction.SetActiveDocFocus();
-            var sideId = Interaction.GetEntity("\nВыберите притягиваемую сторону", typeof(Line));
-            if (sideId == ObjectId.Null)
-            {
-                App.LockAndExecute(() => Interaction.UnhighlightObjects(objectIds));
-                return;
-            }
-            if (!objectIds.Contains(sideId))
-            {
-                Acad.Write($"Притягиваемая сторона должна быть из числа притягиваемых кривых. Операция прервана.");
-                App.LockAndExecute(() => Interaction.UnhighlightObjects(objectIds));
-                return;
-            }
-            Acad.Editor.SetImpliedSelection(new ObjectId[] { sideId });
-            var guideId = Interaction.GetEntity("\nВыберите отрезок к которому выполнить притягивание", typeof(Line));
-            if (guideId == ObjectId.Null)
-            {
-                App.LockAndExecute(() => Interaction.UnhighlightObjects(objectIds));
-                return;
-            }
-            Line guide = guideId.QOpenForRead<Line>();
-            Line side = sideId.QOpenForRead<Line>();
+            _isPullingActive = true;
 
-            var isObjLeft = !side.IsTurnRight(objectIds.GetCenter());
-            var normalVector = guide.Delta.GetNormal().GetPerpendicularVector() * dist;
-
-            if (cbMove.Checked)
+            while (true)
             {
                 Interaction.SetActiveDocFocus();
+                var sideId = Interaction.GetEntity("\nВыберите притягиваемую сторону", typeof(Line));
+                if (sideId == ObjectId.Null)
+                    break;
 
-                using (Acad.ActiveDocument.LockDocument())
+                if (!objectIds.Contains(sideId))
                 {
-                    Interaction.HighlightObjects(new[] { guideId });
-                    Acad.Editor.SetImpliedSelection(objectIds);
-                    PromptSelectionResult psr = Acad.Editor.SelectImplied();
-                    PromptPointResult ppr = Acad.Editor.Drag(psr.Value, "\nУкажите точку вставки объектов: ",
-                                                (Point3d pt, ref Matrix3d mtx) =>
-                                                {
-                                                    mtx = CalcMatrix(pt);
-                                                    return SamplerStatus.OK;
-                                                });
-                    if (ppr.Status == PromptStatus.OK)
-                    {
-                        var matrix = CalcMatrix(ppr.Value);
-                        objectIds.QForEach<Entity>(dbobject => dbobject.TransformBy(matrix));
-                    }
-                    App.LockAndExecute(() => Interaction.UnhighlightObjects(new ObjectId[] { guideId }));
+                    Acad.Write($"Притягиваемая сторона должна быть из числа притягиваемых кривых");
+                    continue;
                 }
-            }
-            else
-            {
-                var mt = CalcMatrix(side.StartPoint);
-                App.LockAndExecute(() => objectIds.QForEach<Curve>(p => p.TransformBy(mt)));
-                Acad.Editor.SetImpliedSelection(objectIds);
-            }
-            Acad.Write($"Притягивание завершено");
+                Acad.Editor.SetImpliedSelection(new ObjectId[] { sideId });
+                var guideId = Interaction.GetEntity("\nВыберите отрезок к которому выполнить притягивание", typeof(Line));
+                if (guideId == ObjectId.Null)
+                    break;
 
-            Matrix3d CalcMatrix(Point3d point)
+                Line guide = guideId.QOpenForRead<Line>();
+                Line side = sideId.QOpenForRead<Line>();
+
+                var isObjLeft = !side.IsTurnRight(objectIds.GetCenter());
+                double.TryParse(tbDist.Text, out double dist);
+                var normalVector = guide.Delta.GetNormal().GetPerpendicularVector() * dist;
+
+                if (cbMove.Checked)
+                {
+                    Interaction.SetActiveDocFocus();
+
+                    using (Acad.ActiveDocument.LockDocument())
+                    {
+                        Interaction.HighlightObjects(new[] { guideId });
+                        Acad.Editor.SetImpliedSelection(objectIds);
+                        PromptSelectionResult psr = Acad.Editor.SelectImplied();
+                        PromptPointResult ppr = Acad.Editor.Drag(psr.Value, "\nУкажите точку вставки объектов: ",
+                                                    (Point3d pt, ref Matrix3d mtx) =>
+                                                    {
+                                                        mtx = CalcMatrix(pt, guide, side, normalVector, isObjLeft);
+                                                        return SamplerStatus.OK;
+                                                    });
+                        if (ppr.Status == PromptStatus.OK)
+                        {
+                            var matrix = CalcMatrix(ppr.Value, guide, side, normalVector, isObjLeft);
+                            objectIds.QForEach<Entity>(dbobject => dbobject.TransformBy(matrix));
+                        }
+                        App.LockAndExecute(() => Interaction.UnhighlightObjects(new ObjectId[] { guideId }));
+                    }
+                }
+                else
+                {
+                    var mt = CalcMatrix(side.StartPoint, guide, side, normalVector, isObjLeft);
+                    App.LockAndExecute(() => objectIds.QForEach<Curve>(p => p.TransformBy(mt)));
+                }
+                Acad.Editor.SetImpliedSelection(Array.Empty<ObjectId>());
+                App.LockAndExecute(() => Interaction.HighlightObjects(objectIds));
+            }
+            Acad.Editor.SetImpliedSelection(Array.Empty<ObjectId>());
+            App.LockAndExecute(() => Interaction.UnhighlightObjects(objectIds));
+            lPulling.Text = "";
+            Acad.Write($"Притягивание завершено");
+            _isPullingActive = false;
+
+            Matrix3d CalcMatrix(Point3d point, Line guide, Line side, Vector3d normalVector, bool isObjLeft)
             {
                 var isPointLeft = !guide.IsTurnRight(point);
                 var rotAngle = side.GetVector2d().ZeroTo2PiAngleTo((isObjLeft ^ isPointLeft) ? guide.GetVector2d().Negate() : guide.GetVector2d());

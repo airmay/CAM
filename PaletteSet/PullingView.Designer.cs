@@ -30,9 +30,10 @@
         {
             this.bPulling = new System.Windows.Forms.Button();
             this.gbPulling = new System.Windows.Forms.GroupBox();
+            this.cbMove = new System.Windows.Forms.CheckBox();
             this.tbDist = new System.Windows.Forms.TextBox();
             this.label5 = new System.Windows.Forms.Label();
-            this.cbMove = new System.Windows.Forms.CheckBox();
+            this.lPulling = new System.Windows.Forms.Label();
             this.gbPulling.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -48,6 +49,7 @@
             // 
             // gbPulling
             // 
+            this.gbPulling.Controls.Add(this.lPulling);
             this.gbPulling.Controls.Add(this.cbMove);
             this.gbPulling.Controls.Add(this.tbDist);
             this.gbPulling.Controls.Add(this.label5);
@@ -55,10 +57,20 @@
             this.gbPulling.Dock = System.Windows.Forms.DockStyle.Top;
             this.gbPulling.Location = new System.Drawing.Point(10, 10);
             this.gbPulling.Name = "gbPulling";
-            this.gbPulling.Size = new System.Drawing.Size(315, 104);
+            this.gbPulling.Size = new System.Drawing.Size(315, 126);
             this.gbPulling.TabIndex = 3;
             this.gbPulling.TabStop = false;
             this.gbPulling.Text = "Притягивание";
+            // 
+            // cbMove
+            // 
+            this.cbMove.AutoSize = true;
+            this.cbMove.Location = new System.Drawing.Point(9, 50);
+            this.cbMove.Name = "cbMove";
+            this.cbMove.Size = new System.Drawing.Size(124, 17);
+            this.cbMove.TabIndex = 6;
+            this.cbMove.Text = "Плавающий режим";
+            this.cbMove.UseVisualStyleBackColor = true;
             // 
             // tbDist
             // 
@@ -77,15 +89,14 @@
             this.label5.TabIndex = 3;
             this.label5.Text = "Дистанция:";
             // 
-            // cbMove
+            // lPulling
             // 
-            this.cbMove.AutoSize = true;
-            this.cbMove.Location = new System.Drawing.Point(9, 50);
-            this.cbMove.Name = "cbMove";
-            this.cbMove.Size = new System.Drawing.Size(124, 17);
-            this.cbMove.TabIndex = 6;
-            this.cbMove.Text = "Плавающий режим";
-            this.cbMove.UseVisualStyleBackColor = true;
+            this.lPulling.AutoSize = true;
+            this.lPulling.ForeColor = System.Drawing.Color.Red;
+            this.lPulling.Location = new System.Drawing.Point(6, 99);
+            this.lPulling.Name = "lPulling";
+            this.lPulling.Size = new System.Drawing.Size(0, 13);
+            this.lPulling.TabIndex = 8;
             // 
             // PullingView
             // 
@@ -107,5 +118,6 @@
         private System.Windows.Forms.TextBox tbDist;
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.CheckBox cbMove;
+        private System.Windows.Forms.Label lPulling;
     }
 }
