@@ -75,6 +75,7 @@
     <TopWidth>50</TopWidth>
     <GutterWidth>50</GutterWidth>
     <Depth>20</Depth>
+    <MaxCrestWidth>5</MaxCrestWidth>
     <Departure>150</Departure>
     <FeedRoughing1>2000</FeedRoughing1>
     <FeedFinishing1>3000</FeedFinishing1>

@@ -13,7 +13,7 @@ namespace CAM
 
         public int Feed { get; set; }
 
-        public CuttingPass(Curve toolpath, int feed)
+        public CuttingPass(Curve toolpath, int feed = 0)
         {
             Toolpath = toolpath;
             Feed = feed;

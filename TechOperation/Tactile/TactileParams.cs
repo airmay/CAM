@@ -14,15 +14,17 @@ namespace CAM.TechOperation.Tactile
     {
         public string Type { get; set; }
 
-        public int TopStart { get; set; }
+        public double TopStart { get; set; }
 
-        public int TopWidth { get; set; }
+        public double TopWidth { get; set; }
 
-        public int GutterWidth { get; set; }
+        public double GutterWidth { get; set; }
 
-        public int Depth { get; set; }
+        public double MaxCrestWidth { get; set; }
 
-        public int Departure { get; set; }
+        public double Depth { get; set; }
+
+        public double Departure { get; set; }
 
         public int FeedRoughing1 { get; set; }
 

@@ -25,19 +25,19 @@ namespace CAM.TechOperation.Tactile
         public void CalcPassList()
         {
             var toolThickness = TechProcess.TechProcessParams.ToolThickness;
+            if (TactileParams.MaxCrestWidth == 0 || TactileParams.MaxCrestWidth > toolThickness)
+                TactileParams.MaxCrestWidth = toolThickness;
             var periodAll = TactileParams.GutterWidth - toolThickness;
-            var periodWidth = toolThickness + toolThickness - 1;
+            var periodWidth = toolThickness + TactileParams.MaxCrestWidth;
             var count = Math.Ceiling(periodAll / periodWidth);
             periodWidth = periodAll / count;
-            TactileParams.PassList = new List<Pass>();
-            for (int i = 0; i < count; i++)
+            var x = (toolThickness - (periodWidth - toolThickness)) / 2;
+            TactileParams.PassList = new List<Pass> { new Pass(toolThickness, CuttingType.Roughing) };
+            for (int i = 1; i <= count; i++)
+            {
                 TactileParams.PassList.Add(new Pass(i * periodWidth + toolThickness, CuttingType.Roughing));
-
-            TactileParams.PassList.Add(new Pass(TactileParams.GutterWidth, CuttingType.Roughing));
-
-            var x = periodWidth + (toolThickness - (periodWidth - toolThickness)) / 2;
-            for (int i = 0; i < count; i++)
                 TactileParams.PassList.Add(new Pass(i * periodWidth + x, CuttingType.Finishing));
+            }
         }
 
         public override List<CuttingSet> GetCutting()
@@ -45,9 +45,8 @@ namespace CAM.TechOperation.Tactile
             if (TactileParams.PassList == null)
                 CalcPassList();
             var cuttingSets = new List<CuttingSet>();
-            var points = ProcessingArea.Curves.SelectMany(p => new[] { p.StartPoint, p.EndPoint }).Distinct();
-            var xMin = points.Min(p => p.X);
-            var basePoint = points.Where(p => p.X == xMin).OrderBy(p => p.Y).First();
+            var points = ProcessingArea.Curves.SelectMany(p => new[] { p.StartPoint, p.EndPoint }).ToList();
+            var basePoint = points.OrderBy(p => p.DistanceTo(Point3d.Origin)).First();
             var basePoint2 = ProcessingArea.Curves.Where(p => p.HasPoint(basePoint)).OrderBy(p => Math.Abs(p.StartPoint.Y - p.EndPoint.Y)).First().NextPoint(basePoint);
 
             var ray = new Ray()
@@ -96,6 +95,12 @@ namespace CAM.TechOperation.Tactile
                     }
                     if (points.Count == 2)
                     {
+                        if (!(points[1] - points[0]).IsCodirectionalTo(ray.UnitDir))
+                        {
+                            var temp = points[1];
+                            points[1] = points[0];
+                            points[0] = temp;
+                        }
                         var vector = (points[1] - points[0]).GetNormal() * TactileParams.Departure;
                         var line = NoDraw.Line(points[0] - vector - Vector3d.ZAxis * TactileParams.Depth, points[1] + vector - Vector3d.ZAxis * TactileParams.Depth);
                         cuttingPassList.Add(new CuttingPass(line, pass.CuttingType == "Гребенка" ? feedRoughing : feedFinishing));
@@ -104,7 +109,7 @@ namespace CAM.TechOperation.Tactile
                 }
                 offset += TactileParams.GutterWidth + TactileParams.TopWidth;
             }
-            while (points.Count != 0 || !cuttingFlag);
+            while (points.Count != 0 || !cuttingFlag || offset > 10000);
 
             return new CuttingSet
             {
