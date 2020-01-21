@@ -32,7 +32,6 @@
             this.cbTechOperation = new System.Windows.Forms.ComboBox();
             this.label3 = new System.Windows.Forms.Label();
             this.cbMachine = new System.Windows.Forms.ComboBox();
-            this.techProcessParamsBindingSource = new System.Windows.Forms.BindingSource(this.components);
             this.cbMaterial = new System.Windows.Forms.ComboBox();
             this.lbMaterial = new System.Windows.Forms.Label();
             this.lbMachine = new System.Windows.Forms.Label();
@@ -43,8 +42,6 @@
             this.label1 = new System.Windows.Forms.Label();
             this.edToolNumber = new System.Windows.Forms.TextBox();
             this.lbToolNumber = new System.Windows.Forms.Label();
-            this.gbTechOperationParams = new System.Windows.Forms.GroupBox();
-            this.panel2 = new System.Windows.Forms.Panel();
             this.gbBillet = new System.Windows.Forms.GroupBox();
             this.edBilletThickness = new System.Windows.Forms.TextBox();
             this.label4 = new System.Windows.Forms.Label();
@@ -55,12 +52,13 @@
             this.edPenetrationRate = new System.Windows.Forms.TextBox();
             this.label7 = new System.Windows.Forms.Label();
             this.pParams = new System.Windows.Forms.Panel();
-            ((System.ComponentModel.ISupportInitialize)(this.techProcessParamsBindingSource)).BeginInit();
+            this.bTechOperationParams = new System.Windows.Forms.Button();
+            this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
+            this.techProcessParamsBindingSource = new System.Windows.Forms.BindingSource(this.components);
             this.gbTool.SuspendLayout();
-            this.gbTechOperationParams.SuspendLayout();
-            this.panel2.SuspendLayout();
             this.gbBillet.SuspendLayout();
             this.pParams.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.techProcessParamsBindingSource)).BeginInit();
             this.SuspendLayout();
             // 
             // cbTechOperation
@@ -69,16 +67,16 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.cbTechOperation.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cbTechOperation.FormattingEnabled = true;
-            this.cbTechOperation.Location = new System.Drawing.Point(91, 0);
+            this.cbTechOperation.Location = new System.Drawing.Point(94, 30);
             this.cbTechOperation.Name = "cbTechOperation";
-            this.cbTechOperation.Size = new System.Drawing.Size(225, 21);
+            this.cbTechOperation.Size = new System.Drawing.Size(206, 21);
             this.cbTechOperation.TabIndex = 6;
             this.cbTechOperation.SelectionChangeCommitted += new System.EventHandler(this.cbTechOperation_SelectionChangeCommitted);
             // 
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(3, 3);
+            this.label3.Location = new System.Drawing.Point(6, 33);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(82, 13);
             this.label3.TabIndex = 5;
@@ -96,10 +94,6 @@
             this.cbMachine.Size = new System.Drawing.Size(234, 21);
             this.cbMachine.TabIndex = 0;
             this.cbMachine.SelectionChangeCommitted += new System.EventHandler(this.cbMachine_SelectionChangeCommitted);
-            // 
-            // techProcessParamsBindingSource
-            // 
-            this.techProcessParamsBindingSource.DataSource = typeof(CAM.TechProcessParams);
             // 
             // cbMaterial
             // 
@@ -142,7 +136,7 @@
             this.gbTool.Controls.Add(this.label1);
             this.gbTool.Controls.Add(this.edToolNumber);
             this.gbTool.Controls.Add(this.lbToolNumber);
-            this.gbTool.Location = new System.Drawing.Point(3, 109);
+            this.gbTool.Location = new System.Drawing.Point(3, 136);
             this.gbTool.Name = "gbTool";
             this.gbTool.Size = new System.Drawing.Size(325, 89);
             this.gbTool.TabIndex = 2;
@@ -209,28 +203,6 @@
             this.lbToolNumber.TabIndex = 3;
             this.lbToolNumber.Text = "Номер";
             // 
-            // gbTechOperationParams
-            // 
-            this.gbTechOperationParams.AutoSize = true;
-            this.gbTechOperationParams.Controls.Add(this.panel2);
-            this.gbTechOperationParams.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.gbTechOperationParams.Location = new System.Drawing.Point(0, 278);
-            this.gbTechOperationParams.Name = "gbTechOperationParams";
-            this.gbTechOperationParams.Size = new System.Drawing.Size(331, 222);
-            this.gbTechOperationParams.TabIndex = 7;
-            this.gbTechOperationParams.TabStop = false;
-            this.gbTechOperationParams.Text = "Параметры обработки";
-            // 
-            // panel2
-            // 
-            this.panel2.Controls.Add(this.cbTechOperation);
-            this.panel2.Controls.Add(this.label3);
-            this.panel2.Dock = System.Windows.Forms.DockStyle.Top;
-            this.panel2.Location = new System.Drawing.Point(3, 16);
-            this.panel2.Name = "panel2";
-            this.panel2.Size = new System.Drawing.Size(325, 21);
-            this.panel2.TabIndex = 7;
-            // 
             // gbBillet
             // 
             this.gbBillet.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
@@ -239,7 +211,7 @@
             this.gbBillet.Controls.Add(this.label4);
             this.gbBillet.Controls.Add(this.cbMaterial);
             this.gbBillet.Controls.Add(this.lbMaterial);
-            this.gbBillet.Location = new System.Drawing.Point(3, 30);
+            this.gbBillet.Location = new System.Drawing.Point(3, 57);
             this.gbBillet.Name = "gbBillet";
             this.gbBillet.Size = new System.Drawing.Size(325, 73);
             this.gbBillet.TabIndex = 1;
@@ -276,7 +248,7 @@
             this.edFrequency.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.edFrequency.DataBindings.Add(new System.Windows.Forms.Binding("Text", this.techProcessParamsBindingSource, "Frequency", true));
-            this.edFrequency.Location = new System.Drawing.Point(94, 204);
+            this.edFrequency.Location = new System.Drawing.Point(94, 231);
             this.edFrequency.Multiline = true;
             this.edFrequency.Name = "edFrequency";
             this.edFrequency.Size = new System.Drawing.Size(225, 20);
@@ -285,7 +257,7 @@
             // label5
             // 
             this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(10, 207);
+            this.label5.Location = new System.Drawing.Point(10, 234);
             this.label5.Name = "label5";
             this.label5.Size = new System.Drawing.Size(58, 13);
             this.label5.TabIndex = 9;
@@ -296,7 +268,7 @@
             this.edZSafety.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.edZSafety.DataBindings.Add(new System.Windows.Forms.Binding("Text", this.techProcessParamsBindingSource, "ZSafety", true));
-            this.edZSafety.Location = new System.Drawing.Point(94, 249);
+            this.edZSafety.Location = new System.Drawing.Point(94, 276);
             this.edZSafety.Multiline = true;
             this.edZSafety.Name = "edZSafety";
             this.edZSafety.Size = new System.Drawing.Size(225, 20);
@@ -305,7 +277,7 @@
             // label6
             // 
             this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(9, 252);
+            this.label6.Location = new System.Drawing.Point(9, 279);
             this.label6.Name = "label6";
             this.label6.Size = new System.Drawing.Size(68, 13);
             this.label6.TabIndex = 11;
@@ -316,7 +288,7 @@
             this.edPenetrationRate.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.edPenetrationRate.DataBindings.Add(new System.Windows.Forms.Binding("Text", this.techProcessParamsBindingSource, "PenetrationRate", true));
-            this.edPenetrationRate.Location = new System.Drawing.Point(94, 226);
+            this.edPenetrationRate.Location = new System.Drawing.Point(94, 253);
             this.edPenetrationRate.Multiline = true;
             this.edPenetrationRate.Name = "edPenetrationRate";
             this.edPenetrationRate.Size = new System.Drawing.Size(224, 20);
@@ -325,7 +297,7 @@
             // label7
             // 
             this.label7.AutoSize = true;
-            this.label7.Location = new System.Drawing.Point(9, 229);
+            this.label7.Location = new System.Drawing.Point(9, 256);
             this.label7.Name = "label7";
             this.label7.Size = new System.Drawing.Size(81, 13);
             this.label7.TabIndex = 13;
@@ -333,6 +305,9 @@
             // 
             // pParams
             // 
+            this.pParams.Controls.Add(this.bTechOperationParams);
+            this.pParams.Controls.Add(this.cbTechOperation);
+            this.pParams.Controls.Add(this.label3);
             this.pParams.Controls.Add(this.cbMachine);
             this.pParams.Controls.Add(this.edPenetrationRate);
             this.pParams.Controls.Add(this.gbTool);
@@ -343,11 +318,27 @@
             this.pParams.Controls.Add(this.label6);
             this.pParams.Controls.Add(this.label5);
             this.pParams.Controls.Add(this.edFrequency);
-            this.pParams.Dock = System.Windows.Forms.DockStyle.Top;
+            this.pParams.Dock = System.Windows.Forms.DockStyle.Fill;
             this.pParams.Location = new System.Drawing.Point(0, 0);
             this.pParams.Name = "pParams";
-            this.pParams.Size = new System.Drawing.Size(331, 278);
+            this.pParams.Size = new System.Drawing.Size(331, 471);
             this.pParams.TabIndex = 15;
+            // 
+            // bTechOperationParams
+            // 
+            this.bTechOperationParams.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.bTechOperationParams.Location = new System.Drawing.Point(306, 30);
+            this.bTechOperationParams.Name = "bTechOperationParams";
+            this.bTechOperationParams.Size = new System.Drawing.Size(21, 21);
+            this.bTechOperationParams.TabIndex = 14;
+            this.bTechOperationParams.Text = "…";
+            this.toolTip1.SetToolTip(this.bTechOperationParams, "Параметры обработки");
+            this.bTechOperationParams.UseVisualStyleBackColor = true;
+            this.bTechOperationParams.Click += new System.EventHandler(this.bTechOperationParams_Click);
+            // 
+            // techProcessParamsBindingSource
+            // 
+            this.techProcessParamsBindingSource.DataSource = typeof(CAM.TechProcessParams);
             // 
             // TechProcessParamsView
             // 
@@ -355,22 +346,17 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoScroll = true;
             this.AutoScrollMinSize = new System.Drawing.Size(0, 350);
-            this.Controls.Add(this.gbTechOperationParams);
             this.Controls.Add(this.pParams);
             this.Name = "TechProcessParamsView";
-            this.Size = new System.Drawing.Size(331, 500);
-            ((System.ComponentModel.ISupportInitialize)(this.techProcessParamsBindingSource)).EndInit();
+            this.Size = new System.Drawing.Size(331, 471);
             this.gbTool.ResumeLayout(false);
             this.gbTool.PerformLayout();
-            this.gbTechOperationParams.ResumeLayout(false);
-            this.panel2.ResumeLayout(false);
-            this.panel2.PerformLayout();
             this.gbBillet.ResumeLayout(false);
             this.gbBillet.PerformLayout();
             this.pParams.ResumeLayout(false);
             this.pParams.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.techProcessParamsBindingSource)).EndInit();
             this.ResumeLayout(false);
-            this.PerformLayout();
 
         }
 
@@ -388,7 +374,6 @@
         private System.Windows.Forms.Label lbMachine;
         private System.Windows.Forms.ComboBox cbTechOperation;
         private System.Windows.Forms.Label label3;
-        private System.Windows.Forms.GroupBox gbTechOperationParams;
 		private System.Windows.Forms.GroupBox gbBillet;
 		private System.Windows.Forms.TextBox edBilletThickness;
 		private System.Windows.Forms.Label label4;
@@ -400,6 +385,7 @@
 		private System.Windows.Forms.Label label7;
 		private System.Windows.Forms.Panel pParams;
 		private System.Windows.Forms.BindingSource techProcessParamsBindingSource;
-		private System.Windows.Forms.Panel panel2;
+        private System.Windows.Forms.Button bTechOperationParams;
+        private System.Windows.Forms.ToolTip toolTip1;
     }
 }

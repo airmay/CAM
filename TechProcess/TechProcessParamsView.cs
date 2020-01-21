@@ -40,17 +40,6 @@ namespace CAM
             cbTechOperation.DataSource = _processingTypes[techProcess.TechProcessParams.Machine];
             cbTechOperation.DisplayMember = "Name";
             cbTechOperation.SelectedItem = _processingTypes[techProcess.TechProcessParams.Machine]?.FirstOrDefault(p => p.Type == techProcess.ProcessingType);
-            if (_techProcess.ProcessingType != null)
-                ParamsViewContainer.SetDefaultParamsView(_techProcess.ProcessingType.Value, _techProcess.TechOperationParams, gbTechOperationParams);
-            else
-                HideParamsViews();
-        }
-
-        private void HideParamsViews()
-        {
-            foreach (Control control in gbTechOperationParams.Controls)
-                if (control is UserControl)
-                    control.Hide();
         }
 
         private void edToolNumber_Validating(object sender, CancelEventArgs e)
@@ -58,7 +47,7 @@ namespace CAM
             e.Cancel = !_techProcess.SetTool(edToolNumber.Text);
             if (e.Cancel)
             {
-                MessageBox.Show($"Инструмент '{edToolNumber.Text}' не найден", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                Acad.Alert($"Инструмент '{edToolNumber.Text}' не найден");
                 //edToolNumber.SelectAll();
                 //edToolNumber.Focus();
             }
@@ -68,7 +57,6 @@ namespace CAM
         {
             var processingType = (ProcessingType)cbTechOperation.SelectedValue;
             _techProcess.SetProcessingType(processingType);
-            ParamsViewContainer.SetDefaultParamsView(_techProcess.ProcessingType.Value, _techProcess.TechOperationParams, gbTechOperationParams);
         }
 
         private void cbMachine_SelectionChangeCommitted(object sender, EventArgs e)
@@ -77,7 +65,19 @@ namespace CAM
             cbTechOperation.DisplayMember = "Name";
             cbTechOperation.SelectedItem = null;
             _techProcess.SetProcessingType(null);
-            HideParamsViews();
+        }
+
+        private ParamsForm _paramsForm;
+
+        private void bTechOperationParams_Click(object sender, EventArgs e)
+        {
+            if (_techProcess.ProcessingType != null)
+            {
+                if (_paramsForm == null)
+                    _paramsForm = new ParamsForm();
+                _paramsForm.SetParams(_techProcess.ProcessingType.Value, _techProcess.TechOperationParams, cbTechOperation.Text);
+                Autodesk.AutoCAD.ApplicationServices.Application.ShowModalDialog(_paramsForm);
+            }
         }
     }
 }

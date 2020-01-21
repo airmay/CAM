@@ -8,10 +8,10 @@ namespace CAM
 {
     public static class ParamsViewContainer
     {
-        private static Dictionary<ProcessingType, Type> _paramsViewTypes;
-        private static Dictionary<ProcessingType, Type> _defaultParamsViewTypes;
-        private static Dictionary<ProcessingType, ParamsView> _paramsViews = new Dictionary<ProcessingType, ParamsView>();
-        private static Dictionary<ProcessingType, ParamsView> _defaultParamsViews = new Dictionary<ProcessingType, ParamsView>();
+        private static readonly Dictionary<ProcessingType, Type> _paramsViewTypes;
+        private static readonly Dictionary<ProcessingType, Type> _defaultParamsViewTypes;
+        private static readonly Dictionary<ProcessingType, ParamsView> _paramsViews = new Dictionary<ProcessingType, ParamsView>();
+        private static readonly Dictionary<ProcessingType, ParamsView> _defaultParamsViews = new Dictionary<ProcessingType, ParamsView>();
 
         static ParamsViewContainer()
         {
