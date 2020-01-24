@@ -10,6 +10,8 @@ namespace CAM
     /// </summary>
     public class ScemaLogicCommandGenerator
     {
+        private int _startRangeIndex;
+
         public List<ProcessCommand> Commands { get; } = new List<ProcessCommand>();
 
         /// <summary>
@@ -57,6 +59,10 @@ namespace CAM
             CreateCommand(CommandNames.Cycle, 28, axis: "XYCZ");
         }
 
+        public void StartRange() => _startRangeIndex = Commands.Count;
+
+        public List<ProcessCommand> GetRange() => Commands.GetRange(_startRangeIndex, Commands.Count - _startRangeIndex);
+
         /// <summary>
         /// Быстрая подача
         /// </summary>
@@ -70,39 +76,24 @@ namespace CAM
         }
 
         /// <summary>
-        ///  Заглубление
-        /// </summary>
-        /// <param name="line"></param>
-        /// <param name="feed"></param>
-        /// <param name="angle"></param>
-        public void Penetration(Line line, int feed, double angle) => 
-            CreateCommand(CommandNames.Penetration, 1, axis: "XYCZ", feed: feed, x: line.EndPoint.X, y: line.EndPoint.Y, param1: angle, param2: line.EndPoint.Z, toolpathCurve: line, endPoint: line.EndPoint, toolAngle: angle);
-
-        public void Transition(Line line, int feed, double angle) =>
-            CreateCommand(CommandNames.Transition, 1, axis: "XYCZ", feed: feed, x: line.EndPoint.X, y: line.EndPoint.Y, param1: angle, param2: line.EndPoint.Z, toolpathCurve: line, endPoint: line.EndPoint, toolAngle: angle);
-
-        /// <summary>
         /// Поднятие
         /// </summary>
         /// <param name="line"></param>
         public void Uplifting(Line line, double angle) => CreateCommand(CommandNames.Uplifting, 0, axis: "XYZ", feed: 0, x: line.EndPoint.X, y: line.EndPoint.Y, param1: line.EndPoint.Z, toolpathCurve: line, endPoint: line.EndPoint, toolAngle: angle);
 
         /// <summary>
-        /// Рабочий ход
+        /// Рез
         /// </summary>
-        /// <param name="curve"></param>
-        /// <param name="feed"></param>
-        /// <param name="destAngle"></param>
-        public void Cutting(Curve curve, int feed, Point3d point, double angle)
+        public void Cutting(string name, Curve curve, int feed, Point3d point, double angle)
         {
             switch (curve)
             {
                 case Line _:
-                    CreateCommand(CommandNames.Cutting, 1, axis: "XYCZ", feed: feed, x: point.X, y: point.Y, param1: angle, param2: point.Z, toolpathCurve: curve, endPoint: point, toolAngle: angle);
+                    CreateCommand(name, 1, axis: "XYCZ", feed: feed, x: point.X, y: point.Y, param1: angle, param2: point.Z, toolpathCurve: curve, endPoint: point, toolAngle: angle);
                     break;
                 case Arc arc:
                     var code = point == curve.StartPoint ? 2 : 3;
-                    CreateCommand(CommandNames.Cutting, code, axis: "XYCZ", feed: feed, x: point.X, y: point.Y, param1: arc.Center.X, param2: arc.Center.Y, toolpathCurve: curve, endPoint: point, toolAngle: angle);
+                    CreateCommand(name, code, axis: "XYCZ", feed: feed, x: point.X, y: point.Y, param1: arc.Center.X, param2: arc.Center.Y, toolpathCurve: curve, endPoint: point, toolAngle: angle);
                     break;
                 default:
                     throw new Exception($"Неподдерживаемый тип кривой {curve.GetType()}");

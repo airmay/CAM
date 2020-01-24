@@ -11,7 +11,7 @@ namespace CAM
     /// <summary>
     /// Генератор команд процесса обработки
     /// </summary>
-    public static class ScemaLogicProcessBuilder
+    public class ScemaLogicProcessBuilder
     {
         const int CornerIndentIncrease = 5;
 
@@ -23,132 +23,133 @@ namespace CAM
             [CommandNames.Fast] = Color.FromColor(System.Drawing.Color.Crimson),
             [CommandNames.Transition] = Color.FromColor(System.Drawing.Color.Yellow)
         };
+        private readonly TechProcessParams _techProcessParams;
+        private readonly ScemaLogicCommandGenerator _generator;
+        private Point3d _currentPoint = Algorithms.NullPoint3d;
+        private double _currentAngle;
+        private Corner? _startCorner;
 
-        public static void BuildProcessing(TechProcess techProcess)
+        public ScemaLogicProcessBuilder(TechProcessParams techProcessParams)
         {
-            var techProcessGenerator = new ScemaLogicCommandGenerator();
-            techProcessGenerator.StartMachine(techProcess.TechProcessParams.ToolNumber);
-            var point = Algorithms.NullPoint3d;
-
-            foreach (var techOperation in techProcess.TechOperations)
-            {
-                var techOperationGenerator = new ScemaLogicCommandGenerator();
-                point = techOperation.GetCutting().Aggregate(point, (p, cuttingSet) => Cutting(techOperationGenerator, p, cuttingSet, techProcess.TechProcessParams));
-
-                techProcessGenerator.Commands.AddRange(techOperationGenerator.Commands);
-                techOperation.ProcessCommands = techOperationGenerator.Commands;
-            }
-            techProcessGenerator.StopMachine();
-            techProcess.ProcessCommands = techProcessGenerator.Commands;
+            _techProcessParams = techProcessParams;
+            _generator = new ScemaLogicCommandGenerator();
+            _generator.StartMachine(techProcessParams.ToolNumber);
         }
 
-        public static Point3d Cutting(ScemaLogicCommandGenerator generator, Point3d currentPoint, CuttingSet cuttingSet, TechProcessParams techProcessParams)
+        public List<ProcessCommand> FinishTechProcess()
         {
-            Point3d point;
-            double angle = 0;
-            var corner = cuttingSet.StartCorner;
-
-            foreach (var cuttingPass in cuttingSet.Cuttings)
-            {
-                var toolpathCurve = cuttingPass.Toolpath;
-                point = toolpathCurve.GetPoint(corner);
-                angle = CalcToolAngle(toolpathCurve, corner);
-
-                if (cuttingSet.Cuttings.IndexOf(cuttingPass) == 0)
-                {
-                    var dest = new Point3d(point.X, point.Y, techProcessParams.ZSafety);
-                    if (currentPoint.IsNull())
-                        generator.InitialMove(dest, angle, techProcessParams.Frequency);
-                    else
-                        generator.Fast(CreateToolpath(currentPoint, dest, Colors[CommandNames.Fast]), angle);
-                    currentPoint = dest;
-                }
-                if (currentPoint.Z == point.Z)
-                    generator.Transition(CreateToolpath(currentPoint, point, Colors[CommandNames.Transition]), techProcessParams.PenetrationRate, angle);
-                else
-                    generator.Penetration(CreateToolpath(currentPoint, point, Colors[CommandNames.Penetration]), techProcessParams.PenetrationRate, angle);
-
-                if (toolpathCurve.Length() > 2)
-                {
-                    corner = corner.Swap();
-                    angle = CalcToolAngle(toolpathCurve, corner);
-                    currentPoint = toolpathCurve.GetPoint(corner);
-                    generator.Cutting(toolpathCurve, cuttingPass.Feed, currentPoint, angle);
-                    toolpathCurve.Color = Colors[CommandNames.Cutting];
-                }
-            }
-            point = new Point3d(currentPoint.X, currentPoint.Y, techProcessParams.ZSafety);
-            generator.Uplifting(CreateToolpath(currentPoint, point, Colors[CommandNames.Uplifting]), angle);
-
-            return point;
+            _generator.StopMachine();
+            return _generator.Commands;
         }
 
-        public static CuttingSet CalcCuttingSet(CuttingParams cuttingParams, TechProcessParams techProcessParams)
-        {
-            var compensation = CalcCompensation(cuttingParams.Curve, cuttingParams.ToolSide, cuttingParams.DepthAll, techProcessParams.ToolThickness, techProcessParams.ToolDiameter);
-            if (cuttingParams.IsExactlyBegin || cuttingParams.IsExactlyEnd)
-            {
-                var sumIndent = CalcIndent(techProcessParams.ToolDiameter, cuttingParams.DepthAll) * (Convert.ToInt32(cuttingParams.IsExactlyBegin) + Convert.ToInt32(cuttingParams.IsExactlyEnd));
-                if (sumIndent >= (cuttingParams.Curve.EndPoint - cuttingParams.Curve.StartPoint).Length)
-                    return Scheduling(cuttingParams, techProcessParams, cuttingParams.Curve.StartPoint, cuttingParams.Curve.EndPoint, cuttingParams.IsExactlyBegin, cuttingParams.IsExactlyEnd, cuttingParams.DepthAll, compensation, techProcessParams.ToolDiameter);
-            }
-            if (!cuttingParams.IsExactlyBegin || !cuttingParams.IsExactlyEnd)
-                CreateGash(cuttingParams.Curve, cuttingParams.ToolSide, techProcessParams.ToolThickness, cuttingParams.DepthAll, techProcessParams.ToolDiameter, cuttingParams.IsExactlyBegin, cuttingParams.IsExactlyEnd);
+        public void StartTechOperation() =>  _generator.StartRange();
 
-            var passList = GetPassList(cuttingParams.CuttingModes, cuttingParams.DepthAll, cuttingParams.IsZeroPass);
-            return new CuttingSet
-            {
-                Cuttings = passList.ConvertAll(p => new CuttingPass(
-                      CreateToolpath(cuttingParams.Curve, compensation, p.Key, techProcessParams.ToolDiameter, cuttingParams.IsExactlyBegin, cuttingParams.IsExactlyEnd), p.Value)),
-                StartCorner = cuttingParams.Curve.IsUpward() ^ (passList.Count() % 2 == 1) ? Corner.End : Corner.Start
-            };
+        public List<ProcessCommand> FinishTechOperation()
+        {
+            if (_currentPoint.Z != _techProcessParams.ZSafety)
+                Uplifting();
+            return _generator.GetRange();
         }
 
         /// <summary>
-        /// Намечание
+        /// Поднятние
         /// </summary>
-        private static CuttingSet Scheduling(CuttingParams cuttingParams, TechProcessParams techProcessParams, Point3d startPoint, Point3d endPoint, bool isExactlyBegin, bool isExactlyEnd, int depth, double compensation, double toolDiam)
+        public void Uplifting() => _generator.Uplifting(LineTo(new Point3d(_currentPoint.X, _currentPoint.Y, _techProcessParams.ZSafety), CommandNames.Uplifting), _currentAngle);
+
+        /// <summary>
+        /// Перемещение над деталью
+        /// </summary>
+        private void Move(Point3d point, double angle)
         {
-            double h;
-            Point3d pointC = Point3d.Origin;
-            var vector = endPoint - startPoint;
-            var length = vector.Length;
-            if (isExactlyBegin && isExactlyEnd)
+            var destPoint = new Point3d(point.X, point.Y, _techProcessParams.ZSafety);
+            if (_currentPoint.IsNull())
+                _generator.InitialMove(destPoint, angle, _techProcessParams.Frequency);
+            else
+                _generator.Fast(LineTo(destPoint), angle);
+            _currentPoint = destPoint;
+            _currentAngle = angle;
+        }
+
+        /// <summary>
+        /// Рез к точке
+        /// </summary>
+        public void Cutting(Point3d point, double angle, int cuttingFeed)
+        {
+            if (_currentPoint.IsNull() || _currentPoint.Z == _techProcessParams.ZSafety)
+                Move(point, angle);
+
+            _currentAngle = angle;
+            CuttingCommand(CommandNames.Penetration, point, cuttingFeed);
+        }
+
+        /// <summary>
+        /// Рез между точками
+        /// </summary>
+        public void Cutting(Point3d startPoint, Point3d endPoint, int cuttingFeed, int transitionFeed) => Cutting(NoDraw.Line(startPoint, endPoint), cuttingFeed, transitionFeed);
+
+        /// <summary>
+        /// Рез по кривой
+        /// </summary>
+        public void Cutting(Curve curve, int cuttingFeed, int transitionFeed)
+        {
+            var point = curve.StartPoint;
+            if (_currentPoint.IsNull() || _currentPoint.Z == _techProcessParams.ZSafety)
             {
-                var l = (endPoint - startPoint).Length - 2 * CornerIndentIncrease;
-                h = (toolDiam - Math.Sqrt(toolDiam * toolDiam - l * l)) / 2;
-                pointC = startPoint + vector / 2 + vector.GetPerpendicularVector().GetNormal() * compensation - Vector3d.ZAxis * h;
+                if (_startCorner.HasValue)
+                {
+                    point = curve.GetPoint(_startCorner.Value);
+                    _startCorner = null;
+                }
+                else if (!_currentPoint.IsNull())
+                    point = (curve.StartPoint - _currentPoint).Length <= (curve.EndPoint - _currentPoint).Length ? curve.StartPoint : curve.EndPoint;
+
+                Move(point, CalcToolAngle(curve, point));
             }
             else
             {
-                var indentVector = vector.GetNormal() * CalcIndent(toolDiam, depth);
-                var point = isExactlyBegin ? startPoint + indentVector : endPoint - indentVector;
-                pointC = point + vector.GetPerpendicularVector().GetNormal() * compensation - Vector3d.ZAxis * depth;
-                CreateGash(cuttingParams.Curve, cuttingParams.ToolSide, techProcessParams.ToolThickness, cuttingParams.DepthAll, techProcessParams.ToolDiameter, cuttingParams.IsExactlyBegin, cuttingParams.IsExactlyEnd, point);
+                point = (curve.StartPoint - _currentPoint).Length <= (curve.EndPoint - _currentPoint).Length ? curve.StartPoint : curve.EndPoint;
+                _currentAngle = CalcToolAngle(curve, point);
             }
-            return new CuttingSet { Cuttings = new List<CuttingPass> { new CuttingPass(new Line(pointC, pointC + vector.GetNormal())) } };
+            CuttingCommand(point.Z !=_currentPoint.Z ? CommandNames.Penetration : CommandNames.Transition, point, transitionFeed);
+            _currentPoint = curve.NextPoint(point);
+            _currentAngle = CalcToolAngle(curve, _currentPoint);
+            _generator.Cutting(CommandNames.Cutting, curve, cuttingFeed, _currentPoint, _currentAngle);
+            curve.Color = Colors[CommandNames.Cutting];
         }
 
-        private static Line CreateToolpath(Point3d point, Point3d dest, Color color) => new Line(point, dest) { Color = color };
+        /// <summary>
+        /// Команда реза
+        /// </summary>
+        private void CuttingCommand(string command, Point3d point, int feed) => _generator.Cutting(command, LineTo(point, command), feed, point, _currentAngle);
 
-        private static Curve CreateToolpath(Curve curve, double offset, double depth, double toolDiam, bool isExactlyBegin, bool isExactlyEnd)
+        private Line LineTo(Point3d point, string command = CommandNames.Fast)
         {
-            Curve toolpathCurve = null;
-            if (offset != 0)
-                toolpathCurve = curve.GetOffsetCurves(offset)[0] as Curve;
+            var line = new Line(_currentPoint, point) { Color = Colors[command] };
+            _currentPoint = point;
+            return line;
+        }
 
-            if (depth != 0)
+        /// <summary>
+        /// Построчный рез
+        /// </summary>
+        public void LineCut(Curve curve, List<CuttingMode> modes, bool isZeroPass, bool isExactlyBegin, bool isExactlyEnd, Side toolSide, int depthAll, double compensation)
+        {
+            var passList = GetPassList(modes, depthAll, isZeroPass);
+            _startCorner = curve.IsUpward() ^ (passList.Count() % 2 == 1) ? Corner.End : Corner.Start;
+            foreach (var item in passList)
             {
-                var matrix = Matrix3d.Displacement(-Vector3d.ZAxis * depth);
-                if (toolpathCurve == null)
-                    toolpathCurve = curve.GetTransformedCopy(matrix) as Curve;
-                else
-                    toolpathCurve.TransformBy(matrix);
+                var toolpathCurve = CreateToolpath(curve, compensation, item.Key, isExactlyBegin, isExactlyEnd);
+                Cutting(toolpathCurve, item.Value, _techProcessParams.PenetrationRate);
             }
-            if (toolpathCurve == null)
-                toolpathCurve = curve.Clone() as Curve;
+        }
 
-            var indent = CalcIndent(toolDiam, depth);
+        public Curve CreateToolpath(Curve curve, double offset, double depth, bool isExactlyBegin, bool isExactlyEnd)
+        {
+            var toolpathCurve = curve.GetOffsetCurves(offset)[0] as Curve;
+            if (depth != 0)
+                toolpathCurve.TransformBy(Matrix3d.Displacement(-Vector3d.ZAxis * depth));
+
+            var indent = CalcIndent(depth);
             switch (toolpathCurve)
             {
                 case Line line:
@@ -203,9 +204,9 @@ namespace CAM
             return passList;
         }
 
-        private static double CalcToolAngle(Curve curve, Corner corner)
+        public double CalcToolAngle(Curve curve, Point3d point)
         {
-            var tangent = curve.GetTangent(corner);
+            var tangent = curve.GetFirstDerivative(point).ToVector2d();
             if (!curve.IsUpward())
                 tangent = tangent.Negate();
             var angle = Graph.ToDeg(Math.PI - Graph.Round(tangent.Angle));
@@ -214,57 +215,18 @@ namespace CAM
             return angle;
         }
 
-        private static double CalcCompensation(Curve curve, Side toolSide, double depth, double toolThickness, double toolDiameter)
+        public double CalcCompensation(Curve curve, Side toolSide)
         {
+            var depth = _techProcessParams.BilletThickness;
             var offset = 0d;
             if (curve.IsUpward() ^ toolSide == Side.Left)
-                offset = toolThickness;
+                offset = _techProcessParams.ToolThickness;
             if (curve is Arc arc && toolSide == Side.Left)
-                offset += arc.Radius - Math.Sqrt(arc.Radius * arc.Radius - depth * (toolDiameter - depth));
+                offset += arc.Radius - Math.Sqrt(arc.Radius * arc.Radius - depth * (_techProcessParams.ToolDiameter - depth));
             return toolSide == Side.Left ^ curve is Arc ? offset : -offset;
         }
 
-        private static double CalcIndent(double toolDiam, double depth) => Math.Sqrt(depth * (toolDiam - depth)) + CornerIndentIncrease;
+        public double CalcIndent(double depth) => Math.Sqrt(depth * (_techProcessParams.ToolDiameter - depth)) + CornerIndentIncrease;
 
-        /// <summary>
-        /// Запилы
-        /// </summary>
-        private static void CreateGash(Curve curve, Side toolSide, double offset, double depth, double toolDiam, bool isExactlyBegin, bool isExactlyEnd, Point3d? point = null)
-        {
-            var gashLength = Math.Sqrt(depth * (toolDiam - depth));
-            //List<Curve> gashCurves = new List<Curve>();
-            //if (toolSide == Side.Right ^ curve is Arc)
-            //    offset = -offset;
-            if (!isExactlyBegin)
-            {
-                var p1 = curve.StartPoint.ToPoint2d();
-                var normal = curve.GetFirstDerivative(curve.StartParam).GetNormal().ToVector2d();
-                var p2 = p1 - normal * gashLength;
-                if (point.HasValue)
-                    p2 += point.Value.ToPoint2d() - p1;
-                var offsetVector = normal.GetPerpendicularVector() * offset * (toolSide == Side.Left ? 1 : -1);
-                var gashCurve = new Polyline();
-                gashCurve.AddVertexAt(0, p1, 0, 0, 0);
-                gashCurve.AddVertexAt(0, p2, 0, 0, 0);
-                gashCurve.AddVertexAt(0, p2 + offsetVector, 0, 0, 0);
-                gashCurve.AddVertexAt(0, p1 + offsetVector, 0, 0, 0);
-                Acad.SaveGash(gashCurve);
-            }
-            if (!isExactlyEnd)
-            {
-                var p1 = curve.EndPoint.ToPoint2d();
-                var normal = curve.GetFirstDerivative(curve.EndPoint).GetNormal().ToVector2d();
-                var p2 = p1 + normal * gashLength;
-                if (point.HasValue)
-                    p2 += point.Value.ToPoint2d() - p1;
-                var offsetVector = normal.GetPerpendicularVector() * offset * (toolSide == Side.Left ? 1 : -1);
-                var gashCurve = new Polyline();
-                gashCurve.AddVertexAt(0, p1, 0, 0, 0);
-                gashCurve.AddVertexAt(0, p2, 0, 0, 0);
-                gashCurve.AddVertexAt(0, p2 + offsetVector, 0, 0, 0);
-                gashCurve.AddVertexAt(0, p1 + offsetVector, 0, 0, 0);
-                Acad.SaveGash(gashCurve);
-            }
-        }
     }
 }

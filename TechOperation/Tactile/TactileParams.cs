@@ -34,7 +34,7 @@ namespace CAM.TechOperation.Tactile
 
         public int FeedFinishing2 { get; set; }
 
-        public int Transition { get; set; }
+        public int TransitionFeed { get; set; }
 
         public List<Pass> PassList { get; set; }
 
@@ -54,7 +54,7 @@ namespace CAM.TechOperation.Tactile
                 FeedFinishing1 = 3000,
                 FeedRoughing2 = 3500,
                 FeedFinishing2 = 4500,
-                Transition = 450
+                TransitionFeed = 450
             };
         }
     }

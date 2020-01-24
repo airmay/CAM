@@ -22,7 +22,7 @@ namespace CAM
 
             paletteSet.Add("Объекты", _techProcessView);
 
-            paletteSet.Add("Притягивание", new PullingView());
+            paletteSet.Add("Инструменты", new PullingView());
 
 
             //var programmPalette = paletteSet.Add("Программа", _programView);

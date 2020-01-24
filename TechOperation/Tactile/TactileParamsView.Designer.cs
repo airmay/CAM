@@ -48,7 +48,7 @@
             this.tactileDefaultParamsView1.Dock = System.Windows.Forms.DockStyle.Top;
             this.tactileDefaultParamsView1.Location = new System.Drawing.Point(0, 0);
             this.tactileDefaultParamsView1.Name = "tactileDefaultParamsView1";
-            this.tactileDefaultParamsView1.Size = new System.Drawing.Size(286, 329);
+            this.tactileDefaultParamsView1.Size = new System.Drawing.Size(286, 356);
             this.tactileDefaultParamsView1.TabIndex = 0;
             // 
             // panel1
@@ -56,7 +56,7 @@
             this.panel1.AutoSize = true;
             this.panel1.Controls.Add(this.bCalculate);
             this.panel1.Dock = System.Windows.Forms.DockStyle.Top;
-            this.panel1.Location = new System.Drawing.Point(0, 329);
+            this.panel1.Location = new System.Drawing.Point(0, 356);
             this.panel1.Name = "panel1";
             this.panel1.Size = new System.Drawing.Size(286, 32);
             this.panel1.TabIndex = 1;
@@ -83,10 +83,10 @@
             this.CuttingType});
             this.dataGridView1.DataSource = this.passListBindingSource;
             this.dataGridView1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.dataGridView1.Location = new System.Drawing.Point(0, 361);
+            this.dataGridView1.Location = new System.Drawing.Point(0, 388);
             this.dataGridView1.MultiSelect = false;
             this.dataGridView1.Name = "dataGridView1";
-            this.dataGridView1.Size = new System.Drawing.Size(286, 165);
+            this.dataGridView1.Size = new System.Drawing.Size(286, 138);
             this.dataGridView1.TabIndex = 2;
             this.dataGridView1.DataError += new System.Windows.Forms.DataGridViewDataErrorEventHandler(this.dataGridView1_DataError);
             // 

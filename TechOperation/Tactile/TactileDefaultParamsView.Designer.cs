@@ -296,7 +296,7 @@
             // 
             this.textBox5.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.textBox5.DataBindings.Add(new System.Windows.Forms.Binding("Text", this.tactileDefaultParamsBindingSource, "Transition", true));
+            this.textBox5.DataBindings.Add(new System.Windows.Forms.Binding("Text", this.tactileDefaultParamsBindingSource, "TransitionFeed", true));
             this.textBox5.Location = new System.Drawing.Point(100, 332);
             this.textBox5.Name = "textBox5";
             this.textBox5.Size = new System.Drawing.Size(119, 20);

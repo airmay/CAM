@@ -1,5 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
+using Autodesk.AutoCAD.Geometry;
+using Dreambuild.AutoCAD;
 
 namespace CAM.TechOperation.Sawing
 {
@@ -27,19 +28,56 @@ namespace CAM.TechOperation.Sawing
             SawingParams = sawingParams;
         }
 
-        public override List<CuttingSet> GetCutting()
+        public override void BuildProcessing(ScemaLogicProcessBuilder builder)
         {
-            var par = new CuttingParams
+            builder.StartTechOperation();
+            var processParams = TechProcess.TechProcessParams;
+            var border = ((BorderProcessingArea)ProcessingArea);           
+            var compensation = builder.CalcCompensation(border.Curve, border.OuterSide);
+            var sumIndent = builder.CalcIndent(processParams.BilletThickness) * (Convert.ToInt32(border.IsExactlyBegin) + Convert.ToInt32(border.IsExactlyEnd));
+            if (sumIndent < border.Curve.Length())
             {
-                Curve = ProcessingArea.Curves[0],
-                CuttingModes = SawingParams.Modes.ConvertAll(p => new CuttingMode { Depth = p.Depth, DepthStep = p.DepthStep, Feed = p.Feed}),
-                IsZeroPass = SawingParams.IsFirstPassOnSurface,
-                IsExactlyBegin = ((BorderProcessingArea)ProcessingArea).IsExactlyBegin,
-                IsExactlyEnd = ((BorderProcessingArea)ProcessingArea).IsExactlyEnd,
-                ToolSide = ((BorderProcessingArea)ProcessingArea).OuterSide,
-                DepthAll = TechProcess.TechProcessParams.BilletThickness
-            };
-            return new List<CuttingSet> { ScemaLogicProcessBuilder.CalcCuttingSet(par, TechProcess.TechProcessParams) };
+                var modes = SawingParams.Modes.ConvertAll(p => new CuttingMode { Depth = p.Depth, DepthStep = p.DepthStep, Feed = p.Feed });
+                builder.LineCut(border.Curve, modes, SawingParams.IsFirstPassOnSurface, border.IsExactlyBegin, border.IsExactlyEnd, border.OuterSide, processParams.BilletThickness, compensation);
+                if (!border.IsExactlyBegin)
+                    Acad.CreateGash(border.Curve, border.StartPoint, border.OuterSide, processParams.BilletThickness, processParams.ToolDiameter, processParams.ToolThickness);
+                if (!border.IsExactlyEnd)
+                    Acad.CreateGash(border.Curve, border.EndPoint, border.OuterSide, processParams.BilletThickness, processParams.ToolDiameter, processParams.ToolThickness);
+            }
+            else
+            {
+                var point = Scheduling(border, compensation);
+                var angle = builder.CalcToolAngle(NoDraw.Line(border.Curve.StartPoint, border.Curve.EndPoint), border.Curve.StartPoint);
+                builder.Cutting(point, angle, TechProcess.TechProcessParams.PenetrationRate);
+            }
+            ProcessCommands = builder.FinishTechOperation();
+        }
+
+        /// <summary>
+        /// Намечание
+        /// </summary>
+        private Point3d Scheduling(BorderProcessingArea border, double compensation)
+        {
+            var diam = TechProcess.TechProcessParams.ToolDiameter;
+            var startPoint = border.Curve.StartPoint;
+            var endPoint = border.Curve.EndPoint;
+            const int CornerIndentIncrease = 5;
+            var vector = endPoint - startPoint;
+            var depth = (double)TechProcess.TechProcessParams.BilletThickness;
+            var point = Point3d.Origin;
+            if (border.IsExactlyBegin && border.IsExactlyEnd)
+            {
+                var l = vector.Length - 2 * CornerIndentIncrease;
+                depth = (diam - Math.Sqrt(diam * diam - l * l)) / 2;
+                point = startPoint + vector / 2;
+            }
+            else
+            {
+                var indentVector = vector.GetNormal() * (Math.Sqrt(depth * (diam - depth)) + CornerIndentIncrease);
+                point = border.IsExactlyBegin ? startPoint + indentVector : endPoint - indentVector;
+                Acad.CreateGash(border.Curve, border.IsExactlyBegin ? border.EndPoint : border.StartPoint, border.OuterSide, (int)depth, diam, TechProcess.TechProcessParams.ToolThickness, point);
+            }
+            return point + vector.GetPerpendicularVector().GetNormal() * compensation - Vector3d.ZAxis * depth;
         }
     }
 }

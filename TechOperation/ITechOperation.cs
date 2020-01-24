@@ -25,7 +25,10 @@ namespace CAM
 
         IEnumerable<Curve> ToolpathCurves { get; }
 
-        List<CuttingSet> GetCutting();
-
+        /// <summary>
+        /// Создает обработку по технологической операции
+        /// </summary>
+        /// <returns></returns>
+        void BuildProcessing(ScemaLogicProcessBuilder builder);
     }
 }

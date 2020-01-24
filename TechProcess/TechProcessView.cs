@@ -251,7 +251,10 @@ namespace CAM
 
         private void bClose_Click(object sender, EventArgs e)
         {
-            Acad.ActiveDocument.CloseAndDiscard();
+            foreach (Autodesk.AutoCAD.ApplicationServices.Document doc in Autodesk.AutoCAD.ApplicationServices.Application.DocumentManager)
+                doc.CloseAndDiscard();
+
+            //Autodesk.AutoCAD.ApplicationServices.Application.DocumentManager.CloseAll();
             Autodesk.AutoCAD.ApplicationServices.Application.Quit();
         }
     }

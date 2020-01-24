@@ -13,7 +13,7 @@ namespace CAM.TechOperation.Profiling
 
         public override object Params => throw new NotImplementedException();
 
-        public override List<CuttingSet> GetCutting()
+        public override void BuildProcessing(ScemaLogicProcessBuilder builder)
         {
             throw new NotImplementedException();
         }

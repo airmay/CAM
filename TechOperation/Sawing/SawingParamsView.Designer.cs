@@ -30,18 +30,18 @@
         {
             this.components = new System.ComponentModel.Container();
             this.edCompensation = new System.Windows.Forms.TextBox();
+            this.sawingParamsBindingSource = new System.Windows.Forms.BindingSource(this.components);
             this.lbCompensation = new System.Windows.Forms.Label();
             this.gbSawingModes = new System.Windows.Forms.GroupBox();
-            this.sawingModesView = new SawingModesView();
+            this.sawingModesView = new CAM.TechOperation.Sawing.SawingModesView();
             this.pSawingModesButton = new System.Windows.Forms.Panel();
             this.bLoadSawingModes = new System.Windows.Forms.Button();
             this.bSaveSawingModes = new System.Windows.Forms.Button();
             this.panel1 = new System.Windows.Forms.Panel();
-            this.sawingParamsBindingSource = new System.Windows.Forms.BindingSource(this.components);
+            ((System.ComponentModel.ISupportInitialize)(this.sawingParamsBindingSource)).BeginInit();
             this.gbSawingModes.SuspendLayout();
             this.pSawingModesButton.SuspendLayout();
             this.panel1.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.sawingParamsBindingSource)).BeginInit();
             this.SuspendLayout();
             // 
             // edCompensation
@@ -52,6 +52,10 @@
             this.edCompensation.Name = "edCompensation";
             this.edCompensation.Size = new System.Drawing.Size(50, 20);
             this.edCompensation.TabIndex = 5;
+            // 
+            // sawingParamsBindingSource
+            // 
+            this.sawingParamsBindingSource.DataSource = typeof(CAM.TechOperation.Sawing.SawingTechOperationParams);
             // 
             // lbCompensation
             // 
@@ -120,10 +124,7 @@
             this.panel1.Name = "panel1";
             this.panel1.Size = new System.Drawing.Size(245, 34);
             this.panel1.TabIndex = 7;
-            // 
-            // sawingParamsBindingSource
-            // 
-            this.sawingParamsBindingSource.DataSource = typeof(SawingTechOperationParams);
+            this.panel1.Visible = false;
             // 
             // SawingParamsView
             // 
@@ -133,11 +134,11 @@
             this.Controls.Add(this.panel1);
             this.Name = "SawingParamsView";
             this.Size = new System.Drawing.Size(245, 411);
+            ((System.ComponentModel.ISupportInitialize)(this.sawingParamsBindingSource)).EndInit();
             this.gbSawingModes.ResumeLayout(false);
             this.pSawingModesButton.ResumeLayout(false);
             this.panel1.ResumeLayout(false);
             this.panel1.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.sawingParamsBindingSource)).EndInit();
             this.ResumeLayout(false);
 
         }

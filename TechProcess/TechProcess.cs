@@ -104,5 +104,16 @@ namespace CAM
         public bool TechOperationMoveDown(ITechOperation techOperation) => TechOperations.SwapNext(techOperation);
 
         public bool TechOperationMoveUp(ITechOperation techOperation) => TechOperations.SwapPrev(techOperation);
+
+        public void BuildProcessing(BorderProcessingArea startBorder = null)
+        {
+            DeleteProcessCommands();
+            TechOperations.ForEach(p => p.ProcessingArea.Curves = p.ProcessingArea.AcadObjectIds.QOpenForRead<Curve>());
+            BorderProcessingArea.ProcessBorders(TechOperations.Select(p => p.ProcessingArea).OfType<BorderProcessingArea>().ToList(), startBorder);
+
+            var builder = new ScemaLogicProcessBuilder(TechProcessParams);
+            TechOperations.ForEach(p => p.BuildProcessing(builder));
+            ProcessCommands = builder.FinishTechProcess();
+        }
     }
 }

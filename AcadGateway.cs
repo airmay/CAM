@@ -162,14 +162,19 @@ namespace CAM
 
         public static ObjectId GetProcessLayerId() => DbHelper.GetLayerId(ProcessLayerName);
 
-        public static ObjectId GetHatchLayerId()
+        public static ObjectId GetHatchLayerId() => GetLayerId(HatchLayerName, layer => layer.Transparency = new Transparency(255 * (100 - 70) / 100));
+
+        public static ObjectId GetGashLayerId() => GetLayerId(GashLayerName, layer => layer.Color = Color.FromColorIndex(ColorMethod.ByColor, 210));
+
+        public static ObjectId GetLayerId(string layerName, Action<LayerTableRecord> setupLayer)
         {
-            var layerId = DbHelper.GetSymbolTableRecord(HostApplicationServices.WorkingDatabase.LayerTableId, HatchLayerName, ObjectId.Null);
+            var layerId = DbHelper.GetSymbolTableRecord(HostApplicationServices.WorkingDatabase.LayerTableId, layerName, ObjectId.Null);
             if (layerId == ObjectId.Null)
-            {
-                layerId = DbHelper.GetLayerId(HatchLayerName);
-                layerId.QOpenForWrite<LayerTableRecord>(layer => layer.Transparency = new Autodesk.AutoCAD.Colors.Transparency(255 * (100 - 70) / 100));
-            }
+                App.LockAndExecute(() =>
+                {
+                    layerId = DbHelper.GetLayerId(layerName);
+                    layerId.QOpenForWrite(setupLayer);
+                });
             return layerId;
         }
 
@@ -222,20 +227,20 @@ namespace CAM
         }
         #endregion
 
-        public static void SaveGash(Curve entity)
+        /// <summary>
+        /// Запил
+        /// </summary>
+        public static void CreateGash(Curve curve, Point3d point, Side side, int depth, double diam, double thickness, Point3d? pointС = null)
         {
-            App.LockAndExecute(() =>
-            {
-                var layerId = DbHelper.GetSymbolTableRecord(HostApplicationServices.WorkingDatabase.LayerTableId, GashLayerName, ObjectId.Null);
-                if (layerId == ObjectId.Null)
-                {
-                    layerId = DbHelper.GetLayerId(GashLayerName);
-                    layerId.QOpenForWrite<LayerTableRecord>(layer => layer.Color = Autodesk.AutoCAD.Colors.Color.FromColorIndex(ColorMethod.ByColor, 210));
-                }
-                entity.LayerId = layerId;
-                entity.AddToCurrentSpace();
-            });
+            var gashLength = Math.Sqrt(depth * (diam - depth));
+            var normal = curve.GetFirstDerivative(point).GetNormal();
+            var point2 = point + normal * gashLength * (point == curve.StartPoint ? -1 : 1);
+            if (pointС.HasValue)
+                point2 += pointС.Value - point;
+            var offsetVector = normal.GetPerpendicularVector() * thickness * (side == Side.Left ? 1 : -1);
+            var gash = NoDraw.Pline(point, point2, point2 + offsetVector, point + offsetVector);
+            gash.LayerId = GetGashLayerId();
+            App.LockAndExecute(() => gash.AddToCurrentSpace());
         }
-
     }
 }

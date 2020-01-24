@@ -60,7 +60,7 @@ namespace CAM
             Name = name;
         }
 
-        public abstract List<CuttingSet> GetCutting();
+        public abstract void BuildProcessing(ScemaLogicProcessBuilder builder);
 
         public IEnumerable<Curve> ToolpathCurves => ProcessCommands?.Select(p => p.ToolpathCurve).Where(p => p != null);
     }

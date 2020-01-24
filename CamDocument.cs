@@ -61,7 +61,7 @@ namespace CAM
                 techProcess.ToolModel = Acad.CreateToolModel(techProcess.TechProcessParams.ToolDiameter, techProcess.TechProcessParams.ToolThickness);
             Acad.DrawToolModel(techProcess.ToolModel, processCommand.EndPoint, processCommand.ToolAngle);
         }
-
+       
         public void BuildProcessing(TechProcess techProcess, BorderProcessingArea startBorder = null)
         {
             try
@@ -71,11 +71,7 @@ namespace CAM
                 Acad.DeleteExtraObjects(techProcess.ToolpathCurves, techProcess.ToolModel); 
                 techProcess.ToolModel = null;
 
-                techProcess.DeleteProcessCommands();
-                techProcess.TechOperations.ForEach(p => p.ProcessingArea.Curves = p.ProcessingArea.AcadObjectIds.QOpenForRead<Curve>());
-                BorderProcessingArea.ProcessBorders(techProcess.TechOperations.Select(p => p.ProcessingArea).OfType<BorderProcessingArea>().ToList(), startBorder);
-
-                ScemaLogicProcessBuilder.BuildProcessing(techProcess);
+                techProcess.BuildProcessing(startBorder);
 
                 Acad.SaveCurves(techProcess.ToolpathCurves);
 
