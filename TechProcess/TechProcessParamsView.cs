@@ -79,5 +79,14 @@ namespace CAM
                 Autodesk.AutoCAD.ApplicationServices.Application.ShowModalDialog(_paramsForm);
             }
         }
+
+        private List<Tool> _tools = new List<Tool> { new Tool { Diameter = 400, Thickness = 7, Number = 1, Type = ToolType.Disk }, new Tool { Diameter = 100, Number = 2, Type = ToolType.Mill } };
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            var tool = ToolsForm.Select(_tools);
+            if (tool != null)
+                edToolNumber.Text = tool.ToString();
+        }
     }
 }

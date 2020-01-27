@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 
 namespace CAM
 {
@@ -14,6 +15,16 @@ namespace CAM
         public int Number { get; set; }
 
         /// <summary>
+        /// Наименование
+        /// </summary>
+        public string Name { get; set; }
+
+        /// <summary>
+        /// Тип
+        /// </summary>
+        public ToolType Type { get; set; }
+
+        /// <summary>
         /// Диаметр
         /// </summary>
         public double Diameter { get; set; }
@@ -21,7 +32,18 @@ namespace CAM
         /// <summary>
         /// Толщина
         /// </summary>
-        public double Thickness { get; set; }
+        public double? Thickness { get; set; }
 
+        public override string ToString() => $"{Name ?? Type.GetDescription()} Ø{Diameter}{(Thickness.HasValue ? " × " + Thickness.ToString() : null)}";
+
+    }
+
+    public enum ToolType
+    {
+        [Description("Диск")]
+        Disk,
+
+        [Description("Фреза")]
+        Mill
     }
 }

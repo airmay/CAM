@@ -84,7 +84,7 @@ namespace CAM
             if (tool != null)
             {
                 TechProcessParams.ToolDiameter = tool.Diameter;
-                TechProcessParams.ToolThickness = tool.Thickness;
+                TechProcessParams.ToolThickness = tool.Thickness.Value;
                 var speed = TechProcessParams.Material == Material.Гранит ? 35 : 50;
                 TechProcessParams.Frequency = (int)Math.Round(speed * 1000 / (tool.Diameter * Math.PI) * 60);
             }
