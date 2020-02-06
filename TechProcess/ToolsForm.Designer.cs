@@ -33,13 +33,13 @@
             this.bClose = new System.Windows.Forms.Button();
             this.bSelect = new System.Windows.Forms.Button();
             this.dataGridView1 = new System.Windows.Forms.DataGridView();
-            this.dataGridViewComboBoxColumn1 = new System.Windows.Forms.DataGridViewComboBoxColumn();
-            this.toolBindingSource = new System.Windows.Forms.BindingSource(this.components);
             this.numberDataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Type = new System.Windows.Forms.DataGridViewComboBoxColumn();
             this.diameterDataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.thicknessDataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Column1 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.toolBindingSource = new System.Windows.Forms.BindingSource(this.components);
+            this.dataGridViewComboBoxColumn1 = new System.Windows.Forms.DataGridViewComboBoxColumn();
             this.pButtons.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.toolBindingSource)).BeginInit();
@@ -97,20 +97,10 @@
             this.dataGridView1.Location = new System.Drawing.Point(0, 0);
             this.dataGridView1.MultiSelect = false;
             this.dataGridView1.Name = "dataGridView1";
-            this.dataGridView1.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
+            this.dataGridView1.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.CellSelect;
             this.dataGridView1.Size = new System.Drawing.Size(562, 440);
             this.dataGridView1.TabIndex = 1;
-            // 
-            // dataGridViewComboBoxColumn1
-            // 
-            this.dataGridViewComboBoxColumn1.DataPropertyName = "Type";
-            this.dataGridViewComboBoxColumn1.HeaderText = "Тип";
-            this.dataGridViewComboBoxColumn1.Name = "dataGridViewComboBoxColumn1";
-            this.dataGridViewComboBoxColumn1.Width = 260;
-            // 
-            // toolBindingSource
-            // 
-            this.toolBindingSource.DataSource = typeof(CAM.Tool);
+            this.dataGridView1.DoubleClick += new System.EventHandler(this.dataGridView1_DoubleClick);
             // 
             // numberDataGridViewTextBoxColumn
             // 
@@ -141,6 +131,17 @@
             this.Column1.DataPropertyName = "Name";
             this.Column1.HeaderText = "Наименование";
             this.Column1.Name = "Column1";
+            // 
+            // toolBindingSource
+            // 
+            this.toolBindingSource.DataSource = typeof(CAM.Tool);
+            // 
+            // dataGridViewComboBoxColumn1
+            // 
+            this.dataGridViewComboBoxColumn1.DataPropertyName = "Type";
+            this.dataGridViewComboBoxColumn1.HeaderText = "Тип";
+            this.dataGridViewComboBoxColumn1.Name = "dataGridViewComboBoxColumn1";
+            this.dataGridViewComboBoxColumn1.Width = 260;
             // 
             // ToolsForm
             // 

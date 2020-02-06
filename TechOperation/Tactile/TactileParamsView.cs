@@ -13,7 +13,7 @@ namespace CAM.TechOperation.Tactile
     [ParamsView(ProcessingType.Tactile)]
     public partial class TactileParamsView : ParamsView
     {
-        private TactileTechOperanion _tactileTechOperanion;
+       // private TactileTechOperanion _tactileTechOperanion;
 
         public TactileParamsView()
         {
@@ -22,15 +22,15 @@ namespace CAM.TechOperation.Tactile
 
         public override void SetParams(object @params)
         {
-            _tactileTechOperanion = (TactileTechOperanion)@params;
-            tactileParamsBindingSource.DataSource = _tactileTechOperanion.TactileParams;
-            tactileParamsBindingSource.ResetBindings(false);
-            tactileDefaultParamsView1.SetParams(_tactileTechOperanion.TactileParams);
+            //_tactileTechOperanion = (TactileTechOperanion)@params;
+            //tactileParamsBindingSource.DataSource = _tactileTechOperanion.TactileParams;
+            //tactileParamsBindingSource.ResetBindings(false);
+            //tactileDefaultParamsView1.SetParams(_tactileTechOperanion.TactileParams);
         }
 
         private void bCalculate_Click(object sender, EventArgs e)
         {
-            _tactileTechOperanion.CalcPassList();
+            //_tactileTechOperanion.CalcPassList();
             tactileParamsBindingSource.ResetBindings(false);
         }
 

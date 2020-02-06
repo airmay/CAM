@@ -1,6 +1,7 @@
 ﻿using Autodesk.AutoCAD.DatabaseServices;
-using Autodesk.AutoCAD.Geometry;
+using Dreambuild.AutoCAD;
 using System;
+using System.Linq;
 
 namespace CAM
 {
@@ -12,39 +13,12 @@ namespace CAM
     {
         public long[] Handles { get; set; }
 
-        /// <summary>
-        /// Идентификатор графического примитива автокада
-        /// </summary>
         [NonSerialized]
         public ObjectId[] AcadObjectIds;
 
         [NonSerialized]
         public Curve[] Curves;
 
-        /// <summary>
-        /// Тип обрабатываемой области
-        /// </summary>
-        //public abstract ProcessingAreaType Type { get; }
-
-        /// <summary>
-        /// Начальная точка кривой
-        /// </summary>
-        public Point3d StartPoint { get { return Curves[0].StartPoint; } }
-
-        /// <summary>
-        /// Конечная точка кривой
-        /// </summary>
-        public Point3d EndPoint { get { return Curves[0].EndPoint; } }
-
-        /// <summary>
-        /// Длина
-        /// </summary>
-        public double Length { get { return Curves[0].Length(); } }
-
-        /// <summary>
-        /// Конструктор
-        /// </summary>
-        /// <param name="curve">Графический примитива автокада представляющий область</param>
         public ProcessingArea(Curve[] curves)
         {
             Curves = curves;
@@ -53,43 +27,24 @@ namespace CAM
             //Set(curve);
         }
 
-        /// <summary>
-        /// Изменение обрабатываемой области
-        /// </summary>
-        /// <param name="curve">Графический примитива автокада представляющий область</param>
-        //public void Modify(Curve curve)
-        //{
-        //    //Contract.
-        //    if (curve.ObjectId != AcadObjectId)
-        //        throw new ArgumentException("Обрабатываемая область не соответствует полученной кривой");
+        public ProcessingArea(ObjectId[] ids)
+        {
+            AcadObjectIds = ids;
+            Handles = Array.ConvertAll(ids, p => p.Handle.Value);
+            Refresh();
+        }
 
-        //    //Set(curve);
-        //    var h = curve.Handle;
-        //}
+        public void Refresh()
+        {
+            if (AcadObjectIds == null)
+                AcadObjectIds = Array.ConvertAll(Handles, p => Acad.Database.GetObjectId(false, new Handle(p), 0));
+            Curves = AcadObjectIds.QOpenForRead<Curve>();
+        }
 
-        /// <summary>
-        /// Заполнение параметров обрабатываемой области в соответствии с полученной кривой
-        /// </summary>
-        /// <param name="curve"></param>
-        //protected virtual void Set(Curve curve)
-        //{
-        //    Curve = curve;
-        //    StartPoint = curve.StartPoint;
-        //    EndPoint = curve.EndPoint;
-        //    Length = curve.Length();
-        //}
-
-	    public override string ToString()
+        public override string ToString()
 	    {
-		    switch (Curves[0])
-		    {
-			    case Line _:
-				    return "Прямая";
-				case Arc _:
-				    return "Дуга";
-				default:
-					return Curves[0].GetType().ToString();
-		    }
+            var count = Curves.Select(p => p.GetType()).Distinct().Count();
+            return $"{(count > 1 ? "Объекты" : Curves[0] is Line ? "Отрезок" : Curves[0] is Arc ? "Дуга" : "Объекты")} ({Curves.Length})";
 	    }
 	}
 }

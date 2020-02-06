@@ -12,22 +12,17 @@ namespace CAM
     public abstract class TechOperationBase : ITechOperation
     {
         /// <summary>
-        /// Вид обработки
-        /// </summary>
-        public abstract ProcessingType Type { get; }
-
-        /// <summary>
         /// Наименование
         /// </summary>
-        public string Name { get; set; }
+        public string Caption { get; set; }
 
         /// <summary>
         /// Технологический процесс обработки
         /// </summary>
         [NonSerialized]
-        private TechProcess _techProcess;
+        private ITechProcess _techProcess;
 
-        public TechProcess TechProcess
+        public ITechProcess TechProcess
         {
             get => _techProcess;
             set => _techProcess = value;
@@ -36,7 +31,7 @@ namespace CAM
         /// <summary>
         /// Обрабатываемая область
         /// </summary>
-        public ProcessingArea ProcessingArea { get; }
+        //public ProcessingArea ProcessingArea { get; }
 
         /// <summary>
         /// Команды
@@ -50,14 +45,11 @@ namespace CAM
             set => _processCommands = value;
         }
 
-        public abstract object Params { get; }
-
-        public TechOperationBase(TechProcess techProcess, ProcessingArea processingArea, string name)
+        public TechOperationBase(ITechProcess techProcess, string caption)
         {
             _techProcess = techProcess;
             _techProcess.TechOperations.Add(this);
-            ProcessingArea = processingArea;
-            Name = name;
+            Caption = caption;
         }
 
         public abstract void BuildProcessing(ScemaLogicProcessBuilder builder);

@@ -23,31 +23,39 @@ namespace CAM
         /// <returns></returns>
         public static Settings Load()
         {
-            Settings settings;
+            //Settings settings;
             try
             {
                 var formatter = new XmlSerializer(typeof(Settings));
                 using (var fileStream = new FileStream(GetFilePath, FileMode.Open))
-                    settings = (Settings)formatter.Deserialize(fileStream);
-
+                    return (Settings)formatter.Deserialize(fileStream);
             }
             catch (Exception e)
             {
                 Acad.Alert($"Ошибка при загрузке настроек из файла {GetFilePath}", e);
-                settings = new Settings
-                {
-                    Tools = new List<Tool>(),
-                    TechProcessParams = new TechProcessParams(),
-                    SawingLineTechOperationParams = new SawingTechOperationParams(),
-                    SawingCurveTechOperationParams = new SawingTechOperationParams()
-                };
+                throw;
+                //settings = new Settings
+                //{
+                //    //Tools = new List<Tool>(),
+                //    //TechProcessParams = new TechProcessParams(),
+                //    SawingLineTechOperationParams = new SawingTechOperationParams(),
+                //    SawingCurveTechOperationParams = new SawingTechOperationParams()
+                //};
             }
-            if (settings.TactileParams == null)
-            {
-                settings.TactileParams = TechOperation.Tactile.TactileParams.GetDefault();
-                Save(settings);
-            }
-            return settings;
+            //if (!settings.MachineSettingsList.Any())
+            //{
+            //    settings.MachineSettingsList = new List<MachineSettings>()
+            //    {
+            //        new MachineSettings{ MachineType = MachineType.ScemaLogic, Tools = new List<Tool>(), MaxFrequency = 3000, ZSafety = 20 },
+            //        new MachineSettings{ MachineType = MachineType.Donatoni, Tools = new List<Tool>(), MaxFrequency = 5000, ZSafety = 20 },
+            //        new MachineSettings{ MachineType = MachineType.Krea, Tools = new List<Tool>(), MaxFrequency = 10000, ZSafety = 20 }
+            //    };
+            //}
+            //if (settings.TactileTechProcessParams == null)
+            //{
+            //    settings.TactileTechProcessParams = Tactile.TactileTechProcessParams.GetDefault();
+            //}
+            //return settings;
         }
 
         /// <summary>
@@ -69,32 +77,10 @@ namespace CAM
 
         #endregion
 
-        #region Machines
-        public Machine[] Machines { get; set; } = new Machine[]
-        {
-            new Machine
-            {
-                Type = MachineType.ScemaLogic,
-                ProgramPath = @"\\US-CATALINA3\public\Программы станок\CodeRepository"
-                // @"\\192.168.137.59\ssd\Automatico\";
-            }
-        };
-
-        public Machine GetMachineSettings(MachineType type) => Machines.Single(p => p.Type == type);
-
-        public class Machine
-        {
-            public MachineType Type { get; set; }
-
-            public string ProgramPath { get; set; }
-        }
-
-        #endregion
-
-        public List<Tool> Tools { get; set; }
-
-        public TechProcessParams TechProcessParams { get; set; }
-
+        public List<MachineSettings> MachineSettingsList { get; set; }
+       
+        public MachineSettings GetMachineSettings(MachineType type) => MachineSettingsList.Single(p => p.MachineType == type);
+      
         //public Dictionary<ProcessingType, IProcessingParams> GetProcessingParams() => new Dictionary<ProcessingType, IProcessingParams> { { ProcessingType.Sawing, new SawingDefaultParams{
         //    SawingCurveTechOperationParams = this.SawingCurveTechOperationParams,
         //    SawingLineTechOperationParams = this.SawingLineTechOperationParams
@@ -106,7 +92,7 @@ namespace CAM
 
         public SawingTechOperationParams SawingCurveTechOperationParams { get; set; }
 
-        public TechOperation.Tactile.TactileParams TactileParams { get; set; }
+        public Tactile.TactileTechProcessParams TactileTechProcessParams { get; set; }
 
         //        public SawingDefaultParams SawingDefaultParams { get; set; }
 

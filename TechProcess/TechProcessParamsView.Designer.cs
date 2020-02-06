@@ -37,6 +37,7 @@
             this.lbMaterial = new System.Windows.Forms.Label();
             this.lbMachine = new System.Windows.Forms.Label();
             this.gbTool = new System.Windows.Forms.GroupBox();
+            this.button1 = new System.Windows.Forms.Button();
             this.edThickness = new System.Windows.Forms.TextBox();
             this.label2 = new System.Windows.Forms.Label();
             this.edDiameter = new System.Windows.Forms.TextBox();
@@ -55,7 +56,7 @@
             this.pParams = new System.Windows.Forms.Panel();
             this.bTechOperationParams = new System.Windows.Forms.Button();
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
-            this.button1 = new System.Windows.Forms.Button();
+            this.button2 = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.techProcessParamsBindingSource)).BeginInit();
             this.gbTool.SuspendLayout();
             this.gbBillet.SuspendLayout();
@@ -135,6 +136,7 @@
             // 
             this.gbTool.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.gbTool.Controls.Add(this.button2);
             this.gbTool.Controls.Add(this.button1);
             this.gbTool.Controls.Add(this.edThickness);
             this.gbTool.Controls.Add(this.label2);
@@ -148,6 +150,17 @@
             this.gbTool.TabIndex = 2;
             this.gbTool.TabStop = false;
             this.gbTool.Text = "Инструмент";
+            // 
+            // button1
+            // 
+            this.button1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.button1.Location = new System.Drawing.Point(287, 18);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(21, 21);
+            this.button1.TabIndex = 8;
+            this.button1.Text = "Ξ";
+            this.button1.UseVisualStyleBackColor = true;
+            this.button1.Click += new System.EventHandler(this.button1_Click);
             // 
             // edThickness
             // 
@@ -177,7 +190,7 @@
             this.edDiameter.Location = new System.Drawing.Point(91, 41);
             this.edDiameter.Multiline = true;
             this.edDiameter.Name = "edDiameter";
-            this.edDiameter.Size = new System.Drawing.Size(225, 20);
+            this.edDiameter.Size = new System.Drawing.Size(190, 20);
             this.edDiameter.TabIndex = 1;
             // 
             // label1
@@ -342,16 +355,15 @@
             this.bTechOperationParams.UseVisualStyleBackColor = true;
             this.bTechOperationParams.Click += new System.EventHandler(this.bTechOperationParams_Click);
             // 
-            // button1
+            // button2
             // 
-            this.button1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.button1.Location = new System.Drawing.Point(287, 18);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(21, 21);
-            this.button1.TabIndex = 8;
-            this.button1.Text = "button1";
-            this.button1.UseVisualStyleBackColor = true;
-            this.button1.Click += new System.EventHandler(this.button1_Click);
+            this.button2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.button2.Location = new System.Drawing.Point(287, 41);
+            this.button2.Name = "button2";
+            this.button2.Size = new System.Drawing.Size(21, 21);
+            this.button2.TabIndex = 15;
+            this.button2.Text = "۞";
+            this.button2.UseVisualStyleBackColor = true;
             // 
             // TechProcessParamsView
             // 
@@ -401,5 +413,6 @@
         private System.Windows.Forms.Button bTechOperationParams;
         private System.Windows.Forms.ToolTip toolTip1;
         private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.Button button2;
     }
 }

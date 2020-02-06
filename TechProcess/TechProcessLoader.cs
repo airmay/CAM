@@ -34,13 +34,13 @@ namespace CAM
                             }
                             stream.Position = 0;
                             var formatter = new BinaryFormatter();
-                            camDocument.TechProcessList = (List<TechProcess>)formatter.Deserialize(stream);
+                            camDocument.TechProcessList = (List<ITechProcess>)formatter.Deserialize(stream);
                         }
 
                 if (camDocument.TechProcessList != null)
                 {
                     camDocument.TechProcessList.ForEach(p => p.Init(settings));
-                    Acad.Write($"Загружены техпроцессы: {string.Join(", ", camDocument.TechProcessList.Select(p => p.Name))}");
+                    Acad.Write($"Загружены техпроцессы: {string.Join(", ", camDocument.TechProcessList.Select(p => p.Caption))}");
                 }
             }
             catch (Exception e)

@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using Autodesk.AutoCAD.DatabaseServices;
-using Autodesk.AutoCAD.Geometry;
-using Dreambuild.AutoCAD;
 
 namespace CAM
 {
@@ -11,64 +9,60 @@ namespace CAM
     /// Технологический процесс обработки
     /// </summary>
     [Serializable]
-    public class TechProcess
+    public abstract class TechProcessBase : ITechProcess, IHasProcessCommands
     {
-        //private readonly TechOperationFactory _techOperationFactory;
-
         [NonSerialized]
-        private Settings _settings;
+        protected Settings _settings;
 
-        /// <summary>
-        /// Наименование
-        /// </summary>
-        public string Name { get; set; }
+        public MachineSettings MachineSettings => _settings.GetMachineSettings(MachineType);
 
-        /// <summary>
-        /// Параметры технологического процесса
-        /// </summary>
-        public TechProcessParams TechProcessParams { get; set; }
+        public string Caption { get; set; }
 
-        /// <summary>
-        /// Список технологических операций процесса
-        /// </summary>
+        public MachineType MachineType { get; set; }
+
+        public Material Material { get; set; }
+
+        public Tool Tool { get; set; }
+
+        public int Frequency { get; set; }
+
+        public ProcessingArea ProcessingArea { get; set; }
+
+        public int OriginX { get; set; }
+
+        public int OriginY { get; set; }
+
         public List<ITechOperation> TechOperations { get; } = new List<ITechOperation>();
 
-        /// <summary>
-        /// Команды
-        /// </summary>
-        [NonSerialized]
-        public List<ProcessCommand> ProcessCommands;
+        public List<ProcessCommand> ProcessCommands { get; set; }
 
         [NonSerialized]
-        public ToolModel ToolModel;
+        private ToolModel _toolModel;
 
-        public ProcessingType? ProcessingType => _techOperationFactory?.ProcessingType;
-
-        public object TechOperationParams => _techOperationFactory.GetTechOperationParams();
-
-        private ITechOperationFactory _techOperationFactory;
-
-        public TechProcess(string name, Settings settings)
+        public ToolModel ToolModel
         {
-            Name = name ?? throw new ArgumentNullException("TechProcessName");
-            _settings = settings;
-            TechProcessParams = _settings.TechProcessParams.Clone();
+            get => _toolModel;
+            set => _toolModel = value;
         }
 
-        public void SetProcessingType(ProcessingType? processingType)
+        public TechProcessBase(string caption, Settings settings)
         {
-            _techOperationFactory = processingType != null ? TechOperationFactoryProvider.CreateFactory(processingType.Value, _settings) : null;
+            Caption = caption;
+            _settings = settings;
         }
 
         public void Init(Settings settings)
         {
             _settings = settings;
+            ProcessingArea.Refresh();
             TechOperations.ForEach(to =>
             {
-                to.ProcessingArea.AcadObjectIds = Acad.GetObjectIds(to.ProcessingArea.Handles);
+                //to.ProcessingArea.AcadObjectIds = Acad.GetObjectIds(to.ProcessingArea.Handles);
                 to.TechProcess = this;
             });
         }
+
+        //public abstract ITechOperation[] CreateTechOperations(string techOperationName);
 
         public IEnumerable<Curve> ToolpathCurves => TechOperations.Where(p => p.ToolpathCurves != null).SelectMany(p => p.ToolpathCurves);
 
@@ -78,40 +72,16 @@ namespace CAM
             ProcessCommands = null;
         }
 
-        public bool SetTool(string text)
-        {
-            var tool = _settings.Tools.SingleOrDefault(p => p.Number.ToString() == text);
-            if (tool != null)
-            {
-                TechProcessParams.ToolDiameter = tool.Diameter;
-                TechProcessParams.ToolThickness = tool.Thickness.Value;
-                var speed = TechProcessParams.Material == Material.Гранит ? 35 : 50;
-                TechProcessParams.Frequency = (int)Math.Round(speed * 1000 / (tool.Diameter * Math.PI) * 60);
-            }
-            return tool != null;
-        }
-
-        public ITechOperation[] CreateTechOperations(ProcessingType type, Curve[] curves)
-        {
-            if (_techOperationFactory == null)
-            {
-                Acad.Alert("Укажите вид обработки");
-                return null;
-            }
-            return _techOperationFactory.Create(this, curves);
-        }
-
         public bool TechOperationMoveDown(ITechOperation techOperation) => TechOperations.SwapNext(techOperation);
 
         public bool TechOperationMoveUp(ITechOperation techOperation) => TechOperations.SwapPrev(techOperation);
 
-        public void BuildProcessing(BorderProcessingArea startBorder = null)
+        public virtual void BuildProcessing() //BorderProcessingArea startBorder = null)
         {
             DeleteProcessCommands();
-            TechOperations.ForEach(p => p.ProcessingArea.Curves = p.ProcessingArea.AcadObjectIds.QOpenForRead<Curve>());
-            BorderProcessingArea.ProcessBorders(TechOperations.Select(p => p.ProcessingArea).OfType<BorderProcessingArea>().ToList(), startBorder);
-
-            var builder = new ScemaLogicProcessBuilder(TechProcessParams);
+            ProcessingArea.Refresh();
+            //BorderProcessingArea.ProcessBorders(TechOperations.Select(p => p.ProcessingArea).OfType<BorderProcessingArea>().ToList(), startBorder);
+            var builder = new ScemaLogicProcessBuilder(Tool.Number, Frequency, MachineSettings.ZSafety);
             TechOperations.ForEach(p => p.BuildProcessing(builder));
             ProcessCommands = builder.FinishTechProcess();
         }

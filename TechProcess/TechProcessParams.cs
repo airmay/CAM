@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 
 namespace CAM
 {
@@ -52,15 +53,19 @@ namespace CAM
 
 	public enum Material
 	{
-		Мрамор,
+        [Description("Гранит")]
+		Granite, 
 
-		Гранит
-	}
+        [Description("Мрамор")]
+        Marble
+    }
 
-	public enum MachineType
+    public enum MachineType
 	{
 		ScemaLogic,
 
-		Krea
-	}
+        Donatoni,
+
+        Krea
+    }
 }

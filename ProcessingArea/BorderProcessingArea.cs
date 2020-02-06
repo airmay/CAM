@@ -132,11 +132,11 @@ namespace CAM
 
             void CalcOuterSide(BorderProcessingArea border)
             {
-                border.OuterSide = Side.Right;
-                var center = borders.Select(p => p.Curve).GetCenter();
-                var v1 = border.EndPoint.ToPoint2d() - border.StartPoint.ToPoint2d();
-                var v2 = center.ToPoint2d() - border.StartPoint.ToPoint2d();
-                border.OuterSide = v1.MinusPiToPiAngleTo(v2) > 0 ? Side.Right : Side.Left;
+                //border.OuterSide = Side.Right;
+                //var center = borders.Select(p => p.Curve).GetCenter();
+                //var v1 = border.EndPoint.ToPoint2d() - border.StartPoint.ToPoint2d();
+                //var v2 = center.ToPoint2d() - border.StartPoint.ToPoint2d();
+                //border.OuterSide = v1.MinusPiToPiAngleTo(v2) > 0 ? Side.Right : Side.Left;
             }
         }
     }

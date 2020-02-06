@@ -125,14 +125,52 @@
     <Compile Include="TechOperation\TechOperationBase.cs" />
     <Compile Include="TechOperation\TechOperationFactoryProvider.cs" />
     <Compile Include="TechProcess\CuttingMode.cs" />
+    <Compile Include="TechProcess\IHasProcessCommands.cs" />
+    <Compile Include="TechProcess\ITechProcess.cs" />
+    <Compile Include="TechProcess\MachineSettings.cs" />
     <Compile Include="TechProcess\ScemaLogicCommandGenerator.cs" />
+    <Compile Include="TechProcess\Tactile\Bands\BandsTechOperation.cs" />
+    <Compile Include="TechProcess\Tactile\Bands\BandsTechOperationView.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="TechProcess\Tactile\Bands\BandsTechOperationView.Designer.cs">
+      <DependentUpon>BandsTechOperationView.cs</DependentUpon>
+    </Compile>
+    <Compile Include="TechProcess\Tactile\Bands\CuttingType.cs" />
+    <Compile Include="TechProcess\Tactile\Bands\Pass.cs" />
+    <Compile Include="TechProcess\Tactile\Chamfers\ChamfersTechOperation.cs" />
+    <Compile Include="TechProcess\Tactile\Chamfers\ChamfersTechOperationView.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="TechProcess\Tactile\Chamfers\ChamfersTechOperationView.Designer.cs">
+      <DependentUpon>ChamfersTechOperationView.cs</DependentUpon>
+    </Compile>
+    <Compile Include="TechProcess\Tactile\Cones\ConesTechOperation.cs" />
+    <Compile Include="TechProcess\Tactile\Cones\ConesTechOperationView.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="TechProcess\Tactile\Cones\ConesTechOperationView.Designer.cs">
+      <DependentUpon>ConesTechOperationView.cs</DependentUpon>
+    </Compile>
+    <Compile Include="TechProcess\Tactile\ITechProcessFactory.cs" />
+    <Compile Include="TechProcess\Tactile\TactileTechProcess.cs" />
+    <Compile Include="TechProcess\Tactile\TactileTechProcessFactory.cs" />
+    <Compile Include="TechProcess\Tactile\TactileTechProcessParams.cs" />
+    <Compile Include="TechProcess\Tactile\TactileTechProcessView.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="TechProcess\Tactile\TactileTechProcessView.Designer.cs">
+      <DependentUpon>TactileTechProcessView.cs</DependentUpon>
+    </Compile>
+    <Compile Include="TechProcess\TechOperationAttribute.cs" />
+    <Compile Include="TechProcess\TechProcessAttribute.cs" />
+    <Compile Include="TechProcess\TechProcessFactory.cs" />
     <Compile Include="TechProcess\TechProcessLoader.cs" />
     <Compile Include="PaletteSet\CamPaletteSet.cs" />
     <Compile Include="TechProcess\CommandCode.cs" />
     <Compile Include="TechProcess\CommandNames.cs" />
     <Compile Include="TechProcess\Corner.cs" />
     <Compile Include="TechProcess\ProcessCommand.cs" />
-    <Compile Include="ProcessingArea\ArcProcessingArea.cs" />
     <Compile Include="ProcessingArea\BorderProcessingArea.cs" />
     <Compile Include="TechOperation\ITechOperationFactory.cs" />
     <Compile Include="TechOperation\Sawing\SawingDefaultParams.cs" />
@@ -140,15 +178,13 @@
     <Compile Include="TechProcess\ScemaLogicProgramGenerator.cs" />
     <Compile Include="Settings.cs" />
     <Compile Include="TechOperation\ITechOperation.cs" />
-    <Compile Include="ProcessingArea\LineProcessingArea.cs" />
     <Compile Include="ProcessingArea\ProcessingArea.cs" />
-    <Compile Include="ProcessingArea\ProcessingAreaFactory.cs" />
-    <Compile Include="ProcessingArea\ProcessingAreaType.cs" />
     <Compile Include="TechOperation\Sawing\SawingArcTechOperation.cs" />
     <Compile Include="TechOperation\Sawing\SawingMode.cs" />
     <Compile Include="TechOperation\Sawing\SawingLineTechOperation.cs" />
     <Compile Include="TechOperation\Sawing\SawingTechOperationFactory.cs" />
     <Compile Include="TechOperation\Sawing\SawingTechOperationParams.cs" />
+    <Compile Include="TechProcess\TechProcessNames.cs" />
     <Compile Include="TechProcess\TechProcessParams.cs" />
     <Compile Include="TechProcess\Tool.cs" />
     <Compile Include="TechProcess\ToolModel.cs" />
@@ -158,6 +194,9 @@
     <Compile Include="TechProcess\ToolsForm.Designer.cs">
       <DependentUpon>ToolsForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="UI\IObjectView.cs" />
+    <Compile Include="UI\ObjectViewAttribute.cs" />
+    <Compile Include="UI\ObjectViewsContainer.cs" />
     <Compile Include="Utils\Exceptions.cs" />
     <Compile Include="Graph.cs" />
     <Compile Include="Utils\Extensions.cs" />
@@ -269,6 +308,18 @@
     <EmbeddedResource Include="TechOperation\Sawing\SawingParamsView.resx">
       <DependentUpon>SawingParamsView.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="TechProcess\Tactile\Bands\BandsTechOperationView.resx">
+      <DependentUpon>BandsTechOperationView.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="TechProcess\Tactile\Chamfers\ChamfersTechOperationView.resx">
+      <DependentUpon>ChamfersTechOperationView.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="TechProcess\Tactile\Cones\ConesTechOperationView.resx">
+      <DependentUpon>ConesTechOperationView.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="TechProcess\Tactile\TactileTechProcessView.resx">
+      <DependentUpon>TactileTechProcessView.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="TechProcess\TechProcessParamsView.resx">
       <DependentUpon>TechProcessParamsView.cs</DependentUpon>
     </EmbeddedResource>
@@ -281,6 +332,11 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Properties\DataSources\CAM.Domain.TechProcessParams.datasource" />
+    <None Include="Properties\DataSources\CAM.Tactile.BandsTechOperation.datasource" />
+    <None Include="Properties\DataSources\CAM.Tactile.ChamfersTechOperation.datasource" />
+    <None Include="Properties\DataSources\CAM.Tactile.ConesTechOperation.datasource" />
+    <None Include="Properties\DataSources\CAM.Tactile.TactileTechProcess.datasource" />
+    <None Include="Properties\DataSources\CAM.Tactile.TactileTechProcessParams.datasource" />
     <None Include="Properties\DataSources\CAM.TechOperation.Tactile.TactileDefaultParams.datasource" />
     <None Include="Properties\DataSources\CAM.TechOperation.Tactile.TactileParams.datasource" />
     <None Include="Resources\arrow-090_.png" />
@@ -346,6 +402,18 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\cross.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\eraser.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\disk--arrow.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\border-color.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\paper-clip.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

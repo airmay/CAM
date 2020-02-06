@@ -59,8 +59,8 @@ namespace CAM
                 _documents[document] = new CamDocument(document, _settings);
                 TechProcessLoader.LoadTechProsess(_documents[document], _settings);
             }
-            _camPaletteSet.SetCamDocument(_documents[document]);
             Acad.ClearHighlighted();
+            _camPaletteSet.SetCamDocument(_documents[document]);
         }
 
         private void Document_CommandWillStart(object sender, CommandEventArgs e)
@@ -86,8 +86,7 @@ namespace CAM
 
         public void Terminate()
         {
-            //Settings.Save(_settings);
-            // TODO fix
+            Settings.Save(_settings);
         }
     }
 }

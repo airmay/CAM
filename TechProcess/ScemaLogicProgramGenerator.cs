@@ -13,15 +13,15 @@ namespace CAM
         /// </summary>
         /// <param name="techProcess"></param>
         /// <returns></returns>
-        public string Generate(TechProcess techProcess)
+        public string Generate(ITechProcess techProcess)
         {
             var program = new StringBuilder();
-            program.AppendLine($"; Программа обработки для станка Denver \"{techProcess.Name}\"  {DateTime.Now}");
+            program.AppendLine($"; Программа обработки для станка Denver \"{techProcess.Caption}\"  {DateTime.Now}");
             program.AppendLine("98");
             program.AppendLine("97 2 1");
             program.AppendLine("17 XYCZ");
             program.AppendLine("28 XYCZ");
-            program.AppendLine($"97 6 {techProcess.TechProcessParams.ToolNumber}");
+            //program.AppendLine($"97 6 {techProcess.TechProcessParams.ToolNumber}");
             program.AppendLine("");
             program.AppendLine("");
 

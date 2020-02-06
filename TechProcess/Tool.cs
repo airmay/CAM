@@ -34,8 +34,13 @@ namespace CAM
         /// </summary>
         public double? Thickness { get; set; }
 
-        public override string ToString() => $"{Name ?? Type.GetDescription()} Ø{Diameter}{(Thickness.HasValue ? " × " + Thickness.ToString() : null)}";
+        public override string ToString() => $"№{Number} {Type.GetDescription()} Ø{Diameter}{(Thickness.HasValue ? " × " + Thickness.ToString() : null)} {Name}";
 
+        public int CalcFrequency(Material material)
+        {
+            var speed = material == Material.Granite ? 35 : 50;
+            return (int)Math.Round(speed * 1000 / (Diameter * Math.PI) * 60);
+        }
     }
 
     public enum ToolType

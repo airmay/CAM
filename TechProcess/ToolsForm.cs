@@ -9,16 +9,16 @@ namespace CAM
     {
         private static ToolsForm _instance;
 
-        public static Tool Select(List<Tool> tools)
+        public static Tool Select(List<Tool> tools, MachineType machineType)
         {
             if (_instance == null)
                 _instance = new ToolsForm();
             _instance.toolBindingSource.DataSource = tools;
+            _instance.Text = $"Инструмент {machineType}";
             if (Autodesk.AutoCAD.ApplicationServices.Application.ShowModalDialog(_instance) == DialogResult.OK)
                 return (Tool)_instance.toolBindingSource.Current;
             return null;
         }
-
 
         public ToolsForm()
         {
@@ -35,6 +35,12 @@ namespace CAM
                 })
                 .OrderBy(item => item.value)
                 .ToList();
+        }
+
+        private void dataGridView1_DoubleClick(object sender, EventArgs e)
+        {
+            DialogResult = DialogResult.OK;
+            Close();
         }
     }
 }

@@ -10,11 +10,11 @@
 		
 	    public override void SetParams(object @params)
 	    {
-            var techOperation = (SawingTechOperation)@params;
+            //var techOperation = (SawingTechOperation)@params;
 
-            sawingParamsBindingSource.DataSource = techOperation.Params;
-            sawingParamsBindingSource.ResetBindings(false);
-            sawingModesView.sawingModesBindingSource.DataSource = techOperation.SawingParams.Modes;
+            //sawingParamsBindingSource.DataSource = techOperation.Params;
+            //sawingParamsBindingSource.ResetBindings(false);
+            //sawingModesView.sawingModesBindingSource.DataSource = techOperation.SawingParams.Modes;
 	    }
 	}
 }

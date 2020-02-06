@@ -14,16 +14,12 @@ namespace CAM
 	        return true;
         }
 
-        public static bool SwapNext<T>(this List<T> list, T item)
-        {
-            var index = list.IndexOf(item);
-	        return list.Swap(index, index + 1);
-        }
+        public static bool SwapNext<T>(this List<T> list, int index) => list.Swap(index, index + 1);
 
-        public static bool SwapPrev<T>(this List<T> list, T item)
-        {
-            var index = list.IndexOf(item);
-	        return list.Swap(index, index - 1);
-        }
+        public static bool SwapPrev<T>(this List<T> list, int index) => list.Swap(index, index - 1);
+
+        public static bool SwapNext<T>(this List<T> list, T item) => SwapNext(list, list.IndexOf(item));
+
+        public static bool SwapPrev<T>(this List<T> list, T item) => SwapPrev(list, list.IndexOf(item));
     }
 }

@@ -14,6 +14,8 @@ namespace CAM
     public class ScemaLogicProcessBuilder
     {
         const int CornerIndentIncrease = 5;
+        private int ZSafety;
+        private int Frequency;
 
         private static readonly Dictionary<string, Color> Colors = new Dictionary<string, Color>()
         {
@@ -23,17 +25,19 @@ namespace CAM
             [CommandNames.Fast] = Color.FromColor(System.Drawing.Color.Crimson),
             [CommandNames.Transition] = Color.FromColor(System.Drawing.Color.Yellow)
         };
-        private readonly TechProcessParams _techProcessParams;
+        //private readonly TechProcessParams _techProcessParams;
         private readonly ScemaLogicCommandGenerator _generator;
         private Point3d _currentPoint = Algorithms.NullPoint3d;
         private double _currentAngle;
         private Corner? _startCorner;
 
-        public ScemaLogicProcessBuilder(TechProcessParams techProcessParams)
+        public ScemaLogicProcessBuilder(int toolNumber, int frequency, int zSafety)
         {
-            _techProcessParams = techProcessParams;
+            ZSafety = zSafety;
+            Frequency = frequency;
+            //_techProcessParams = techProcessParams;
             _generator = new ScemaLogicCommandGenerator();
-            _generator.StartMachine(techProcessParams.ToolNumber);
+            _generator.StartMachine(toolNumber);
         }
 
         public List<ProcessCommand> FinishTechProcess()
@@ -46,7 +50,7 @@ namespace CAM
 
         public List<ProcessCommand> FinishTechOperation()
         {
-            if (_currentPoint.Z != _techProcessParams.ZSafety)
+            if (_currentPoint.Z != ZSafety)
                 Uplifting();
             return _generator.GetRange();
         }
@@ -54,16 +58,16 @@ namespace CAM
         /// <summary>
         /// Поднятние
         /// </summary>
-        public void Uplifting() => _generator.Uplifting(LineTo(new Point3d(_currentPoint.X, _currentPoint.Y, _techProcessParams.ZSafety), CommandNames.Uplifting), _currentAngle);
+        public void Uplifting() => _generator.Uplifting(LineTo(new Point3d(_currentPoint.X, _currentPoint.Y, ZSafety), CommandNames.Uplifting), _currentAngle);
 
         /// <summary>
         /// Перемещение над деталью
         /// </summary>
         private void Move(Point3d point, double angle)
         {
-            var destPoint = new Point3d(point.X, point.Y, _techProcessParams.ZSafety);
+            var destPoint = new Point3d(point.X, point.Y, ZSafety);
             if (_currentPoint.IsNull())
-                _generator.InitialMove(destPoint, angle, _techProcessParams.Frequency);
+                _generator.InitialMove(destPoint, angle, Frequency);
             else
                 _generator.Fast(LineTo(destPoint), angle);
             _currentPoint = destPoint;
@@ -75,7 +79,7 @@ namespace CAM
         /// </summary>
         public void Cutting(Point3d point, double angle, int cuttingFeed)
         {
-            if (_currentPoint.IsNull() || _currentPoint.Z == _techProcessParams.ZSafety)
+            if (_currentPoint.IsNull() || _currentPoint.Z == ZSafety)
                 Move(point, angle);
 
             _currentAngle = angle;
@@ -93,7 +97,7 @@ namespace CAM
         public void Cutting(Curve curve, int cuttingFeed, int transitionFeed)
         {
             var point = curve.StartPoint;
-            if (_currentPoint.IsNull() || _currentPoint.Z == _techProcessParams.ZSafety)
+            if (_currentPoint.IsNull() || _currentPoint.Z == ZSafety)
             {
                 if (_startCorner.HasValue)
                 {
@@ -139,7 +143,7 @@ namespace CAM
             foreach (var item in passList)
             {
                 var toolpathCurve = CreateToolpath(curve, compensation, item.Key, isExactlyBegin, isExactlyEnd);
-                Cutting(toolpathCurve, item.Value, _techProcessParams.PenetrationRate);
+                //Cutting(toolpathCurve, item.Value, _techProcessParams.PenetrationRate);
             }
         }
 
@@ -217,16 +221,17 @@ namespace CAM
 
         public double CalcCompensation(Curve curve, Side toolSide)
         {
-            var depth = _techProcessParams.BilletThickness;
-            var offset = 0d;
-            if (curve.IsUpward() ^ toolSide == Side.Left)
-                offset = _techProcessParams.ToolThickness;
-            if (curve is Arc arc && toolSide == Side.Left)
-                offset += arc.Radius - Math.Sqrt(arc.Radius * arc.Radius - depth * (_techProcessParams.ToolDiameter - depth));
-            return toolSide == Side.Left ^ curve is Arc ? offset : -offset;
+            return 0;
+            //var depth = _techProcessParams.BilletThickness;
+            //var offset = 0d;
+            //if (curve.IsUpward() ^ toolSide == Side.Left)
+            //    offset = _techProcessParams.ToolThickness;
+            //if (curve is Arc arc && toolSide == Side.Left)
+            //    offset += arc.Radius - Math.Sqrt(arc.Radius * arc.Radius - depth * (_techProcessParams.ToolDiameter - depth));
+            //return toolSide == Side.Left ^ curve is Arc ? offset : -offset;
         }
 
-        public double CalcIndent(double depth) => Math.Sqrt(depth * (_techProcessParams.ToolDiameter - depth)) + CornerIndentIncrease;
+        public double CalcIndent(double depth) => 0; // Math.Sqrt(depth * (_techProcessParams.ToolDiameter - depth)) + CornerIndentIncrease;
 
     }
 }

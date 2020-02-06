@@ -12,33 +12,31 @@ namespace CAM
     {
         public readonly Document Document;
         public int Hash;
-        public List<TechProcess> TechProcessList { get; set; } = new List<TechProcess>();
+        public List<ITechProcess> TechProcessList { get; set; } = new List<ITechProcess>();
         private Settings _settings;
+        private readonly TechProcessFactory _techProcessFactory;
 
         public CamDocument(Document document, Settings settings)
         {
             Document = document;
             _settings = settings;
+            _techProcessFactory = new TechProcessFactory(settings);
         }
 
-        public TechProcess CreateTechProcess()
+        public ITechProcess CreateTechProcess(string techProcessName)
         {
-            var techProcess = new TechProcess($"Обработка{TechProcessList.Count + 1}", _settings);
+            var techProcess = _techProcessFactory.CreateTechProcess(techProcessName);
             TechProcessList.Add(techProcess);
             return techProcess;
         }
 
-        public ITechOperation[] CreateTechOperations(TechProcess techProcess, ProcessingType processingType)
-        {
-            var curves = Acad.GetSelectedCurves();
-            if (curves.Any())
-                return techProcess.CreateTechOperations(processingType, curves);
+        public ITechOperation CreateTechOperation(ITechProcess techProcess, string techOperationName) => _techProcessFactory.CreateTechOperation(techProcess, techOperationName);
 
-            Acad.Alert($"Не выбраны элементы чертежа");
-            return null;
-        }
+        public IEnumerable<string> GetTechProcessNames() => _techProcessFactory.GetTechProcessNames();
 
-        public void DeleteTechProcess(TechProcess techProcess)
+        public ILookup<Type, string> GetTechOperationNames() => _techProcessFactory.GetTechOperationNames();
+
+        public void DeleteTechProcess(ITechProcess techProcess)
         {
             Acad.DeleteExtraObjects(techProcess.ToolpathCurves, techProcess.ToolModel);
             TechProcessList.Remove(techProcess);
@@ -50,28 +48,28 @@ namespace CAM
             techOperation.TechProcess.TechOperations.Remove(techOperation);
         }
 
-        public void SelectTechProcess(TechProcess techProcess) => Acad.SelectObjectIds(techProcess.TechOperations.SelectMany(p => p.ProcessingArea.AcadObjectIds).ToArray());
+        public void SelectTechProcess(ITechProcess techProcess) => Acad.SelectObjectIds(techProcess.ProcessingArea?.AcadObjectIds);
 
-        public void SelectTechOperation(ITechOperation techOperation) => Acad.SelectObjectIds(techOperation.ProcessingArea.AcadObjectIds.ToArray());
+        public void SelectTechOperation(ITechOperation techOperation) {} // Acad.SelectObjectIds(techOperation.ProcessingArea.AcadObjectIds.ToArray());
 
-        public void SelectProcessCommand(TechProcess techProcess, ProcessCommand processCommand)
+        public void SelectProcessCommand(ITechProcess techProcess, ProcessCommand processCommand)
         {
             Acad.SelectCurve(processCommand.ToolpathCurve);
             if (techProcess.ToolModel == null && processCommand.EndPoint != null)
-                techProcess.ToolModel = Acad.CreateToolModel(techProcess.TechProcessParams.ToolDiameter, techProcess.TechProcessParams.ToolThickness);
+                techProcess.ToolModel = Acad.CreateToolModel(techProcess.Tool.Diameter, techProcess.Tool.Thickness.Value);
             Acad.DrawToolModel(techProcess.ToolModel, processCommand.EndPoint, processCommand.ToolAngle);
         }
        
-        public void BuildProcessing(TechProcess techProcess, BorderProcessingArea startBorder = null)
+        public void BuildProcessing(ITechProcess techProcess, BorderProcessingArea startBorder = null)
         {
             try
             {
-                Acad.Write($"Выполняется расчет обработки по техпроцессу {techProcess.Name} ...");
+                Acad.Write($"Выполняется расчет обработки по техпроцессу {techProcess.Caption} ...");
 
-                Acad.DeleteExtraObjects(techProcess.ToolpathCurves, techProcess.ToolModel); 
+                Acad.DeleteExtraObjects(techProcess.ToolpathCurves, techProcess.ToolModel);
                 techProcess.ToolModel = null;
 
-                techProcess.BuildProcessing(startBorder);
+                techProcess.BuildProcessing(); // startBorder);
 
                 Acad.SaveCurves(techProcess.ToolpathCurves);
 
@@ -84,36 +82,41 @@ namespace CAM
             }
         }
 
-        public void SwapOuterSide(TechProcess techProcess, TechOperationBase techOperation)
+        public void HideShowProcessing(ITechProcess techProcess)
         {
-            var to = techOperation ?? techProcess?.TechOperations?.FirstOrDefault();
-            if (to?.ProcessingArea is BorderProcessingArea border)
-            {
-                border.OuterSide = border.OuterSide.Swap();
-                BuildProcessing(to.TechProcess, border);
-            }
+            Acad.HideExtraObjects(techProcess.ToolpathCurves, techProcess.ToolModel);
+            techProcess.ToolModel = null;
         }
 
-        public void SendProgram(TechProcess techProcess)
+        public void SwapOuterSide(ITechProcess techProcess, TechOperationBase techOperation)
         {
-            var contents = techProcess?.ProcessCommands?.Select(p => p.GetProgrammLine()).ToArray();
-            if (contents == null || !contents.Any())
+            //var to = techOperation ?? techProcess?.TechOperations?.FirstOrDefault();
+            //if (to?.ProcessingArea is BorderProcessingArea border)
+            //{
+            //    border.OuterSide = border.OuterSide.Swap();
+            //    BuildProcessing(to.TechProcess, border);
+            //}
+        }
+
+        public void SendProgram(List<ProcessCommand> processCommands, ITechProcess techProcess)
+        {
+            if (processCommands == null || !processCommands.Any())
             {
                 Acad.Alert("Программа не сформирована");
                 return;
             }
-            var fileName = $"{techProcess.Name}.csv";
-            var filePath = _settings.GetMachineSettings(techProcess.TechProcessParams.Machine).ProgramPath;
-            var fullPath = Path.Combine(filePath, fileName);
-            try
-            {
-                File.WriteAllLines(fullPath, contents);
-                Acad.Write($"Создан файл {fullPath}");
-            }
-            catch (Exception ex)
-            {
-                Acad.Alert($"Ошибка при записи файла {fullPath}", ex);
-            }
+            var fileName = Acad.SaveFileDialog(techProcess.Caption, techProcess.MachineSettings.ProgramFileExtension, techProcess.MachineType.ToString());
+            if (fileName != null)
+                try
+                {
+                    var contents = processCommands?.Select(p => p.GetProgrammLine()).ToArray();
+                    File.WriteAllLines(fileName, contents);
+                    Acad.Write($"Создан файл {fileName}");
+                }
+                catch (Exception ex)
+                {
+                    Acad.Alert($"Ошибка при записи файла {fileName}", ex);
+                }
         }
     }
 }

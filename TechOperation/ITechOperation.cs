@@ -6,29 +6,14 @@ namespace CAM
     /// <summary>
     /// Интрефейс технологической операции
     /// </summary>
-    public interface ITechOperation
+    public interface ITechOperation : IHasProcessCommands
     {
-        ProcessingType Type { get; }
+        ITechProcess TechProcess { get; set; }
 
-        TechProcess TechProcess { get; set; }
-
-        object Params { get; }
-
-        ProcessingArea ProcessingArea { get; }
-
-        List<ProcessCommand> ProcessCommands { get; set; }
-
-        /// <summary>
-        /// Наименование
-        /// </summary>
-        string Name { get; set; }
+        string Caption { get; set; }
 
         IEnumerable<Curve> ToolpathCurves { get; }
 
-        /// <summary>
-        /// Создает обработку по технологической операции
-        /// </summary>
-        /// <returns></returns>
         void BuildProcessing(ScemaLogicProcessBuilder builder);
     }
 }
