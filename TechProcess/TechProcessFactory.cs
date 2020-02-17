@@ -24,7 +24,7 @@ namespace CAM
                             .ToDictionary(p => _techProcessTypes[p.Key], p => p.ToDictionary(k => k.Attr.TechOperationName, v => v.Type));
         }
 
-        public ITechProcess CreateTechProcess(string techProcessName) => Activator.CreateInstance(_techProcessTypes[techProcessName], new[] { _settings }) as ITechProcess;
+        public ITechProcess CreateTechProcess(string techProcessName) => Activator.CreateInstance(_techProcessTypes[techProcessName], new object[] { techProcessName, _settings }) as ITechProcess;
 
         public ITechOperation CreateTechOperation(ITechProcess techProcess, string techOperationName) => 
             Activator.CreateInstance(_techOperationTypes[techProcess.GetType()][techOperationName], new object[] { techProcess, techOperationName }) as ITechOperation;

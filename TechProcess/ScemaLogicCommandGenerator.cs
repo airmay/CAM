@@ -18,9 +18,10 @@ namespace CAM
         /// Запуск станка
         /// </summary>
         /// <param name="toolNumber"></param>
-        public void StartMachine(int toolNumber)
+        public void StartMachine(string caption, int toolNumber)
         {
             var name = "";
+            //CreateCommand($"; Программа обработки для станка ScemaLogic \"{caption}\" от {DateTime.Now}");
             CreateCommand(name, 98);
             CreateCommand(name, 97, 2, feed: 1);
             CreateCommand(name, 17, axis: "XYCZ");
@@ -100,23 +101,24 @@ namespace CAM
             }
         }
 
-        private void CreateCommand(string name, int gCode, int? mCode = null, string axis = null, int? feed = null, double? x = null, double? y = null, 
+        private void CreateCommand(string name, int gCode, int? mCode = null, string axis = null, int? feed = null, double? x = null, double? y = null,
             double? param1 = null, double? param2 = null, Curve toolpathCurve = null, Point3d? endPoint = null, double? toolAngle = null)
-            => Commands.Add(new ProcessCommand
-            {
-                Name = name,
-                GCode = gCode.ToString(),
-                MCode = mCode?.ToString(),
-                Axis = axis,
-                Feed = feed.ToString(),
-                X = Round(x),
-                Y = Round(y),
-                Param1 = Round(param1),
-                Param2 = Round(param2),
-                ToolpathCurve = toolpathCurve,
-                EndPoint = endPoint,
-                ToolAngle = toolAngle
-            });
+            {}
+        //Commands.Add(new ProcessCommand
+        //    {
+        //        Name = name,
+        //        GCode = gCode.ToString(),
+        //        MCode = mCode?.ToString(),
+        //        Axis = axis,
+        //        Feed = feed.ToString(),
+        //        X = Round(x),
+        //        Y = Round(y),
+        //        Param1 = Round(param1),
+        //        Param2 = Round(param2),
+        //        ToolpathCurve = toolpathCurve,
+        //        EndPoint = endPoint,
+        //        ToolAngle = toolAngle
+        //    });
 
         private static string Round(double? value) => value.HasValue ? Math.Round(value.Value, 4).ToString() : null;
     }

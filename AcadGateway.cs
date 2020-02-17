@@ -50,6 +50,12 @@ namespace CAM
                 App.LockAndExecute(() => ids.QForEach(action));
         }
 
+        public static void ForEach<T>(this IEnumerable<ObjectId> ids, Action<T> action) where T : DBObject
+        {
+            if (ids.Any())
+                App.LockAndExecute(() => ids.QForEach(action));
+        }
+
         public static void ForEach(this IEnumerable<Curve> ids, Action<Curve> action)
         {
             if (ids.Any())

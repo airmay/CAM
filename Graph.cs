@@ -69,6 +69,12 @@ namespace CAM
 
         public static bool IsTurnRight(this Line line, Point3d point) => IsTurnRight(line.StartPoint, line.EndPoint, point);
 
+        public static List<Point3d> Intersect(this Curve entity, List<Curve> entitys, Intersect intersectType = default)
+        {
+            var result = new List<Point3d>();
+            entitys.ForEach(p => result.AddRange(entity.Intersect(p, intersectType)));
+            return result;
+        }
 
         public static void CreateHatch(List<Curve> contour, int sign)
         {

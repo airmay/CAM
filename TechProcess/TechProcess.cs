@@ -81,7 +81,7 @@ namespace CAM
             DeleteProcessCommands();
             ProcessingArea.Refresh();
             //BorderProcessingArea.ProcessBorders(TechOperations.Select(p => p.ProcessingArea).OfType<BorderProcessingArea>().ToList(), startBorder);
-            var builder = new ScemaLogicProcessBuilder(Tool.Number, Frequency, MachineSettings.ZSafety);
+            var builder = new ScemaLogicProcessBuilder(MachineType, Caption, Tool.Number, Frequency, MachineSettings.ZSafety);
             TechOperations.ForEach(p => p.BuildProcessing(builder));
             ProcessCommands = builder.FinishTechProcess();
         }

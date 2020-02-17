@@ -81,7 +81,6 @@ namespace CAM.Tactile
             var passDir = ray.UnitDir.GetPerpendicularVector();
             var points = new List<Point3d>();
             double offset = BandStart - BandSpacing - BandWidth;
-            bool cuttingFlag = false;
             var TactileTechProcessParams = ((TactileTechProcess)TechProcess).TactileTechProcessParams;
 
             builder.StartTechOperation();
@@ -98,18 +97,17 @@ namespace CAM.Tactile
                         if (intersectPoints.Count == 1)
                             points.Add(intersectPoints[0]);
                     }
-                    if (points.Count == 2)
+                    if (points.Count == 2 && points[0] != points[1])
                     {
                         var vector = (points[1] - points[0]).GetNormal() * TactileTechProcessParams.Departure;
                         var startPoint = points[0] - vector - Vector3d.ZAxis * Depth;
                         var endPoint = points[1] + vector - Vector3d.ZAxis * Depth;
                         builder.Cutting(startPoint, endPoint, pass.CuttingType == CuttingType .Roughing ? Feed : FeedFinishing, TactileTechProcessParams.TransitionFeed);
-                        cuttingFlag = true;
                     }
                 }
                 offset += BandWidth + BandSpacing;
             }
-            while ((points.Count != 0 || !cuttingFlag) && offset < 10000);
+            while ((points.Count != 0 || offset < BandWidth + BandSpacing) && offset < 10000);
 
             ProcessCommands = builder.FinishTechOperation();
         }

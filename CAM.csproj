@@ -22,7 +22,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <PlatformTarget>AnyCPU</PlatformTarget>
-    <LangVersion>7.3</LangVersion>
+    <LangVersion>7.1</LangVersion>
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
@@ -33,6 +33,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <Prefer32Bit>false</Prefer32Bit>
+    <LangVersion>7.3</LangVersion>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="AcCui, Version=18.2.0.0, Culture=neutral, processorArchitecture=MSIL">
@@ -85,6 +86,18 @@
     <Compile Include="AcadGateway.cs" />
     <Compile Include="CamDocument.cs" />
     <Compile Include="CamManager.cs" />
+    <Compile Include="PaletteSet\TrimmingView.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="PaletteSet\TrimmingView.Designer.cs">
+      <DependentUpon>TrimmingView.cs</DependentUpon>
+    </Compile>
+    <Compile Include="PaletteSet\UtilsView.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="PaletteSet\UtilsView.Designer.cs">
+      <DependentUpon>UtilsView.cs</DependentUpon>
+    </Compile>
     <Compile Include="TechOperation\DefaultParamsViewAttribute.cs" />
     <Compile Include="TechOperation\ParamsForm.cs">
       <SubType>Form</SubType>
@@ -125,6 +138,8 @@
     <Compile Include="TechOperation\TechOperationBase.cs" />
     <Compile Include="TechOperation\TechOperationFactoryProvider.cs" />
     <Compile Include="TechProcess\CuttingMode.cs" />
+    <Compile Include="TechProcess\DonatoniCommandGenerator.cs" />
+    <Compile Include="TechProcess\DonatoniProcessCommand.cs" />
     <Compile Include="TechProcess\IHasProcessCommands.cs" />
     <Compile Include="TechProcess\ITechProcess.cs" />
     <Compile Include="TechProcess\MachineSettings.cs" />
@@ -273,6 +288,12 @@
     <None Include="Properties\DataSources\CAM.Domain.SawingTechOperationParams.datasource" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="PaletteSet\TrimmingView.resx">
+      <DependentUpon>TrimmingView.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="PaletteSet\UtilsView.resx">
+      <DependentUpon>UtilsView.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="TechOperation\ParamsForm.resx">
       <DependentUpon>ParamsForm.cs</DependentUpon>
     </EmbeddedResource>

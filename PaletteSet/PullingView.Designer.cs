@@ -30,10 +30,10 @@
         {
             this.bPulling = new System.Windows.Forms.Button();
             this.gbPulling = new System.Windows.Forms.GroupBox();
+            this.lPulling = new System.Windows.Forms.Label();
             this.cbMove = new System.Windows.Forms.CheckBox();
             this.tbDist = new System.Windows.Forms.TextBox();
             this.label5 = new System.Windows.Forms.Label();
-            this.lPulling = new System.Windows.Forms.Label();
             this.gbPulling.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -55,12 +55,21 @@
             this.gbPulling.Controls.Add(this.label5);
             this.gbPulling.Controls.Add(this.bPulling);
             this.gbPulling.Dock = System.Windows.Forms.DockStyle.Top;
-            this.gbPulling.Location = new System.Drawing.Point(10, 10);
+            this.gbPulling.Location = new System.Drawing.Point(3, 3);
             this.gbPulling.Name = "gbPulling";
-            this.gbPulling.Size = new System.Drawing.Size(315, 126);
+            this.gbPulling.Size = new System.Drawing.Size(329, 110);
             this.gbPulling.TabIndex = 3;
             this.gbPulling.TabStop = false;
             this.gbPulling.Text = "Притягивание";
+            // 
+            // lPulling
+            // 
+            this.lPulling.AutoSize = true;
+            this.lPulling.ForeColor = System.Drawing.Color.Red;
+            this.lPulling.Location = new System.Drawing.Point(6, 99);
+            this.lPulling.Name = "lPulling";
+            this.lPulling.Size = new System.Drawing.Size(0, 13);
+            this.lPulling.TabIndex = 8;
             // 
             // cbMove
             // 
@@ -89,23 +98,14 @@
             this.label5.TabIndex = 3;
             this.label5.Text = "Дистанция:";
             // 
-            // lPulling
-            // 
-            this.lPulling.AutoSize = true;
-            this.lPulling.ForeColor = System.Drawing.Color.Red;
-            this.lPulling.Location = new System.Drawing.Point(6, 99);
-            this.lPulling.Name = "lPulling";
-            this.lPulling.Size = new System.Drawing.Size(0, 13);
-            this.lPulling.TabIndex = 8;
-            // 
             // PullingView
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.Controls.Add(this.gbPulling);
             this.Name = "PullingView";
-            this.Padding = new System.Windows.Forms.Padding(10);
-            this.Size = new System.Drawing.Size(335, 473);
+            this.Padding = new System.Windows.Forms.Padding(3);
+            this.Size = new System.Drawing.Size(335, 121);
             this.gbPulling.ResumeLayout(false);
             this.gbPulling.PerformLayout();
             this.ResumeLayout(false);

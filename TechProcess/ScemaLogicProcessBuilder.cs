@@ -26,18 +26,20 @@ namespace CAM
             [CommandNames.Transition] = Color.FromColor(System.Drawing.Color.Yellow)
         };
         //private readonly TechProcessParams _techProcessParams;
-        private readonly ScemaLogicCommandGenerator _generator;
+        //private readonly ScemaLogicCommandGenerator _generator = new ScemaLogicCommandGenerator();
+        private readonly DonatoniCommandGenerator _generator = new DonatoniCommandGenerator();
         private Point3d _currentPoint = Algorithms.NullPoint3d;
         private double _currentAngle;
         private Corner? _startCorner;
 
-        public ScemaLogicProcessBuilder(int toolNumber, int frequency, int zSafety)
+        public ScemaLogicProcessBuilder(MachineType machineType, string caption, int toolNumber, int frequency, int zSafety)
         {
             ZSafety = zSafety;
             Frequency = frequency;
             //_techProcessParams = techProcessParams;
-            _generator = new ScemaLogicCommandGenerator();
-            _generator.StartMachine(toolNumber);
+            //_generator = new DonatoniCommandGenerator();
+            //_generator = new DonatoniCommandGenerator();
+            _generator.StartMachine(caption, toolNumber);
         }
 
         public List<ProcessCommand> FinishTechProcess()
@@ -67,8 +69,10 @@ namespace CAM
         {
             var destPoint = new Point3d(point.X, point.Y, ZSafety);
             if (_currentPoint.IsNull())
+                //_generator.InitialMove(destPoint, angle, Frequency);
                 _generator.InitialMove(destPoint, angle, Frequency);
             else
+                //_generator.Fast(LineTo(destPoint), angle);
                 _generator.Fast(LineTo(destPoint), angle);
             _currentPoint = destPoint;
             _currentAngle = angle;
