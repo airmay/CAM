@@ -38,21 +38,21 @@
             this.dataGridViewCommand = new System.Windows.Forms.DataGridView();
             this.panel1 = new System.Windows.Forms.Panel();
             this.toolStrip1 = new System.Windows.Forms.ToolStrip();
-            this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
-            this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
-            this.panel2 = new System.Windows.Forms.Panel();
             this.bCreateTechProcess = new System.Windows.Forms.ToolStripDropDownButton();
             this.bRemove = new System.Windows.Forms.ToolStripButton();
-            this.bCreateTechOperation = new System.Windows.Forms.ToolStripDropDownButton();
             this.bMoveUpTechOperation = new System.Windows.Forms.ToolStripButton();
             this.bMoveDownTechOperation = new System.Windows.Forms.ToolStripButton();
+            this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.bSwapOuterSide = new System.Windows.Forms.ToolStripButton();
             this.bBuildProcessing = new System.Windows.Forms.ToolStripButton();
             this.bDeleteProcessing = new System.Windows.Forms.ToolStripButton();
+            this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
             this.bSendProgramm = new System.Windows.Forms.ToolStripButton();
-            this.bClose = new System.Windows.Forms.ToolStripButton();
             this.bAttachDrawing = new System.Windows.Forms.ToolStripButton();
+            this.bClose = new System.Windows.Forms.ToolStripButton();
+            this.panel2 = new System.Windows.Forms.Panel();
             this.processCommandBindingSource = new System.Windows.Forms.BindingSource(this.components);
+            this.bCreateTechOperation = new System.Windows.Forms.ToolStripDropDownButton();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
@@ -187,25 +187,6 @@
             this.toolStrip1.TabIndex = 0;
             this.toolStrip1.Text = "toolStrip1";
             // 
-            // toolStripSeparator1
-            // 
-            this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(6, 25);
-            // 
-            // toolStripSeparator2
-            // 
-            this.toolStripSeparator2.Name = "toolStripSeparator2";
-            this.toolStripSeparator2.Size = new System.Drawing.Size(6, 25);
-            // 
-            // panel2
-            // 
-            this.panel2.Controls.Add(this.splitContainer1);
-            this.panel2.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.panel2.Location = new System.Drawing.Point(0, 25);
-            this.panel2.Name = "panel2";
-            this.panel2.Size = new System.Drawing.Size(337, 675);
-            this.panel2.TabIndex = 3;
-            // 
             // bCreateTechProcess
             // 
             this.bCreateTechProcess.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
@@ -223,14 +204,6 @@
             this.bRemove.Size = new System.Drawing.Size(23, 22);
             this.bRemove.Text = "Удалить";
             this.bRemove.Click += new System.EventHandler(this.bRemove_Click);
-            // 
-            // bCreateTechOperation
-            // 
-            this.bCreateTechOperation.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.bCreateTechOperation.Image = global::CAM.Properties.Resources.plus;
-            this.bCreateTechOperation.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.bCreateTechOperation.Name = "bCreateTechOperation";
-            this.bCreateTechOperation.Size = new System.Drawing.Size(29, 22);
             // 
             // bMoveUpTechOperation
             // 
@@ -251,6 +224,11 @@
             this.bMoveDownTechOperation.Size = new System.Drawing.Size(23, 22);
             this.bMoveDownTechOperation.Text = "Переместить ниже";
             this.bMoveDownTechOperation.Click += new System.EventHandler(this.bMoveDownTechOperation_Click);
+            // 
+            // toolStripSeparator1
+            // 
+            this.toolStripSeparator1.Name = "toolStripSeparator1";
+            this.toolStripSeparator1.Size = new System.Drawing.Size(6, 25);
             // 
             // bSwapOuterSide
             // 
@@ -282,6 +260,11 @@
             this.bDeleteProcessing.Text = "Скрыть/показать обработку";
             this.bDeleteProcessing.Click += new System.EventHandler(this.bDeleteProcessing_Click);
             // 
+            // toolStripSeparator2
+            // 
+            this.toolStripSeparator2.Name = "toolStripSeparator2";
+            this.toolStripSeparator2.Size = new System.Drawing.Size(6, 25);
+            // 
             // bSendProgramm
             // 
             this.bSendProgramm.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
@@ -291,6 +274,16 @@
             this.bSendProgramm.Size = new System.Drawing.Size(23, 22);
             this.bSendProgramm.Text = "Записать файл с программой";
             this.bSendProgramm.Click += new System.EventHandler(this.bSend_Click);
+            // 
+            // bAttachDrawing
+            // 
+            this.bAttachDrawing.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.bAttachDrawing.Image = global::CAM.Properties.Resources.paper_clip;
+            this.bAttachDrawing.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.bAttachDrawing.Name = "bAttachDrawing";
+            this.bAttachDrawing.Size = new System.Drawing.Size(23, 22);
+            this.bAttachDrawing.Text = "Прикрепить чертеж";
+            this.bAttachDrawing.Click += new System.EventHandler(this.bAttachDrawing_Click);
             // 
             // bClose
             // 
@@ -303,20 +296,27 @@
             this.bClose.Visible = false;
             this.bClose.Click += new System.EventHandler(this.bClose_Click);
             // 
-            // bAttachDrawing
+            // panel2
             // 
-            this.bAttachDrawing.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.bAttachDrawing.Image = global::CAM.Properties.Resources.paper_clip;
-            this.bAttachDrawing.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.bAttachDrawing.Name = "bAttachDrawing";
-            this.bAttachDrawing.Size = new System.Drawing.Size(23, 22);
-            this.bAttachDrawing.Text = "Прикрепить чертеж";
-            this.bAttachDrawing.Click += new System.EventHandler(this.bAttachDrawing_Click);
+            this.panel2.Controls.Add(this.splitContainer1);
+            this.panel2.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.panel2.Location = new System.Drawing.Point(0, 25);
+            this.panel2.Name = "panel2";
+            this.panel2.Size = new System.Drawing.Size(337, 675);
+            this.panel2.TabIndex = 3;
             // 
             // processCommandBindingSource
             // 
             this.processCommandBindingSource.DataSource = typeof(CAM.ProcessCommand);
             this.processCommandBindingSource.CurrentChanged += new System.EventHandler(this.processCommandBindingSource_CurrentChanged);
+            // 
+            // bCreateTechOperation
+            // 
+            this.bCreateTechOperation.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.bCreateTechOperation.Image = global::CAM.Properties.Resources.plus;
+            this.bCreateTechOperation.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.bCreateTechOperation.Name = "bCreateTechOperation";
+            this.bCreateTechOperation.Size = new System.Drawing.Size(29, 22);
             // 
             // TechProcessView
             // 
@@ -373,8 +373,8 @@
         private System.Windows.Forms.ToolStripButton bSendProgramm;
         private System.Windows.Forms.ToolStripButton bClose;
         private System.Windows.Forms.ToolStripDropDownButton bCreateTechProcess;
-        private System.Windows.Forms.ToolStripDropDownButton bCreateTechOperation;
         private System.Windows.Forms.ToolStripButton bDeleteProcessing;
         private System.Windows.Forms.ToolStripButton bAttachDrawing;
+        private System.Windows.Forms.ToolStripDropDownButton bCreateTechOperation;
     }
 }

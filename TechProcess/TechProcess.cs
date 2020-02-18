@@ -85,5 +85,7 @@ namespace CAM
             TechOperations.ForEach(p => p.BuildProcessing(builder));
             ProcessCommands = builder.FinishTechProcess();
         }
+
+        public virtual List<ITechOperation> CreateTechOperations() => new List<ITechOperation>();
     }
 }

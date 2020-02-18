@@ -22,6 +22,7 @@ namespace CAM
             SetButtonsEnabled();
 
             bSwapOuterSide.Visible = false;
+            bAttachDrawing.Visible = false;
 #if DEBUG
             bClose.Visible = true;
 #endif
@@ -107,7 +108,9 @@ namespace CAM
             if (CurrentTechProcess.GetType() != _currentTechProcessType)
             {
                 bCreateTechOperation.DropDownItems.Clear();
-                bCreateTechOperation.DropDownItems.AddRange(_techOperationItems[CurrentTechProcess.GetType()]);
+                var items = new List<ToolStripItem> { new ToolStripMenuItem("Все операции", null, new EventHandler(bCreateTechOperation_Click)), new ToolStripSeparator() }
+                    .Concat(_techOperationItems[CurrentTechProcess.GetType()]).ToArray();
+                bCreateTechOperation.DropDownItems.AddRange(items);
                 _currentTechProcessType = CurrentTechProcess.GetType();
             }
             RefreshView();
@@ -146,11 +149,10 @@ namespace CAM
         {
             EndEdit();
             var techOperations = _camDocument.CreateTechOperation(CurrentTechProcess, ((ToolStripMenuItem)sender).Text);
-            if (techOperations != null)
+            if (techOperations.Any())
             {
                 var techProcessNode = treeView.SelectedNode.Parent ?? treeView.SelectedNode;
-                techProcessNode.Nodes.Add(CreateTechOperationNode(techOperations));
-//                techProcessNode.Nodes.AddRange(Array.ConvertAll(techOperations, CreateTechOperationNode));
+                techProcessNode.Nodes.AddRange(techOperations.ConvertAll(CreateTechOperationNode).ToArray());
                 treeView.SelectedNode = techProcessNode.Nodes[techProcessNode.Nodes.Count - 1];
             }
             SetButtonsEnabled();

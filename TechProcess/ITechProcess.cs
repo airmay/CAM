@@ -23,9 +23,9 @@ namespace CAM
         void DeleteProcessCommands();
         void Init(Settings settings);
 
-//        ITechOperation[] CreateTechOperations(string techOperationName);
-//        string[] GetTechOperationNames();
         bool TechOperationMoveDown(ITechOperation techOperation);
         bool TechOperationMoveUp(ITechOperation techOperation);
+
+        List<ITechOperation> CreateTechOperations();
     }
 }

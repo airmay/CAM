@@ -30,7 +30,7 @@ namespace CAM
             return techProcess;
         }
 
-        public ITechOperation CreateTechOperation(ITechProcess techProcess, string techOperationName) => _techProcessFactory.CreateTechOperation(techProcess, techOperationName);
+        public List<ITechOperation> CreateTechOperation(ITechProcess techProcess, string techOperationName) => _techProcessFactory.CreateTechOperations(techProcess, techOperationName);
 
         public IEnumerable<string> GetTechProcessNames() => _techProcessFactory.GetTechProcessNames();
 

@@ -3,6 +3,7 @@ using Autodesk.AutoCAD.Geometry;
 using Dreambuild.AutoCAD;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace CAM
 {
@@ -11,11 +12,16 @@ namespace CAM
     /// </summary>
     public static class Graph
     {
+        public static string GetDesc(this ObjectId[] ids)
+        {
+            var objects = ids.QOpenForRead();
+            var count = objects.Select(p => p.GetType()).Distinct().Count();
+            return $"{(count > 1 ? "Объекты" : objects[0] is Line ? "Отрезок" : objects[0] is Arc ? "Дуга" : "Объекты")} ({objects.Length})";
+        }
+
         internal static double ToRad(double angle) => angle * Math.PI / 180;
 
         internal static double ToDeg(double angle) => angle * 180 / Math.PI;
-
-        internal static double Round(this double val) => Math.Round(val, 6);
 
         public static double Length(this Curve curve) => curve.GetDistanceAtParameter(curve.EndParam) - curve.GetDistanceAtParameter(curve.StartParam);
 
@@ -34,6 +40,11 @@ namespace CAM
             return Math.Abs(tangent.Y) > Consts.Epsilon
                 ? tangent.Y > 0
                 : tangent.X > 0;
+        }
+        public static IEnumerable<Point3d> GetPoints(this Curve curve)
+        {
+            yield return curve.StartPoint;
+            yield return curve.EndPoint;
         }
 
         public static Point3d GetPoint(this Curve curve, Corner corner) => corner == Corner.Start ? curve.StartPoint : curve.EndPoint;

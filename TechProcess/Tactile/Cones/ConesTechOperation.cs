@@ -11,16 +11,24 @@ namespace CAM.Tactile
     [TechOperation(TechProcessNames.Tactile, "Конусы")]
     public class ConesTechOperation : TechOperationBase
     {
-        public int Frequency { get; set; }
+        public double BandWidth { get; set; }
 
-        public int ProcessingAngle { get; set; }
+        public double BandSpacing { get; set; }
 
         public double BandStart1 { get; set; }
 
         public double BandStart2 { get; set; }
 
+        public int Frequency { get; set; }
+
+        public int ProcessingAngle { get; set; }
+
         public ConesTechOperation(TactileTechProcess techProcess, string name) : base(techProcess, name)
         {
+            BandWidth = techProcess.BandWidth.Value;
+            BandSpacing = techProcess.BandSpacing.Value;
+            BandStart1 = techProcess.BandStart1.Value;
+            BandStart2 = techProcess.BandStart2.Value;
             Frequency = 5000;
             ProcessingAngle = 45;
         }
@@ -37,9 +45,9 @@ namespace CAM.Tactile
             };
             var passDir = ray.UnitDir.GetPerpendicularVector();
             var tactileParams = ((TactileTechProcess)TechProcess).TactileTechProcessParams;
-            ray.BasePoint += passDir * (BandStart1 - tactileParams.BandSpacing / 2);
+            ray.BasePoint += passDir * (BandStart1 - BandSpacing / 2);
 
-            var step = tactileParams.BandWidth + tactileParams.BandSpacing;
+            var step = BandWidth + BandSpacing;
             var curves = TechProcess.ProcessingArea.Curves.ToList();
             var lines = new List<Curve>();
             List<Point3d> points;
@@ -50,7 +58,7 @@ namespace CAM.Tactile
             }
             ray.UnitDir = passDir;
             passDir = passDir.GetPerpendicularVector();
-            ray.BasePoint = (baseCurve.StartPoint.X < baseCurve.EndPoint.X ? baseCurve.EndPoint : baseCurve.StartPoint) + passDir * (BandStart2 - tactileParams.BandSpacing / 2);
+            ray.BasePoint = (baseCurve.StartPoint.X < baseCurve.EndPoint.X ? baseCurve.EndPoint : baseCurve.StartPoint) + passDir * (BandStart2 - BandSpacing / 2);
 
             bool flag = false;
             builder.StartTechOperation();

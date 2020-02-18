@@ -217,7 +217,7 @@ namespace CAM
             var tangent = curve.GetFirstDerivative(point).ToVector2d();
             if (!curve.IsUpward())
                 tangent = tangent.Negate();
-            var angle = Graph.ToDeg(Math.PI - Graph.Round(tangent.Angle));
+            var angle = Graph.ToDeg(Math.PI - (tangent.Angle).Round(6));
             if (curve is Line && angle == 180)
                 angle = 0;
             return angle;

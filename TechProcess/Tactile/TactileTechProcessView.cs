@@ -31,8 +31,9 @@ namespace CAM.Tactile
             tactileTechProcessBindingSource.DataSource = @object;
             tactileTechProcessParamsBindingSource.DataSource = _tactileTechProcess.TactileTechProcessParams;
             tbTool.Text = _tactileTechProcess.Tool?.ToString();
-            tbProcessingArea.Text = _tactileTechProcess.ProcessingArea?.ToString();
             tbOrigin.Text = $"{_tactileTechProcess.OriginX},{_tactileTechProcess.OriginY}";
+            tbContour.Text = _tactileTechProcess.ProcessingArea?.AcadObjectIds.GetDesc();
+            SetParamsEnabled();
         }
 
         private void bTool_Click(object sender, EventArgs e)
@@ -51,17 +52,14 @@ namespace CAM.Tactile
         private void bProcessingArea_Click(object sender, EventArgs e)
         {
             Interaction.SetActiveDocFocus();
-            var ids = Interaction.GetSelection("\nВыберите 4 отрезка контура плитки", "LINE");
+            var ids = Interaction.GetSelection("\nВыберите объекты контура плитки", "LINE");
             if (ids.Length == 0)
                 return;
-            if (ids.Length != 4)
-            {
-                Acad.Alert("Контур плитки должен содержать 4 отрезка");
-                return;
-            }
+            _tactileTechProcess.CalcContour(ids);
             _tactileTechProcess.ProcessingArea = new ProcessingArea(ids);
-            tbProcessingArea.Text = _tactileTechProcess.ProcessingArea.ToString();
+            tbContour.Text = _tactileTechProcess.ProcessingArea.AcadObjectIds.GetDesc();
             Acad.SelectObjectIds(ids);
+            SetParamsEnabled();
         }
 
         private void bOrigin_Click(object sender, EventArgs e)
@@ -74,6 +72,28 @@ namespace CAM.Tactile
                 _tactileTechProcess.OriginY = (int)origin.Y;
                 tbOrigin.Text = $"{_tactileTechProcess.OriginX},{_tactileTechProcess.OriginY}";
             }
+        }
+
+        private void bObjects_Click(object sender, EventArgs e)
+        {
+            Interaction.SetActiveDocFocus();
+            var ids = Interaction.GetSelection("\nВыберите 2 элемента плитки");
+            if (ids.Length > 0)
+            {
+                _tactileTechProcess.CalcType(ids);
+                tbObjects.Text = ids.GetDesc();
+                tactileTechProcessBindingSource.ResetBindings(false);
+                SetParamsEnabled();
+            }
+        }
+
+        private void SetParamsEnabled()
+        {
+            var enabled = _tactileTechProcess.Contour != null &&  _tactileTechProcess.Type != null;
+            tbBandWidth.Enabled = enabled;
+            tbBandSpacing.Enabled = enabled;
+            tbBandStart1.Enabled = enabled;
+            tbBandStart2.Enabled = enabled;
         }
     }
 }

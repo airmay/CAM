@@ -4,10 +4,10 @@ namespace CAM
 {
     public class TechProcessAttribute : Attribute
     {
-        public string Name { get; }
-        public TechProcessAttribute(string name)
+        public string Caption { get; }
+        public TechProcessAttribute(string caption)
         {
-            this.Name = name;
+            this.Caption = caption;
         }
     }
 }

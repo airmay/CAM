@@ -8,14 +8,14 @@ namespace CAM
 {
     public class TechOperationAttribute : Attribute
     {
-        public string TechProcessName { get; }
+        public string TechProcessCaption { get; }
 
-        public string TechOperationName { get; }
+        public string TechOperationCaption { get; }
 
-        public TechOperationAttribute(string techProcessName, string techOperationName)
+        public TechOperationAttribute(string techProcessCaption, string techOperationCaption)
         {
-            this.TechProcessName = techProcessName;
-            this.TechOperationName = techOperationName;
+            this.TechProcessCaption = techProcessCaption;
+            this.TechOperationCaption = techOperationCaption;
         }
     }
 }

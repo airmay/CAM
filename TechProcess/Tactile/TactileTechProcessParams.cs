@@ -8,12 +8,6 @@ namespace CAM.Tactile
     [Serializable]
     public class TactileTechProcessParams
     {
-        public double BandWidth { get; set; }
-
-        public double BandSpacing { get; set; }
-
-        public double BandStart { get; set; }
-
         public double Depth { get; set; }
 
         public double Departure { get; set; }
@@ -28,18 +22,5 @@ namespace CAM.Tactile
 
         public TactileTechProcessParams Clone() => MemberwiseClone() as TactileTechProcessParams;
 
-        public static TactileTechProcessParams GetDefault()
-        {
-            return new TactileTechProcessParams
-            {
-                BandWidth = 25,
-                BandSpacing = 25,
-                BandStart = 37.5,
-                Depth = 20,
-                Departure = 150,
-                TransitionFeed = 2000,
-                PenetrationFeed = 200
-            };
-        }
     }
 }

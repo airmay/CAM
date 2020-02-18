@@ -13,5 +13,8 @@ namespace CAM
             var attribute = (DescriptionAttribute)fieldInfo.GetCustomAttribute(typeof(DescriptionAttribute));
             return attribute.Description;
         }
+
+        public static double Round(this double value, int digits) => Math.Round(value, digits);
+
     }
 }

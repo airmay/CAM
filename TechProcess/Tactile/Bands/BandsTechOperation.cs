@@ -28,11 +28,11 @@ namespace CAM.Tactile
 
         public List<Pass> PassList { get; set; }
 
-        public BandsTechOperation(TactileTechProcess techProcess, string name) : base(techProcess, name)
+        public BandsTechOperation(TactileTechProcess techProcess, string caption) : base(techProcess, caption)
         {
-            BandWidth = techProcess.TactileTechProcessParams.BandWidth;
-            BandSpacing = techProcess.TactileTechProcessParams.BandSpacing;
-            BandStart = techProcess.TactileTechProcessParams.BandStart;
+            BandWidth = techProcess.BandWidth.Value;
+            BandSpacing = techProcess.BandSpacing.Value;
+            BandStart = techProcess.BandStart1.Value;
             Depth = techProcess.TactileTechProcessParams.Depth;
             Feed = techProcess.TactileTechProcessParams.CuttingFeed;
             FeedFinishing = techProcess.TactileTechProcessParams.FinishingFeed;
