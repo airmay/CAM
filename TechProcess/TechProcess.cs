@@ -51,7 +51,7 @@ namespace CAM
             _settings = settings;
         }
 
-        public void Init(Settings settings)
+        public virtual void Init(Settings settings)
         {
             _settings = settings;
             ProcessingArea.Refresh();

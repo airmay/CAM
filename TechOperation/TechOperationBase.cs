@@ -49,7 +49,7 @@ namespace CAM
         {
             _techProcess = techProcess;
             _techProcess.TechOperations.Add(this);
-            Caption = caption;
+            Caption = $"{caption}{_techProcess.TechOperations.Count()}";
         }
 
         public abstract void BuildProcessing(ScemaLogicProcessBuilder builder);

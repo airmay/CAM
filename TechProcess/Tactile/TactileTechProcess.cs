@@ -3,10 +3,7 @@ using Autodesk.AutoCAD.Geometry;
 using Dreambuild.AutoCAD;
 using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CAM.Tactile
 {
@@ -16,7 +13,8 @@ namespace CAM.Tactile
     {
         public TactileTechProcessParams TactileTechProcessParams { get; }
 
-        public RectangleF Contour { get; set; }
+        [NonSerialized]
+        public Polyline Contour;
 
         public double? BandWidth { get; set; }
 
@@ -34,10 +32,16 @@ namespace CAM.Tactile
             Material = Material.Granite;
         }
 
-        public void CalcContour(ObjectId[] ids)
+        public override void Init(Settings settings)
         {
-            var points = ids.QOpenForRead<Curve>().SelectMany(p => p.GetPoints());
-            Contour = RectangleF.FromLTRB((float)points.Min(p => p.X), (float)points.Max(p => p.Y), (float)points.Max(p => p.X), (float)points.Min(p => p.Y));
+            base.Init(settings);
+            CreateContour();
+        }
+
+        public void CreateContour()
+        {
+            var points = ProcessingArea.AcadObjectIds.QOpenForRead<Curve>().SelectMany(p => p.GetPoints());
+            Contour = NoDraw.Rectang(new Point3d(points.Min(p => p.X), points.Min(p => p.Y), 0), new Point3d(points.Max(p => p.X), points.Max(p => p.Y), 0));
         }
 
         public void CalcType(ObjectId[] ids)
@@ -53,6 +57,7 @@ namespace CAM.Tactile
                 Acad.Alert("Выберите 2 элемента");
                 return;
             }
+            var contourPoints = Contour.GetPolyPoints().ToArray();
             var curves = ids.QOpenForRead<Curve>();
             var circles = curves.OfType<Circle>().ToArray();
             if (circles.Any())
@@ -68,17 +73,17 @@ namespace CAM.Tactile
                 if (vector.IsParallelTo(Vector3d.XAxis) || vector.IsPerpendicularTo(Vector3d.XAxis))
                 {
                     Type = "Конусы прямые";
-                    BandStart1 = (center.Y + radius - Contour.Bottom).Round(3);
-                    BandStart2 = (center.X + radius - Contour.Left).Round(3);
+                    BandStart1 = (center.Y + radius - contourPoints[0].Y).Round(3);
+                    BandStart2 = (center.X + radius - contourPoints[0].X).Round(3);
                 }
                 else
                 {
                     Type = "Конусы диагональные";
                     var ray = new Ray { BasePoint = center };
                     ray.UnitDir = Vector3d.XAxis.RotateBy(Math.PI * 3 / 4, Vector3d.ZAxis);
-                    BandStart1 = (ray.GetDistToPoint(new Point3d(Contour.Left, Contour.Bottom, 0), true) + radius).Round(3);
+                    BandStart1 = (ray.GetDistToPoint(contourPoints[0], true) + radius).Round(3);
                     ray.UnitDir = Vector3d.XAxis.RotateBy(Math.PI / 4, Vector3d.ZAxis);
-                    BandStart2 = (ray.GetDistToPoint(new Point3d(Contour.Right, Contour.Bottom, 0), true) % vector.Length + radius).Round(3);
+                    BandStart2 = (ray.GetDistToPoint(contourPoints[3], true) % vector.Length + radius).Round(3);
                 }
                 return;
             }
@@ -89,8 +94,8 @@ namespace CAM.Tactile
                 BandSpacing = lines.First().Length;
                 var points = lines.SelectMany(p => Graph.GetPoints(p));
                 var point1 = new Point3d(points.Min(p => p.X), points.Min(p => p.Y), 0);
-                BandStart1 = point1.Y + BandSpacing - Contour.Bottom;
-                BandStart2 = point1.X + BandSpacing - Contour.Left;
+                BandStart1 = point1.Y + BandSpacing - contourPoints[0].Y;
+                BandStart2 = point1.X + BandSpacing - contourPoints[0].X;
                 var point2 = new Point3d(points.Max(p => p.X), points.Max(p => p.Y), 0);
                 var vector = point2 - point1;
                 BandWidth = (vector.X > vector.Y ? point2.X - point1.X : point2.Y - point1.Y) - BandSpacing * 2;
@@ -111,7 +116,7 @@ namespace CAM.Tactile
                 if (angle.HasValue)
                 {
                     Type = $"Полосы {angle}";
-                    var point = angle == 45 ? new Point3d(Contour.Right, Contour.Bottom, 0) : new Point3d(Contour.Left, Contour.Bottom, 0);
+                    var point = angle == 45 ? contourPoints[3] : contourPoints[0];
                     var dist = lines.Select(p => p.GetDistToPoint(point)).OrderBy(p => p).ToArray();
                     var s1 = dist[1] - dist[0];
                     var s2 = dist[2] - dist[1];
@@ -127,6 +132,11 @@ namespace CAM.Tactile
         public override List<ITechOperation> CreateTechOperations()
         {
             List<ITechOperation> techOperations = new List<ITechOperation>();
+            if (Contour == null)
+            {
+                Acad.Alert("Не указан контур плитки");
+                return techOperations;
+            }
             if (Type == null)
             {
                 Acad.Alert("Не определен тип плитки");
@@ -136,11 +146,11 @@ namespace CAM.Tactile
             {
                 var angle1 = Type.Contains("прямые") ? 0 : 135;
                 var angle2 = Type.Contains("прямые") ? 90 : 45;
-                techOperations.Add(new BandsTechOperation(this, "Конусы1") { ProcessingAngle = angle1 });
-                techOperations.Add(new BandsTechOperation(this, "Конусы2") { ProcessingAngle = angle2 });
-                techOperations.Add(new ChamfersTechOperation(this, "Фаска3") { ProcessingAngle = angle1 });
-                techOperations.Add(new ChamfersTechOperation(this, "Фаска4") { ProcessingAngle = angle2 });
-                techOperations.Add(new ConesTechOperation(this, "Конусы5") { ProcessingAngle = angle1 });
+                techOperations.Add(new BandsTechOperation(this, "Полосы") { ProcessingAngle = angle1 });
+                techOperations.Add(new BandsTechOperation(this, "Полосы") { ProcessingAngle = angle2 });
+                techOperations.Add(new ChamfersTechOperation(this, "Фаска") { ProcessingAngle = angle1 });
+                techOperations.Add(new ChamfersTechOperation(this, "Фаска") { ProcessingAngle = angle2 });
+                techOperations.Add(new ConesTechOperation(this, "Конусы") { ProcessingAngle = angle1 });
             }
             return techOperations;
         }
