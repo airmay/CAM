@@ -1,5 +1,6 @@
 ﻿using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
+using Dreambuild.AutoCAD;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,7 +13,7 @@ namespace CAM.Tactile
     {
         public int ProcessingAngle { get; set; }
 
-        public int Feed { get; set; }
+        public int CuttingFeed { get; set; }
 
         public int FeedFinishing { get; set; }
 
@@ -28,24 +29,22 @@ namespace CAM.Tactile
 
         public List<Pass> PassList { get; set; }
 
-        public BandsTechOperation(TactileTechProcess techProcess, string caption) : base(techProcess, caption)
+        public BandsTechOperation(TactileTechProcess techProcess, string caption) : this(techProcess, caption, null, null) { }
+
+        public BandsTechOperation(TactileTechProcess techProcess, string caption, int? processingAngle, double? bandStart) : base(techProcess, caption)
         {
             BandWidth = techProcess.BandWidth.Value;
             BandSpacing = techProcess.BandSpacing.Value;
-            BandStart = techProcess.BandStart1.Value;
+            BandStart = bandStart ?? techProcess.BandStart1.Value;
+            ProcessingAngle = processingAngle ?? techProcess.ProcessingAngle1.Value;
             Depth = techProcess.TactileTechProcessParams.Depth;
-            Feed = techProcess.TactileTechProcessParams.CuttingFeed;
+            CuttingFeed = techProcess.TactileTechProcessParams.CuttingFeed;
             FeedFinishing = techProcess.TactileTechProcessParams.FinishingFeed;
             MaxCrestWidth = (TechProcess.Tool?.Thickness).GetValueOrDefault();
         }
 
         public void CalcPassList()
         {
-            if (TechProcess.Tool == null)
-            {
-                Acad.Alert("Не указан инструмент");
-                return;
-            }
             if (TechProcess.Tool.Thickness == null)
             {
                 Acad.Alert("Не указана толщина инструмента");
@@ -59,11 +58,12 @@ namespace CAM.Tactile
             var count = Math.Ceiling(periodAll / periodWidth);
             periodWidth = periodAll / count;
             var x = (toolThickness - (periodWidth - toolThickness)) / 2;
-            PassList = new List<Pass> { new Pass(toolThickness, CuttingType.Roughing) };
+            var shift = TechProcess.MachineType == MachineType.ScemaLogic ^ ProcessingAngle < 90? toolThickness : 0;
+            PassList = new List<Pass> { new Pass(shift, CuttingType.Roughing) };
             for (int i = 1; i <= count; i++)
             {
-                PassList.Add(new Pass(i * periodWidth + toolThickness, CuttingType.Roughing));
-                PassList.Add(new Pass(i * periodWidth + x, CuttingType.Finishing));
+                PassList.Add(new Pass(i * periodWidth + shift, CuttingType.Roughing));
+                PassList.Add(new Pass(i * periodWidth + x + shift - toolThickness, CuttingType.Finishing));
             }
         }
 
@@ -71,17 +71,18 @@ namespace CAM.Tactile
         {
             if (PassList?.Any() != true)
                 CalcPassList();
-            var baseCurve = TechProcess.ProcessingArea.Curves.OrderBy(p => p.StartPoint.Y + p.EndPoint.Y).First();
-            var basePoint = baseCurve.StartPoint.X < baseCurve.EndPoint.X ^ ProcessingAngle < 90 ? baseCurve.StartPoint : baseCurve.EndPoint;
+            var tactileTechProcess = (TactileTechProcess)TechProcess;
+            var contour = tactileTechProcess.GetContour();
+            var contourPoints = contour.GetPolyPoints().ToArray();
+            var basePoint = ProcessingAngle == 45 ? contourPoints[3] : contourPoints[0];
             var ray = new Ray
             {
                 BasePoint = basePoint,
                 UnitDir = Vector3d.XAxis.RotateBy(Graph.ToRad(ProcessingAngle - (ProcessingAngle < 90 ? 0 : 180)), Vector3d.ZAxis)
             };
             var passDir = ray.UnitDir.GetPerpendicularVector();
-            var points = new List<Point3d>();
+            var diag = (contourPoints[2] - contourPoints[0]).Length;
             double offset = BandStart - BandSpacing - BandWidth;
-            var TactileTechProcessParams = ((TactileTechProcess)TechProcess).TactileTechProcessParams;
 
             builder.StartTechOperation();
             do
@@ -89,25 +90,19 @@ namespace CAM.Tactile
                 foreach (var pass in PassList)
                 {
                     ray.BasePoint = basePoint + passDir * (offset + pass.Pos);
-                    points.Clear();
-                    foreach (var curve in TechProcess.ProcessingArea.Curves)
-                    {
-                        var intersectPoints = new Point3dCollection();
-                        ray.IntersectWith(curve, Intersect.ExtendThis, intersectPoints, 0, 0);
-                        if (intersectPoints.Count == 1)
-                            points.Add(intersectPoints[0]);
-                    }
+                    var points = new Point3dCollection();
+                    ray.IntersectWith(contour, Intersect.ExtendThis, new Plane(), points, IntPtr.Zero, IntPtr.Zero);
                     if (points.Count == 2 && points[0] != points[1])
                     {
-                        var vector = (points[1] - points[0]).GetNormal() * TactileTechProcessParams.Departure;
+                        var vector = (points[1] - points[0]).GetNormal() * tactileTechProcess.TactileTechProcessParams.Departure;
                         var startPoint = points[0] - vector - Vector3d.ZAxis * Depth;
                         var endPoint = points[1] + vector - Vector3d.ZAxis * Depth;
-                        builder.Cutting(startPoint, endPoint, pass.CuttingType == CuttingType .Roughing ? Feed : FeedFinishing, TactileTechProcessParams.TransitionFeed);
+                        builder.Cutting(startPoint, endPoint, pass.CuttingType == CuttingType.Roughing ? CuttingFeed : FeedFinishing, tactileTechProcess.TactileTechProcessParams.TransitionFeed);
                     }
                 }
                 offset += BandWidth + BandSpacing;
             }
-            while ((points.Count != 0 || offset < BandWidth + BandSpacing) && offset < 10000);
+            while (offset < diag);
 
             ProcessCommands = builder.FinishTechOperation();
         }

@@ -14,7 +14,7 @@ namespace CAM.Tactile
 
         public Pass(double pos, string cuttingType)
         {
-            Pos = pos;
+            Pos = pos.Round(3);
             CuttingType = cuttingType;
         }
     }

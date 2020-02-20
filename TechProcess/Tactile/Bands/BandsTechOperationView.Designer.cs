@@ -51,8 +51,8 @@
             this.bUp = new System.Windows.Forms.Button();
             this.bDown = new System.Windows.Forms.Button();
             this.bandsTechOperationBindingSource = new System.Windows.Forms.BindingSource(this.components);
-            this.posDataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.CuttingType = new System.Windows.Forms.DataGridViewComboBoxColumn();
+            this.posDataGridViewTextBoxColumn1 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.cuttingTypeDataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewComboBoxColumn();
             ((System.ComponentModel.ISupportInitialize)(this.gvPassList)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.passListBindingSource)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.bandsTechOperationBindingSource)).BeginInit();
@@ -62,7 +62,7 @@
             // 
             this.tbFeed.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.tbFeed.DataBindings.Add(new System.Windows.Forms.Binding("Text", this.bandsTechOperationBindingSource, "Feed", true));
+            this.tbFeed.DataBindings.Add(new System.Windows.Forms.Binding("Text", this.bandsTechOperationBindingSource, "CuttingFeed", true));
             this.tbFeed.Location = new System.Drawing.Point(102, 26);
             this.tbFeed.Name = "tbFeed";
             this.tbFeed.Size = new System.Drawing.Size(152, 20);
@@ -192,9 +192,10 @@
             this.gvPassList.BackgroundColor = System.Drawing.SystemColors.Window;
             this.gvPassList.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.gvPassList.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.DisableResizing;
+            this.gvPassList.ColumnHeadersVisible = false;
             this.gvPassList.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
-            this.posDataGridViewTextBoxColumn,
-            this.CuttingType});
+            this.posDataGridViewTextBoxColumn1,
+            this.cuttingTypeDataGridViewTextBoxColumn});
             this.gvPassList.DataSource = this.passListBindingSource;
             this.gvPassList.Location = new System.Drawing.Point(0, 249);
             this.gvPassList.MultiSelect = false;
@@ -273,21 +274,22 @@
             // 
             this.bandsTechOperationBindingSource.DataSource = typeof(CAM.Tactile.BandsTechOperation);
             // 
-            // posDataGridViewTextBoxColumn
+            // posDataGridViewTextBoxColumn1
             // 
-            this.posDataGridViewTextBoxColumn.DataPropertyName = "Pos";
-            this.posDataGridViewTextBoxColumn.HeaderText = "Позиция";
-            this.posDataGridViewTextBoxColumn.Name = "posDataGridViewTextBoxColumn";
+            this.posDataGridViewTextBoxColumn1.DataPropertyName = "Pos";
+            this.posDataGridViewTextBoxColumn1.HeaderText = "Pos";
+            this.posDataGridViewTextBoxColumn1.Name = "posDataGridViewTextBoxColumn1";
             // 
-            // CuttingType
+            // cuttingTypeDataGridViewTextBoxColumn
             // 
-            this.CuttingType.DataPropertyName = "CuttingType";
-            this.CuttingType.DisplayStyleForCurrentCellOnly = true;
-            this.CuttingType.HeaderText = "Тип";
-            this.CuttingType.Items.AddRange(new object[] {
+            this.cuttingTypeDataGridViewTextBoxColumn.DataPropertyName = "CuttingType";
+            this.cuttingTypeDataGridViewTextBoxColumn.DisplayStyleForCurrentCellOnly = true;
+            this.cuttingTypeDataGridViewTextBoxColumn.HeaderText = "CuttingType";
+            this.cuttingTypeDataGridViewTextBoxColumn.Items.AddRange(new object[] {
             "Гребенка",
             "Чистка"});
-            this.CuttingType.Name = "CuttingType";
+            this.cuttingTypeDataGridViewTextBoxColumn.Name = "cuttingTypeDataGridViewTextBoxColumn";
+            this.cuttingTypeDataGridViewTextBoxColumn.Resizable = System.Windows.Forms.DataGridViewTriState.True;
             // 
             // BandsTechOperationView
             // 
@@ -347,7 +349,7 @@
         private System.Windows.Forms.Label label7;
         private System.Windows.Forms.Button bUp;
         private System.Windows.Forms.Button bDown;
-        private System.Windows.Forms.DataGridViewTextBoxColumn posDataGridViewTextBoxColumn;
-        private System.Windows.Forms.DataGridViewComboBoxColumn CuttingType;
+        private System.Windows.Forms.DataGridViewTextBoxColumn posDataGridViewTextBoxColumn1;
+        private System.Windows.Forms.DataGridViewComboBoxColumn cuttingTypeDataGridViewTextBoxColumn;
     }
 }

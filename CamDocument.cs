@@ -55,9 +55,12 @@ namespace CAM
         public void SelectProcessCommand(ITechProcess techProcess, ProcessCommand processCommand)
         {
             Acad.SelectCurve(processCommand.ToolpathCurve);
-            if (techProcess.ToolModel == null && processCommand.EndPoint != null)
-                techProcess.ToolModel = Acad.CreateToolModel(techProcess.Tool.Diameter, techProcess.Tool.Thickness.Value);
-            Acad.DrawToolModel(techProcess.ToolModel, processCommand.EndPoint, processCommand.ToolAngle);
+            if (processCommand.EndPoint != null)
+            {
+                if (techProcess.ToolModel == null)
+                    techProcess.ToolModel = Acad.CreateToolModel(techProcess.Tool.Diameter, techProcess.Tool.Thickness.Value);
+                Acad.DrawToolModel(techProcess.ToolModel, processCommand.EndPoint.Value, processCommand.ToolAngle.Value);
+            }
         }
        
         public void BuildProcessing(ITechProcess techProcess, BorderProcessingArea startBorder = null)

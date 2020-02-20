@@ -76,8 +76,8 @@ namespace CAM
             CreateCommand("M300");
             //G17 плоскость
 
-            CreateCommand($"G0 X{Round(point.X)} Y{Round(point.Y)} C{angle}", endPoint: point, toolAngle: angle);
-            CreateCommand($"G0 Z{Round(point.Z)}", endPoint: point, toolAngle: angle);
+            CreateGCommand(CommandNames.InitialMove, 0, "XYC", point, angle);
+            CreateGCommand(CommandNames.InitialMove, 0, "Z", point, angle);
 
             //CreateCommand($"G1 A0 F{feed}");
             //CreateCommand($"G1 Z{Round(point.Z)} F{feed}");
@@ -97,14 +97,16 @@ namespace CAM
         /// <param name="angle"></param>
         public void Fast(Line line, double angleC, double angleA = 0)
         {
-            CreateCommand(CommandNames.Fast, 0, toolpathCurve: line, endPoint: line.EndPoint, toolAngle: angleC);
+            CreateGCommand(CommandNames.Fast, 0, "XYZC", line.EndPoint, angleC, line);
+            //CreateCommand($"G0 Z{Round(line.EndPoint.Z)}", endPoint: line.EndPoint, toolAngle: angleC);
+            //CreateCommand(CommandNames.Fast, 0, toolpathCurve: line, endPoint: line.EndPoint, toolAngle: angleC);
         }
 
         /// <summary>
         /// Поднятие
         /// </summary>
         /// <param name="line"></param>
-        public void Uplifting(Line line, double angle) => CreateCommand(CommandNames.Uplifting, 0, toolpathCurve: line, endPoint: line.EndPoint, toolAngle: angle);
+        public void Uplifting(Line line, double angle) => CreateGCommand(CommandNames.Uplifting, 0, "XYZC", line.EndPoint, angle, line);
 
         /// <summary>
         /// Рез
@@ -114,11 +116,11 @@ namespace CAM
             switch (curve)
             {
                 case Line _:
-                    CreateCommand(name, 1, feed: feed, toolpathCurve: curve, endPoint: point, toolAngle: angle);
+                    CreateGCommand(name, 1, "XYZCF", point, angle, curve, feed);
                     break;
                 case Arc arc:
                     var code = point == curve.StartPoint ? 2 : 3;
-                    CreateCommand(name, code, feed: feed, toolpathCurve: curve, endPoint: point, toolAngle: angle);
+                    CreateGCommand(name, code, "XYZCF", point, angle, curve, feed);
                     break;
                 default:
                     throw new Exception($"Неподдерживаемый тип кривой {curve.GetType()}");
@@ -143,26 +145,65 @@ namespace CAM
         //        ToolAngle = toolAngle
         //    });
 
-        private void CreateCommand(string text, Curve toolpathCurve = null, Point3d? endPoint = null, double? toolAngle = null) => Commands.Add(new ProcessCommand
-        {
-            Text = text,
-            ToolpathCurve = toolpathCurve,
-            EndPoint = endPoint,
-            ToolAngle = toolAngle
-        });
-
-        private void CreateCommand(string name, int gCode, int? feed = null, Curve toolpathCurve = null, Point3d? endPoint = null, double? toolAngle = null) => Commands.Add(new ProcessCommand
+        private void CreateCommand(string text, string name = null) => Commands.Add(new ProcessCommand
         {
             Name = name,
-            Text = $"G{gCode}{Format('X', endPoint?.X)}{Format('Y', endPoint?.Y)}{Format('Z', endPoint?.Z)}{Format('F', feed)}",
-            ToolpathCurve = toolpathCurve,
-            EndPoint = endPoint,
-            ToolAngle = toolAngle
+            Text = text
         });
 
-        private static string Format(char label, double? value) => value.HasValue ? $" {label}{Math.Round(value.Value, 4)}" : String.Empty;
+        private CommandParams _commandParams = new CommandParams();
 
-        private static double Round(double value) => Math.Round(value, 4);
+        private void CreateGCommand(string name, int gCode, string @params, Point3d point, double angleC, Curve curve = null, double feed = double.NaN) => Commands.Add(new ProcessCommand
+        {
+            Name = name,
+            Text = _commandParams.GetParams(gCode, @params, point, angleC, feed),
+            ToolpathCurve = curve,
+            EndPoint = point,
+            ToolAngle = angleC
+        });
 
+        //private string Format(string @params, string label, double value, ref double oldValue)
+        //{
+        //    var text = @params.Contains(label) && value != oldValue ? $" {label}{value.Round(4)}" : "";
+        //    oldValue = value;
+        //    return text;
+        //}
+
+        //private void CreateCommand(string name, int gCode, int? feed = null, Curve toolpathCurve = null, Point3d? endPoint = null, double? toolAngle = null) => Commands.Add(new ProcessCommand
+        //{
+        //    Name = name,
+        //    Text = $"G{gCode}{Format('X', endPoint?.X)}{Format('Y', endPoint?.Y)}{Format('Z', endPoint?.Z)}{Format('F', feed)}",
+        //    ToolpathCurve = toolpathCurve,
+        //    EndPoint = endPoint,
+        //    ToolAngle = toolAngle
+        //});
+
+        //private static string Format(char label, double? value) => value.HasValue ? $" {label}{Math.Round(value.Value, 4)}" : String.Empty;
+
+        //private static double Round(double value) => Math.Round(value, 4);
+
+        class CommandParams
+        {
+            int _g;
+            double _x = double.NaN, _y = double.NaN, _z = double.NaN, _c = double.NaN, _f = double.NaN;
+
+            public string GetParams(int gCode, string @params, Point3d point, double angleC, double feed)
+            {
+                var reset = gCode != _g;
+                _g = gCode;
+
+                return $"G{gCode}{Format("X", point.X, ref _x)}{Format("Y", point.Y, ref _y)}{Format("Z", point.Z, ref _z)}{Format("C", angleC, ref _c)}{Format("F", feed, ref _f)}";
+                
+                string Format(string label, double value, ref double oldValue)
+                {
+                    if (@params.Contains(label) && (value != oldValue || reset))
+                    {
+                        oldValue = value;
+                        return $" {label}{value.Round(4)}";
+                    }
+                    return null;
+                }
+            }
+        }
     }
 }

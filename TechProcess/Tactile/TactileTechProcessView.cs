@@ -56,7 +56,6 @@ namespace CAM.Tactile
             if (ids.Length == 0)
                 return;
             _tactileTechProcess.ProcessingArea = new ProcessingArea(ids);
-            _tactileTechProcess.CreateContour();
             tbContour.Text = _tactileTechProcess.ProcessingArea.AcadObjectIds.GetDesc();
             Acad.SelectObjectIds(ids);
             SetParamsEnabled();
@@ -76,6 +75,11 @@ namespace CAM.Tactile
 
         private void bObjects_Click(object sender, EventArgs e)
         {
+            if (_tactileTechProcess.ProcessingArea == null)
+            {
+                Acad.Alert("Укажите контур плитки");
+                return;
+            }
             Interaction.SetActiveDocFocus();
             var ids = Interaction.GetSelection("\nВыберите 2 элемента плитки");
             if (ids.Length > 0)
@@ -89,7 +93,7 @@ namespace CAM.Tactile
 
         private void SetParamsEnabled()
         {
-            var enabled = _tactileTechProcess.Contour != null &&  _tactileTechProcess.Type != null;
+            var enabled = _tactileTechProcess.ProcessingArea != null &&  _tactileTechProcess.Type != null;
             tbBandWidth.Enabled = enabled;
             tbBandSpacing.Enabled = enabled;
             tbBandStart1.Enabled = enabled;

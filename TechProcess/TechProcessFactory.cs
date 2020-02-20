@@ -26,9 +26,12 @@ namespace CAM
 
         public ITechProcess CreateTechProcess(string techProcessCaption) => Activator.CreateInstance(_techProcessTypes[techProcessCaption], new object[] { techProcessCaption, _settings }) as ITechProcess;
 
-        public List<ITechOperation> CreateTechOperations(ITechProcess techProcess, string techOperationName) => techOperationName == "Все операции"
-                ? techProcess.CreateTechOperations()
-                : new List<ITechOperation> { Activator.CreateInstance(_techOperationTypes[techProcess.GetType()][techOperationName], new object[] { techProcess, techOperationName }) as ITechOperation };
+        public List<ITechOperation> CreateTechOperations(ITechProcess techProcess, string techOperationName) => 
+            !techProcess.Validate() 
+                ? new List<ITechOperation>()
+                : techOperationName == "Все операции"
+                    ? techProcess.CreateTechOperations()
+                    : new List<ITechOperation> { Activator.CreateInstance(_techOperationTypes[techProcess.GetType()][techOperationName], new object[] { techProcess, techOperationName }) as ITechOperation };
 
         public IEnumerable<string> GetTechProcessNames() => _techProcessTypes.Keys;
 

@@ -27,5 +27,7 @@ namespace CAM
         bool TechOperationMoveUp(ITechOperation techOperation);
 
         List<ITechOperation> CreateTechOperations();
+
+        bool Validate();
     }
 }

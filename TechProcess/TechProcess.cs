@@ -78,8 +78,10 @@ namespace CAM
 
         public virtual void BuildProcessing() //BorderProcessingArea startBorder = null)
         {
+            if (!Validate())
+                return;
             DeleteProcessCommands();
-            ProcessingArea.Refresh();
+            ProcessingArea?.Refresh();
             //BorderProcessingArea.ProcessBorders(TechOperations.Select(p => p.ProcessingArea).OfType<BorderProcessingArea>().ToList(), startBorder);
             var builder = new ScemaLogicProcessBuilder(MachineType, Caption, Tool.Number, Frequency, MachineSettings.ZSafety);
             TechOperations.ForEach(p => p.BuildProcessing(builder));
@@ -87,5 +89,15 @@ namespace CAM
         }
 
         public virtual List<ITechOperation> CreateTechOperations() => new List<ITechOperation>();
+
+        public virtual bool Validate()
+        {
+            if (Tool == null)
+            {
+                Acad.Alert("Не указан инструмент");
+                return false;
+            }
+            return true;
+        }
     }
 }

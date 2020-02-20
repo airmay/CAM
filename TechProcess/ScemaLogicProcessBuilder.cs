@@ -69,10 +69,8 @@ namespace CAM
         {
             var destPoint = new Point3d(point.X, point.Y, ZSafety);
             if (_currentPoint.IsNull())
-                //_generator.InitialMove(destPoint, angle, Frequency);
                 _generator.InitialMove(destPoint, angle, Frequency);
             else
-                //_generator.Fast(LineTo(destPoint), angle);
                 _generator.Fast(LineTo(destPoint), angle);
             _currentPoint = destPoint;
             _currentAngle = angle;
@@ -109,13 +107,13 @@ namespace CAM
                     _startCorner = null;
                 }
                 else if (!_currentPoint.IsNull())
-                    point = (curve.StartPoint - _currentPoint).Length <= (curve.EndPoint - _currentPoint).Length ? curve.StartPoint : curve.EndPoint;
+                    point = curve.GetClosestPoint(_currentPoint);
 
                 Move(point, CalcToolAngle(curve, point));
             }
             else
             {
-                point = (curve.StartPoint - _currentPoint).Length <= (curve.EndPoint - _currentPoint).Length ? curve.StartPoint : curve.EndPoint;
+                point = curve.GetClosestPoint(_currentPoint);
                 _currentAngle = CalcToolAngle(curve, point);
             }
             CuttingCommand(point.Z !=_currentPoint.Z ? CommandNames.Penetration : CommandNames.Transition, point, transitionFeed);

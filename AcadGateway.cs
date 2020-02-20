@@ -82,19 +82,17 @@ namespace CAM
         }
 
         #region ToolModel
-        public static void DrawToolModel(ToolModel toolModel, Point3d? endPoint, double? toolAngle)
+        public static void DrawToolModel(ToolModel toolModel, Point3d endPoint, double toolAngle)
         {
-            if (endPoint == null)
-                return;
-            var mat = Matrix3d.Displacement(toolModel.Origin.GetVectorTo(endPoint.Value)) * Matrix3d.Rotation(Graph.ToRad(toolModel.Angle - toolAngle.Value), Vector3d.ZAxis, toolModel.Origin);
+            var mat = Matrix3d.Displacement(toolModel.Origin.GetVectorTo(endPoint)) * Matrix3d.Rotation(Graph.ToRad(toolModel.Angle - toolAngle), Vector3d.ZAxis, toolModel.Origin);
             foreach (var item in toolModel.GetCurves())
             {
                 item.Visible = true;
                 item.TransformBy(mat);
                 TransientManager.CurrentTransientManager.UpdateTransient(item, new IntegerCollection());
             }
-            toolModel.Origin = endPoint.Value;
-            toolModel.Angle = toolAngle.Value;
+            toolModel.Origin = endPoint;
+            toolModel.Angle = toolAngle;
             Editor.UpdateScreen();
         }
 

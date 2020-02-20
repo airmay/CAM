@@ -19,6 +19,8 @@ namespace CAM
             return $"{(count > 1 ? "Объекты" : objects[0] is Line ? "Отрезок" : objects[0] is Arc ? "Дуга" : "Объекты")} ({objects.Length})";
         }
 
+        public static Point3d GetClosestPoint(this Curve curve, Point3d point) => (curve.StartPoint - point).Length <= (curve.EndPoint - point).Length ? curve.StartPoint : curve.EndPoint;
+
         internal static double ToRad(double angle) => angle * Math.PI / 180;
 
         internal static double ToDeg(double angle) => angle * 180 / Math.PI;
