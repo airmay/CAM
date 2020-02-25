@@ -12,11 +12,20 @@ namespace CAM
     /// </summary>
     public static class Graph
     {
-        public static string GetDesc(this ObjectId[] ids)
+        public static string GetDesc(this ObjectId[] ids) => ids.QOpenForRead<Curve>().GetDesc();
+
+        public static string GetDesc(this Curve[] curves) => string.Join(",", curves.GroupBy(p => p.GetName(), (k, c) => $"{k}({c.Count()})"));
+
+        public static string GetName(this Curve curve)
         {
-            var objects = ids.QOpenForRead();
-            var count = objects.Select(p => p.GetType()).Distinct().Count();
-            return $"{(count > 1 ? "Объекты" : objects[0] is Line ? "Отрезок" : objects[0] is Arc ? "Дуга" : "Объекты")} ({objects.Length})";
+            switch (curve)
+            {
+                case Line _: return "Отрезок";
+                case Arc _: return "Дуга";
+                case Circle _: return "Круг";
+                case Polyline _: return "Полилиния";
+                default: return "Объект";
+            }
         }
 
         public static Point3d GetClosestPoint(this Curve curve, Point3d point) => (curve.StartPoint - point).Length <= (curve.EndPoint - point).Length ? curve.StartPoint : curve.EndPoint;
@@ -43,7 +52,7 @@ namespace CAM
                 ? tangent.Y > 0
                 : tangent.X > 0;
         }
-        public static IEnumerable<Point3d> GetPoints(this Curve curve)
+        public static IEnumerable<Point3d> GetStartEndPoints(this Curve curve)
         {
             yield return curve.StartPoint;
             yield return curve.EndPoint;
@@ -54,7 +63,7 @@ namespace CAM
         public static Corner GetCorner(this Curve curve, Point3d point) =>
             point == curve.StartPoint ? Corner.Start : (point == curve.EndPoint ? Corner.End : throw new ArgumentException($"Ошибка GetCorner: Точка {point} не принадлежит кривой {curve}"));
 
-        public static bool HasPoint(this Curve curve, Point3d point) => point == curve.StartPoint || point == curve.EndPoint;
+        public static bool HasPoint(this Curve curve, Point3d point) => point.IsEqualTo(curve.StartPoint) || point.IsEqualTo(curve.EndPoint);
 
         public static Point3d NextPoint(this Curve curve, Point3d point) =>
             point == curve.StartPoint ? curve.EndPoint : (point == curve.EndPoint ? curve.StartPoint : throw new ArgumentException($"Ошибка NextPoint: Точка {point} не принадлежит кривой {curve}"));

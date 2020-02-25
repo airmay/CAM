@@ -32,7 +32,7 @@ namespace CAM
             var ids = Interaction.GetSelection("\nВыберите контур");
             if (ids.Length > 0)
             {
-                tbObjects.Text = $"Объекты ({ids.Length})";
+                tbObjects.Text = ids.GetDesc();
                 CreatePline(ids);
                 tbItemsCount.Text = _items.Count.ToString();
             }
@@ -53,7 +53,9 @@ namespace CAM
             var points = new List<Point3d>(ids.Length) { item.Point, point };
             while (point != item.Point)
             {
-                curve = curves.Single(p => p != curve && p.HasPoint(point));
+                curve = curves.FirstOrDefault(p => p != curve && p.HasPoint(point));
+                if (curve == null)
+                    throw new Exception($"Не найден соседний отрезок в точке {point.X},{point.Y}");
                 point = curve.NextPoint(point);
                 points.Add(point);
             }

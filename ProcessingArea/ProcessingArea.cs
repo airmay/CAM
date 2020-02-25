@@ -40,5 +40,7 @@ namespace CAM
                 AcadObjectIds = Array.ConvertAll(Handles, p => Acad.Database.GetObjectId(false, new Handle(p), 0));
             Curves = AcadObjectIds.QOpenForRead<Curve>();
         }
-	}
+
+        public override string ToString() => Curves?.GetDesc();
+    }
 }

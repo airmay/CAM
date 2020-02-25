@@ -15,5 +15,7 @@ namespace CAM
         IEnumerable<Curve> ToolpathCurves { get; }
 
         void BuildProcessing(ScemaLogicProcessBuilder builder);
+
+        void SetToolpathVisible(bool visible);
     }
 }

@@ -58,7 +58,7 @@ namespace CAM
 
         public static void ForEach(this IEnumerable<Curve> ids, Action<Curve> action)
         {
-            if (ids.Any())
+            if (ids?.Any() == true)
                 App.LockAndExecute(() => ids.Select(p => p.ObjectId).QForEach(action));
         }
 
@@ -82,17 +82,31 @@ namespace CAM
         }
 
         #region ToolModel
-        public static void DrawToolModel(ToolModel toolModel, Point3d endPoint, double toolAngle)
+        public static void DrawToolModel(ToolModel toolModel, ToolPosition toolPosition)
         {
-            var mat = Matrix3d.Displacement(toolModel.Origin.GetVectorTo(endPoint)) * Matrix3d.Rotation(Graph.ToRad(toolModel.Angle - toolAngle), Vector3d.ZAxis, toolModel.Origin);
+            //var mat = Matrix3d.Displacement(toolModel.Origin.GetVectorTo(toolPosition.Point)) * Matrix3d.Rotation(Graph.ToRad(toolModel.AngleC - toolPosition.AngleC), Vector3d.ZAxis, toolModel.Origin)
+            //     * Matrix3d.Rotation(Graph.ToRad(toolModel.AngleA - toolPosition.AngleA), Vector3d.XAxis.RotateBy(-toolPosition.AngleC, Vector3d.XAxis), toolModel.Origin);
+            var mat = Matrix3d.Displacement(toolModel.ToolPosition.Point.GetVectorTo(toolPosition.Point)) 
+                 * Matrix3d.Rotation(Graph.ToRad(toolModel.ToolPosition.AngleC - toolPosition.AngleC), Vector3d.ZAxis, toolPosition.Point)
+                 * Matrix3d.Rotation(Graph.ToRad(toolModel.ToolPosition.AngleA - toolPosition.AngleA), Vector3d.XAxis.RotateBy(Graph.ToRad(-toolPosition.AngleC), Vector3d.ZAxis), toolPosition.Point);
+
+            var mat1 = Matrix3d.Displacement(toolModel.ToolPosition.Point.GetVectorTo(toolPosition.Point));
+            var mat2 = Matrix3d.Rotation(Graph.ToRad(toolModel.ToolPosition.AngleC - toolPosition.AngleC), Vector3d.ZAxis, toolPosition.Point);
+            var mat3 = Matrix3d.Rotation(Graph.ToRad(toolModel.ToolPosition.AngleA - toolPosition.AngleA), Vector3d.XAxis.RotateBy(Graph.ToRad(-toolPosition.AngleC), Vector3d.ZAxis), toolPosition.Point);
+
             foreach (var item in toolModel.GetCurves())
             {
-                item.Visible = true;
                 item.TransformBy(mat);
+                //item.TransformBy(mat1);
+                //item.TransformBy(mat2);
+                //item.TransformBy(mat3);
                 TransientManager.CurrentTransientManager.UpdateTransient(item, new IntegerCollection());
             }
-            toolModel.Origin = endPoint;
-            toolModel.Angle = toolAngle;
+            toolModel.ToolPosition = toolPosition;
+            //toolModel.Origin = toolPosition.Point;
+            //toolModel.AngleC = toolPosition.AngleC;
+            //toolModel.AngleA = toolPosition.AngleA;
+
             Editor.UpdateScreen();
         }
 
@@ -109,8 +123,9 @@ namespace CAM
                         Circle0 = new Circle(center, Vector3d.YAxis, diameter/2) { Color = color },
                         Circle1 = new Circle(center - Vector3d.YAxis * thickness, Vector3d.YAxis, diameter/2) { Color = color },
                         Axis = new Line(center, center + Vector3d.YAxis * diameter/4),
-                        Origin = Point3d.Origin,
-                        Angle = 0
+                        //Origin = Point3d.Origin,
+                        //AngleC = 0,
+                        //AngleA= 0
                     };
                     foreach (var item in toolModel.GetCurves())
                         TransientManager.CurrentTransientManager.AddTransient(item, TransientDrawingMode.Main, 128, new IntegerCollection());

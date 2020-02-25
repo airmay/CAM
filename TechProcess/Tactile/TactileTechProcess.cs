@@ -11,6 +11,8 @@ namespace CAM.Tactile
     [TechProcess(TechProcessNames.Tactile)]
     public class TactileTechProcess: TechProcessBase
     {
+        public ProcessingArea Objects { get; set; }
+
         public TactileTechProcessParams TactileTechProcessParams { get; }
 
         public double? BandWidth { get; set; }
@@ -32,10 +34,16 @@ namespace CAM.Tactile
             TactileTechProcessParams = settings.TactileTechProcessParams.Clone();
             Material = Material.Granite;
         }
-       
+
+        public override void Init(Settings settings)
+        {
+            base.Init(settings);
+            Objects.Refresh();
+        }
+
         public Polyline GetContour()
         {
-            var points = ProcessingArea.Curves.SelectMany(p => p.GetPoints());
+            var points = ProcessingArea.Curves.SelectMany(p => p.GetStartEndPoints());
             return NoDraw.Rectang(new Point3d(points.Min(p => p.X), points.Min(p => p.Y), 0), new Point3d(points.Max(p => p.X), points.Max(p => p.Y), 0));
         }
 
@@ -97,7 +105,7 @@ namespace CAM.Tactile
                 ProcessingAngle1 = 0;
                 ProcessingAngle2 = 90;
                 BandSpacing = lines.First().Length;
-                var points = lines.SelectMany(p => Graph.GetPoints(p));
+                var points = lines.SelectMany(p => Graph.GetStartEndPoints(p));
                 var point1 = new Point3d(points.Min(p => p.X), points.Min(p => p.Y), 0);
                 BandStart1 = point1.Y + BandSpacing - contourPoints[0].Y;
                 BandStart2 = point1.X + BandSpacing - contourPoints[0].X;
@@ -140,9 +148,14 @@ namespace CAM.Tactile
             {
                 techOperations.Add(new BandsTechOperation(this, "Полосы", ProcessingAngle1, BandStart1));
                 techOperations.Add(new BandsTechOperation(this, "Полосы", ProcessingAngle2, BandStart2));
-                techOperations.Add(new ChamfersTechOperation(this, "Фаска", ProcessingAngle1, BandStart1));
-                techOperations.Add(new ChamfersTechOperation(this, "Фаска", ProcessingAngle2, BandStart2));
+                techOperations.Add(new ChamfersTechOperation(this, "Фаска", 0));
+                techOperations.Add(new ChamfersTechOperation(this, "Фаска", 90));
                 techOperations.Add(new ConesTechOperation(this, "Конусы"));
+            }
+            if (Type.Contains("Полосы"))
+            {
+                techOperations.Add(new BandsTechOperation(this, "Полосы", ProcessingAngle1, BandStart1));
+                techOperations.Add(new ChamfersTechOperation(this, "Фаска", ProcessingAngle1.Value));
             }
             return techOperations;
         }

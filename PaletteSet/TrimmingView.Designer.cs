@@ -57,9 +57,9 @@
             // 
             this.tbItemsCount.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.tbItemsCount.Enabled = false;
             this.tbItemsCount.Location = new System.Drawing.Point(89, 40);
             this.tbItemsCount.Name = "tbItemsCount";
+            this.tbItemsCount.ReadOnly = true;
             this.tbItemsCount.Size = new System.Drawing.Size(119, 20);
             this.tbItemsCount.TabIndex = 49;
             this.tbItemsCount.Text = "0";
@@ -89,9 +89,9 @@
             // 
             this.tbObjects.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.tbObjects.Enabled = false;
             this.tbObjects.Location = new System.Drawing.Point(89, 17);
             this.tbObjects.Name = "tbObjects";
+            this.tbObjects.ReadOnly = true;
             this.tbObjects.Size = new System.Drawing.Size(119, 20);
             this.tbObjects.TabIndex = 46;
             // 

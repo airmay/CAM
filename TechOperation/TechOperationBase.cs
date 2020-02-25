@@ -54,6 +54,8 @@ namespace CAM
 
         public abstract void BuildProcessing(ScemaLogicProcessBuilder builder);
 
+        public void SetToolpathVisible(bool visible) => ToolpathCurves.ForEach(p => p.Visible = visible);
+
         public IEnumerable<Curve> ToolpathCurves => ProcessCommands?.Select(p => p.ToolpathCurve).Where(p => p != null);
     }
 }

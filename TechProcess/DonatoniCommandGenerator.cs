@@ -66,9 +66,9 @@ namespace CAM
         /// Первый подвод
         /// </summary>
         /// <param name="point"></param>
-        /// <param name="angle"></param>
+        /// <param name="angleC"></param>
         /// <param name="frequency"></param>
-        public void InitialMove(Point3d point, double angle, int frequency) //, int feed)
+        public void InitialMove(Point3d point, double angleC, double angleA, int frequency) //, int feed)
         {
             CreateCommand("T1");
             CreateCommand("M6");
@@ -76,8 +76,8 @@ namespace CAM
             CreateCommand("M300");
             //G17 плоскость
 
-            CreateGCommand(CommandNames.InitialMove, 0, "XYC", point, angle);
-            CreateGCommand(CommandNames.InitialMove, 0, "Z", point, angle);
+            CreateGCommand(CommandNames.InitialMove, 0, "XYCA", point, angleC, angleA: angleA);
+            CreateGCommand(CommandNames.InitialMove, 0, "Z", point, angleC, angleA: angleA);
 
             //CreateCommand($"G1 A0 F{feed}");
             //CreateCommand($"G1 Z{Round(point.Z)} F{feed}");
@@ -97,7 +97,7 @@ namespace CAM
         /// <param name="angle"></param>
         public void Fast(Line line, double angleC, double angleA = 0)
         {
-            CreateGCommand(CommandNames.Fast, 0, "XYZC", line.EndPoint, angleC, line);
+            CreateGCommand(CommandNames.Fast, 0, "XYZCA", line.EndPoint, angleC, line, angleA: angleA);
             //CreateCommand($"G0 Z{Round(line.EndPoint.Z)}", endPoint: line.EndPoint, toolAngle: angleC);
             //CreateCommand(CommandNames.Fast, 0, toolpathCurve: line, endPoint: line.EndPoint, toolAngle: angleC);
         }
@@ -148,62 +148,81 @@ namespace CAM
         private void CreateCommand(string text, string name = null) => Commands.Add(new ProcessCommand
         {
             Name = name,
-            Text = text
+            Text = text,
+            ToolPosition = _tool
         });
 
-        private CommandParams _commandParams = new CommandParams();
+        //private CommandParams _commandParams = new CommandParams();
 
-        private void CreateGCommand(string name, int gCode, string @params, Point3d point, double angleC, Curve curve = null, double feed = double.NaN) => Commands.Add(new ProcessCommand
+        private ToolPosition _tool = new ToolPosition();
+        private int _GCode;
+        private int _feed;
+
+        private void CreateGCommand(string name, int gCode, string @params, Point3d point, double? angleC = null, Curve curve = null, int? feed = null, double? angleA = null)
         {
-            Name = name,
-            Text = _commandParams.GetParams(gCode, @params, point, angleC, feed),
-            ToolpathCurve = curve,
-            EndPoint = point,
-            ToolAngle = angleC
-        });
+            var reset = _GCode != gCode;
+            var commandText = $"G{gCode}{Format("X", point.X, _tool.Point.X)}{Format("Y", point.Y, _tool.Point.Y)}{Format("Z", point.Z, _tool.Point.Z)}" +
+                $"{Format("C", angleC, _tool.AngleC)}{Format("A", angleA, _tool.AngleA)}{Format("F", feed, _feed)}";
+            _GCode = gCode;
+            _tool.Set(point, angleC, angleA);
+            _feed = feed ?? _feed;
 
-        //private string Format(string @params, string label, double value, ref double oldValue)
-        //{
-        //    var text = @params.Contains(label) && value != oldValue ? $" {label}{value.Round(4)}" : "";
-        //    oldValue = value;
-        //    return text;
-        //}
-
-        //private void CreateCommand(string name, int gCode, int? feed = null, Curve toolpathCurve = null, Point3d? endPoint = null, double? toolAngle = null) => Commands.Add(new ProcessCommand
-        //{
-        //    Name = name,
-        //    Text = $"G{gCode}{Format('X', endPoint?.X)}{Format('Y', endPoint?.Y)}{Format('Z', endPoint?.Z)}{Format('F', feed)}",
-        //    ToolpathCurve = toolpathCurve,
-        //    EndPoint = endPoint,
-        //    ToolAngle = toolAngle
-        //});
-
-        //private static string Format(char label, double? value) => value.HasValue ? $" {label}{Math.Round(value.Value, 4)}" : String.Empty;
-
-        //private static double Round(double value) => Math.Round(value, 4);
-
-        class CommandParams
-        {
-            int _g;
-            double _x = double.NaN, _y = double.NaN, _z = double.NaN, _c = double.NaN, _f = double.NaN;
-
-            public string GetParams(int gCode, string @params, Point3d point, double angleC, double feed)
+            Commands.Add(new ProcessCommand
             {
-                var reset = gCode != _g;
-                _g = gCode;
+                Name = name,
+                Text = commandText,
+                ToolpathCurve = curve,
+                ToolPosition = _tool
+            });
 
-                return $"G{gCode}{Format("X", point.X, ref _x)}{Format("Y", point.Y, ref _y)}{Format("Z", point.Z, ref _z)}{Format("C", angleC, ref _c)}{Format("F", feed, ref _f)}";
-                
-                string Format(string label, double value, ref double oldValue)
-                {
-                    if (@params.Contains(label) && (value != oldValue || reset))
-                    {
-                        oldValue = value;
-                        return $" {label}{value.Round(4)}";
-                    }
-                    return null;
-                }
-            }
+            string Format(string label, double? value, double oldValue) =>
+                 @params.Contains(label) && (value.GetValueOrDefault(oldValue) != oldValue || reset)
+                        ? $" {label}{value.GetValueOrDefault(oldValue).Round(4)}"
+                        : null;
         }
     }
+
+    //private string Format(string @params, string label, double value, ref double oldValue)
+    //{
+    //    var text = @params.Contains(label) && value != oldValue ? $" {label}{value.Round(4)}" : "";
+    //    oldValue = value;
+    //    return text;
+    //}
+
+    //private void CreateCommand(string name, int gCode, int? feed = null, Curve toolpathCurve = null, Point3d? endPoint = null, double? toolAngle = null) => Commands.Add(new ProcessCommand
+    //{
+    //    Name = name,
+    //    Text = $"G{gCode}{Format('X', endPoint?.X)}{Format('Y', endPoint?.Y)}{Format('Z', endPoint?.Z)}{Format('F', feed)}",
+    //    ToolpathCurve = toolpathCurve,
+    //    EndPoint = endPoint,
+    //    ToolAngle = toolAngle
+    //});
+
+    //private static string Format(char label, double? value) => value.HasValue ? $" {label}{Math.Round(value.Value, 4)}" : String.Empty;
+
+    //private static double Round(double value) => Math.Round(value, 4);
+
+    //class CommandParams
+    //{
+    //    int _g;
+    //    double _x = double.NaN, _y = double.NaN, _z = double.NaN, _c = double.NaN, _a = double.NaN, _f = double.NaN;
+
+    //    public string GetParams(int gCode, string @params, ToolPosition tool, double feed)
+    //    {
+    //        var reset = gCode != _g;
+    //        _g = gCode;
+
+    //        return $"G{gCode}{Format("X", tool.Point.X, ref _x)}{Format("Y", tool.Point.Y, ref _y)}{Format("Z", tool.Point.Z, ref _z)}{Format("C", tool.AngleC, ref _c)}{Format("A", tool.AngleA, ref _a)}{Format("F", feed, ref _f)}";
+
+    //        string Format(string label, double value, ref double oldValue)
+    //        {
+    //            if (@params.Contains(label) && (value != oldValue || reset))
+    //            {
+    //                oldValue = value;
+    //                return $" {label}{value.Round(4)}";
+    //            }
+    //            return null;
+    //        }
+    //    }
+    //}
 }

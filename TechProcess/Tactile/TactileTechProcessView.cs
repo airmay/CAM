@@ -32,7 +32,8 @@ namespace CAM.Tactile
             tactileTechProcessParamsBindingSource.DataSource = _tactileTechProcess.TactileTechProcessParams;
             tbTool.Text = _tactileTechProcess.Tool?.ToString();
             tbOrigin.Text = $"{_tactileTechProcess.OriginX},{_tactileTechProcess.OriginY}";
-            tbContour.Text = _tactileTechProcess.ProcessingArea?.AcadObjectIds.GetDesc();
+            tbContour.Text = _tactileTechProcess.ProcessingArea?.ToString();
+            tbObjects.Text = _tactileTechProcess.Objects?.ToString();
             SetParamsEnabled();
         }
 
@@ -56,7 +57,7 @@ namespace CAM.Tactile
             if (ids.Length == 0)
                 return;
             _tactileTechProcess.ProcessingArea = new ProcessingArea(ids);
-            tbContour.Text = _tactileTechProcess.ProcessingArea.AcadObjectIds.GetDesc();
+            tbContour.Text = _tactileTechProcess.ProcessingArea.ToString();
             Acad.SelectObjectIds(ids);
             SetParamsEnabled();
         }
@@ -85,7 +86,8 @@ namespace CAM.Tactile
             if (ids.Length > 0)
             {
                 _tactileTechProcess.CalcType(ids);
-                tbObjects.Text = ids.GetDesc();
+                _tactileTechProcess.Objects = new ProcessingArea(ids);
+                tbObjects.Text = _tactileTechProcess.Objects.ToString();
                 tactileTechProcessBindingSource.ResetBindings(false);
                 SetParamsEnabled();
             }
@@ -98,6 +100,16 @@ namespace CAM.Tactile
             tbBandSpacing.Enabled = enabled;
             tbBandStart1.Enabled = enabled;
             tbBandStart2.Enabled = enabled;
+        }
+
+        private void tbContour_Enter(object sender, EventArgs e)
+        {
+            Acad.SelectObjectIds(_tactileTechProcess.ProcessingArea.AcadObjectIds);
+        }
+
+        private void tbObjects_Enter(object sender, EventArgs e)
+        {
+            Acad.SelectObjectIds(_tactileTechProcess.Objects.AcadObjectIds);
         }
     }
 }

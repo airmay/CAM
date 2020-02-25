@@ -12,9 +12,13 @@ namespace CAM
 
         public Line Axis { get; set; }
 
-        public Point3d Origin { get; set; }
+        //public Point3d Origin { get; set; }
 
-        public double Angle { get; set; }
+        //public double AngleC { get; set; }
+
+        //public double AngleA { get; set; }
+
+        public ToolPosition ToolPosition { get; set; }
 
         public IEnumerable<Curve> GetCurves()
         {

@@ -78,9 +78,11 @@ namespace CAM.Tactile
             var ray = new Ray
             {
                 BasePoint = basePoint,
-                UnitDir = Vector3d.XAxis.RotateBy(Graph.ToRad(ProcessingAngle - (ProcessingAngle < 90 ? 0 : 180)), Vector3d.ZAxis)
+                UnitDir = Vector3d.XAxis.RotateBy(Graph.ToRad(ProcessingAngle), Vector3d.ZAxis)
             };
             var passDir = ray.UnitDir.GetPerpendicularVector();
+            if (ProcessingAngle >= 90)
+                passDir = passDir.Negate();
             var diag = (contourPoints[2] - contourPoints[0]).Length;
             double offset = BandStart - BandSpacing - BandWidth;
 

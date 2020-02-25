@@ -21,6 +21,7 @@ namespace CAM
             processCommandBindingSource.DataSource = null;
             SetButtonsEnabled();
 
+            bDeleteProcessing.Visible = false;
             bSwapOuterSide.Visible = false;
             bAttachDrawing.Visible = false;
 #if DEBUG
@@ -114,7 +115,10 @@ namespace CAM
                 _currentTechProcessType = CurrentTechProcess.GetType();
             }
             RefreshView();
-            _camDocument.SelectTechProcess(CurrentTechProcess);
+            if (treeView.SelectedNode.Tag is ITechProcess)
+                _camDocument.SelectTechProcess((ITechProcess)treeView.SelectedNode.Tag);
+            else
+                _camDocument.SelectTechOperation((ITechOperation)treeView.SelectedNode.Tag);
         }
 
         private void treeView_NodeMouseDoubleClick(object sender, TreeNodeMouseClickEventArgs e)

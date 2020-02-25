@@ -30,10 +30,10 @@
         {
             this.components = new System.ComponentModel.Container();
             this.tbFeed = new System.Windows.Forms.TextBox();
+            this.chamfersTechOperationBindingSource = new System.Windows.Forms.BindingSource(this.components);
             this.label11 = new System.Windows.Forms.Label();
             this.tbProcessingAngle = new System.Windows.Forms.TextBox();
             this.label5 = new System.Windows.Forms.Label();
-            this.chamfersTechOperationBindingSource = new System.Windows.Forms.BindingSource(this.components);
             ((System.ComponentModel.ISupportInitialize)(this.chamfersTechOperationBindingSource)).BeginInit();
             this.SuspendLayout();
             // 
@@ -41,11 +41,15 @@
             // 
             this.tbFeed.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.tbFeed.DataBindings.Add(new System.Windows.Forms.Binding("Text", this.chamfersTechOperationBindingSource, "Feed", true));
+            this.tbFeed.DataBindings.Add(new System.Windows.Forms.Binding("Text", this.chamfersTechOperationBindingSource, "CuttingFeed", true));
             this.tbFeed.Location = new System.Drawing.Point(102, 26);
             this.tbFeed.Name = "tbFeed";
             this.tbFeed.Size = new System.Drawing.Size(152, 20);
             this.tbFeed.TabIndex = 45;
+            // 
+            // chamfersTechOperationBindingSource
+            // 
+            this.chamfersTechOperationBindingSource.DataSource = typeof(CAM.Tactile.ChamfersTechOperation);
             // 
             // label11
             // 
@@ -74,10 +78,6 @@
             this.label5.Size = new System.Drawing.Size(73, 13);
             this.label5.TabIndex = 46;
             this.label5.Text = "Угол полосы";
-            // 
-            // chamfersTechOperationBindingSource
-            // 
-            this.chamfersTechOperationBindingSource.DataSource = typeof(CAM.Tactile.ChamfersTechOperation);
             // 
             // ChamfersTechOperationView
             // 

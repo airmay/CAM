@@ -231,10 +231,10 @@
             // 
             this.tbTool.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.tbTool.Enabled = false;
             this.tbTool.ForeColor = System.Drawing.SystemColors.WindowText;
             this.tbTool.Location = new System.Drawing.Point(102, 27);
             this.tbTool.Name = "tbTool";
+            this.tbTool.ReadOnly = true;
             this.tbTool.Size = new System.Drawing.Size(130, 20);
             this.tbTool.TabIndex = 2;
             // 
@@ -260,19 +260,20 @@
             // 
             this.tbContour.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.tbContour.Enabled = false;
             this.tbContour.Location = new System.Drawing.Point(102, 218);
             this.tbContour.Name = "tbContour";
+            this.tbContour.ReadOnly = true;
             this.tbContour.Size = new System.Drawing.Size(130, 20);
             this.tbContour.TabIndex = 21;
+            this.tbContour.Enter += new System.EventHandler(this.tbContour_Enter);
             // 
             // tbOrigin
             // 
             this.tbOrigin.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.tbOrigin.Enabled = false;
             this.tbOrigin.Location = new System.Drawing.Point(102, 180);
             this.tbOrigin.Name = "tbOrigin";
+            this.tbOrigin.ReadOnly = true;
             this.tbOrigin.Size = new System.Drawing.Size(130, 20);
             this.tbOrigin.TabIndex = 13;
             // 
@@ -357,11 +358,12 @@
             // 
             this.tbObjects.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.tbObjects.Enabled = false;
             this.tbObjects.Location = new System.Drawing.Point(102, 241);
             this.tbObjects.Name = "tbObjects";
+            this.tbObjects.ReadOnly = true;
             this.tbObjects.Size = new System.Drawing.Size(130, 20);
             this.tbObjects.TabIndex = 22;
+            this.tbObjects.Enter += new System.EventHandler(this.tbObjects_Enter);
             // 
             // label10
             // 

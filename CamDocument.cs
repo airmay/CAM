@@ -48,19 +48,32 @@ namespace CAM
             techOperation.TechProcess.TechOperations.Remove(techOperation);
         }
 
-        public void SelectTechProcess(ITechProcess techProcess) => Acad.SelectObjectIds(techProcess.ProcessingArea?.AcadObjectIds);
+        public void SelectTechProcess(ITechProcess techProcess)
+        {
+            techProcess.TechOperations.ForEach(p => p.SetToolpathVisible(false));
+            Acad.SelectObjectIds(techProcess.ProcessingArea?.AcadObjectIds);
+        }
 
-        public void SelectTechOperation(ITechOperation techOperation) {} // Acad.SelectObjectIds(techOperation.ProcessingArea.AcadObjectIds.ToArray());
+        public void SelectTechOperation(ITechOperation techOperation) // Acad.SelectObjectIds(techOperation.ProcessingArea.AcadObjectIds.ToArray());
+        {
+            techOperation.TechProcess.TechOperations.ForEach(p => p.SetToolpathVisible(p == techOperation));
+            Acad.Editor.UpdateScreen();
+        }
 
         public void SelectProcessCommand(ITechProcess techProcess, ProcessCommand processCommand)
         {
             Acad.SelectCurve(processCommand.ToolpathCurve);
-            if (processCommand.EndPoint != null)
-            {
+            //if (processCommand.ToolPosition != null)
+            //{
                 if (techProcess.ToolModel == null)
                     techProcess.ToolModel = Acad.CreateToolModel(techProcess.Tool.Diameter, techProcess.Tool.Thickness.Value);
-                Acad.DrawToolModel(techProcess.ToolModel, processCommand.EndPoint.Value, processCommand.ToolAngle.Value);
-            }
+                Acad.DrawToolModel(techProcess.ToolModel, processCommand.ToolPosition);
+            //}
+            //else if (techProcess.ToolModel != null)
+            //{
+            //    Acad.DeleteToolModel(techProcess.ToolModel);
+            //    techProcess.ToolModel = null;
+            //}
         }
        
         public void BuildProcessing(ITechProcess techProcess, BorderProcessingArea startBorder = null)
