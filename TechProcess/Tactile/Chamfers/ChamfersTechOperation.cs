@@ -10,15 +10,18 @@ namespace CAM.Tactile
     [TechOperation(TechProcessNames.Tactile, "Фаска")]
     public class ChamfersTechOperation : TechOperationBase
     {
+        public double BandStart { get; set; }
+
         public int ProcessingAngle { get; set; }
 
         public int CuttingFeed { get; set; }
 
-        public ChamfersTechOperation(TactileTechProcess techProcess, string caption) : this(techProcess, caption, 0) { }
+        public ChamfersTechOperation(TactileTechProcess techProcess, string caption) : this(techProcess, caption, null, null) { }
 
-        public ChamfersTechOperation(TactileTechProcess techProcess, string caption, int processingAngle) : base(techProcess, caption)
+        public ChamfersTechOperation(TactileTechProcess techProcess, string caption, int? processingAngle, double? bandStart) : base(techProcess, caption)
         {
-            ProcessingAngle = processingAngle;
+            BandStart = bandStart ?? techProcess.BandStart1.Value;
+            ProcessingAngle = processingAngle ?? techProcess.ProcessingAngle1.Value;
             CuttingFeed = techProcess.TactileTechProcessParams.CuttingFeed;
         }
 
@@ -36,7 +39,7 @@ namespace CAM.Tactile
             if (ProcessingAngle >= 90)
                 passDir = passDir.Negate();
             ray.BasePoint += passDir * tactileTechProcess.BandStart1.Value;
-            var step = passDir * (tactileTechProcess.BandWidth.Value + tactileTechProcess.BandSpacing.Value);
+            var step = tactileTechProcess.BandWidth.Value + tactileTechProcess.BandSpacing.Value;
 
             bool flag = true;
             var tactileParams = tactileTechProcess.TactileTechProcessParams;
@@ -51,16 +54,17 @@ namespace CAM.Tactile
                     var vector = (points[1] - points[0]).GetNormal() * tactileParams.Departure;
                     var startPoint = points[0] - vector - Vector3d.ZAxis * tactileParams.Depth;
                     var endPoint = points[1] + vector - Vector3d.ZAxis * tactileParams.Depth;
-                    builder.Cutting(startPoint, endPoint, CuttingFeed, tactileParams.TransitionFeed, 45);
+                    builder.Cutting(startPoint, endPoint, CuttingFeed, tactileParams.TransitionFeed, 45, step > 0 ^ ProcessingAngle == 45 ? Side.Right : Side.Left);
                 }
-                else if (step.IsCodirectionalTo(passDir))
+                else if (step > 0)
                 {
                     ray.BasePoint -= passDir * tactileTechProcess.BandSpacing.Value;
-                    step = step.Negate();
+                    step = -step;
+                    builder.Uplifting();
                 }
                 else
                     break;
-                ray.BasePoint += step;
+                ray.BasePoint += passDir * step;
             }
             ProcessCommands = builder.FinishTechOperation();
         }

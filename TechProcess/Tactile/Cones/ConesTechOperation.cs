@@ -74,7 +74,7 @@ namespace CAM.Tactile
 
             void Cutting(Point3d point)
             {
-                builder.Cutting(new Point3d(point.X, point.Y, tactileParams.Depth), 0, 0);
+                //builder.Cutting(new Point3d(point.X, point.Y, tactileParams.Depth), 0, 0);
                 builder.Uplifting();
             }
         }

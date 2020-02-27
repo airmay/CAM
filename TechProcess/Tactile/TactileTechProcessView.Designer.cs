@@ -76,6 +76,7 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.cbMachine.DataBindings.Add(new System.Windows.Forms.Binding("Text", this.tactileTechProcessBindingSource, "MachineType", true));
             this.cbMachine.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cbMachine.Enabled = false;
             this.cbMachine.FormattingEnabled = true;
             this.cbMachine.Location = new System.Drawing.Point(102, 3);
             this.cbMachine.Name = "cbMachine";
@@ -379,9 +380,9 @@
             this.tbType.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.tbType.DataBindings.Add(new System.Windows.Forms.Binding("Text", this.tactileTechProcessBindingSource, "Type", true));
-            this.tbType.Enabled = false;
             this.tbType.Location = new System.Drawing.Point(102, 279);
             this.tbType.Name = "tbType";
+            this.tbType.ReadOnly = true;
             this.tbType.Size = new System.Drawing.Size(152, 20);
             this.tbType.TabIndex = 41;
             // 

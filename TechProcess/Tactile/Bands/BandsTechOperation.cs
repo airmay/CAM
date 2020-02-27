@@ -58,7 +58,7 @@ namespace CAM.Tactile
             var count = Math.Ceiling(periodAll / periodWidth);
             periodWidth = periodAll / count;
             var x = (toolThickness - (periodWidth - toolThickness)) / 2;
-            var shift = TechProcess.MachineType == MachineType.ScemaLogic ^ ProcessingAngle < 90? toolThickness : 0;
+            var shift = TechProcess.MachineType == MachineType.ScemaLogic ^ ProcessingAngle == 45? toolThickness : 0;
             PassList = new List<Pass> { new Pass(shift, CuttingType.Roughing) };
             for (int i = 1; i <= count; i++)
             {

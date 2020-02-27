@@ -1,5 +1,7 @@
-﻿using Autodesk.AutoCAD.DatabaseServices;
+﻿using Autodesk.AutoCAD.Colors;
+using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
+using Dreambuild.AutoCAD;
 using System;
 using System.Collections.Generic;
 
@@ -11,8 +13,29 @@ namespace CAM
     public class DonatoniCommandGenerator
     {
         private int _startRangeIndex;
+        private const int UpperZ = 100;
+        public ToolPosition Tool;
+        private int _GCode;
+        private int _feed;
+
+        private readonly Dictionary<string, Color> Colors = new Dictionary<string, Color>()
+        {
+            [CommandNames.Cutting] = Color.FromColor(System.Drawing.Color.Green),
+            [CommandNames.Uplifting] = Color.FromColor(System.Drawing.Color.Blue),
+            [CommandNames.Penetration] = Color.FromColor(System.Drawing.Color.Yellow),
+            [CommandNames.Fast] = Color.FromColor(System.Drawing.Color.Crimson),
+            [CommandNames.Transition] = Color.FromColor(System.Drawing.Color.Yellow)
+        };
 
         public List<ProcessCommand> Commands { get; } = new List<ProcessCommand>();
+
+        public Point3d ToolPosition => Tool.Point;
+
+        public bool EngineStarted => ToolPosition.Z < UpperZ;
+
+        public void StartRange() => _startRangeIndex = Commands.Count;
+
+        public List<ProcessCommand> GetRange() => Commands.GetRange(_startRangeIndex, Commands.Count - _startRangeIndex);
 
         /// <summary>
         /// Запуск станка
@@ -20,6 +43,8 @@ namespace CAM
         /// <param name="toolNumber"></param>
         public void StartMachine(string caption, int toolNumber)
         {
+            Tool.Set(new Point3d(0, 0, UpperZ), 0, 0);
+
             CreateCommand($"; Donatoni \"{caption}\"");
             CreateCommand($"; DATE {DateTime.Now}");
 
@@ -68,7 +93,7 @@ namespace CAM
         /// <param name="point"></param>
         /// <param name="angleC"></param>
         /// <param name="frequency"></param>
-        public void InitialMove(Point3d point, double angleC, double angleA, int frequency) //, int feed)
+        public void InitialMove(double x, double y, double z, double angleC, int frequency) //, int feed)
         {
             CreateCommand("T1");
             CreateCommand("M6");
@@ -76,8 +101,8 @@ namespace CAM
             CreateCommand("M300");
             //G17 плоскость
 
-            CreateGCommand(CommandNames.InitialMove, 0, "XYCA", point, angleC, angleA: angleA);
-            CreateGCommand(CommandNames.InitialMove, 0, "Z", point, angleC, angleA: angleA);
+            CreateCommand(CommandNames.InitialMove, 0, x: x, y: y, angleC: angleC);
+            CreateCommand(CommandNames.InitialMove, 0, z: z);
 
             //CreateCommand($"G1 A0 F{feed}");
             //CreateCommand($"G1 Z{Round(point.Z)} F{feed}");
@@ -86,46 +111,52 @@ namespace CAM
             CreateCommand($"M3 S{frequency}");
         }
 
-        public void StartRange() => _startRangeIndex = Commands.Count;
-
-        public List<ProcessCommand> GetRange() => Commands.GetRange(_startRangeIndex, Commands.Count - _startRangeIndex);
-
         /// <summary>
         /// Быстрая подача
         /// </summary>
         /// <param name="line"></param>
         /// <param name="angle"></param>
-        public void Fast(Line line, double angleC, double angleA = 0)
-        {
-            CreateGCommand(CommandNames.Fast, 0, "XYZCA", line.EndPoint, angleC, line, angleA: angleA);
-            //CreateCommand($"G0 Z{Round(line.EndPoint.Z)}", endPoint: line.EndPoint, toolAngle: angleC);
-            //CreateCommand(CommandNames.Fast, 0, toolpathCurve: line, endPoint: line.EndPoint, toolAngle: angleC);
-        }
+        //public void Fast(Line line, double angleC, double angleA = 0)
+        //{
+        //    CreateGCommand(CommandNames.Fast, 0, "XYZCA", line.EndPoint, angleC, line, angleA: angleA);
+        //    //CreateCommand($"G0 Z{Round(line.EndPoint.Z)}", endPoint: line.EndPoint, toolAngle: angleC);
+        //    //CreateCommand(CommandNames.Fast, 0, toolpathCurve: line, endPoint: line.EndPoint, toolAngle: angleC);
+        //}
+
+        //public void CommandG0(string name, Point3d? point = null, double? x = null, double? y = null, double? z = null, double? angleC = null, double? angleA = null)
+        //{
+        //    CreateGCommand(name, 0, "XYZCA", point: point, x: x, y: y, z: z, angleC: angleC, angleA: angleA);
+        //}
+
+        //public void CommandG1(string name, int feed, Point3d? point = null, double? x = null, double? y = null, double? z = null, double? angleC = null, double? angleA = null, Curve curve = null)
+        //{
+        //    CreateGCommand(name, 1, "XYZCA", point: point, x: x, y: y, z: z, angleC: angleC, angleA: angleA, curve: curve, feed: feed);
+        //}
 
         /// <summary>
         /// Поднятие
         /// </summary>
         /// <param name="line"></param>
-        public void Uplifting(Line line, double angle) => CreateGCommand(CommandNames.Uplifting, 0, "XYZC", line.EndPoint, angle, line);
+        //public void Uplifting(Line line, double angle) => CreateGCommand(CommandNames.Uplifting, 0, "XYZC", line.EndPoint, angle, line);
 
         /// <summary>
         /// Рез
         /// </summary>
-        public void Cutting(string name, Curve curve, int feed, Point3d point, double angle)
-        {
-            switch (curve)
-            {
-                case Line _:
-                    CreateGCommand(name, 1, "XYZCF", point, angle, curve, feed);
-                    break;
-                case Arc arc:
-                    var code = point == curve.StartPoint ? 2 : 3;
-                    CreateGCommand(name, code, "XYZCF", point, angle, curve, feed);
-                    break;
-                default:
-                    throw new Exception($"Неподдерживаемый тип кривой {curve.GetType()}");
-            }
-        }
+        //public void Cutting(string name, Curve curve, int feed, Point3d point, double angle)
+        //{
+        //    switch (curve)
+        //    {
+        //        case Line _:
+        //            CreateGCommand(name, 1, "XYZCF", point, angle, curve, feed);
+        //            break;
+        //        case Arc arc:
+        //            var code = point == curve.StartPoint ? 2 : 3;
+        //            CreateGCommand(name, code, "XYZCF", point, angle, curve, feed);
+        //            break;
+        //        default:
+        //            throw new Exception($"Неподдерживаемый тип кривой {curve.GetType()}");
+        //    }
+        //}
 
         //private void CreateCommand(string name, int gCode, int? mCode = null, string axis = null, int? feed = null, double? x = null, double? y = null,
         //    double? param1 = null, double? param2 = null, Curve toolpathCurve = null, Point3d? endPoint = null, double? toolAngle = null)
@@ -149,22 +180,30 @@ namespace CAM
         {
             Name = name,
             Text = text,
-            ToolPosition = _tool
+            ToolPosition = Tool
         });
 
         //private CommandParams _commandParams = new CommandParams();
 
-        private ToolPosition _tool = new ToolPosition();
-        private int _GCode;
-        private int _feed;
-
-        private void CreateGCommand(string name, int gCode, string @params, Point3d point, double? angleC = null, Curve curve = null, int? feed = null, double? angleA = null)
+        public void CreateCommand(string name, int gCode, string paramsString = null, Point3d? point = null, double? x = null, double? y = null, double? z = null, 
+            double? angleC = null, double? angleA = null, Curve curve = null, int? feed = null)
         {
-            var reset = _GCode != gCode;
-            var commandText = $"G{gCode}{Format("X", point.X, _tool.Point.X)}{Format("Y", point.Y, _tool.Point.Y)}{Format("Z", point.Z, _tool.Point.Z)}" +
-                $"{Format("C", angleC, _tool.AngleC)}{Format("A", angleA, _tool.AngleA)}{Format("F", feed, _feed)}";
+            if (point == null)
+                point = new Point3d(x ?? Tool.Point.X, y ?? Tool.Point.Y, z ?? Tool.Point.Z);
+
+            var commandText = $"G{gCode}{Format("X", point.Value.X, Tool.Point.X)}{Format("Y", point.Value.Y, Tool.Point.Y)}{Format("Z", point.Value.Z, Tool.Point.Z)}" +
+                $"{Format("C", angleC, Tool.AngleC)}{Format("A", angleA, Tool.AngleA)}{Format("F", feed, _feed)}";
+
+            if (name != CommandNames.InitialMove)
+            {
+                if (curve == null && (point.Value - Tool.Point).Length > 1)
+                    curve = NoDraw.Line(Tool.Point, point.Value);
+                if (curve != null)
+                    curve.Color = Colors[name];
+            }
+
             _GCode = gCode;
-            _tool.Set(point, angleC, angleA);
+            Tool.Set(point.Value, angleC, angleA);
             _feed = feed ?? _feed;
 
             Commands.Add(new ProcessCommand
@@ -172,15 +211,16 @@ namespace CAM
                 Name = name,
                 Text = commandText,
                 ToolpathCurve = curve,
-                ToolPosition = _tool
+                ToolPosition = Tool
             });
 
             string Format(string label, double? value, double oldValue) =>
-                 @params.Contains(label) && (value.GetValueOrDefault(oldValue) != oldValue || reset)
+                 (paramsString == null || paramsString.Contains(label)) && (value.GetValueOrDefault(oldValue) != oldValue || (_GCode != gCode))
                         ? $" {label}{value.GetValueOrDefault(oldValue).Round(4)}"
                         : null;
         }
     }
+}
 
     //private string Format(string @params, string label, double value, ref double oldValue)
     //{
@@ -225,4 +265,4 @@ namespace CAM
     //        }
     //    }
     //}
-}
+//}

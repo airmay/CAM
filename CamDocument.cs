@@ -26,6 +26,7 @@ namespace CAM
         public ITechProcess CreateTechProcess(string techProcessName)
         {
             var techProcess = _techProcessFactory.CreateTechProcess(techProcessName);
+            techProcess.MachineType = MachineType.Donatoni; ////////////////////////
             TechProcessList.Add(techProcess);
             return techProcess;
         }
@@ -66,7 +67,7 @@ namespace CAM
             //if (processCommand.ToolPosition != null)
             //{
                 if (techProcess.ToolModel == null)
-                    techProcess.ToolModel = Acad.CreateToolModel(techProcess.Tool.Diameter, techProcess.Tool.Thickness.Value);
+                    techProcess.ToolModel = Acad.CreateToolModel(techProcess.Tool.Diameter, techProcess.Tool.Thickness.Value, true);
                 Acad.DrawToolModel(techProcess.ToolModel, processCommand.ToolPosition);
             //}
             //else if (techProcess.ToolModel != null)

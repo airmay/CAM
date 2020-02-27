@@ -84,51 +84,35 @@ namespace CAM
         #region ToolModel
         public static void DrawToolModel(ToolModel toolModel, ToolPosition toolPosition)
         {
-            //var mat = Matrix3d.Displacement(toolModel.Origin.GetVectorTo(toolPosition.Point)) * Matrix3d.Rotation(Graph.ToRad(toolModel.AngleC - toolPosition.AngleC), Vector3d.ZAxis, toolModel.Origin)
-            //     * Matrix3d.Rotation(Graph.ToRad(toolModel.AngleA - toolPosition.AngleA), Vector3d.XAxis.RotateBy(-toolPosition.AngleC, Vector3d.XAxis), toolModel.Origin);
-            var mat = Matrix3d.Displacement(toolModel.ToolPosition.Point.GetVectorTo(toolPosition.Point)) 
-                 * Matrix3d.Rotation(Graph.ToRad(toolModel.ToolPosition.AngleC - toolPosition.AngleC), Vector3d.ZAxis, toolPosition.Point)
-                 * Matrix3d.Rotation(Graph.ToRad(toolModel.ToolPosition.AngleA - toolPosition.AngleA), Vector3d.XAxis.RotateBy(Graph.ToRad(-toolPosition.AngleC), Vector3d.ZAxis), toolPosition.Point);
-
             var mat1 = Matrix3d.Displacement(toolModel.ToolPosition.Point.GetVectorTo(toolPosition.Point));
             var mat2 = Matrix3d.Rotation(Graph.ToRad(toolModel.ToolPosition.AngleC - toolPosition.AngleC), Vector3d.ZAxis, toolPosition.Point);
-            var mat3 = Matrix3d.Rotation(Graph.ToRad(toolModel.ToolPosition.AngleA - toolPosition.AngleA), Vector3d.XAxis.RotateBy(Graph.ToRad(-toolPosition.AngleC), Vector3d.ZAxis), toolPosition.Point);
-
+            var mat3 = Matrix3d.Rotation(Graph.ToRad(toolPosition.AngleA - toolModel.ToolPosition.AngleA), Vector3d.XAxis.RotateBy(Graph.ToRad(-toolPosition.AngleC), Vector3d.ZAxis), toolPosition.Point);
+            var mat = mat3 * mat2 * mat1;
             foreach (var item in toolModel.GetCurves())
             {
                 item.TransformBy(mat);
-                //item.TransformBy(mat1);
-                //item.TransformBy(mat2);
-                //item.TransformBy(mat3);
                 TransientManager.CurrentTransientManager.UpdateTransient(item, new IntegerCollection());
             }
             toolModel.ToolPosition = toolPosition;
-            //toolModel.Origin = toolPosition.Point;
-            //toolModel.AngleC = toolPosition.AngleC;
-            //toolModel.AngleA = toolPosition.AngleA;
 
             Editor.UpdateScreen();
         }
 
-        public static ToolModel CreateToolModel(double diameter, double thickness)
+        public static ToolModel CreateToolModel(double diameter, double thickness, bool isFrontPlaneZero)
         {
             using (var doclock = Application.DocumentManager.MdiActiveDocument.LockDocument())
             {
                 using (Transaction tr = Database.TransactionManager.StartTransaction())
                 {
-                    var color = Color.FromColorIndex(ColorMethod.ByColor, 131);
-                    var center = new Point3d(0, 0, diameter/2);
-                    var toolModel = new ToolModel
-                    {
-                        Circle0 = new Circle(center, Vector3d.YAxis, diameter/2) { Color = color },
-                        Circle1 = new Circle(center - Vector3d.YAxis * thickness, Vector3d.YAxis, diameter/2) { Color = color },
-                        Axis = new Line(center, center + Vector3d.YAxis * diameter/4),
-                        //Origin = Point3d.Origin,
-                        //AngleC = 0,
-                        //AngleA= 0
-                    };
+                    var toolModel = new ToolModel();
+                    toolModel.Circle0 = new Circle(new Point3d(isFrontPlaneZero ? 0 : -thickness, 0, diameter / 2), Vector3d.YAxis, diameter / 2);
+                    toolModel.Circle1 = new Circle(toolModel.Circle0.Center + Vector3d.YAxis * thickness, Vector3d.YAxis, diameter / 2);
+                    toolModel.Axis = new Line(toolModel.Circle1.Center, toolModel.Circle1.Center + Vector3d.YAxis * diameter / 4);
                     foreach (var item in toolModel.GetCurves())
+                    {
+                        item.Color = Color.FromColorIndex(ColorMethod.ByColor, 131);
                         TransientManager.CurrentTransientManager.AddTransient(item, TransientDrawingMode.Main, 128, new IntegerCollection());
+                    }
                     tr.Commit();
                     return toolModel;
                 }

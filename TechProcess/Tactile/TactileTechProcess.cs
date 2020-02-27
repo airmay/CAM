@@ -134,7 +134,7 @@ namespace CAM.Tactile
                     var s2 = dist[2] - dist[1];
                     BandWidth = Math.Max(s1, s2);
                     BandSpacing = Math.Min(s1, s2);
-                    BandStart1 = s1 > s2 ? dist[0] : dist[1];
+                    BandStart1 = (s1 > s2 ? dist[0] : dist[1]) % (BandWidth + BandSpacing);
                     return;
                 }
             }
@@ -144,19 +144,19 @@ namespace CAM.Tactile
         public override List<ITechOperation> CreateTechOperations()
         {
             List<ITechOperation> techOperations = new List<ITechOperation>();
-            if (Type.Contains("Конусы"))
-            {
-                techOperations.Add(new BandsTechOperation(this, "Полосы", ProcessingAngle1, BandStart1));
+            techOperations.Add(new BandsTechOperation(this, "Полосы", ProcessingAngle1, BandStart1));
+            if (ProcessingAngle2 != null)
                 techOperations.Add(new BandsTechOperation(this, "Полосы", ProcessingAngle2, BandStart2));
-                techOperations.Add(new ChamfersTechOperation(this, "Фаска", 0));
-                techOperations.Add(new ChamfersTechOperation(this, "Фаска", 90));
-                techOperations.Add(new ConesTechOperation(this, "Конусы"));
-            }
-            if (Type.Contains("Полосы"))
+
+            if (!Type.Contains("Конусы"))
             {
-                techOperations.Add(new BandsTechOperation(this, "Полосы", ProcessingAngle1, BandStart1));
-                techOperations.Add(new ChamfersTechOperation(this, "Фаска", ProcessingAngle1.Value));
+                techOperations.Add(new ChamfersTechOperation(this, "Фаска", ProcessingAngle1, BandStart1));
+                if (ProcessingAngle2 != null)
+                    techOperations.Add(new ChamfersTechOperation(this, "Фаска", ProcessingAngle2, BandStart2));
             }
+            else
+                techOperations.Add(new ConesTechOperation(this, "Конусы"));
+
             return techOperations;
         }
 

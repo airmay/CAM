@@ -28,8 +28,8 @@ namespace CAM
         //private readonly TechProcessParams _techProcessParams;
         //private readonly ScemaLogicCommandGenerator _generator = new ScemaLogicCommandGenerator();
         private readonly DonatoniCommandGenerator _generator = new DonatoniCommandGenerator();
-        private Point3d _currentPoint = Algorithms.NullPoint3d;
-        private double _currentAngle;
+        //private Point3d _currentPoint = Algorithms.NullPoint3d;
+        //private double _currentAngle;
         private Corner? _startCorner;
 
         public ScemaLogicProcessBuilder(MachineType machineType, string caption, int toolNumber, int frequency, int zSafety)
@@ -52,7 +52,7 @@ namespace CAM
 
         public List<ProcessCommand> FinishTechOperation()
         {
-            if (_currentPoint.Z != ZSafety)
+            if (_generator.ToolPosition.Z < ZSafety)
                 Uplifting();
             return _generator.GetRange();
         }
@@ -60,33 +60,39 @@ namespace CAM
         /// <summary>
         /// Поднятние
         /// </summary>
-        public void Uplifting() => _generator.Uplifting(LineTo(new Point3d(_currentPoint.X, _currentPoint.Y, ZSafety), CommandNames.Uplifting), _currentAngle);
+        //public void Uplifting() => _generator.Uplifting(LineTo(new Point3d(_currentPoint.X, _currentPoint.Y, ZSafety), CommandNames.Uplifting), _currentAngle);
+        public void Uplifting() => _generator.CreateCommand(CommandNames.Uplifting, 0, z: ZSafety);
 
         /// <summary>
         /// Перемещение над деталью
         /// </summary>
         private void Move(Point3d point, double angleC, double angleA = 0)
         {
-            var destPoint = new Point3d(point.X, point.Y, ZSafety);
-            if (_currentPoint.IsNull())
-                _generator.InitialMove(destPoint, angleC, angleA, Frequency);
+            //var destPoint = new Point3d(point.X, point.Y, ZSafety);
+            if (_generator.EngineStarted)
+            {
+                _generator.CreateCommand(CommandNames.Fast, 0, x: point.X, y: point.Y, angleC: angleC);
+            }
             else
-                _generator.Fast(LineTo(destPoint), angleC, angleA);
-            _currentPoint = destPoint;
-            _currentAngle = angleC;
+                _generator.InitialMove(point.X, point.Y, ZSafety, angleC, Frequency);
+            if (angleA != _generator.Tool.AngleA)
+                _generator.CreateCommand("", 1, angleA: angleA);
+            //_generator.Fast(LineTo(destPoint), angleC, angleA);
+            //_currentPoint = destPoint;
+            //_currentAngle = angleC;
         }
 
         /// <summary>
         /// Рез к точке
         /// </summary>
-        public void Cutting(Point3d point, double angleC, int cuttingFeed)
-        {
-            if (_currentPoint.IsNull() || _currentPoint.Z == ZSafety)
-                Move(point, angleC);
+        //public void Cutting(Point3d point, double angleC, int cuttingFeed)
+        //{
+        //    if (_currentPoint.IsNull() || _currentPoint.Z == ZSafety)
+        //        Move(point, angleC);
 
-            _currentAngle = angleC;
-            CuttingCommand(CommandNames.Penetration, point, cuttingFeed);
-        }
+        //    _currentAngle = angleC;
+        //    CuttingCommand(CommandNames.Penetration, point, cuttingFeed);
+        //}
 
         /// <summary>
         /// Рез между точками
@@ -99,42 +105,48 @@ namespace CAM
         /// </summary>
         public void Cutting(Curve curve, int cuttingFeed, int transitionFeed, double angleA = 0, Side engineSide = Side.Right)
         {
-            var point = curve.StartPoint;
-            if (_currentPoint.IsNull() || _currentPoint.Z == ZSafety)
-            {
-                if (_startCorner.HasValue)
-                {
-                    point = curve.GetPoint(_startCorner.Value);
-                    _startCorner = null;
-                }
-                else if (!_currentPoint.IsNull())
-                    point = curve.GetClosestPoint(_currentPoint);
+            var point = _startCorner.HasValue ? curve.GetPoint(_startCorner.Value) : curve.GetClosestPoint(_generator.ToolPosition);
+            _startCorner = null;
+            var angleC = CalcToolAngle(curve, point, engineSide);
+            if (_generator.ToolPosition.Z >= ZSafety)
+                Move(point, angleC, angleA);
 
-                Move(point, CalcToolAngle(curve, point, engineSide), angleA);
-            }
-            else
-            {
-                point = curve.GetClosestPoint(_currentPoint);
-                _currentAngle = CalcToolAngle(curve, point, engineSide);
-            }
-            CuttingCommand(point.Z !=_currentPoint.Z ? CommandNames.Penetration : CommandNames.Transition, point, transitionFeed);
-            _currentPoint = curve.NextPoint(point);
-            _currentAngle = CalcToolAngle(curve, _currentPoint, engineSide);
-            _generator.Cutting(CommandNames.Cutting, curve, cuttingFeed, _currentPoint, _currentAngle);
-            curve.Color = Colors[CommandNames.Cutting];
+            //double angle = 0;
+            //if (_generator.ToolPosition.Z >= ZSafety)
+            //{
+            //    if (_startCorner.HasValue)
+            //    {
+            //        point = curve.GetPoint(_startCorner.Value);
+            //        _startCorner = null;
+            //    }
+            //    else if (_generator.EngineStarted)
+            //        point = curve.GetClosestPoint(_generator.ToolPosition);
+
+            //    Move(point, CalcToolAngle(curve, point, engineSide), angleA);
+            //}
+            //else
+            //{
+            //    point = curve.GetClosestPoint(_generator.ToolPosition);
+            //    angle = CalcToolAngle(curve, point, engineSide);
+            //}
+            _generator.CreateCommand(point.Z != _generator.ToolPosition.Z ? CommandNames.Penetration : CommandNames.Transition, 1, point: point, angleC: angleC, angleA: angleA, feed: transitionFeed);
+            point = curve.NextPoint(point);
+            if (!(curve is Line))
+                angleC = CalcToolAngle(curve, point, engineSide);
+            _generator.CreateCommand(CommandNames.Cutting, 1, point: point, angleC: angleC, feed: cuttingFeed);
         }
 
         /// <summary>
         /// Команда реза
         /// </summary>
-        private void CuttingCommand(string command, Point3d point, int feed) => _generator.Cutting(command, LineTo(point, command), feed, point, _currentAngle);
+        //private void CuttingCommand(string command, Point3d point, int feed) => _generator.Cutting(command, LineTo(point, command), feed, point, _currentAngle);
 
-        private Line LineTo(Point3d point, string command = CommandNames.Fast)
-        {
-            var line = new Line(_currentPoint, point) { Color = Colors[command] };
-            _currentPoint = point;
-            return line;
-        }
+        //private Line LineTo(Point3d point, string command = CommandNames.Fast)
+        //{
+        //    var line = new Line(_currentPoint, point) { Color = Colors[command] };
+        //    _currentPoint = point;
+        //    return line;
+        //}
 
         /// <summary>
         /// Построчный рез
@@ -211,14 +223,16 @@ namespace CAM
             return passList;
         }
 
-        public double CalcToolAngle(Curve curve, Point3d point, Side engineSide = Side.Right)
+        public double CalcToolAngle(Curve curve, Point3d point, Side engineSide)
         {
             var tangent = curve.GetFirstDerivative(point).ToVector2d();
             if (!curve.IsUpward())
                 tangent = tangent.Negate();
-            var angle = Graph.ToDeg(Math.PI - (tangent.Angle).Round(6));
+            var angle = Graph.ToDeg(Math.PI - tangent.Angle.Round(6));
             if (curve is Line && angle == 180)
                 angle = 0;
+            if (engineSide == Side.Left)
+                angle += 180;
             return angle;
         }
 
