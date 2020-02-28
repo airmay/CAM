@@ -104,12 +104,12 @@ namespace CAM.Tactile
 
         private void tbContour_Enter(object sender, EventArgs e)
         {
-            Acad.SelectObjectIds(_tactileTechProcess.ProcessingArea.AcadObjectIds);
+            Acad.SelectObjectIds(_tactileTechProcess.ProcessingArea?.AcadObjectIds);
         }
 
         private void tbObjects_Enter(object sender, EventArgs e)
         {
-            Acad.SelectObjectIds(_tactileTechProcess.Objects.AcadObjectIds);
+            Acad.SelectObjectIds(_tactileTechProcess.Objects?.AcadObjectIds);
         }
     }
 }

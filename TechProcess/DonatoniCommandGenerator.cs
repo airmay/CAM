@@ -14,7 +14,7 @@ namespace CAM
     {
         private int _startRangeIndex;
         private const int UpperZ = 100;
-        public ToolPosition Tool;
+        public ToolInfo ToolInfo;
         private int _GCode;
         private int _feed;
 
@@ -29,7 +29,7 @@ namespace CAM
 
         public List<ProcessCommand> Commands { get; } = new List<ProcessCommand>();
 
-        public Point3d ToolPosition => Tool.Point;
+        public Point3d ToolPosition => ToolInfo.Point;
 
         public bool EngineStarted => ToolPosition.Z < UpperZ;
 
@@ -43,7 +43,7 @@ namespace CAM
         /// <param name="toolNumber"></param>
         public void StartMachine(string caption, int toolNumber)
         {
-            Tool.Set(new Point3d(0, 0, UpperZ), 0, 0);
+            ToolInfo.Point = new Point3d(0, 0, UpperZ);
 
             CreateCommand($"; Donatoni \"{caption}\"");
             CreateCommand($"; DATE {DateTime.Now}");
@@ -60,6 +60,18 @@ namespace CAM
             CreateCommand("G0 G53 A0");
             CreateCommand("G64");
             CreateCommand("G154O10");
+        }
+
+        internal void SetTool(int toolNo)
+        {
+            if (ToolInfo.Index != toolNo)
+            {
+                ToolInfo.Index = toolNo;
+                CreateCommand($"T{toolNo}");
+                CreateCommand("M6");
+                CreateCommand("G172 T1 H1 D1");
+                CreateCommand("M300");
+            }
         }
 
         /// <summary>
@@ -176,11 +188,11 @@ namespace CAM
         //        ToolAngle = toolAngle
         //    });
 
-        private void CreateCommand(string text, string name = null) => Commands.Add(new ProcessCommand
+        public void CreateCommand(string text, string name = null) => Commands.Add(new ProcessCommand
         {
             Name = name,
             Text = text,
-            ToolPosition = Tool
+            ToolInfo = ToolInfo
         });
 
         //private CommandParams _commandParams = new CommandParams();
@@ -189,21 +201,21 @@ namespace CAM
             double? angleC = null, double? angleA = null, Curve curve = null, int? feed = null)
         {
             if (point == null)
-                point = new Point3d(x ?? Tool.Point.X, y ?? Tool.Point.Y, z ?? Tool.Point.Z);
+                point = new Point3d(x ?? ToolInfo.Point.X, y ?? ToolInfo.Point.Y, z ?? ToolInfo.Point.Z);
 
-            var commandText = $"G{gCode}{Format("X", point.Value.X, Tool.Point.X)}{Format("Y", point.Value.Y, Tool.Point.Y)}{Format("Z", point.Value.Z, Tool.Point.Z)}" +
-                $"{Format("C", angleC, Tool.AngleC)}{Format("A", angleA, Tool.AngleA)}{Format("F", feed, _feed)}";
+            var commandText = $"G{gCode}{Format("X", point.Value.X, ToolInfo.Point.X)}{Format("Y", point.Value.Y, ToolInfo.Point.Y)}{Format("Z", point.Value.Z, ToolInfo.Point.Z)}" +
+                $"{Format("C", angleC, ToolInfo.AngleC)}{Format("A", angleA, ToolInfo.AngleA)}{Format("F", feed, _feed)}";
 
             if (name != CommandNames.InitialMove)
             {
-                if (curve == null && (point.Value - Tool.Point).Length > 1)
-                    curve = NoDraw.Line(Tool.Point, point.Value);
+                if (curve == null && (point.Value - ToolInfo.Point).Length > 1)
+                    curve = NoDraw.Line(ToolInfo.Point, point.Value);
                 if (curve != null)
                     curve.Color = Colors[name];
             }
 
             _GCode = gCode;
-            Tool.Set(point.Value, angleC, angleA);
+            ToolInfo.Set(point.Value, angleC, angleA);
             _feed = feed ?? _feed;
 
             Commands.Add(new ProcessCommand
@@ -211,7 +223,7 @@ namespace CAM
                 Name = name,
                 Text = commandText,
                 ToolpathCurve = curve,
-                ToolPosition = Tool
+                ToolInfo = ToolInfo
             });
 
             string Format(string label, double? value, double oldValue) =>

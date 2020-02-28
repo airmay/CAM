@@ -27,6 +27,9 @@ namespace CAM.Tactile
 
         public override void BuildProcessing(ScemaLogicProcessBuilder builder)
         {
+            if (TechProcess.MachineType != MachineType.Donatoni)
+                return;
+
             var tactileTechProcess = (TactileTechProcess)TechProcess;
             var contour = tactileTechProcess.GetContour();
             var contourPoints = contour.GetPolyPoints().ToArray();
@@ -40,8 +43,6 @@ namespace CAM.Tactile
                 passDir = passDir.Negate();
             ray.BasePoint += passDir * tactileTechProcess.BandStart1.Value;
             var step = tactileTechProcess.BandWidth.Value + tactileTechProcess.BandSpacing.Value;
-
-            bool flag = true;
             var tactileParams = tactileTechProcess.TactileTechProcessParams;
 
             builder.StartTechOperation();

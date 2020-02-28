@@ -202,6 +202,7 @@
     <Compile Include="TechProcess\TechProcessNames.cs" />
     <Compile Include="TechProcess\TechProcessParams.cs" />
     <Compile Include="TechProcess\Tool.cs" />
+    <Compile Include="TechProcess\ToolInfo.cs" />
     <Compile Include="TechProcess\ToolModel.cs" />
     <Compile Include="TechProcess\ToolsForm.cs">
       <SubType>Form</SubType>

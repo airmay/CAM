@@ -1,10 +1,9 @@
 ﻿using Autodesk.AutoCAD.DatabaseServices;
-using Autodesk.AutoCAD.Geometry;
 using System.Collections.Generic;
 
 namespace CAM
 {
-    public class ToolModel
+    public class ToolObject
     {
         public Circle Circle0 { get; set; }
 
@@ -18,13 +17,16 @@ namespace CAM
 
         //public double AngleA { get; set; }
 
-        public ToolPosition ToolPosition { get; set; }
+        public ToolInfo ToolInfo;
 
         public IEnumerable<Curve> GetCurves()
         {
-            yield return Circle0;
-            yield return Circle1;
-            yield return Axis;
+            if (Circle0 != null)
+                yield return Circle0;
+            if (Circle1 != null)
+                yield return Circle1;
+            if (Axis != null)
+                yield return Axis;
         }
     }
 }

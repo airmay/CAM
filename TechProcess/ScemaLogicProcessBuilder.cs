@@ -48,7 +48,11 @@ namespace CAM
             return _generator.Commands;
         }
 
-        public void StartTechOperation() =>  _generator.StartRange();
+        public void StartTechOperation(int toolNo = 1)
+        { 
+            _generator.StartRange();
+            _generator.SetTool(toolNo);
+        }
 
         public List<ProcessCommand> FinishTechOperation()
         {
@@ -61,21 +65,19 @@ namespace CAM
         /// Поднятние
         /// </summary>
         //public void Uplifting() => _generator.Uplifting(LineTo(new Point3d(_currentPoint.X, _currentPoint.Y, ZSafety), CommandNames.Uplifting), _currentAngle);
-        public void Uplifting() => _generator.CreateCommand(CommandNames.Uplifting, 0, z: ZSafety);
+        public void Uplifting(double? z = null) => _generator.CreateCommand(CommandNames.Uplifting, 0, z: z ?? ZSafety);
 
         /// <summary>
         /// Перемещение над деталью
         /// </summary>
-        private void Move(Point3d point, double angleC, double angleA = 0)
+        private void Move(double x, double y, double angleC, double angleA = 0)
         {
             //var destPoint = new Point3d(point.X, point.Y, ZSafety);
             if (_generator.EngineStarted)
-            {
-                _generator.CreateCommand(CommandNames.Fast, 0, x: point.X, y: point.Y, angleC: angleC);
-            }
+                _generator.CreateCommand(CommandNames.Fast, 0, x: x, y: y, angleC: angleC);
             else
-                _generator.InitialMove(point.X, point.Y, ZSafety, angleC, Frequency);
-            if (angleA != _generator.Tool.AngleA)
+                _generator.InitialMove(x, y, ZSafety, angleC, Frequency);
+            if (angleA != _generator.ToolInfo.AngleA)
                 _generator.CreateCommand("", 1, angleA: angleA);
             //_generator.Fast(LineTo(destPoint), angleC, angleA);
             //_currentPoint = destPoint;
@@ -85,14 +87,12 @@ namespace CAM
         /// <summary>
         /// Рез к точке
         /// </summary>
-        //public void Cutting(Point3d point, double angleC, int cuttingFeed)
-        //{
-        //    if (_currentPoint.IsNull() || _currentPoint.Z == ZSafety)
-        //        Move(point, angleC);
-
-        //    _currentAngle = angleC;
-        //    CuttingCommand(CommandNames.Penetration, point, cuttingFeed);
-        //}
+        public void Cutting(double x, double y, double z, double angleC, int cuttingFeed, double angleA = 0)
+        {
+            if (_generator.ToolPosition.Z >= ZSafety)
+                Move(x, y, angleC, angleA);
+            _generator.CreateCommand(CommandNames.Penetration, 1, x: x, y: y, z: z, angleC: angleC, angleA: angleA, feed: cuttingFeed);
+        }
 
         /// <summary>
         /// Рез между точками
@@ -109,7 +109,7 @@ namespace CAM
             _startCorner = null;
             var angleC = CalcToolAngle(curve, point, engineSide);
             if (_generator.ToolPosition.Z >= ZSafety)
-                Move(point, angleC, angleA);
+                Move(point.X, point.Y, angleC, angleA);
 
             //double angle = 0;
             //if (_generator.ToolPosition.Z >= ZSafety)
@@ -134,6 +134,11 @@ namespace CAM
             if (!(curve is Line))
                 angleC = CalcToolAngle(curve, point, engineSide);
             _generator.CreateCommand(CommandNames.Cutting, 1, point: point, angleC: angleC, feed: cuttingFeed);
+        }
+
+        public void Pause()
+        {
+            _generator.CreateCommand("G4 F0.2", "Пауза");
         }
 
         /// <summary>

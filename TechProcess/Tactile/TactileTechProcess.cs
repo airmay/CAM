@@ -73,15 +73,15 @@ namespace CAM.Tactile
                 radius += Delta;
                 var vector = circles[1].Center - circles[0].Center;
                 var center = (circles[1].Center.X < circles[0].Center.X ? circles[1] : circles[0]).Center;
-                BandSpacing = (radius * 2).Round(3);
-                BandWidth = (vector.Length - BandSpacing.Value).Round(3);
+                BandSpacing = radius * 2;
+                BandWidth = vector.Length - BandSpacing.Value;
                 if (vector.IsParallelTo(Vector3d.XAxis) || vector.IsPerpendicularTo(Vector3d.XAxis))
                 {
                     Type = "Конусы прямые";
                     ProcessingAngle1 = 0;
                     ProcessingAngle2 = 90;
-                    BandStart1 = (center.Y + radius - contourPoints[0].Y).Round(3);
-                    BandStart2 = (center.X + radius - contourPoints[0].X).Round(3);
+                    BandStart1 = center.Y + radius - contourPoints[0].Y;
+                    BandStart2 = center.X + radius - contourPoints[0].X;
                 }
                 else
                 {
@@ -90,12 +90,13 @@ namespace CAM.Tactile
 
                     ProcessingAngle1 = 135;
                     ray.UnitDir = Vector3d.XAxis.RotateBy(Graph.ToRad(ProcessingAngle1.Value), Vector3d.ZAxis);
-                    BandStart1 = (ray.GetDistToPoint(contourPoints[0], true) + radius).Round(3);
+                    BandStart1 = ray.GetDistToPoint(contourPoints[0], true) + radius;
 
                     ProcessingAngle2 = 45;
                     ray.UnitDir = Vector3d.XAxis.RotateBy(Graph.ToRad(ProcessingAngle2.Value), Vector3d.ZAxis);
-                    BandStart2 = (ray.GetDistToPoint(contourPoints[3], true) % vector.Length + radius).Round(3);
+                    BandStart2 = ray.GetDistToPoint(contourPoints[3], true) % vector.Length + radius;
                 }
+                RoundParams();
                 return;
             }
             var lines = curves.OfType<Line>().ToArray();
@@ -112,6 +113,8 @@ namespace CAM.Tactile
                 var point2 = new Point3d(points.Max(p => p.X), points.Max(p => p.Y), 0);
                 var vector = point2 - point1;
                 BandWidth = (vector.X > vector.Y ? point2.X - point1.X : point2.Y - point1.Y) - BandSpacing * 2;
+
+                RoundParams();
                 return;
             }
             if (lines.Length == 3 || lines.Length == 4)
@@ -135,10 +138,20 @@ namespace CAM.Tactile
                     BandWidth = Math.Max(s1, s2);
                     BandSpacing = Math.Min(s1, s2);
                     BandStart1 = (s1 > s2 ? dist[0] : dist[1]) % (BandWidth + BandSpacing);
+
+                    RoundParams();
                     return;
                 }
             }
             Acad.Alert("Тип плитки не распознан");
+
+            void RoundParams()
+            {
+                BandSpacing = BandSpacing?.Round(3);
+                BandWidth = BandWidth?.Round(3);
+                BandStart1 = BandStart1?.Round(3);
+                BandStart2 = BandStart2?.Round(3);
+            }
         }
 
         public override List<ITechOperation> CreateTechOperations()

@@ -37,9 +37,9 @@ namespace CAM
         public List<ProcessCommand> ProcessCommands { get; set; }
 
         [NonSerialized]
-        private ToolModel _toolModel;
+        private ToolObject _toolModel;
 
-        public ToolModel ToolModel
+        public ToolObject ToolObject
         {
             get => _toolModel;
             set => _toolModel = value;

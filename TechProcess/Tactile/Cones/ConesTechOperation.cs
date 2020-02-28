@@ -11,115 +11,108 @@ namespace CAM.Tactile
     [TechOperation(TechProcessNames.Tactile, "Конусы")]
     public class ConesTechOperation : TechOperationBase
     {
-        public double BandWidth { get; set; }
+        public int CuttingFeed { get; set; }
 
-        public double BandSpacing { get; set; }
+        public int FeedMax { get; set; }
 
-        public double BandStart1 { get; set; }
+        public int FeedMin { get; set; }
 
-        public double BandStart2 { get; set; }
+        //public double BandWidth { get; set; }
+
+        //public double BandSpacing { get; set; }
+
+        //public double BandStart1 { get; set; }
+
+        //public double BandStart2 { get; set; }
 
         public int Frequency { get; set; }
 
-        public int ProcessingAngle { get; set; }
+        //public int ProcessingAngle { get; set; }
 
         public ConesTechOperation(TactileTechProcess techProcess, string name) : base(techProcess, name)
         {
-            BandWidth = techProcess.BandWidth.Value;
-            BandSpacing = techProcess.BandSpacing.Value;
-            BandStart1 = techProcess.BandStart1.Value;
-            BandStart2 = techProcess.BandStart2.Value;
+            //BandWidth = techProcess.BandWidth.Value;
+            //BandSpacing = techProcess.BandSpacing.Value;
+            //BandStart1 = techProcess.BandStart1.Value;
+            //BandStart2 = techProcess.BandStart2.Value;
+            FeedMax = 200;
+            FeedMin = 80;
             Frequency = 5000;
-            ProcessingAngle = 45;
+            //ProcessingAngle = 45;
         }
 
         public override void BuildProcessing(ScemaLogicProcessBuilder builder)
         {
             if (!(TechProcess.MachineType == MachineType.Donatoni || TechProcess.MachineType == MachineType.Krea))
                 return;
-            var baseCurve = TechProcess.ProcessingArea.Curves.OrderBy(p => p.StartPoint.Y + p.EndPoint.Y).First();
-            var ray = new Ray
-            {
-                BasePoint = baseCurve.StartPoint.X < baseCurve.EndPoint.X ? baseCurve.StartPoint : baseCurve.EndPoint,
-                UnitDir = Vector3d.XAxis.RotateBy(Graph.ToRad(ProcessingAngle - 90), Vector3d.ZAxis)
-            };
-            var passDir = ray.UnitDir.GetPerpendicularVector();
+
+            var tactileTechProcess = (TactileTechProcess)TechProcess;
             var tactileParams = ((TactileTechProcess)TechProcess).TactileTechProcessParams;
-            ray.BasePoint += passDir * (BandStart1 - BandSpacing / 2);
+            var isDiag = tactileTechProcess.ProcessingAngle1 != 0;
 
-            var step = BandWidth + BandSpacing;
-            var curves = TechProcess.ProcessingArea.Curves.ToList();
-            var lines = new List<Curve>();
-            List<Point3d> points;
-            while ((points = ray.Intersect(curves, Intersect.ExtendThis)).Count == 2)
+            var contour = tactileTechProcess.GetContour();
+            var contourPoints = contour.GetPolyPoints().ToArray();
+
+            var point = tactileTechProcess.Objects.Curves.OfType<Circle>().Select(p => p.Center).OrderBy(p => (int)p.Y).ThenBy(p => p.X).First();
+            var x = point.X;
+            var y = point.Y;
+            var stepX = tactileTechProcess.BandSpacing.Value + tactileTechProcess.BandWidth.Value;
+            var stepY = stepX;
+            if (isDiag)
             {
-                lines.Add(NoDraw.Line(points[0], points[1]));
-                ray.BasePoint += passDir * step;
+                stepY /= Math.Sqrt(2);
+                stepX = stepY * 2;
             }
-            ray.UnitDir = passDir;
-            passDir = passDir.GetPerpendicularVector();
-            ray.BasePoint = (baseCurve.StartPoint.X < baseCurve.EndPoint.X ? baseCurve.EndPoint : baseCurve.StartPoint) + passDir * (BandStart2 - BandSpacing / 2);
+            builder.StartTechOperation(2);
 
-            bool flag = false;
-            builder.StartTechOperation();
-            while ((points = ray.Intersect(lines, Intersect.ExtendThis)).Any())
+            while (y < contourPoints[1].Y)
             {
-                if (flag)
-                    points.Reverse();
-                flag = !flag;
-                points.ForEach(Cutting);
-                ray.BasePoint += passDir * step;
+                Cutting();
+                x += stepX;
+                if (x > contourPoints[3].X)
+                {
+                    y += stepY;
+                    x -= stepY;
+                    stepX = -stepX;
+                    if (x > contourPoints[3].X)
+                        x += stepX;
+                }
+                if (x < contourPoints[1].X)
+                {
+                    y += stepY;
+                    x += stepY;
+                    stepX = -stepX;
+                    if (x < contourPoints[1].X)
+                        x += stepX;
+                }
             }
             ProcessCommands = builder.FinishTechOperation();
 
-            void Cutting(Point3d point)
+            void Cutting()
             {
-                //builder.Cutting(new Point3d(point.X, point.Y, tactileParams.Depth), 0, 0);
+                var zMin = -tactileParams.Depth;
+                double z = 0;
+                int counter = 0;
+                while (z >= zMin)
+                {
+                    var feed = (int)((FeedMax - FeedMin) / zMin * (z * z / zMin - 2 * z) + FeedMax);
+                    builder.Cutting(x, y, z, 0, cuttingFeed: feed);
+                    if (z <= -2)
+                    {
+                        if (++counter == 5) // Подъем на 1мм для охлаждения
+                        {
+                            counter = 0;
+                            builder.Pause();
+                            builder.Uplifting(z + 1);
+                            builder.Cutting(x, y, z + 0.2, 0, cuttingFeed: 300);
+                            builder.Cutting(x, y, z, 0, cuttingFeed: feed);
+                        }
+                    }
+                    z -= 0.2;
+                }
+                builder.Pause();
                 builder.Uplifting();
             }
         }
-
-        public void BuildProcessing1(ScemaLogicProcessBuilder builder)
-        {
-            var tactileTechProcess = (TactileTechProcess)TechProcess;
-            var contour = tactileTechProcess.GetContour();
-            var contourPoints = contour.GetPolyPoints().ToArray();
-            var basePoint = contourPoints[0];
-            var ray = new Ray
-            {
-                BasePoint = basePoint,
-                UnitDir = Vector3d.XAxis.RotateBy(Graph.ToRad(ProcessingAngle), Vector3d.ZAxis)
-            };
-            var passDir = ray.UnitDir.GetPerpendicularVector();
-            if (ProcessingAngle >= 90)
-                passDir = passDir.Negate();
-            var diag = (contourPoints[2] - contourPoints[0]).Length;
-            var width = (tactileTechProcess.BandWidth.Value + tactileTechProcess.BandSpacing.Value) / Math.Sqrt(2) - tactileTechProcess.BandSpacing.Value;
-            var offset = (Math.Min(tactileTechProcess.BandStart1.Value, tactileTechProcess.BandStart2.Value) - tactileTechProcess.BandSpacing.Value / 2) / Math.Sqrt(2)
-                - tactileTechProcess.BandSpacing.Value / 2;
-            bool flag = true;
-            var tactileParams = tactileTechProcess.TactileTechProcessParams;
-
-            builder.StartTechOperation();
-            do
-            {
-                ray.BasePoint = basePoint + passDir * offset;
-                var points = new Point3dCollection();
-                ray.IntersectWith(contour, Intersect.ExtendThis, new Plane(), points, IntPtr.Zero, IntPtr.Zero);
-                if (points.Count == 2 && points[0] != points[1])
-                {
-                    var vector = (points[1] - points[0]).GetNormal() * tactileParams.Departure;
-                    var startPoint = points[0] - vector - Vector3d.ZAxis * tactileParams.Depth;
-                    var endPoint = points[1] + vector - Vector3d.ZAxis * tactileParams.Depth;
-//                    builder.Cutting(startPoint, endPoint, CuttingFeed, tactileParams.TransitionFeed, 45);
-                }
-                offset += flag ? tactileTechProcess.BandSpacing.Value : width;
-                flag = !flag;
-            }
-            while (offset < diag);
-
-            ProcessCommands = builder.FinishTechOperation();
-        }
-
     }
 }

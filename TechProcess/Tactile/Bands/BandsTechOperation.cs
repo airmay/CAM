@@ -69,6 +69,9 @@ namespace CAM.Tactile
 
         public override void BuildProcessing(ScemaLogicProcessBuilder builder)
         {
+            if (!(TechProcess.MachineType == MachineType.ScemaLogic || TechProcess.MachineType == MachineType.Donatoni))
+                return;
+
             if (PassList?.Any() != true)
                 CalcPassList();
             var tactileTechProcess = (TactileTechProcess)TechProcess;

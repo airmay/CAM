@@ -82,32 +82,42 @@ namespace CAM
         }
 
         #region ToolModel
-        public static void DrawToolModel(ToolModel toolModel, ToolPosition toolPosition)
+        public static void DrawToolModel(ToolObject toolObject, ToolInfo toolInfo)
         {
-            var mat1 = Matrix3d.Displacement(toolModel.ToolPosition.Point.GetVectorTo(toolPosition.Point));
-            var mat2 = Matrix3d.Rotation(Graph.ToRad(toolModel.ToolPosition.AngleC - toolPosition.AngleC), Vector3d.ZAxis, toolPosition.Point);
-            var mat3 = Matrix3d.Rotation(Graph.ToRad(toolPosition.AngleA - toolModel.ToolPosition.AngleA), Vector3d.XAxis.RotateBy(Graph.ToRad(-toolPosition.AngleC), Vector3d.ZAxis), toolPosition.Point);
+            var mat1 = Matrix3d.Displacement(toolObject.ToolInfo.Point.GetVectorTo(toolInfo.Point));
+            var mat2 = Matrix3d.Rotation(Graph.ToRad(toolObject.ToolInfo.AngleC - toolInfo.AngleC), Vector3d.ZAxis, toolInfo.Point);
+            var mat3 = Matrix3d.Rotation(Graph.ToRad(toolInfo.AngleA - toolObject.ToolInfo.AngleA), Vector3d.XAxis.RotateBy(Graph.ToRad(-toolInfo.AngleC), Vector3d.ZAxis), toolInfo.Point);
             var mat = mat3 * mat2 * mat1;
-            foreach (var item in toolModel.GetCurves())
+            foreach (var item in toolObject.GetCurves())
             {
                 item.TransformBy(mat);
                 TransientManager.CurrentTransientManager.UpdateTransient(item, new IntegerCollection());
             }
-            toolModel.ToolPosition = toolPosition;
+            toolObject.ToolInfo = toolInfo;
 
             Editor.UpdateScreen();
         }
 
-        public static ToolModel CreateToolModel(double diameter, double thickness, bool isFrontPlaneZero)
+        public static ToolObject CreateToolModel(int index, double diameter, double thickness, bool isFrontPlaneZero)
         {
             using (var doclock = Application.DocumentManager.MdiActiveDocument.LockDocument())
             {
                 using (Transaction tr = Database.TransactionManager.StartTransaction())
                 {
-                    var toolModel = new ToolModel();
-                    toolModel.Circle0 = new Circle(new Point3d(isFrontPlaneZero ? 0 : -thickness, 0, diameter / 2), Vector3d.YAxis, diameter / 2);
-                    toolModel.Circle1 = new Circle(toolModel.Circle0.Center + Vector3d.YAxis * thickness, Vector3d.YAxis, diameter / 2);
-                    toolModel.Axis = new Line(toolModel.Circle1.Center, toolModel.Circle1.Center + Vector3d.YAxis * diameter / 4);
+                    var toolModel = new ToolObject();
+                    toolModel.ToolInfo.Index = index;
+                    if (index == 1)
+                    {
+                        toolModel.Circle0 = new Circle(new Point3d(isFrontPlaneZero ? 0 : -thickness, 0, diameter / 2), Vector3d.YAxis, diameter / 2);
+                        toolModel.Circle1 = new Circle(toolModel.Circle0.Center + Vector3d.YAxis * thickness, Vector3d.YAxis, diameter / 2);
+                        toolModel.Axis = new Line(toolModel.Circle1.Center, toolModel.Circle1.Center + Vector3d.YAxis * diameter / 4);
+                    }
+                    if (index == 2)
+                    {
+                        toolModel.Circle0 = new Circle(Point3d.Origin, Vector3d.ZAxis, 20);
+                        toolModel.Axis = new Line(Point3d.Origin, Point3d.Origin + Vector3d.ZAxis * 100);
+                    }
+
                     foreach (var item in toolModel.GetCurves())
                     {
                         item.Color = Color.FromColorIndex(ColorMethod.ByColor, 131);
@@ -119,7 +129,7 @@ namespace CAM
             }
         }
 
-        public static void DeleteToolModel(ToolModel toolModel)
+        public static void DeleteToolModel(ToolObject toolModel)
         {
             if (toolModel == null)
                 return;
@@ -228,7 +238,7 @@ namespace CAM
             });
         }
 
-        public static void DeleteExtraObjects(IEnumerable<Curve> curves, ToolModel toolModel)
+        public static void DeleteExtraObjects(IEnumerable<Curve> curves, ToolObject toolModel)
         {
             DeleteCurves(curves);
             DeleteByLayer(HatchLayerName);
@@ -236,7 +246,7 @@ namespace CAM
             DeleteToolModel(toolModel);
         }
 
-        public static void HideExtraObjects(IEnumerable<Curve> curves, ToolModel toolModel)
+        public static void HideExtraObjects(IEnumerable<Curve> curves, ToolObject toolModel)
         {
             curves.ForEach(p => p.Visible = !p.Visible);
             DeleteToolModel(toolModel);
