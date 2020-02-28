@@ -17,6 +17,7 @@ namespace CAM
         public ToolInfo ToolInfo;
         private int _GCode;
         private int _feed;
+        private double _originX, _originY;
 
         private readonly Dictionary<string, Color> Colors = new Dictionary<string, Color>()
         {
@@ -41,9 +42,11 @@ namespace CAM
         /// Запуск станка
         /// </summary>
         /// <param name="toolNumber"></param>
-        public void StartMachine(string caption, int toolNumber)
+        public void StartMachine(string caption, int toolNumber, double originX, double originY)
         {
             ToolInfo.Point = new Point3d(0, 0, UpperZ);
+            _originX = originX;
+            _originY = originY;
 
             CreateCommand($"; Donatoni \"{caption}\"");
             CreateCommand($"; DATE {DateTime.Now}");
@@ -203,8 +206,8 @@ namespace CAM
             if (point == null)
                 point = new Point3d(x ?? ToolInfo.Point.X, y ?? ToolInfo.Point.Y, z ?? ToolInfo.Point.Z);
 
-            var commandText = $"G{gCode}{Format("X", point.Value.X, ToolInfo.Point.X)}{Format("Y", point.Value.Y, ToolInfo.Point.Y)}{Format("Z", point.Value.Z, ToolInfo.Point.Z)}" +
-                $"{Format("C", angleC, ToolInfo.AngleC)}{Format("A", angleA, ToolInfo.AngleA)}{Format("F", feed, _feed)}";
+            var commandText = $"G{gCode}{Format("X", point.Value.X, ToolInfo.Point.X, _originX)}{Format("Y", point.Value.Y, ToolInfo.Point.Y, _originY)}" +
+                $"{Format("Z", point.Value.Z, ToolInfo.Point.Z)}{Format("C", angleC, ToolInfo.AngleC)}{Format("A", angleA, ToolInfo.AngleA)}{Format("F", feed, _feed)}";
 
             if (name != CommandNames.InitialMove)
             {
@@ -226,9 +229,9 @@ namespace CAM
                 ToolInfo = ToolInfo
             });
 
-            string Format(string label, double? value, double oldValue) =>
+            string Format(string label, double? value, double oldValue, double origin = 0) =>
                  (paramsString == null || paramsString.Contains(label)) && (value.GetValueOrDefault(oldValue) != oldValue || (_GCode != gCode))
-                        ? $" {label}{value.GetValueOrDefault(oldValue).Round(4)}"
+                        ? $" {label}{(value.GetValueOrDefault(oldValue) - origin).Round(4)}"
                         : null;
         }
     }

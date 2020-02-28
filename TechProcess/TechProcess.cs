@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Autodesk.AutoCAD.DatabaseServices;
+using Autodesk.AutoCAD.Geometry;
 
 namespace CAM
 {
@@ -28,13 +29,22 @@ namespace CAM
 
         public ProcessingArea ProcessingArea { get; set; }
 
-        public int OriginX { get; set; }
-
-        public int OriginY { get; set; }
-
         public List<ITechOperation> TechOperations { get; } = new List<ITechOperation>();
 
         public List<ProcessCommand> ProcessCommands { get; set; }
+
+        public double OriginX { get; set; }
+
+        public double OriginY { get; set; }
+
+        [NonSerialized]
+        public ObjectId[] _originObject;
+
+        public ObjectId[] OriginObject
+        {
+            get => _originObject;
+            set => _originObject = value;
+        }
 
         [NonSerialized]
         private ToolObject _toolModel;
@@ -55,6 +65,9 @@ namespace CAM
         {
             _settings = settings;
             ProcessingArea.Refresh();
+            if (OriginX != 0 || OriginY != 0)
+                OriginObject = Acad.CreateOriginObject(new Point3d(OriginX, OriginY, 0));
+
             TechOperations.ForEach(to =>
             {
                 //to.ProcessingArea.AcadObjectIds = Acad.GetObjectIds(to.ProcessingArea.Handles);
@@ -83,7 +96,7 @@ namespace CAM
             DeleteProcessCommands();
             ProcessingArea?.Refresh();
             //BorderProcessingArea.ProcessBorders(TechOperations.Select(p => p.ProcessingArea).OfType<BorderProcessingArea>().ToList(), startBorder);
-            var builder = new ScemaLogicProcessBuilder(MachineType, Caption, Tool.Number, Frequency, MachineSettings.ZSafety);
+            var builder = new ScemaLogicProcessBuilder(MachineType, Caption, Tool.Number, Frequency, MachineSettings.ZSafety, OriginX, OriginY);
             TechOperations.ForEach(p => p.BuildProcessing(builder));
             ProcessCommands = builder.FinishTechProcess();
         }

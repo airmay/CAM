@@ -277,6 +277,7 @@
             this.tbOrigin.ReadOnly = true;
             this.tbOrigin.Size = new System.Drawing.Size(130, 20);
             this.tbOrigin.TabIndex = 13;
+            this.tbOrigin.Enter += new System.EventHandler(this.tbOrigin_Enter);
             // 
             // bContour
             // 

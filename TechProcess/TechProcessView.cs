@@ -238,10 +238,10 @@ namespace CAM
 
         private void bSend_Click(object sender, EventArgs e)
         {
-            Acad.Register();
+            //Acad.Register();
             //Acad.SaveToPdf();
-            //dataGridViewCommand.EndEdit();
-            //_camDocument.SendProgram(((IHasProcessCommands)treeView.SelectedNode.Tag).ProcessCommands, CurrentTechProcess);
+            dataGridViewCommand.EndEdit();
+            _camDocument.SendProgram(((IHasProcessCommands)treeView.SelectedNode.Tag).ProcessCommands, CurrentTechProcess);
         }
 
         private void bClose_Click(object sender, EventArgs e)

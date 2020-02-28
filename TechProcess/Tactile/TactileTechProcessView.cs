@@ -31,7 +31,7 @@ namespace CAM.Tactile
             tactileTechProcessBindingSource.DataSource = @object;
             tactileTechProcessParamsBindingSource.DataSource = _tactileTechProcess.TactileTechProcessParams;
             tbTool.Text = _tactileTechProcess.Tool?.ToString();
-            tbOrigin.Text = $"{_tactileTechProcess.OriginX},{_tactileTechProcess.OriginY}";
+            tbOrigin.Text = $"{{{_tactileTechProcess.OriginX}, {_tactileTechProcess.OriginY}}}";
             tbContour.Text = _tactileTechProcess.ProcessingArea?.ToString();
             tbObjects.Text = _tactileTechProcess.Objects?.ToString();
             SetParamsEnabled();
@@ -65,12 +65,15 @@ namespace CAM.Tactile
         private void bOrigin_Click(object sender, EventArgs e)
         {
             Interaction.SetActiveDocFocus();
-            var origin = Interaction.GetPoint("\nВыберите точку начала координат");
-            if (!origin.IsNull())
+            var point = Interaction.GetPoint("\nВыберите точку начала координат");
+            if (!point.IsNull())
             {
-                _tactileTechProcess.OriginX = (int)origin.X;
-                _tactileTechProcess.OriginY = (int)origin.Y;
-                tbOrigin.Text = $"{_tactileTechProcess.OriginX},{_tactileTechProcess.OriginY}";
+                _tactileTechProcess.OriginX = point.X.Round(3);
+                _tactileTechProcess.OriginY = point.Y.Round(3);
+                tbOrigin.Text = $"{{{_tactileTechProcess.OriginX}, {_tactileTechProcess.OriginY}}}";
+                if (_tactileTechProcess.OriginObject != null)
+                    Acad.DeleteObjects(_tactileTechProcess.OriginObject);
+                _tactileTechProcess.OriginObject = Acad.CreateOriginObject(point);
             }
         }
 
@@ -110,6 +113,11 @@ namespace CAM.Tactile
         private void tbObjects_Enter(object sender, EventArgs e)
         {
             Acad.SelectObjectIds(_tactileTechProcess.Objects?.AcadObjectIds);
+        }
+
+        private void tbOrigin_Enter(object sender, EventArgs e)
+        {
+            Acad.SelectObjectIds(_tactileTechProcess.OriginObject);
         }
     }
 }

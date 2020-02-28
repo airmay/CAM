@@ -10,8 +10,9 @@ namespace CAM
         MachineType MachineType { get; set; }
         Material Material { get; set; }
         string Caption { get; set; }
-        int OriginX { get; set; }
-        int OriginY { get; set; }
+        double OriginX { get; set; }
+        double OriginY { get; set; }
+        ObjectId[] OriginObject { get; set; }
         List<ProcessCommand> ProcessCommands { get; set; }
         ProcessingArea ProcessingArea { get; set; }
         List<ITechOperation> TechOperations { get; }

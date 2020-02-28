@@ -39,7 +39,7 @@ namespace CAM
 
         public void DeleteTechProcess(ITechProcess techProcess)
         {
-            Acad.DeleteExtraObjects(techProcess.ToolpathCurves, techProcess.ToolObject);
+            Acad.DeleteExtraObjects(techProcess.ToolpathCurves, techProcess.ToolObject, techProcess.OriginObject);
             TechProcessList.Remove(techProcess);
         }
 

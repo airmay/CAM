@@ -71,14 +71,30 @@ namespace CAM
             });
         }
 
+        public static void DeleteObjects(ObjectId[] ids)
+        {
+            _highlightedObjects = _highlightedObjects.Except(ids).ToArray();
+            App.LockAndExecute(() => ids.QForEach(p => p.Erase()));
+        }
+
         public static void DeleteCurves(IEnumerable<Curve> curves)
         {
             if (curves != null && curves.Any())
+                DeleteObjects(curves.Select(p => p.ObjectId).ToArray());
+        }
+
+        public static ObjectId[] CreateOriginObject(Point3d point)
+        {
+            int length = 100;
+            var curves = new Curve[]
             {
-                var ids = curves.Select(p => p.ObjectId).ToArray();
-                _highlightedObjects = _highlightedObjects.Except(ids).ToArray();
-                App.LockAndExecute(() => ids.QForEach(p => p.Erase()));
-            }
+                NoDraw.Line(point, point + Vector3d.XAxis * length),
+                NoDraw.Line(point, point + Vector3d.YAxis * length),
+                NoDraw.Rectang(new Point3d(point.X - length / 10, point.Y - length / 10, 0), new Point3d(point.X + length / 10, point.Y + length / 10, 0))
+            };
+            var layerId = GetExtraObjectsLayerId();
+            App.LockAndExecute(() => curves.Select(p => { p.LayerId = layerId; return p; }).AddToCurrentSpace());
+            return Array.ConvertAll(curves, p => p.ObjectId);
         }
 
         #region ToolModel
@@ -189,8 +205,11 @@ namespace CAM
         public const string ProcessLayerName = "Обработка";
         public const string HatchLayerName = "Штриховка";
         public const string GashLayerName = "Запилы";
+        public const string ExtraObjectsLayerName = "Дополнительные объекты";
 
         public static ObjectId GetProcessLayerId() => DbHelper.GetLayerId(ProcessLayerName);
+
+        public static ObjectId GetExtraObjectsLayerId() => DbHelper.GetLayerId(ExtraObjectsLayerName);
 
         public static ObjectId GetHatchLayerId() => GetLayerId(HatchLayerName, layer => layer.Transparency = new Transparency(255 * (100 - 70) / 100));
 
@@ -214,36 +233,32 @@ namespace CAM
             {
                 ClearHighlighted();
                 var layerTable = HostApplicationServices.WorkingDatabase.LayerTableId.QOpenForRead<SymbolTable>();
-                if (layerTable.Has(ProcessLayerName))
-                {
-                    HostApplicationServices.WorkingDatabase.Clayer = layerTable["0"];
-                    var ids = QuickSelection.SelectAll(FilterList.Create().Layer(ProcessLayerName));
-                    ids.QForEach(entity => entity.Erase());
-                    layerTable[ProcessLayerName].Erase();
-                }
-                if (layerTable.Has(HatchLayerName))
-                {
-                    HostApplicationServices.WorkingDatabase.Clayer = layerTable["0"];
-                    var ids = QuickSelection.SelectAll(FilterList.Create().Layer(HatchLayerName));
-                    ids.QForEach(entity => entity.Erase());
-                    layerTable[HatchLayerName].Erase();
-                }
-                if (layerTable.Has(GashLayerName))
-                {
-                    HostApplicationServices.WorkingDatabase.Clayer = layerTable["0"];
-                    var ids = QuickSelection.SelectAll(FilterList.Create().Layer(GashLayerName));
-                    ids.QForEach(entity => entity.Erase());
-                    layerTable[GashLayerName].Erase();
-                }
+                HostApplicationServices.WorkingDatabase.Clayer = layerTable["0"];
+                DeleteByLayer(layerTable, ProcessLayerName);
+                DeleteByLayer(layerTable, HatchLayerName);
+                DeleteByLayer(layerTable, GashLayerName);
+                DeleteByLayer(layerTable, ExtraObjectsLayerName);
             });
+
+            void DeleteByLayer(SymbolTable layerTable, string layerName)
+            {
+                if (layerTable.Has(layerName))
+                {
+                    var ids = QuickSelection.SelectAll(FilterList.Create().Layer(layerName));
+                    ids.QForEach(entity => entity.Erase());
+                    layerTable[layerName].Erase();
+                }
+            }
         }
 
-        public static void DeleteExtraObjects(IEnumerable<Curve> curves, ToolObject toolModel)
+        public static void DeleteExtraObjects(IEnumerable<Curve> curves, ToolObject toolModel, ObjectId[] originObject = null)
         {
             DeleteCurves(curves);
             DeleteByLayer(HatchLayerName);
             DeleteByLayer(GashLayerName);
             DeleteToolModel(toolModel);
+            if (originObject != null)
+                Acad.DeleteObjects(originObject);
         }
 
         public static void HideExtraObjects(IEnumerable<Curve> curves, ToolObject toolModel)

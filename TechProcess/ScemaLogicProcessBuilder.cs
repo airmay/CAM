@@ -32,14 +32,14 @@ namespace CAM
         //private double _currentAngle;
         private Corner? _startCorner;
 
-        public ScemaLogicProcessBuilder(MachineType machineType, string caption, int toolNumber, int frequency, int zSafety)
+        public ScemaLogicProcessBuilder(MachineType machineType, string caption, int toolNumber, int frequency, int zSafety, double originX, double originY)
         {
             ZSafety = zSafety;
             Frequency = frequency;
             //_techProcessParams = techProcessParams;
             //_generator = new DonatoniCommandGenerator();
             //_generator = new DonatoniCommandGenerator();
-            _generator.StartMachine(caption, toolNumber);
+            _generator.StartMachine(caption, toolNumber, originX, originY);
         }
 
         public List<ProcessCommand> FinishTechProcess()
