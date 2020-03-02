@@ -34,6 +34,7 @@ namespace CAM
             if (ex != null)
                 File.WriteAllText($@"\\US-CATALINA3\public\Программы станок\CodeRepository\Logs\error_{DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss")}.log", $"{Acad.ActiveDocument.Name}\n\n{message}\n\n{ex.FullMessage()}");
         }
+
         public static void Write(Exception ex) => Write("Ошибка", ex);
 
         public static void Alert(string message, Exception ex = null)
@@ -124,7 +125,7 @@ namespace CAM
                     toolModel.ToolInfo.Index = index;
                     if (index == 1)
                     {
-                        toolModel.Circle0 = new Circle(new Point3d(isFrontPlaneZero ? 0 : -thickness, 0, diameter / 2), Vector3d.YAxis, diameter / 2);
+                        toolModel.Circle0 = new Circle(new Point3d(0, isFrontPlaneZero ? 0 : -thickness, diameter / 2), Vector3d.YAxis, diameter / 2);
                         toolModel.Circle1 = new Circle(toolModel.Circle0.Center + Vector3d.YAxis * thickness, Vector3d.YAxis, diameter / 2);
                         toolModel.Axis = new Line(toolModel.Circle1.Center, toolModel.Circle1.Center + Vector3d.YAxis * diameter / 4);
                     }
@@ -302,6 +303,20 @@ namespace CAM
             return dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK
                 ? dialog.Filename
                 : null;
+        }
+
+        public static ObjectId[] CreateMeasurementPoint(Point3d point)
+        {
+            int radius = 10;
+            var curves = new Curve[]
+            {
+                NoDraw.Line(new Point3d(point.X - radius, point.Y, 0), new Point3d(point.X + radius, point.Y, 0)),
+                NoDraw.Line(new Point3d(point.X, point.Y - radius, 0), new Point3d(point.X, point.Y + radius, 0)),
+                NoDraw.Circle(point, radius)
+            };
+            var layerId = GetExtraObjectsLayerId();
+            App.LockAndExecute(() => curves.Select(p => { p.LayerId = layerId; return p; }).AddToCurrentSpace());
+            return Array.ConvertAll(curves, p => p.ObjectId);
         }
 
         public static void SaveToPdf()

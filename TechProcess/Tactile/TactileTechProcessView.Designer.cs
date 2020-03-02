@@ -76,7 +76,6 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.cbMachine.DataBindings.Add(new System.Windows.Forms.Binding("Text", this.tactileTechProcessBindingSource, "MachineType", true));
             this.cbMachine.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.cbMachine.Enabled = false;
             this.cbMachine.FormattingEnabled = true;
             this.cbMachine.Location = new System.Drawing.Point(102, 3);
             this.cbMachine.Name = "cbMachine";

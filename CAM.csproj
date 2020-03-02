@@ -168,6 +168,13 @@
       <DependentUpon>ConesTechOperationView.cs</DependentUpon>
     </Compile>
     <Compile Include="TechProcess\Tactile\ITechProcessFactory.cs" />
+    <Compile Include="TechProcess\Tactile\Measurement\MeasurementTechOperation.cs" />
+    <Compile Include="TechProcess\Tactile\Measurement\MeasurementTechOperationView.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="TechProcess\Tactile\Measurement\MeasurementTechOperationView.Designer.cs">
+      <DependentUpon>MeasurementTechOperationView.cs</DependentUpon>
+    </Compile>
     <Compile Include="TechProcess\Tactile\TactileTechProcess.cs" />
     <Compile Include="TechProcess\Tactile\TactileTechProcessFactory.cs" />
     <Compile Include="TechProcess\Tactile\TactileTechProcessParams.cs" />
@@ -338,6 +345,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="TechProcess\Tactile\Cones\ConesTechOperationView.resx">
       <DependentUpon>ConesTechOperationView.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="TechProcess\Tactile\Measurement\MeasurementTechOperationView.resx">
+      <DependentUpon>MeasurementTechOperationView.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="TechProcess\Tactile\TactileTechProcessView.resx">
       <DependentUpon>TactileTechProcessView.cs</DependentUpon>

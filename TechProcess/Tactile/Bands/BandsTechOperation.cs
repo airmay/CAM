@@ -75,6 +75,7 @@ namespace CAM.Tactile
             if (PassList?.Any() != true)
                 CalcPassList();
             var tactileTechProcess = (TactileTechProcess)TechProcess;
+            var thickness = TechProcess.Tool.Thickness.Value;
             var contour = tactileTechProcess.GetContour();
             var contourPoints = contour.GetPolyPoints().ToArray();
             var basePoint = ProcessingAngle == 45 ? contourPoints[3] : contourPoints[0];
@@ -86,30 +87,52 @@ namespace CAM.Tactile
             var passDir = ray.UnitDir.GetPerpendicularVector();
             if (ProcessingAngle >= 90)
                 passDir = passDir.Negate();
-            var diag = (contourPoints[2] - contourPoints[0]).Length;
             double offset = BandStart - BandSpacing - BandWidth;
+            var size = (contourPoints[ProcessingAngle == 0 ? 3 : ProcessingAngle == 90 ? 1 : 2] - contourPoints[0]).Length;
 
             builder.StartTechOperation();
+
+            if (ProcessingAngle == 45 ^ TechProcess.MachineType == MachineType.Donatoni)
+                Cutting(0.8 * thickness, CuttingFeed, -thickness);
+
+            if (offset > 0)
+            {
+                var count = (int)Math.Ceiling(offset / (0.8 * thickness));
+                Algorithms.Range(-0.8 * thickness * count, -0.1, 0.8 * thickness).ForEach(p => Cutting(offset + PassList[0].Pos + p, CuttingFeed));
+            }
+
             do
             {
                 foreach (var pass in PassList)
-                {
-                    ray.BasePoint = basePoint + passDir * (offset + pass.Pos);
-                    var points = new Point3dCollection();
-                    ray.IntersectWith(contour, Intersect.ExtendThis, new Plane(), points, IntPtr.Zero, IntPtr.Zero);
-                    if (points.Count == 2 && points[0] != points[1])
-                    {
-                        var vector = (points[1] - points[0]).GetNormal() * tactileTechProcess.TactileTechProcessParams.Departure;
-                        var startPoint = points[0] - vector - Vector3d.ZAxis * Depth;
-                        var endPoint = points[1] + vector - Vector3d.ZAxis * Depth;
-                        builder.Cutting(startPoint, endPoint, pass.CuttingType == CuttingType.Roughing ? CuttingFeed : FeedFinishing, tactileTechProcess.TactileTechProcessParams.TransitionFeed);
-                    }
-                }
+                    Cutting(offset + pass.Pos, pass.CuttingType == CuttingType.Roughing ? CuttingFeed : FeedFinishing);
+
                 offset += BandWidth + BandSpacing;
             }
-            while (offset < diag);
+            while (offset < size);
+
+            if (offset - BandSpacing < size)
+                Algorithms.Range(offset - BandSpacing, size, 0.8 * thickness).ForEach(p => Cutting(p, CuttingFeed));
+
+            if (ProcessingAngle == 45 ^ TechProcess.MachineType == MachineType.ScemaLogic)
+                Cutting(size - 0.8 * thickness, CuttingFeed, thickness);
 
             ProcessCommands = builder.FinishTechOperation();
+
+            void Cutting(double pos, int feed, double s = 0)
+            {
+                if (pos < 0 || pos > size)
+                    return;
+                ray.BasePoint = basePoint + passDir * pos;
+                var points = new Point3dCollection();
+                ray.IntersectWith(contour, Intersect.ExtendThis, new Plane(), points, IntPtr.Zero, IntPtr.Zero);
+                if (points.Count == 2)
+                {
+                    var vector = (points[1] - points[0]).GetNormal() * tactileTechProcess.TactileTechProcessParams.Departure;
+                    var startPoint = points[0] + passDir * s - vector - Vector3d.ZAxis * Depth;
+                    var endPoint = points[1] + passDir * s + vector - Vector3d.ZAxis * Depth;
+                    builder.Cutting(startPoint, endPoint, feed, tactileTechProcess.TactileTechProcessParams.TransitionFeed);
+                }
+            }
         }
     }
 }
