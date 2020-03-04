@@ -27,6 +27,8 @@ namespace CAM
 
         public static Editor Editor => Application.DocumentManager.MdiActiveDocument.Editor;
 
+        public static ToolObject ToolObject { get; set; }
+
         public static void Write(string message, Exception ex = null)
         {
             var text = ex == null ? message : $"{message}: {ex.Message}";
@@ -101,6 +103,8 @@ namespace CAM
         #region ToolModel
         public static void DrawToolModel(ToolObject toolObject, ToolInfo toolInfo)
         {
+            if (toolInfo.Point.IsNull())
+                return;
             var mat1 = Matrix3d.Displacement(toolObject.ToolInfo.Point.GetVectorTo(toolInfo.Point));
             var mat2 = Matrix3d.Rotation(Graph.ToRad(toolObject.ToolInfo.AngleC - toolInfo.AngleC), Vector3d.ZAxis, toolInfo.Point);
             var mat3 = Matrix3d.Rotation(Graph.ToRad(toolInfo.AngleA - toolObject.ToolInfo.AngleA), Vector3d.XAxis.RotateBy(Graph.ToRad(-toolInfo.AngleC), Vector3d.ZAxis), toolInfo.Point);
@@ -305,7 +309,7 @@ namespace CAM
                 : null;
         }
 
-        public static ObjectId[] CreateMeasurementPoint(Point3d point)
+        public static ObjectId[] CreateMeasurementPoint(Point3d point) => App.LockAndExecute(() =>
         {
             int radius = 10;
             var curves = new Curve[]
@@ -315,9 +319,9 @@ namespace CAM
                 NoDraw.Circle(point, radius)
             };
             var layerId = GetExtraObjectsLayerId();
-            App.LockAndExecute(() => curves.Select(p => { p.LayerId = layerId; return p; }).AddToCurrentSpace());
+            curves.Select(p => { p.LayerId = layerId; return p; }).AddToCurrentSpace();
             return Array.ConvertAll(curves, p => p.ObjectId);
-        }
+        });
 
         public static void SaveToPdf()
         {

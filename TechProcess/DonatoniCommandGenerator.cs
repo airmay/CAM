@@ -13,11 +13,13 @@ namespace CAM
     public class DonatoniCommandGenerator
     {
         private int _startRangeIndex;
-        private const int UpperZ = 100;
+        public const int UpperZ = 80;
         public ToolInfo ToolInfo;
         private int _GCode;
         private int _feed;
         private double _originX, _originY;
+        private int _frequency;
+        private int _zSafety;
 
         private readonly Dictionary<string, Color> Colors = new Dictionary<string, Color>()
         {
@@ -32,21 +34,24 @@ namespace CAM
 
         public Point3d ToolPosition => ToolInfo.Point;
 
-        public bool EngineStarted => ToolPosition.Z < UpperZ;
+        public bool EngineStarted { get; set; } 
 
         public void StartRange() => _startRangeIndex = Commands.Count;
 
         public List<ProcessCommand> GetRange() => Commands.GetRange(_startRangeIndex, Commands.Count - _startRangeIndex);
 
+        public string Thick { get; set; }
+
         /// <summary>
         /// Запуск станка
         /// </summary>
         /// <param name="toolNumber"></param>
-        public void StartMachine(string caption, int toolNumber, double originX, double originY)
+        public void StartMachine(string caption, int toolNumber, double originX, double originY, int zSafety)
         {
-            ToolInfo.Point = new Point3d(0, 0, UpperZ);
             _originX = originX;
             _originY = originY;
+            _zSafety = zSafety;
+            EngineStarted = false;
 
             CreateCommand($"; Donatoni \"{caption}\"");
             CreateCommand($"; DATE {DateTime.Now}");
@@ -65,16 +70,34 @@ namespace CAM
             CreateCommand("G154O10");
         }
 
-        internal void SetTool(int toolNo)
+        public void SetTool(int toolNo, int frequency)
         {
             if (ToolInfo.Index != toolNo)
             {
+                if (EngineStarted)
+                    StopEngine();
+
                 ToolInfo.Index = toolNo;
-                CreateCommand($"T{toolNo}");
+                ToolInfo.Set(Algorithms.NullPoint3d, 0, 0);
+
+                CreateCommand($"T{toolNo}", "");
                 CreateCommand("M6");
                 CreateCommand("G172 T1 H1 D1");
                 CreateCommand("M300");
             }
+            _frequency = frequency;
+        }
+
+        public void StopEngine()
+        {
+            CreateCommand("M5", "Останов шпинделя");
+            CreateCommand("M9", "Отключение охлаждения");
+            CreateCommand("G61");
+            CreateCommand("G153");
+            CreateCommand("G0 G53 Z0");
+            CreateCommand("SETMSP=1");
+
+            EngineStarted = false;
         }
 
         /// <summary>
@@ -82,48 +105,44 @@ namespace CAM
         /// </summary>
         public void StopMachine()
         {
-            CreateCommand("M5");              // выключение шпинделя                       
             //if (Settings.Machine == MachineKind.Krea)
             //{
             //    AddLine("M9 M10");          // выключение воды
             //    AddLine("G0 G79 Z(@ZUP)");  // подъем в верхнюю точку
             //}
-            CreateCommand("M9");
-            CreateCommand("G61");
-            CreateCommand("G153");
-            CreateCommand(";G0 G53 Z0");
-            CreateCommand("SETMSP=1");
+            StopEngine();
+
             CreateCommand("G0 G53 Z0 ");
             CreateCommand("G0 G53 A0 C0");
             CreateCommand("G0 G53 X0 Y0");
-            CreateCommand("M30");
+            CreateCommand("M30", "Конец");
 
             int number = 0;
             Commands.ForEach(p => p.Number = ++number);
         }
 
         /// <summary>
-        /// Первый подвод
+        /// подвод
         /// </summary>
         /// <param name="point"></param>
         /// <param name="angleC"></param>
         /// <param name="frequency"></param>
-        public void InitialMove(double x, double y, double z, double angleC, int frequency) //, int feed)
+        public void Move(double x, double y, double angleC, double angleA)
         {
-            CreateCommand("T1");
-            CreateCommand("M6");
-            CreateCommand("G172 T1 H1 D1");
-            CreateCommand("M300");
-            //G17 плоскость
+            CreateCommand(EngineStarted ? CommandNames.Fast : CommandNames.InitialMove, 0, x: x, y: y, angleC: angleC);
+            if (!EngineStarted)
+                CreateCommand(CommandNames.InitialMove, 0, z: _zSafety);
 
-            CreateCommand(CommandNames.InitialMove, 0, x: x, y: y, angleC: angleC);
-            CreateCommand(CommandNames.InitialMove, 0, z: z);
+            if (angleA != ToolInfo.AngleA)
+                CreateCommand("Наклон", 1, angleA: angleA);
 
-            //CreateCommand($"G1 A0 F{feed}");
-            //CreateCommand($"G1 Z{Round(point.Z)} F{feed}");
+            if (!EngineStarted)
+            {
+                CreateCommand(ToolInfo.Index == 2 ? "M8" : "M7");
+                CreateCommand($"M3 S{_frequency}");
 
-            CreateCommand("M8"); // M7 ?
-            CreateCommand($"M3 S{frequency}");
+                EngineStarted = true;
+            }
         }
 
         /// <summary>
@@ -209,11 +228,11 @@ namespace CAM
             var commandText = $"G{gCode}{Format("X", point.Value.X, ToolInfo.Point.X, _originX)}{Format("Y", point.Value.Y, ToolInfo.Point.Y, _originY)}" +
                 $"{Format("Z", point.Value.Z, ToolInfo.Point.Z)}{Format("C", angleC, ToolInfo.AngleC)}{Format("A", angleA, ToolInfo.AngleA)}{Format("F", feed, _feed)}";
 
-            if (name != CommandNames.InitialMove)
+            if (!ToolInfo.Point.IsNull())
             {
                 if (curve == null && (point.Value - ToolInfo.Point).Length > 1)
                     curve = NoDraw.Line(ToolInfo.Point, point.Value);
-                if (curve != null)
+                if (curve != null && Colors.ContainsKey(name))
                     curve.Color = Colors[name];
             }
 

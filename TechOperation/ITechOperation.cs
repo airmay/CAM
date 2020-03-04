@@ -17,5 +17,9 @@ namespace CAM
         void BuildProcessing(ScemaLogicProcessBuilder builder);
 
         void SetToolpathVisible(bool visible);
+
+        void Setup(ITechProcess techProcess);
+
+        void Teardown();
     }
 }

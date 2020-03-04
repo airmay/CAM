@@ -39,7 +39,7 @@ namespace CAM
 
                 if (camDocument.TechProcessList != null)
                 {
-                    camDocument.TechProcessList.ForEach(p => p.Init(settings));
+                    camDocument.TechProcessList.ForEach(p => p.Setup(settings));
                     Acad.Write($"Загружены техпроцессы: {string.Join(", ", camDocument.TechProcessList.Select(p => p.Caption))}");
                 }
             }

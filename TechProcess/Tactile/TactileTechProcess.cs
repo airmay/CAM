@@ -35,9 +35,9 @@ namespace CAM.Tactile
             Material = Material.Granite;
         }
 
-        public override void Init(Settings settings)
+        public override void Setup(Settings settings)
         {
-            base.Init(settings);
+            base.Setup(settings);
             Objects.Refresh();
         }
 
@@ -177,6 +177,7 @@ namespace CAM.Tactile
         {
             if (!base.Validate())
                 return false;
+
             if (Type == null)
             {
                 Acad.Alert("Не определен тип плитки");

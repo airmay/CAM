@@ -25,6 +25,7 @@ namespace CAM
             [CommandNames.Fast] = Color.FromColor(System.Drawing.Color.Crimson),
             [CommandNames.Transition] = Color.FromColor(System.Drawing.Color.Yellow)
         };
+
         //private readonly TechProcessParams _techProcessParams;
         //private readonly ScemaLogicCommandGenerator _generator = new ScemaLogicCommandGenerator();
         private readonly DonatoniCommandGenerator _generator = new DonatoniCommandGenerator();
@@ -39,7 +40,7 @@ namespace CAM
             //_techProcessParams = techProcessParams;
             //_generator = new DonatoniCommandGenerator();
             //_generator = new DonatoniCommandGenerator();
-            _generator.StartMachine(caption, toolNumber, originX, originY);
+            _generator.StartMachine(caption, toolNumber, originX, originY, zSafety);
         }
 
         public List<ProcessCommand> FinishTechProcess()
@@ -48,10 +49,10 @@ namespace CAM
             return _generator.Commands;
         }
 
-        public void StartTechOperation(int toolNo = 1)
+        public void StartTechOperation(int toolNo = 1, int? frequency = null)
         { 
             _generator.StartRange();
-            _generator.SetTool(toolNo);
+            _generator.SetTool(toolNo, frequency ?? Frequency);
         }
 
         public List<ProcessCommand> FinishTechOperation()
@@ -70,19 +71,17 @@ namespace CAM
         /// <summary>
         /// Перемещение над деталью
         /// </summary>
-        private void Move(double x, double y, double angleC, double angleA = 0)
-        {
-            //var destPoint = new Point3d(point.X, point.Y, ZSafety);
-            if (_generator.EngineStarted)
-                _generator.CreateCommand(CommandNames.Fast, 0, x: x, y: y, angleC: angleC);
-            else
-                _generator.InitialMove(x, y, ZSafety, angleC, Frequency);
-            if (angleA != _generator.ToolInfo.AngleA)
-                _generator.CreateCommand("", 1, angleA: angleA);
-            //_generator.Fast(LineTo(destPoint), angleC, angleA);
-            //_currentPoint = destPoint;
-            //_currentAngle = angleC;
-        }
+        //private void Move(double x, double y, double angleC, double angleA = 0)
+        //{
+        //    //var destPoint = new Point3d(point.X, point.Y, ZSafety);
+        //    if (_generator.EngineStarted)
+        //        _generator.CreateCommand(CommandNames.Fast, 0, x: x, y: y, angleC: angleC);
+        //    else
+        //        _generator.InitialMove(x, y, ZSafety, angleC, Frequency);
+        //    if (angleA != _generator.ToolInfo.AngleA)
+        //        _generator.CreateCommand("", 1, angleA: angleA);
+
+        //}
 
         /// <summary>
         /// Рез к точке
@@ -90,7 +89,7 @@ namespace CAM
         public void Cutting(double x, double y, double z, double angleC, int cuttingFeed, double angleA = 0)
         {
             if (_generator.ToolPosition.Z >= ZSafety)
-                Move(x, y, angleC, angleA);
+                _generator.Move(x, y, angleC, angleA);
             _generator.CreateCommand(CommandNames.Penetration, 1, x: x, y: y, z: z, angleC: angleC, angleA: angleA, feed: cuttingFeed);
         }
 
@@ -109,7 +108,7 @@ namespace CAM
             _startCorner = null;
             var angleC = CalcToolAngle(curve, point, engineSide);
             if (_generator.ToolPosition.Z >= ZSafety)
-                Move(point.X, point.Y, angleC, angleA);
+                _generator.Move(point.X, point.Y, angleC, angleA);
 
             //double angle = 0;
             //if (_generator.ToolPosition.Z >= ZSafety)
@@ -139,6 +138,20 @@ namespace CAM
         public void Pause()
         {
             _generator.CreateCommand("G4 F0.2", "Пауза");
+        }
+
+        public void Measure(List<double> pointsX, List<double> pointsY)
+        {
+            for (int i = 0; i < pointsX.Count; i++)
+            {
+                _generator.CreateCommand("", 0, x: pointsX[i], y: pointsY[0]);
+                _generator.CreateCommand("", 0, z: DonatoniCommandGenerator.UpperZ);
+                _generator.CreateCommand("M131");
+                _generator.CreateCommand($"DBL THICK{i} = %TastL.ZLastra - %TastL.ZBanco", "Измерение");
+                _generator.CreateCommand($"G0 Z(THICK{i}/1000 + 100)");
+            }
+            var s = String.Join(" + ", Enumerable.Range(0, pointsX.Count).Select(p => $"THICK{p}"));
+            _generator.CreateCommand($"DBL THICK = ({s})/{pointsX.Count}/1000");
         }
 
         /// <summary>

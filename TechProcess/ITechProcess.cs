@@ -14,7 +14,7 @@ namespace CAM
         double OriginY { get; set; }
         ObjectId[] OriginObject { get; set; }
         List<ProcessCommand> ProcessCommands { get; set; }
-        ProcessingArea ProcessingArea { get; set; }
+        ProcessingArea ProcessingArea { get; set; } 
         List<ITechOperation> TechOperations { get; }
         Tool Tool { get; set; }
         ToolObject ToolObject { get; set; }
@@ -22,7 +22,6 @@ namespace CAM
 
         void BuildProcessing();
         void DeleteProcessCommands();
-        void Init(Settings settings);
 
         bool TechOperationMoveDown(ITechOperation techOperation);
         bool TechOperationMoveUp(ITechOperation techOperation);
@@ -30,5 +29,9 @@ namespace CAM
         List<ITechOperation> CreateTechOperations();
 
         bool Validate();
+
+        void Setup(Settings settings);
+
+        void Teardown();
     }
 }

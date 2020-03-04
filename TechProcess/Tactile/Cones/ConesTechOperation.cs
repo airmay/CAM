@@ -17,28 +17,13 @@ namespace CAM.Tactile
 
         public int FeedMin { get; set; }
 
-        //public double BandWidth { get; set; }
-
-        //public double BandSpacing { get; set; }
-
-        //public double BandStart1 { get; set; }
-
-        //public double BandStart2 { get; set; }
-
         public int Frequency { get; set; }
-
-        //public int ProcessingAngle { get; set; }
 
         public ConesTechOperation(TactileTechProcess techProcess, string name) : base(techProcess, name)
         {
-            //BandWidth = techProcess.BandWidth.Value;
-            //BandSpacing = techProcess.BandSpacing.Value;
-            //BandStart1 = techProcess.BandStart1.Value;
-            //BandStart2 = techProcess.BandStart2.Value;
             FeedMax = 200;
             FeedMin = 80;
             Frequency = 5000;
-            //ProcessingAngle = 45;
         }
 
         public override void BuildProcessing(ScemaLogicProcessBuilder builder)

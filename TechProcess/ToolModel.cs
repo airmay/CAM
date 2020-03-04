@@ -11,11 +11,7 @@ namespace CAM
 
         public Line Axis { get; set; }
 
-        //public Point3d Origin { get; set; }
-
-        //public double AngleC { get; set; }
-
-        //public double AngleA { get; set; }
+        public Tool Tool { get; set; }
 
         public ToolInfo ToolInfo;
 

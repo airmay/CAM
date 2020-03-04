@@ -49,11 +49,12 @@
             // 
             this.tbPointsCount.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.tbPointsCount.Location = new System.Drawing.Point(100, 3);
+            this.tbPointsCount.Location = new System.Drawing.Point(102, 3);
             this.tbPointsCount.Name = "tbPointsCount";
             this.tbPointsCount.ReadOnly = true;
-            this.tbPointsCount.Size = new System.Drawing.Size(130, 20);
+            this.tbPointsCount.Size = new System.Drawing.Size(128, 20);
             this.tbPointsCount.TabIndex = 43;
+            this.tbPointsCount.Enter += new System.EventHandler(this.tbPointsCount_Enter);
             // 
             // label1
             // 

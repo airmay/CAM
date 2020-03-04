@@ -47,14 +47,23 @@ namespace CAM
 
         public TechOperationBase(ITechProcess techProcess, string caption)
         {
-            _techProcess = techProcess;
-            _techProcess.TechOperations.Add(this);
-            Caption = $"{caption}{_techProcess.TechOperations.Count()}";
+            techProcess.TechOperations.Add(this);
+            Caption = $"{caption}{techProcess.TechOperations.Count()}";
+            Setup(techProcess);
         }
 
         public abstract void BuildProcessing(ScemaLogicProcessBuilder builder);
 
         public void SetToolpathVisible(bool visible) => ToolpathCurves.ForEach(p => p.Visible = visible);
+
+        public virtual void Setup(ITechProcess techProcess)
+        {
+            TechProcess = techProcess;
+        }
+
+        public virtual void Teardown()
+        {
+        }
 
         public IEnumerable<Curve> ToolpathCurves => ProcessCommands?.Select(p => p.ToolpathCurve).Where(p => p != null);
     }

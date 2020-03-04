@@ -61,7 +61,7 @@ namespace CAM
             _settings = settings;
         }
 
-        public virtual void Init(Settings settings)
+        public virtual void Setup(Settings settings)
         {
             _settings = settings;
             ProcessingArea.Refresh();
@@ -70,8 +70,8 @@ namespace CAM
 
             TechOperations.ForEach(to =>
             {
+                to.Setup(this);
                 //to.ProcessingArea.AcadObjectIds = Acad.GetObjectIds(to.ProcessingArea.Handles);
-                to.TechProcess = this;
             });
         }
 
@@ -111,6 +111,12 @@ namespace CAM
                 return false;
             }
             return true;
+        }
+
+        public virtual void Teardown()
+        {
+            Acad.DeleteExtraObjects(ToolpathCurves, ToolObject, OriginObject);
+            TechOperations.ForEach(to => to.Teardown());
         }
     }
 }
