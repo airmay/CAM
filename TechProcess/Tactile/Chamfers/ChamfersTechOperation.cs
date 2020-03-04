@@ -45,7 +45,6 @@ namespace CAM.Tactile
             var step = tactileTechProcess.BandWidth.Value + tactileTechProcess.BandSpacing.Value;
             var tactileParams = tactileTechProcess.TactileTechProcessParams;
 
-            builder.StartTechOperation();
             while(true)
             {
                 var points = new Point3dCollection();
@@ -67,7 +66,6 @@ namespace CAM.Tactile
                     break;
                 ray.BasePoint += passDir * step;
             }
-            ProcessCommands = builder.FinishTechOperation();
         }
     }
 }

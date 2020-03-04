@@ -45,7 +45,7 @@ namespace CAM
 
         public void DeleteTechOperation(TechOperationBase techOperation)
         {
-            Acad.DeleteCurves(techOperation.ToolpathCurves);
+            techOperation.Teardown();
             techOperation.TechProcess.TechOperations.Remove(techOperation);
         }
 
@@ -64,16 +64,7 @@ namespace CAM
         public void SelectProcessCommand(ITechProcess techProcess, ProcessCommand processCommand)
         {
             Acad.SelectCurve(processCommand.ToolpathCurve);
-
-            if (techProcess.ToolObject != null && techProcess.ToolObject.ToolInfo.Index != processCommand.ToolInfo.Index)
-            {
-                Acad.DeleteToolModel(techProcess.ToolObject);
-                techProcess.ToolObject = null;
-            }
-            if (techProcess.ToolObject == null && processCommand.ToolInfo.Index != 0)
-                techProcess.ToolObject = Acad.CreateToolModel(processCommand.ToolInfo.Index, techProcess.Tool.Diameter, techProcess.Tool.Thickness.Value, techProcess.MachineType == MachineType.Donatoni);
-            if (techProcess.ToolObject != null)
-                Acad.DrawToolModel(techProcess.ToolObject, processCommand.ToolInfo);
+            Acad.ShowToolObject(techProcess.Tool, processCommand.ToolIndex, processCommand.ToolLocation, techProcess.MachineType == MachineType.Donatoni);
         }
        
         public void BuildProcessing(ITechProcess techProcess, BorderProcessingArea startBorder = null)
@@ -82,12 +73,11 @@ namespace CAM
             {
                 Acad.Write($"Выполняется расчет обработки по техпроцессу {techProcess.Caption} ...");
 
-                Acad.DeleteExtraObjects(techProcess.ToolpathCurves, techProcess.ToolObject);
-                techProcess.ToolObject = null;
+                Acad.DeleteExtraObjects(techProcess.ToolpathCurves);
 
                 techProcess.BuildProcessing(); // startBorder);
 
-                Acad.SaveCurves(techProcess.ToolpathCurves);
+                Acad.SaveToolpathCurves(techProcess.ToolpathCurves);
 
                 Acad.Write("Расчет обработки завершен");
             }
@@ -100,8 +90,7 @@ namespace CAM
 
         public void HideShowProcessing(ITechProcess techProcess)
         {
-            Acad.HideExtraObjects(techProcess.ToolpathCurves, techProcess.ToolObject);
-            techProcess.ToolObject = null;
+            Acad.HideExtraObjects(techProcess.ToolpathCurves);
         }
 
         public void SwapOuterSide(ITechProcess techProcess, TechOperationBase techOperation)

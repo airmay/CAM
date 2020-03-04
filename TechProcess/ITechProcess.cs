@@ -17,7 +17,7 @@ namespace CAM
         ProcessingArea ProcessingArea { get; set; } 
         List<ITechOperation> TechOperations { get; }
         Tool Tool { get; set; }
-        ToolObject ToolObject { get; set; }
+        
         IEnumerable<Curve> ToolpathCurves { get; }
 
         void BuildProcessing();

@@ -46,15 +46,6 @@ namespace CAM
             set => _originObject = value;
         }
 
-        [NonSerialized]
-        private ToolObject _toolModel;
-
-        public ToolObject ToolObject
-        {
-            get => _toolModel;
-            set => _toolModel = value;
-        }
-
         public TechProcessBase(string caption, Settings settings)
         {
             Caption = caption;
@@ -96,8 +87,14 @@ namespace CAM
             DeleteProcessCommands();
             ProcessingArea?.Refresh();
             //BorderProcessingArea.ProcessBorders(TechOperations.Select(p => p.ProcessingArea).OfType<BorderProcessingArea>().ToList(), startBorder);
-            var builder = new ScemaLogicProcessBuilder(MachineType, Caption, Tool.Number, Frequency, MachineSettings.ZSafety, OriginX, OriginY);
-            TechOperations.ForEach(p => p.BuildProcessing(builder));
+            var builder = new ScemaLogicProcessBuilder(MachineType, Caption, OriginX, OriginY, MachineSettings.ZSafety);
+            TechOperations.ForEach(p =>
+            {
+                builder.StartTechOperation();
+                builder.SetTool(1, Frequency);
+                p.BuildProcessing(builder);
+                p.ProcessCommands = builder.FinishTechOperation();
+            });
             ProcessCommands = builder.FinishTechProcess();
         }
 
@@ -115,7 +112,8 @@ namespace CAM
 
         public virtual void Teardown()
         {
-            Acad.DeleteExtraObjects(ToolpathCurves, ToolObject, OriginObject);
+            Acad.DeleteExtraObjects(ToolpathCurves);
+            Acad.DeleteObjects(OriginObject);
             TechOperations.ForEach(to => to.Teardown());
         }
     }

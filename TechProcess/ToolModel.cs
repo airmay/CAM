@@ -13,7 +13,9 @@ namespace CAM
 
         public Tool Tool { get; set; }
 
-        public ToolInfo ToolInfo;
+        public int Index { get; set; }
+
+        public Location Location;
 
         public IEnumerable<Curve> GetCurves()
         {

@@ -48,7 +48,7 @@ namespace CAM.Tactile
                 stepY /= Math.Sqrt(2);
                 stepX = stepY * 2;
             }
-            builder.StartTechOperation(2);
+            builder.SetTool(2, Frequency, 90);
 
             while (y < contourPoints[1].Y)
             {
@@ -71,7 +71,6 @@ namespace CAM.Tactile
                         x += stepX;
                 }
             }
-            ProcessCommands = builder.FinishTechOperation();
 
             void Cutting()
             {

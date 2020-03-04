@@ -1,6 +1,5 @@
 ﻿using Autodesk.AutoCAD.ApplicationServices;
 using Autodesk.AutoCAD.Runtime;
-using CAM.UI;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -80,6 +79,7 @@ namespace CAM
             document.CommandWillStart -= Document_CommandWillStart;
             document.BeginDocumentClose -= Document_BeginDocumentClose;
             _documents.Remove(document);
+
             if (!_documents.Any())
                 _camPaletteSet.SetCamDocument();
         }

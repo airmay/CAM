@@ -15,7 +15,6 @@ namespace CAM
     {
         const int CornerIndentIncrease = 5;
         private int ZSafety;
-        private int Frequency;
 
         private static readonly Dictionary<string, Color> Colors = new Dictionary<string, Color>()
         {
@@ -33,14 +32,14 @@ namespace CAM
         //private double _currentAngle;
         private Corner? _startCorner;
 
-        public ScemaLogicProcessBuilder(MachineType machineType, string caption, int toolNumber, int frequency, int zSafety, double originX, double originY)
+        public ScemaLogicProcessBuilder(MachineType machineType, string caption, double originX, double originY, int zSafety)
         {
             ZSafety = zSafety;
-            Frequency = frequency;
+            //Frequency = frequency;
             //_techProcessParams = techProcessParams;
             //_generator = new DonatoniCommandGenerator();
             //_generator = new DonatoniCommandGenerator();
-            _generator.StartMachine(caption, toolNumber, originX, originY, zSafety);
+            _generator.StartMachine(caption, originX, originY, zSafety);
         }
 
         public List<ProcessCommand> FinishTechProcess()
@@ -49,15 +48,13 @@ namespace CAM
             return _generator.Commands;
         }
 
-        public void StartTechOperation(int toolNo = 1, int? frequency = null)
-        { 
-            _generator.StartRange();
-            _generator.SetTool(toolNo, frequency ?? Frequency);
-        }
+        public void StartTechOperation() => _generator.StartRange();
+
+        public void SetTool(int toolNo, int frequency, double angleA = 0) => _generator.SetTool(toolNo, frequency, angleA);
 
         public List<ProcessCommand> FinishTechOperation()
         {
-            if (_generator.ToolPosition.Z < ZSafety)
+            if (!_generator.IsUpperTool)
                 Uplifting();
             return _generator.GetRange();
         }
@@ -88,7 +85,7 @@ namespace CAM
         /// </summary>
         public void Cutting(double x, double y, double z, double angleC, int cuttingFeed, double angleA = 0)
         {
-            if (_generator.ToolPosition.Z >= ZSafety)
+            if (_generator.IsUpperTool)
                 _generator.Move(x, y, angleC, angleA);
             _generator.CreateCommand(CommandNames.Penetration, 1, x: x, y: y, z: z, angleC: angleC, angleA: angleA, feed: cuttingFeed);
         }
@@ -107,7 +104,7 @@ namespace CAM
             var point = _startCorner.HasValue ? curve.GetPoint(_startCorner.Value) : curve.GetClosestPoint(_generator.ToolPosition);
             _startCorner = null;
             var angleC = CalcToolAngle(curve, point, engineSide);
-            if (_generator.ToolPosition.Z >= ZSafety)
+            if (_generator.IsUpperTool)
                 _generator.Move(point.X, point.Y, angleC, angleA);
 
             //double angle = 0;
@@ -144,14 +141,15 @@ namespace CAM
         {
             for (int i = 0; i < pointsX.Count; i++)
             {
-                _generator.CreateCommand("", 0, x: pointsX[i], y: pointsY[0]);
-                _generator.CreateCommand("", 0, z: DonatoniCommandGenerator.UpperZ);
+                _generator.CreateCommand(CommandNames.Fast, 0, paramsString: "XY", x: pointsX[i], y: pointsY[i], z: DonatoniCommandGenerator.UpperZ);
+                _generator.CreateCommand($"G0 Z{DonatoniCommandGenerator.UpperZ}");
                 _generator.CreateCommand("M131");
                 _generator.CreateCommand($"DBL THICK{i} = %TastL.ZLastra - %TastL.ZBanco", "Измерение");
                 _generator.CreateCommand($"G0 Z(THICK{i}/1000 + 100)");
             }
             var s = String.Join(" + ", Enumerable.Range(0, pointsX.Count).Select(p => $"THICK{p}"));
             _generator.CreateCommand($"DBL THICK = ({s})/{pointsX.Count}/1000");
+            _generator.WithThick = true;
         }
 
         /// <summary>

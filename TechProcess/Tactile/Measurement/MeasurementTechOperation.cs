@@ -49,8 +49,7 @@ namespace CAM.Tactile
 
         public override void Teardown()
         {
-            if (PointObjectIds.Any())
-                Acad.DeleteObjects(PointObjectIds);
+            Acad.DeleteObjects(PointObjectIds);
             base.Teardown();
         }
     }

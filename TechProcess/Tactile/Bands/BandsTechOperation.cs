@@ -90,8 +90,6 @@ namespace CAM.Tactile
             double offset = BandStart - BandSpacing - BandWidth;
             var size = (contourPoints[ProcessingAngle == 0 ? 3 : ProcessingAngle == 90 ? 1 : 2] - contourPoints[0]).Length;
 
-            builder.StartTechOperation();
-
             if (ProcessingAngle == 45 ^ TechProcess.MachineType == MachineType.Donatoni)
                 Cutting(0.8 * thickness, CuttingFeed, -thickness);
 
@@ -115,8 +113,6 @@ namespace CAM.Tactile
 
             if (ProcessingAngle == 45 ^ TechProcess.MachineType == MachineType.ScemaLogic)
                 Cutting(size - 0.8 * thickness, CuttingFeed, thickness);
-
-            ProcessCommands = builder.FinishTechOperation();
 
             void Cutting(double pos, int feed, double s = 0)
             {

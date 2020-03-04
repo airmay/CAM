@@ -63,6 +63,7 @@ namespace CAM
 
         public virtual void Teardown()
         {
+            Acad.DeleteCurves(ToolpathCurves);
         }
 
         public IEnumerable<Curve> ToolpathCurves => ProcessCommands?.Select(p => p.ToolpathCurve).Where(p => p != null);

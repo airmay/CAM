@@ -27,8 +27,6 @@ namespace CAM
 
         public static Editor Editor => Application.DocumentManager.MdiActiveDocument.Editor;
 
-        public static ToolObject ToolObject { get; set; }
-
         public static void Write(string message, Exception ex = null)
         {
             var text = ex == null ? message : $"{message}: {ex.Message}";
@@ -65,7 +63,7 @@ namespace CAM
                 App.LockAndExecute(() => ids.Select(p => p.ObjectId).QForEach(action));
         }
 
-        public static void SaveCurves(IEnumerable<Curve> entities)
+        public static void SaveToolpathCurves(IEnumerable<Curve> entities)
         {
             App.LockAndExecute(() =>
             {
@@ -74,17 +72,16 @@ namespace CAM
             });
         }
 
-        public static void DeleteObjects(ObjectId[] ids)
+        public static void DeleteObjects(IEnumerable<ObjectId> ids)
         {
-            _highlightedObjects = _highlightedObjects.Except(ids).ToArray();
-            App.LockAndExecute(() => ids.QForEach(p => p.Erase()));
+            if (ids != null && ids.Any())
+            {
+                _highlightedObjects = _highlightedObjects.Except(ids).ToArray();
+                App.LockAndExecute(() => ids.QForEach(p => p.Erase()));
+            }
         }
 
-        public static void DeleteCurves(IEnumerable<Curve> curves)
-        {
-            if (curves != null && curves.Any())
-                DeleteObjects(curves.Select(p => p.ObjectId).ToArray());
-        }
+        public static void DeleteCurves(IEnumerable<Curve> curves) => DeleteObjects(curves?.Select(p => p.ObjectId));
 
         public static ObjectId[] CreateOriginObject(Point3d point)
         {
@@ -100,38 +97,51 @@ namespace CAM
             return Array.ConvertAll(curves, p => p.ObjectId);
         }
 
-        #region ToolModel
-        public static void DrawToolModel(ToolObject toolObject, ToolInfo toolInfo)
+        #region ToolObject
+
+        public static ToolObject ToolObject { get; set; }
+
+        public static void ShowToolObject(Tool tool, int index, Location location, bool isFrontPlaneZero)
         {
-            if (toolInfo.Point.IsNull())
-                return;
-            var mat1 = Matrix3d.Displacement(toolObject.ToolInfo.Point.GetVectorTo(toolInfo.Point));
-            var mat2 = Matrix3d.Rotation(Graph.ToRad(toolObject.ToolInfo.AngleC - toolInfo.AngleC), Vector3d.ZAxis, toolInfo.Point);
-            var mat3 = Matrix3d.Rotation(Graph.ToRad(toolInfo.AngleA - toolObject.ToolInfo.AngleA), Vector3d.XAxis.RotateBy(Graph.ToRad(-toolInfo.AngleC), Vector3d.ZAxis), toolInfo.Point);
+            if (ToolObject != null && (tool != ToolObject.Tool || index != ToolObject.Index || !location.IsDefined))
+                DeleteToolObject();
+            if (ToolObject == null && index != 0 && location.IsDefined)
+                ToolObject = CreateToolObject(tool, index, isFrontPlaneZero);
+            if (ToolObject != null)
+                DrawToolObject(location);
+        }
+
+        private static void DrawToolObject(Location location)
+        {
+            var mat1 = Matrix3d.Displacement(ToolObject.Location.Point.GetVectorTo(location.Point));
+            var mat2 = Matrix3d.Rotation(Graph.ToRad(ToolObject.Location.AngleC - location.AngleC), Vector3d.ZAxis, location.Point);
+            var mat3 = Matrix3d.Rotation(Graph.ToRad(location.AngleA - ToolObject.Location.AngleA), Vector3d.XAxis.RotateBy(Graph.ToRad(-location.AngleC), Vector3d.ZAxis), location.Point);
             var mat = mat3 * mat2 * mat1;
-            foreach (var item in toolObject.GetCurves())
+            foreach (var item in ToolObject.GetCurves())
             {
                 item.TransformBy(mat);
                 TransientManager.CurrentTransientManager.UpdateTransient(item, new IntegerCollection());
             }
-            toolObject.ToolInfo = toolInfo;
-
+            ToolObject.Location = location;
             Editor.UpdateScreen();
         }
 
-        public static ToolObject CreateToolModel(int index, double diameter, double thickness, bool isFrontPlaneZero)
+        private static ToolObject CreateToolObject(Tool tool, int index, bool isFrontPlaneZero)
         {
             using (var doclock = Application.DocumentManager.MdiActiveDocument.LockDocument())
             {
                 using (Transaction tr = Database.TransactionManager.StartTransaction())
                 {
-                    var toolModel = new ToolObject();
-                    toolModel.ToolInfo.Index = index;
+                    var toolModel = new ToolObject
+                    {
+                        Tool = tool,
+                        Index = index
+                    };
                     if (index == 1)
                     {
-                        toolModel.Circle0 = new Circle(new Point3d(0, isFrontPlaneZero ? 0 : -thickness, diameter / 2), Vector3d.YAxis, diameter / 2);
-                        toolModel.Circle1 = new Circle(toolModel.Circle0.Center + Vector3d.YAxis * thickness, Vector3d.YAxis, diameter / 2);
-                        toolModel.Axis = new Line(toolModel.Circle1.Center, toolModel.Circle1.Center + Vector3d.YAxis * diameter / 4);
+                        toolModel.Circle0 = new Circle(new Point3d(0, isFrontPlaneZero ? 0 : -tool.Thickness.Value, tool.Diameter / 2), Vector3d.YAxis, tool.Diameter / 2);
+                        toolModel.Circle1 = new Circle(toolModel.Circle0.Center + Vector3d.YAxis * tool.Thickness.Value, Vector3d.YAxis, tool.Diameter / 2);
+                        toolModel.Axis = new Line(toolModel.Circle1.Center, toolModel.Circle1.Center + Vector3d.YAxis * tool.Diameter / 4);
                     }
                     if (index == 2)
                     {
@@ -150,17 +160,18 @@ namespace CAM
             }
         }
 
-        public static void DeleteToolModel(ToolObject toolModel)
+        public static void DeleteToolObject()
         {
-            if (toolModel == null)
+            if (ToolObject == null)
                 return;
             using (var doclock = Application.DocumentManager.MdiActiveDocument.LockDocument())
             using (Transaction tr = Database.TransactionManager.StartTransaction())
-                foreach (var item in toolModel.GetCurves())
+                foreach (var item in ToolObject.GetCurves())
                 {
                     TransientManager.CurrentTransientManager.EraseTransient(item, new IntegerCollection());
                     item.Dispose();
                 }
+            ToolObject = null;
         }
 
         #endregion
@@ -250,26 +261,25 @@ namespace CAM
                 if (layerTable.Has(layerName))
                 {
                     var ids = QuickSelection.SelectAll(FilterList.Create().Layer(layerName));
-                    ids.QForEach(entity => entity.Erase());
+                    if (ids.Any())
+                        ids.QForEach(entity => entity.Erase());
                     layerTable[layerName].Erase();
                 }
             }
         }
 
-        public static void DeleteExtraObjects(IEnumerable<Curve> curves, ToolObject toolModel, ObjectId[] originObject = null)
+        public static void DeleteExtraObjects(IEnumerable<Curve> curves)
         {
             DeleteCurves(curves);
             DeleteByLayer(HatchLayerName);
             DeleteByLayer(GashLayerName);
-            DeleteToolModel(toolModel);
-            if (originObject != null)
-                Acad.DeleteObjects(originObject);
+            DeleteToolObject();
         }
 
-        public static void HideExtraObjects(IEnumerable<Curve> curves, ToolObject toolModel)
+        public static void HideExtraObjects(IEnumerable<Curve> curves)
         {
             curves.ForEach(p => p.Visible = !p.Visible);
-            DeleteToolModel(toolModel);
+            DeleteToolObject();
             Editor.UpdateScreen();
             //Interaction.SetActiveDocFocus();
         }

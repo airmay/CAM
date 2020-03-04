@@ -2,10 +2,8 @@
 
 namespace CAM
 {
-    public struct ToolInfo
+    public struct Location
     {
-        public int Index { get; set; }
-
         public Point3d Point { get; set; }
         public double AngleC { get; set; }
         public double AngleA { get; set; }
@@ -16,6 +14,8 @@ namespace CAM
             AngleC = angleC ?? AngleC;
             AngleA = angleA ?? AngleA;
         }
+
+        public bool IsDefined => !double.IsNaN(Point.X) && !double.IsNaN(Point.Y) && !double.IsNaN(Point.Z);
 
         //public ToolPosition Clone() => (ToolPosition)this.MemberwiseClone();
     }

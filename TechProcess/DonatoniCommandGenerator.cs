@@ -14,7 +14,9 @@ namespace CAM
     {
         private int _startRangeIndex;
         public const int UpperZ = 80;
-        public ToolInfo ToolInfo;
+
+        private int _toolIndex;
+        private Location _location;
         private int _GCode;
         private int _feed;
         private double _originX, _originY;
@@ -32,7 +34,9 @@ namespace CAM
 
         public List<ProcessCommand> Commands { get; } = new List<ProcessCommand>();
 
-        public Point3d ToolPosition => ToolInfo.Point;
+        public Point3d ToolPosition => _location.Point;
+
+        public bool IsUpperTool => _location.Point.Z >= _zSafety;
 
         public bool EngineStarted { get; set; } 
 
@@ -40,13 +44,13 @@ namespace CAM
 
         public List<ProcessCommand> GetRange() => Commands.GetRange(_startRangeIndex, Commands.Count - _startRangeIndex);
 
-        public string Thick { get; set; }
+        public bool WithThick { get; set; }
 
         /// <summary>
         /// Запуск станка
         /// </summary>
         /// <param name="toolNumber"></param>
-        public void StartMachine(string caption, int toolNumber, double originX, double originY, int zSafety)
+        public void StartMachine(string caption, double originX, double originY, int zSafety)
         {
             _originX = originX;
             _originY = originY;
@@ -64,24 +68,24 @@ namespace CAM
             CreateCommand("RTCP=1");
             CreateCommand("G600 X0 Y-2500 Z-370 U3800 V0 W0 N0");
             CreateCommand("G601");
-            CreateCommand("G0 G53 Z0.0");
-            CreateCommand("G0 G53 A0");
-            CreateCommand("G64");
-            CreateCommand("G154O10");
         }
 
-        public void SetTool(int toolNo, int frequency)
+        public void SetTool(int toolNo, int frequency, double angleA = 0)
         {
-            if (ToolInfo.Index != toolNo)
+            if (_toolIndex != toolNo)
             {
                 if (EngineStarted)
                     StopEngine();
 
-                ToolInfo.Index = toolNo;
-                ToolInfo.Set(Algorithms.NullPoint3d, 0, 0);
+                _toolIndex = toolNo;
+                _location.Set(new Point3d(double.NaN, double.NaN, UpperZ), 0, 0);
 
-                CreateCommand($"T{toolNo}", "");
-                CreateCommand("M6");
+                CreateCommand("G0 G53 Z0");
+                CreateCommand($"G0 G53 C0 A{angleA}");
+                CreateCommand("G64");
+                CreateCommand("G154O10");
+                CreateCommand($"T{toolNo}", "Инструмент");
+                CreateCommand("M6", "Инструмент");
                 CreateCommand("G172 T1 H1 D1");
                 CreateCommand("M300");
             }
@@ -90,8 +94,8 @@ namespace CAM
 
         public void StopEngine()
         {
-            CreateCommand("M5", "Останов шпинделя");
-            CreateCommand("M9", "Отключение охлаждения");
+            CreateCommand("M5", "Шпиндель откл.");
+            CreateCommand("M9", "Охлаждение откл.");
             CreateCommand("G61");
             CreateCommand("G153");
             CreateCommand("G0 G53 Z0");
@@ -110,7 +114,8 @@ namespace CAM
             //    AddLine("M9 M10");          // выключение воды
             //    AddLine("G0 G79 Z(@ZUP)");  // подъем в верхнюю точку
             //}
-            StopEngine();
+            if (EngineStarted)
+                StopEngine();
 
             CreateCommand("G0 G53 Z0 ");
             CreateCommand("G0 G53 A0 C0");
@@ -133,13 +138,13 @@ namespace CAM
             if (!EngineStarted)
                 CreateCommand(CommandNames.InitialMove, 0, z: _zSafety);
 
-            if (angleA != ToolInfo.AngleA)
+            if (angleA != _location.AngleA)
                 CreateCommand("Наклон", 1, angleA: angleA);
 
             if (!EngineStarted)
             {
-                CreateCommand(ToolInfo.Index == 2 ? "M8" : "M7");
-                CreateCommand($"M3 S{_frequency}");
+                CreateCommand(_toolIndex == 2 ? "M8" : "M7", "Охлаждение");
+                CreateCommand($"M3 S{_frequency}", "Шпиндель");
 
                 EngineStarted = true;
             }
@@ -214,7 +219,8 @@ namespace CAM
         {
             Name = name,
             Text = text,
-            ToolInfo = ToolInfo
+            ToolIndex = _toolIndex,
+            ToolLocation = _location
         });
 
         //private CommandParams _commandParams = new CommandParams();
@@ -223,21 +229,22 @@ namespace CAM
             double? angleC = null, double? angleA = null, Curve curve = null, int? feed = null)
         {
             if (point == null)
-                point = new Point3d(x ?? ToolInfo.Point.X, y ?? ToolInfo.Point.Y, z ?? ToolInfo.Point.Z);
+                point = new Point3d(x ?? _location.Point.X, y ?? _location.Point.Y, z ?? _location.Point.Z);
 
-            var commandText = $"G{gCode}{Format("X", point.Value.X, ToolInfo.Point.X, _originX)}{Format("Y", point.Value.Y, ToolInfo.Point.Y, _originY)}" +
-                $"{Format("Z", point.Value.Z, ToolInfo.Point.Z)}{Format("C", angleC, ToolInfo.AngleC)}{Format("A", angleA, ToolInfo.AngleA)}{Format("F", feed, _feed)}";
+            var commandText = $"G{gCode}{Format("X", point.Value.X, _location.Point.X, _originX)}{Format("Y", point.Value.Y, _location.Point.Y, _originY)}" +
+                $"{Format("Z", point.Value.Z, _location.Point.Z, withThick: WithThick)}{Format("C", angleC, _location.AngleC)}{Format("A", angleA, _location.AngleA)}" +
+                $"{Format("F", feed, _feed)}";
 
-            if (!ToolInfo.Point.IsNull())
+            if (_location.IsDefined)
             {
-                if (curve == null && (point.Value - ToolInfo.Point).Length > 1)
-                    curve = NoDraw.Line(ToolInfo.Point, point.Value);
+                if (curve == null && (point.Value - _location.Point).Length > 1)
+                    curve = NoDraw.Line(_location.Point, point.Value);
                 if (curve != null && Colors.ContainsKey(name))
                     curve.Color = Colors[name];
             }
 
             _GCode = gCode;
-            ToolInfo.Set(point.Value, angleC, angleA);
+            _location.Set(point.Value, angleC, angleA);
             _feed = feed ?? _feed;
 
             Commands.Add(new ProcessCommand
@@ -245,13 +252,16 @@ namespace CAM
                 Name = name,
                 Text = commandText,
                 ToolpathCurve = curve,
-                ToolInfo = ToolInfo
+                ToolIndex = _toolIndex,
+                ToolLocation = _location
             });
 
-            string Format(string label, double? value, double oldValue, double origin = 0) =>
+            string Format(string label, double? value, double oldValue, double origin = 0, bool withThick = false) =>
                  (paramsString == null || paramsString.Contains(label)) && (value.GetValueOrDefault(oldValue) != oldValue || (_GCode != gCode))
-                        ? $" {label}{(value.GetValueOrDefault(oldValue) - origin).Round(4)}"
+                        ? $" {label}{FormatValue((value.GetValueOrDefault(oldValue) - origin).Round(4), withThick)}"
                         : null;
+
+            string FormatValue(double value, bool withThick) => withThick ? $"({value} + THICK)" : value.ToString();
         }
     }
 }
