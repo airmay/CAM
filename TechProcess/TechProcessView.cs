@@ -17,8 +17,6 @@ namespace CAM
             InitializeComponent();
 
             imageList.Images.AddRange(new Image[] { Properties.Resources.drive, Properties.Resources.drive_download });
-            dataGridViewCommand.DataSource = processCommandBindingSource;
-            processCommandBindingSource.DataSource = null;
             SetButtonsEnabled();
 
             bDeleteProcessing.Visible = false;
@@ -90,7 +88,7 @@ namespace CAM
 
         private void processCommandBindingSource_CurrentChanged(object sender, EventArgs e)
         {
-            if (processCommandBindingSource.Current != null)
+            if (processCommandBindingSource.Current is ProcessCommand)
                 _camDocument.SelectProcessCommand(CurrentTechProcess, processCommandBindingSource.Current as ProcessCommand);
         }
 

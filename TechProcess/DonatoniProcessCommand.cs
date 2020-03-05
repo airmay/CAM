@@ -1,5 +1,4 @@
-﻿using System;
-using Autodesk.AutoCAD.DatabaseServices;
+﻿using Autodesk.AutoCAD.DatabaseServices;
 
 namespace CAM
 {
@@ -11,11 +10,11 @@ namespace CAM
 
         public string Text { get; set; }
 
-        public Curve ToolpathCurve { get; set; }
-
         public int ToolIndex { get; set; }
 
         public Location ToolLocation;
+
+        public Curve ToolpathCurve;
 
         public string GetProgrammLine() => $"{Number} {Text}";
     }

@@ -40,6 +40,7 @@
             this.toolStrip1 = new System.Windows.Forms.ToolStrip();
             this.bCreateTechProcess = new System.Windows.Forms.ToolStripDropDownButton();
             this.bRemove = new System.Windows.Forms.ToolStripButton();
+            this.bCreateTechOperation = new System.Windows.Forms.ToolStripDropDownButton();
             this.bMoveUpTechOperation = new System.Windows.Forms.ToolStripButton();
             this.bMoveDownTechOperation = new System.Windows.Forms.ToolStripButton();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
@@ -52,7 +53,9 @@
             this.bClose = new System.Windows.Forms.ToolStripButton();
             this.panel2 = new System.Windows.Forms.Panel();
             this.processCommandBindingSource = new System.Windows.Forms.BindingSource(this.components);
-            this.bCreateTechOperation = new System.Windows.Forms.ToolStripDropDownButton();
+            this.numberDataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.nameDataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.textDataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
@@ -141,11 +144,17 @@
             // dataGridViewCommand
             // 
             this.dataGridViewCommand.AllowUserToResizeRows = false;
+            this.dataGridViewCommand.AutoGenerateColumns = false;
             this.dataGridViewCommand.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.AllCellsExceptHeader;
             this.dataGridViewCommand.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.dataGridViewCommand.ClipboardCopyMode = System.Windows.Forms.DataGridViewClipboardCopyMode.EnableWithoutHeaderText;
             this.dataGridViewCommand.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dataGridViewCommand.ColumnHeadersVisible = false;
+            this.dataGridViewCommand.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
+            this.numberDataGridViewTextBoxColumn,
+            this.nameDataGridViewTextBoxColumn,
+            this.textDataGridViewTextBoxColumn});
+            this.dataGridViewCommand.DataSource = this.processCommandBindingSource;
             this.dataGridViewCommand.Dock = System.Windows.Forms.DockStyle.Fill;
             this.dataGridViewCommand.Location = new System.Drawing.Point(3, 3);
             this.dataGridViewCommand.MultiSelect = false;
@@ -204,6 +213,14 @@
             this.bRemove.Size = new System.Drawing.Size(23, 22);
             this.bRemove.Text = "Удалить";
             this.bRemove.Click += new System.EventHandler(this.bRemove_Click);
+            // 
+            // bCreateTechOperation
+            // 
+            this.bCreateTechOperation.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.bCreateTechOperation.Image = global::CAM.Properties.Resources.plus;
+            this.bCreateTechOperation.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.bCreateTechOperation.Name = "bCreateTechOperation";
+            this.bCreateTechOperation.Size = new System.Drawing.Size(29, 22);
             // 
             // bMoveUpTechOperation
             // 
@@ -310,13 +327,29 @@
             this.processCommandBindingSource.DataSource = typeof(CAM.ProcessCommand);
             this.processCommandBindingSource.CurrentChanged += new System.EventHandler(this.processCommandBindingSource_CurrentChanged);
             // 
-            // bCreateTechOperation
+            // numberDataGridViewTextBoxColumn
             // 
-            this.bCreateTechOperation.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.bCreateTechOperation.Image = global::CAM.Properties.Resources.plus;
-            this.bCreateTechOperation.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.bCreateTechOperation.Name = "bCreateTechOperation";
-            this.bCreateTechOperation.Size = new System.Drawing.Size(29, 22);
+            this.numberDataGridViewTextBoxColumn.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCellsExceptHeader;
+            this.numberDataGridViewTextBoxColumn.DataPropertyName = "Number";
+            this.numberDataGridViewTextBoxColumn.HeaderText = "Number";
+            this.numberDataGridViewTextBoxColumn.Name = "numberDataGridViewTextBoxColumn";
+            this.numberDataGridViewTextBoxColumn.Width = 21;
+            // 
+            // nameDataGridViewTextBoxColumn
+            // 
+            this.nameDataGridViewTextBoxColumn.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCellsExceptHeader;
+            this.nameDataGridViewTextBoxColumn.DataPropertyName = "Name";
+            this.nameDataGridViewTextBoxColumn.HeaderText = "Name";
+            this.nameDataGridViewTextBoxColumn.Name = "nameDataGridViewTextBoxColumn";
+            this.nameDataGridViewTextBoxColumn.Width = 21;
+            // 
+            // textDataGridViewTextBoxColumn
+            // 
+            this.textDataGridViewTextBoxColumn.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCellsExceptHeader;
+            this.textDataGridViewTextBoxColumn.DataPropertyName = "Text";
+            this.textDataGridViewTextBoxColumn.HeaderText = "Text";
+            this.textDataGridViewTextBoxColumn.Name = "textDataGridViewTextBoxColumn";
+            this.textDataGridViewTextBoxColumn.Width = 21;
             // 
             // TechProcessView
             // 
@@ -376,5 +409,8 @@
         private System.Windows.Forms.ToolStripButton bDeleteProcessing;
         private System.Windows.Forms.ToolStripButton bAttachDrawing;
         private System.Windows.Forms.ToolStripDropDownButton bCreateTechOperation;
+        private System.Windows.Forms.DataGridViewTextBoxColumn numberDataGridViewTextBoxColumn;
+        private System.Windows.Forms.DataGridViewTextBoxColumn nameDataGridViewTextBoxColumn;
+        private System.Windows.Forms.DataGridViewTextBoxColumn textDataGridViewTextBoxColumn;
     }
 }
