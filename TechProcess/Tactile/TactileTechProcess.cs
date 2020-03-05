@@ -185,5 +185,15 @@ namespace CAM.Tactile
             }
             return true;
         }
+
+        public override void BuildProcessing()
+        {
+            if (!TechOperations.Any())
+            {
+                Acad.Alert("Нет операций");
+                return;
+            }
+            base.BuildProcessing();
+        }
     }
 }

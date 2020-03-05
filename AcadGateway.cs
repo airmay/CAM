@@ -106,7 +106,7 @@ namespace CAM
             if (ToolObject != null && (tool != ToolObject.Tool || index != ToolObject.Index || !location.IsDefined))
                 DeleteToolObject();
             if (ToolObject == null && index != 0 && location.IsDefined)
-                ToolObject = CreateToolObject(tool, index, isFrontPlaneZero);
+                ToolObject = ToolObject.CreateToolObject(tool, index, isFrontPlaneZero);
             if (ToolObject != null)
                 DrawToolObject(location);
         }
@@ -117,7 +117,7 @@ namespace CAM
             var mat2 = Matrix3d.Rotation(Graph.ToRad(ToolObject.Location.AngleC - location.AngleC), Vector3d.ZAxis, location.Point);
             var mat3 = Matrix3d.Rotation(Graph.ToRad(location.AngleA - ToolObject.Location.AngleA), Vector3d.XAxis.RotateBy(Graph.ToRad(-location.AngleC), Vector3d.ZAxis), location.Point);
             var mat = mat3 * mat2 * mat1;
-            foreach (var item in ToolObject.GetCurves())
+            foreach (var item in ToolObject.Curves)
             {
                 item.TransformBy(mat);
                 TransientManager.CurrentTransientManager.UpdateTransient(item, new IntegerCollection());
@@ -126,47 +126,13 @@ namespace CAM
             Editor.UpdateScreen();
         }
 
-        private static ToolObject CreateToolObject(Tool tool, int index, bool isFrontPlaneZero)
-        {
-            using (var doclock = Application.DocumentManager.MdiActiveDocument.LockDocument())
-            {
-                using (Transaction tr = Database.TransactionManager.StartTransaction())
-                {
-                    var toolModel = new ToolObject
-                    {
-                        Tool = tool,
-                        Index = index
-                    };
-                    if (index == 1)
-                    {
-                        toolModel.Circle0 = new Circle(new Point3d(0, isFrontPlaneZero ? 0 : -tool.Thickness.Value, tool.Diameter / 2), Vector3d.YAxis, tool.Diameter / 2);
-                        toolModel.Circle1 = new Circle(toolModel.Circle0.Center + Vector3d.YAxis * tool.Thickness.Value, Vector3d.YAxis, tool.Diameter / 2);
-                        toolModel.Axis = new Line(toolModel.Circle1.Center, toolModel.Circle1.Center + Vector3d.YAxis * tool.Diameter / 4);
-                    }
-                    if (index == 2)
-                    {
-                        toolModel.Circle0 = new Circle(Point3d.Origin, Vector3d.ZAxis, 20);
-                        toolModel.Axis = new Line(Point3d.Origin, Point3d.Origin + Vector3d.ZAxis * 100);
-                    }
-
-                    foreach (var item in toolModel.GetCurves())
-                    {
-                        item.Color = Color.FromColorIndex(ColorMethod.ByColor, 131);
-                        TransientManager.CurrentTransientManager.AddTransient(item, TransientDrawingMode.Main, 128, new IntegerCollection());
-                    }
-                    tr.Commit();
-                    return toolModel;
-                }
-            }
-        }
-
         public static void DeleteToolObject()
         {
             if (ToolObject == null)
                 return;
             using (var doclock = Application.DocumentManager.MdiActiveDocument.LockDocument())
             using (Transaction tr = Database.TransactionManager.StartTransaction())
-                foreach (var item in ToolObject.GetCurves())
+                foreach (var item in ToolObject.Curves)
                 {
                     TransientManager.CurrentTransientManager.EraseTransient(item, new IntegerCollection());
                     item.Dispose();
