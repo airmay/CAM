@@ -95,7 +95,7 @@ namespace CAM
         public void RefreshView()
         {
             var dataObject = treeView.SelectedNode.Tag;
-            ObjectViewsContainer.SetObjectView(dataObject, tabPageParams);
+            ViewsContainer.BindData(dataObject, tabPageParams);
             processCommandBindingSource.DataSource = ((IHasProcessCommands)dataObject).ProcessCommands;
             bDeleteProcessing.Enabled = CurrentTechProcess.ProcessCommands != null;
         }

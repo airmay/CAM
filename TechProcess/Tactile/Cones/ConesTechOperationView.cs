@@ -1,22 +1,17 @@
-﻿using System;
-using System.Windows.Forms;
+﻿using System.Windows.Forms;
 
 namespace CAM.Tactile
 {
-    [ObjectView(typeof(ConesTechOperation))]
-    public partial class ConesTechOperationView : UserControl, IObjectView
+    public partial class ConesTechOperationView : UserControl, IDataView<ConesTechOperation>
     {
-        private ConesTechOperation _conesTechOperation;
-
         public ConesTechOperationView()
         {
             InitializeComponent();
         }
 
-        public void SetObject(object @object)
+        public void BindData(ConesTechOperation data)
         {
-            _conesTechOperation = (ConesTechOperation)@object;
-            conesTechOperationBindingSource.DataSource = @object;
+            conesTechOperationBindingSource.DataSource = data;
         }
     }
 }

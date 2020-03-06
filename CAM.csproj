@@ -143,6 +143,20 @@
     <Compile Include="TechProcess\IHasProcessCommands.cs" />
     <Compile Include="TechProcess\ITechProcess.cs" />
     <Compile Include="TechProcess\MachineSettings.cs" />
+    <Compile Include="TechProcess\Sawing\SawingTechOperation.cs" />
+    <Compile Include="TechProcess\Sawing\SawingTechOperationView.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="TechProcess\Sawing\SawingTechOperationView.Designer.cs">
+      <DependentUpon>SawingTechOperationView.cs</DependentUpon>
+    </Compile>
+    <Compile Include="TechProcess\Sawing\SawingTechProcess.cs" />
+    <Compile Include="TechProcess\Sawing\SawingTechProcessView.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="TechProcess\Sawing\SawingTechProcessView.Designer.cs">
+      <DependentUpon>SawingTechProcessView.cs</DependentUpon>
+    </Compile>
     <Compile Include="TechProcess\ScemaLogicCommandGenerator.cs" />
     <Compile Include="TechProcess\Tactile\Bands\BandsTechOperation.cs" />
     <Compile Include="TechProcess\Tactile\Bands\BandsTechOperationView.cs">
@@ -217,9 +231,8 @@
     <Compile Include="TechProcess\ToolsForm.Designer.cs">
       <DependentUpon>ToolsForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="UI\IObjectView.cs" />
-    <Compile Include="UI\ObjectViewAttribute.cs" />
-    <Compile Include="UI\ObjectViewsContainer.cs" />
+    <Compile Include="UI\IDataView.cs" />
+    <Compile Include="UI\ViewsContainer.cs" />
     <Compile Include="Utils\Exceptions.cs" />
     <Compile Include="Graph.cs" />
     <Compile Include="Utils\Extensions.cs" />
@@ -337,6 +350,9 @@
     <EmbeddedResource Include="TechOperation\Sawing\SawingParamsView.resx">
       <DependentUpon>SawingParamsView.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="TechProcess\Sawing\SawingTechProcessView.resx">
+      <DependentUpon>SawingTechProcessView.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="TechProcess\Tactile\Bands\BandsTechOperationView.resx">
       <DependentUpon>BandsTechOperationView.cs</DependentUpon>
     </EmbeddedResource>
@@ -447,6 +463,7 @@
   <ItemGroup>
     <None Include="Resources\paper-clip.png" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

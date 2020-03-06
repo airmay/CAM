@@ -12,10 +12,10 @@ namespace CAM
 
         public string TechOperationCaption { get; }
 
-        public TechOperationAttribute(string techProcessCaption, string techOperationCaption)
+        public TechOperationAttribute(string techProcessCaption, string techOperationCaption = null)
         {
             this.TechProcessCaption = techProcessCaption;
-            this.TechOperationCaption = techOperationCaption;
+            this.TechOperationCaption = techOperationCaption ?? techProcessCaption;
         }
     }
 }

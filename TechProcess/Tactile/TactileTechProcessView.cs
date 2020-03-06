@@ -1,15 +1,13 @@
 ﻿using Dreambuild.AutoCAD;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Windows.Forms;
 
 namespace CAM.Tactile
 {
-    [ObjectView(typeof(TactileTechProcess))]
-    public partial class TactileTechProcessView : UserControl, IObjectView
+    public partial class TactileTechProcessView : UserControl, IDataView<TactileTechProcess>
     {
-        private TactileTechProcess _tactileTechProcess;
+        private TactileTechProcess _techProcess;
 
         public TactileTechProcessView()
         {
@@ -25,27 +23,26 @@ namespace CAM.Tactile
                 });
         }
 
-        public void SetObject(object @object)
+        public void BindData(TactileTechProcess data)
         {
-            _tactileTechProcess = (TactileTechProcess)@object;
-            tactileTechProcessBindingSource.DataSource = @object;
-            tactileTechProcessParamsBindingSource.DataSource = _tactileTechProcess.TactileTechProcessParams;
-            tbTool.Text = _tactileTechProcess.Tool?.ToString();
-            tbOrigin.Text = $"{{{_tactileTechProcess.OriginX}, {_tactileTechProcess.OriginY}}}";
-            tbContour.Text = _tactileTechProcess.ProcessingArea?.ToString();
-            tbObjects.Text = _tactileTechProcess.Objects?.ToString();
+            tactileTechProcessBindingSource.DataSource = _techProcess = data;
+            tactileTechProcessParamsBindingSource.DataSource = _techProcess.TactileTechProcessParams;
+            tbTool.Text = _techProcess.Tool?.ToString();
+            tbOrigin.Text = $"{{{_techProcess.OriginX}, {_techProcess.OriginY}}}";
+            tbContour.Text = _techProcess.ProcessingArea?.ToString();
+            tbObjects.Text = _techProcess.Objects?.ToString();
             SetParamsEnabled();
         }
 
         private void bTool_Click(object sender, EventArgs e)
         {
-            var tool = ToolsForm.Select(_tactileTechProcess.MachineSettings.Tools, _tactileTechProcess.MachineType);
+            var tool = ToolsForm.Select(_techProcess.MachineSettings.Tools, _techProcess.MachineType);
             if (tool != null)
             {
-                _tactileTechProcess.Tool = tool;
+                _techProcess.Tool = tool;
                 tbTool.Text = tool.ToString();
-                if (_tactileTechProcess.Frequency == 0)
-                    _tactileTechProcess.Frequency = Math.Min(tool.CalcFrequency(_tactileTechProcess.Material), _tactileTechProcess.MachineSettings.MaxFrequency);
+                if (_techProcess.Frequency == 0)
+                    _techProcess.Frequency = Math.Min(tool.CalcFrequency(_techProcess.Material), _techProcess.MachineSettings.MaxFrequency);
                 tactileTechProcessBindingSource.ResetBindings(false);
             }
         }
@@ -56,8 +53,8 @@ namespace CAM.Tactile
             var ids = Interaction.GetSelection("\nВыберите объекты контура плитки", "LINE");
             if (ids.Length == 0)
                 return;
-            _tactileTechProcess.ProcessingArea = new ProcessingArea(ids);
-            tbContour.Text = _tactileTechProcess.ProcessingArea.ToString();
+            _techProcess.ProcessingArea = new ProcessingArea(ids);
+            tbContour.Text = _techProcess.ProcessingArea.ToString();
             Acad.SelectObjectIds(ids);
             SetParamsEnabled();
         }
@@ -68,18 +65,18 @@ namespace CAM.Tactile
             var point = Interaction.GetPoint("\nВыберите точку начала координат");
             if (!point.IsNull())
             {
-                _tactileTechProcess.OriginX = point.X.Round(3);
-                _tactileTechProcess.OriginY = point.Y.Round(3);
-                tbOrigin.Text = $"{{{_tactileTechProcess.OriginX}, {_tactileTechProcess.OriginY}}}";
-                if (_tactileTechProcess.OriginObject != null)
-                    Acad.DeleteObjects(_tactileTechProcess.OriginObject);
-                _tactileTechProcess.OriginObject = Acad.CreateOriginObject(point);
+                _techProcess.OriginX = point.X.Round(3);
+                _techProcess.OriginY = point.Y.Round(3);
+                tbOrigin.Text = $"{{{_techProcess.OriginX}, {_techProcess.OriginY}}}";
+                if (_techProcess.OriginObject != null)
+                    Acad.DeleteObjects(_techProcess.OriginObject);
+                _techProcess.OriginObject = Acad.CreateOriginObject(point);
             }
         }
 
         private void bObjects_Click(object sender, EventArgs e)
         {
-            if (_tactileTechProcess.ProcessingArea == null)
+            if (_techProcess.ProcessingArea == null)
             {
                 Acad.Alert("Укажите контур плитки");
                 return;
@@ -88,9 +85,9 @@ namespace CAM.Tactile
             var ids = Interaction.GetSelection("\nВыберите 2 элемента плитки");
             if (ids.Length > 0)
             {
-                _tactileTechProcess.CalcType(ids);
-                _tactileTechProcess.Objects = new ProcessingArea(ids);
-                tbObjects.Text = _tactileTechProcess.Objects.ToString();
+                _techProcess.CalcType(ids);
+                _techProcess.Objects = new ProcessingArea(ids);
+                tbObjects.Text = _techProcess.Objects.ToString();
                 tactileTechProcessBindingSource.ResetBindings(false);
                 SetParamsEnabled();
             }
@@ -98,7 +95,7 @@ namespace CAM.Tactile
 
         private void SetParamsEnabled()
         {
-            var enabled = _tactileTechProcess.ProcessingArea != null &&  _tactileTechProcess.Type != null;
+            var enabled = _techProcess.ProcessingArea != null &&  _techProcess.Type != null;
             tbBandWidth.Enabled = enabled;
             tbBandSpacing.Enabled = enabled;
             tbBandStart1.Enabled = enabled;
@@ -107,17 +104,17 @@ namespace CAM.Tactile
 
         private void tbContour_Enter(object sender, EventArgs e)
         {
-            Acad.SelectObjectIds(_tactileTechProcess.ProcessingArea?.AcadObjectIds);
+            Acad.SelectObjectIds(_techProcess.ProcessingArea?.AcadObjectIds);
         }
 
         private void tbObjects_Enter(object sender, EventArgs e)
         {
-            Acad.SelectObjectIds(_tactileTechProcess.Objects?.AcadObjectIds);
+            Acad.SelectObjectIds(_techProcess.Objects?.AcadObjectIds);
         }
 
         private void tbOrigin_Enter(object sender, EventArgs e)
         {
-            Acad.SelectObjectIds(_tactileTechProcess.OriginObject);
+            Acad.SelectObjectIds(_techProcess.OriginObject);
         }
     }
 }

@@ -10,31 +10,29 @@ using System.Windows.Forms;
 
 namespace CAM.Tactile
 {
-    [ObjectView(typeof(BandsTechOperation))]
-    public partial class BandsTechOperationView : UserControl, IObjectView
+    public partial class BandsTechOperationView : UserControl, IDataView<BandsTechOperation>
     {
-        private BandsTechOperation _bandsTechOperation;
+        private BandsTechOperation _techOperation;
 
         public BandsTechOperationView()
         {
             InitializeComponent();
         }
 
-        public void SetObject(object @object)
+        public void BindData(BandsTechOperation data)
         {
-            _bandsTechOperation = (BandsTechOperation)@object;
-            bandsTechOperationBindingSource.DataSource = @object;
+            bandsTechOperationBindingSource.DataSource = _techOperation = data;
         }
 
         private void bCalculate_Click(object sender, EventArgs e)
         {
-            _bandsTechOperation.CalcPassList();
+            _techOperation.CalcPassList();
             bandsTechOperationBindingSource.ResetBindings(false);
         }
 
         private void bUp_Click(object sender, EventArgs e)
         {
-            if (_bandsTechOperation.PassList.SwapPrev(passListBindingSource.Position))
+            if (_techOperation.PassList.SwapPrev(passListBindingSource.Position))
             {
                 bandsTechOperationBindingSource.ResetBindings(false);
                 passListBindingSource.Position--;
@@ -43,7 +41,7 @@ namespace CAM.Tactile
 
         private void bDown_Click(object sender, EventArgs e)
         {
-            if (_bandsTechOperation.PassList.SwapNext(passListBindingSource.Position))
+            if (_techOperation.PassList.SwapNext(passListBindingSource.Position))
             {
                 bandsTechOperationBindingSource.ResetBindings(false);
                 passListBindingSource.Position++;

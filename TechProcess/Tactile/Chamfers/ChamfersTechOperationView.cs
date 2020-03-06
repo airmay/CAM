@@ -2,20 +2,16 @@
 
 namespace CAM.Tactile
 {
-    [ObjectView(typeof(ChamfersTechOperation))]
-    public partial class ChamfersTechOperationView : UserControl, IObjectView
+    public partial class ChamfersTechOperationView : UserControl, IDataView<ChamfersTechOperation>
     {
-        private ChamfersTechOperation _chamfersTechOperation;
-
         public ChamfersTechOperationView()
         {
             InitializeComponent();
         }
 
-        public void SetObject(object @object)
+        public void BindData(ChamfersTechOperation data)
         {
-            _chamfersTechOperation = (ChamfersTechOperation)@object;
-            chamfersTechOperationBindingSource.DataSource = @object;
+            chamfersTechOperationBindingSource.DataSource = data;
         }
     }
 }
