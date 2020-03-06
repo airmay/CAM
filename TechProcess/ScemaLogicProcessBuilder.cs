@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Autodesk.AutoCAD.ApplicationServices;
 using Autodesk.AutoCAD.Colors;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
@@ -32,9 +33,18 @@ namespace CAM
         //private double _currentAngle;
         private Corner? _startCorner;
 
+        private DocumentLock _documentLock;
+        private Transaction _transaction;
+        private BlockTableRecord _currentSpace;
+
         public ScemaLogicProcessBuilder(MachineType machineType, string caption, double originX, double originY, int zSafety)
         {
-            ZSafety = zSafety;
+            _documentLock = Acad.ActiveDocument.LockDocument();
+            _transaction = Acad.Database.TransactionManager.StartTransaction();
+            _currentSpace = (BlockTableRecord)_transaction.GetObject(Acad.Database.CurrentSpaceId, OpenMode.ForWrite, false);
+            _generator.Transaction = _transaction;
+            _generator.CurrentSpace = _currentSpace;
+                ZSafety = zSafety;
             //Frequency = frequency;
             //_techProcessParams = techProcessParams;
             //_generator = new DonatoniCommandGenerator();
@@ -45,6 +55,9 @@ namespace CAM
         public List<ProcessCommand> FinishTechProcess()
         {
             _generator.StopMachine();
+            _transaction.Commit();
+            _transaction.Dispose();
+            _documentLock.Dispose();
             return _generator.Commands;
         }
 
@@ -129,7 +142,7 @@ namespace CAM
             point = curve.NextPoint(point);
             if (!(curve is Line))
                 angleC = CalcToolAngle(curve, point, engineSide);
-            _generator.CreateCommand(CommandNames.Cutting, 1, point: point, angleC: angleC, feed: cuttingFeed);
+            _generator.CreateCommand(CommandNames.Cutting, 1, point: point, angleC: angleC, curve: curve, feed: cuttingFeed);
         }
 
         public void Pause()

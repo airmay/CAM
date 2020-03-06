@@ -63,13 +63,9 @@ namespace CAM
                 App.LockAndExecute(() => ids.Select(p => p.ObjectId).QForEach(action));
         }
 
-        public static void SaveToolpathCurves(IEnumerable<Curve> entities)
+        public static Curve[] OpenForRead(IEnumerable<ObjectId> ids)
         {
-            App.LockAndExecute(() =>
-            {
-                var layerId = GetProcessLayerId();
-                entities.Select(p => { p.LayerId = layerId; return p; }).AddToCurrentSpace();
-            });
+            return ids.Any() ? ids.QOpenForRead<Curve>() : Array.Empty<Curve>();
         }
 
         public static void DeleteObjects(IEnumerable<ObjectId> ids)
@@ -81,7 +77,7 @@ namespace CAM
             }
         }
 
-        public static void DeleteCurves(IEnumerable<Curve> curves) => DeleteObjects(curves?.Select(p => p.ObjectId));
+        public static Curve[] GetSelectedCurves() => OpenForRead(Interaction.GetPickSet());
 
         public static ObjectId[] CreateOriginObject(Point3d point)
         {
@@ -142,31 +138,17 @@ namespace CAM
 
         #endregion
 
-        public static Curve[] GetSelectedCurves() => OpenForRead(Interaction.GetPickSet());
-
-        public static Curve[] OpenForRead(IEnumerable<ObjectId> ids)
-        {
-            return ids.Any() ? ids.QOpenForRead<Curve>() : Array.Empty<Curve>();
-        }
-
         #region Select methods
 
         private static ObjectId[] _highlightedObjects = Array.Empty<ObjectId>();
 
         public static void ClearHighlighted() => _highlightedObjects = Array.Empty<ObjectId>();
 
-        public static void SelectCurve(Curve curve)
-        {
-            if (curve != null)
-                SelectObjectIds(curve.ObjectId);
-            else
-                SelectObjectIds();
-        }
-
         public static void SelectObjectIds(params ObjectId[] objectIds)
         {
             if (objectIds == null)
                 objectIds = Array.Empty<ObjectId>();
+            objectIds = Array.FindAll(objectIds, p => p != ObjectId.Null);
             App.LockAndExecute(() =>
             {
                 try
@@ -176,7 +158,10 @@ namespace CAM
                     if (objectIds.Any())
                         Interaction.HighlightObjects(objectIds);
                 }
-                catch { }
+                catch (Exception ex)
+                {
+                    Acad.Write($"Error Acad.SelectObjectIds: {ex.Message}");
+                }
                 _highlightedObjects = objectIds;
             });
             Editor.UpdateScreen();
@@ -189,9 +174,9 @@ namespace CAM
         public const string GashLayerName = "Запилы";
         public const string ExtraObjectsLayerName = "Дополнительные объекты";
 
-        public static ObjectId GetProcessLayerId() => DbHelper.GetLayerId(ProcessLayerName);
+        public static ObjectId GetProcessLayerId() => App.LockAndExecute(() => DbHelper.GetLayerId(ProcessLayerName));
 
-        public static ObjectId GetExtraObjectsLayerId() => DbHelper.GetLayerId(ExtraObjectsLayerName);
+        public static ObjectId GetExtraObjectsLayerId() => App.LockAndExecute(() => DbHelper.GetLayerId(ExtraObjectsLayerName));
 
         public static ObjectId GetHatchLayerId() => GetLayerId(HatchLayerName, layer => layer.Transparency = new Transparency(255 * (100 - 70) / 100));
 
@@ -211,6 +196,7 @@ namespace CAM
 
         public static void DeleteAll()
         {
+            DeleteToolObject();
             App.LockAndExecute(() =>
             {
                 ClearHighlighted();
@@ -234,9 +220,8 @@ namespace CAM
             }
         }
 
-        public static void DeleteExtraObjects(IEnumerable<Curve> curves)
+        public static void DeleteExtraObjects()
         {
-            DeleteCurves(curves);
             DeleteByLayer(HatchLayerName);
             DeleteByLayer(GashLayerName);
             DeleteToolObject();

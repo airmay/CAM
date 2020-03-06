@@ -11,7 +11,7 @@ namespace CAM.Tactile
     [TechProcess(TechProcessNames.Tactile)]
     public class TactileTechProcess: TechProcessBase
     {
-        public ProcessingArea Objects { get; set; }
+        public AcadObjects Objects { get; set; }
 
         public TactileTechProcessParams TactileTechProcessParams { get; }
 
@@ -33,12 +33,6 @@ namespace CAM.Tactile
         {
             TactileTechProcessParams = settings.TactileTechProcessParams.Clone();
             Material = Material.Granite;
-        }
-
-        public override void Setup(Settings settings)
-        {
-            base.Setup(settings);
-            Objects.Refresh();
         }
 
         public Polyline GetContour()

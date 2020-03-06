@@ -129,6 +129,8 @@ namespace CAM.Tactile
                     builder.Cutting(startPoint, endPoint, feed, tactileTechProcess.TactileTechProcessParams.TransitionFeed);
                 }
             }
+            ray.Dispose();
+            contour.Dispose();
         }
     }
 }

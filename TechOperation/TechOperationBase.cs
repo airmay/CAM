@@ -54,7 +54,7 @@ namespace CAM
 
         public abstract void BuildProcessing(ScemaLogicProcessBuilder builder);
 
-        public void SetToolpathVisible(bool visible) => ToolpathCurves.ForEach(p => p.Visible = visible);
+        public void SetToolpathVisible(bool visible) => ToolpathObjectIds?.ForEach<Curve>(p => p.Visible = visible);
 
         public virtual void Setup(ITechProcess techProcess)
         {
@@ -63,9 +63,9 @@ namespace CAM
 
         public virtual void Teardown()
         {
-            Acad.DeleteCurves(ToolpathCurves);
+            Acad.DeleteObjects(ToolpathObjectIds);
         }
 
-        public IEnumerable<Curve> ToolpathCurves => ProcessCommands?.Select(p => p.ToolpathCurve).Where(p => p != null);
+        public IEnumerable<ObjectId> ToolpathObjectIds => ProcessCommands?.Select(p => p.ToolpathObjectId).Where(p => p != ObjectId.Null);
     }
 }

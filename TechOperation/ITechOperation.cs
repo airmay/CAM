@@ -12,7 +12,7 @@ namespace CAM
 
         string Caption { get; set; }
 
-        IEnumerable<Curve> ToolpathCurves { get; }
+        IEnumerable<ObjectId> ToolpathObjectIds { get; }
 
         void BuildProcessing(ScemaLogicProcessBuilder builder);
 

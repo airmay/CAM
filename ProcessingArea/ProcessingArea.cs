@@ -1,46 +1,36 @@
 ﻿using Autodesk.AutoCAD.DatabaseServices;
 using Dreambuild.AutoCAD;
 using System;
-using System.Linq;
 
 namespace CAM
 {
-    /// <summary>
-    /// Обрабатываемая область
-    /// </summary>
     [Serializable]
-    public class ProcessingArea
+    public class AcadObjects
     {
         public long[] Handles { get; set; }
 
         [NonSerialized]
-        public ObjectId[] AcadObjectIds;
+        private ObjectId[] _objectIds;
 
-        [NonSerialized]
-        public Curve[] Curves;
-
-        public ProcessingArea(Curve[] curves)
+        public ObjectId[] ObjectIds
         {
-            Curves = curves;
-            AcadObjectIds = Array.ConvertAll(curves, p => p.ObjectId);
+            get => _objectIds ?? (_objectIds = Array.ConvertAll(Handles, p => Acad.Database.GetObjectId(false, new Handle(p), 0)));
+        }
+
+        public Curve[] Curves => ObjectIds.QOpenForRead<Curve>();
+
+        public AcadObjects(Curve[] curves)
+        {
             Handles = Array.ConvertAll(curves, p => p.Handle.Value);
-            //Set(curve);
+            _objectIds = Array.ConvertAll(curves, p => p.ObjectId);
         }
 
-        public ProcessingArea(ObjectId[] ids)
+        public AcadObjects(ObjectId[] ids)
         {
-            AcadObjectIds = ids;
             Handles = Array.ConvertAll(ids, p => p.Handle.Value);
-            Refresh();
+            _objectIds = ids;
         }
 
-        public void Refresh()
-        {
-            if (AcadObjectIds == null)
-                AcadObjectIds = Array.ConvertAll(Handles, p => Acad.Database.GetObjectId(false, new Handle(p), 0));
-            Curves = AcadObjectIds.QOpenForRead<Curve>();
-        }
-
-        public override string ToString() => Curves?.GetDesc();
+        public override string ToString() => ObjectIds.GetDesc();
     }
 }

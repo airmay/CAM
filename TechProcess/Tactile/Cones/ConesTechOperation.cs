@@ -97,6 +97,8 @@ namespace CAM.Tactile
                 builder.Pause();
                 builder.Uplifting();
             }
+
+            contour.Dispose();
         }
     }
 }

@@ -14,11 +14,11 @@ namespace CAM
         double OriginY { get; set; }
         ObjectId[] OriginObject { get; set; }
         List<ProcessCommand> ProcessCommands { get; set; }
-        ProcessingArea ProcessingArea { get; set; } 
+        AcadObjects ProcessingArea { get; set; } 
         List<ITechOperation> TechOperations { get; }
         Tool Tool { get; set; }
         
-        IEnumerable<Curve> ToolpathCurves { get; }
+        IEnumerable<ObjectId> ToolpathObjectIds { get; }
 
         void BuildProcessing();
         void DeleteProcessCommands();

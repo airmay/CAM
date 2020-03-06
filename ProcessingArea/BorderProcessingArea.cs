@@ -8,7 +8,7 @@ using Dreambuild.AutoCAD;
 namespace CAM
 {
     [Serializable]
-    public class BorderProcessingArea : ProcessingArea
+    public class BorderProcessingArea : AcadObjects
     {
         /// <summary>
         /// Пограничная обрабатываемая область

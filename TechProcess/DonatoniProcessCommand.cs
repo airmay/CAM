@@ -14,7 +14,7 @@ namespace CAM
 
         public Location ToolLocation;
 
-        public Curve ToolpathCurve;
+        public ObjectId ToolpathObjectId { get; set; }
 
         public string GetProgrammLine() => $"{Number} {Text}";
     }

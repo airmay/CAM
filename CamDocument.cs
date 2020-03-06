@@ -52,18 +52,19 @@ namespace CAM
         public void SelectTechProcess(ITechProcess techProcess)
         {
             techProcess.TechOperations.ForEach(p => p.SetToolpathVisible(false));
-            Acad.SelectObjectIds(techProcess.ProcessingArea?.AcadObjectIds);
+            Acad.SelectObjectIds(techProcess.ProcessingArea?.ObjectIds);
         }
 
-        public void SelectTechOperation(ITechOperation techOperation) // Acad.SelectObjectIds(techOperation.ProcessingArea.AcadObjectIds.ToArray());
+        public void SelectTechOperation(ITechOperation techOperation)
         {
+            //Acad.SelectObjectIds(techOperation.ProcessingArea.AcadObjectIds.ToArray());
             techOperation.TechProcess.TechOperations.ForEach(p => p.SetToolpathVisible(p == techOperation));
             Acad.Editor.UpdateScreen();
         }
 
         public void SelectProcessCommand(ITechProcess techProcess, ProcessCommand processCommand)
         {
-            Acad.SelectCurve(processCommand.ToolpathCurve);
+            Acad.SelectObjectIds(processCommand.ToolpathObjectId);
             Acad.ShowToolObject(techProcess.Tool, processCommand.ToolIndex, processCommand.ToolLocation, techProcess.MachineType == MachineType.Donatoni);
         }
        
@@ -73,11 +74,10 @@ namespace CAM
             {
                 Acad.Write($"Выполняется расчет обработки по техпроцессу {techProcess.Caption} ...");
 
-                Acad.DeleteExtraObjects(techProcess.ToolpathCurves);
+                Acad.DeleteObjects(techProcess.ToolpathObjectIds);
+                Acad.DeleteExtraObjects();
 
                 techProcess.BuildProcessing(); // startBorder);
-
-                Acad.SaveToolpathCurves(techProcess.ToolpathCurves);
 
                 Acad.Write("Расчет обработки завершен");
             }
@@ -90,7 +90,7 @@ namespace CAM
 
         public void HideShowProcessing(ITechProcess techProcess)
         {
-            Acad.HideExtraObjects(techProcess.ToolpathCurves);
+            //Acad.HideExtraObjects(techProcess.ToolpathCurves);
         }
 
         public void SwapOuterSide(ITechProcess techProcess, TechOperationBase techOperation)

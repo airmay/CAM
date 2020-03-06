@@ -53,7 +53,7 @@ namespace CAM.Tactile
             var ids = Interaction.GetSelection("\nВыберите объекты контура плитки", "LINE");
             if (ids.Length == 0)
                 return;
-            _techProcess.ProcessingArea = new ProcessingArea(ids);
+            _techProcess.ProcessingArea = new AcadObjects(ids);
             tbContour.Text = _techProcess.ProcessingArea.ToString();
             Acad.SelectObjectIds(ids);
             SetParamsEnabled();
@@ -86,7 +86,7 @@ namespace CAM.Tactile
             if (ids.Length > 0)
             {
                 _techProcess.CalcType(ids);
-                _techProcess.Objects = new ProcessingArea(ids);
+                _techProcess.Objects = new AcadObjects(ids);
                 tbObjects.Text = _techProcess.Objects.ToString();
                 tactileTechProcessBindingSource.ResetBindings(false);
                 SetParamsEnabled();
@@ -104,12 +104,12 @@ namespace CAM.Tactile
 
         private void tbContour_Enter(object sender, EventArgs e)
         {
-            Acad.SelectObjectIds(_techProcess.ProcessingArea?.AcadObjectIds);
+            Acad.SelectObjectIds(_techProcess.ProcessingArea?.ObjectIds);
         }
 
         private void tbObjects_Enter(object sender, EventArgs e)
         {
-            Acad.SelectObjectIds(_techProcess.Objects?.AcadObjectIds);
+            Acad.SelectObjectIds(_techProcess.Objects?.ObjectIds);
         }
 
         private void tbOrigin_Enter(object sender, EventArgs e)

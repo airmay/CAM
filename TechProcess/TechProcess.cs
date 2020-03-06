@@ -27,7 +27,7 @@ namespace CAM
 
         public int Frequency { get; set; }
 
-        public ProcessingArea ProcessingArea { get; set; }
+        public AcadObjects ProcessingArea { get; set; }
 
         public List<ITechOperation> TechOperations { get; } = new List<ITechOperation>();
 
@@ -55,7 +55,6 @@ namespace CAM
         public virtual void Setup(Settings settings)
         {
             _settings = settings;
-            ProcessingArea.Refresh();
             if (OriginX != 0 || OriginY != 0)
                 OriginObject = Acad.CreateOriginObject(new Point3d(OriginX, OriginY, 0));
 
@@ -68,7 +67,7 @@ namespace CAM
 
         //public abstract ITechOperation[] CreateTechOperations(string techOperationName);
 
-        public IEnumerable<Curve> ToolpathCurves => TechOperations.Where(p => p.ToolpathCurves != null).SelectMany(p => p.ToolpathCurves);
+        public IEnumerable<ObjectId> ToolpathObjectIds => TechOperations.Where(p => p.ToolpathObjectIds != null).SelectMany(p => p.ToolpathObjectIds);
 
         public void DeleteProcessCommands()
         {
@@ -85,8 +84,9 @@ namespace CAM
             if (!Validate())
                 return;
             DeleteProcessCommands();
-            ProcessingArea?.Refresh();
+            
             //BorderProcessingArea.ProcessBorders(TechOperations.Select(p => p.ProcessingArea).OfType<BorderProcessingArea>().ToList(), startBorder);
+
             var builder = new ScemaLogicProcessBuilder(MachineType, Caption, OriginX, OriginY, MachineSettings.ZSafety);
             TechOperations.ForEach(p =>
             {
@@ -112,7 +112,6 @@ namespace CAM
 
         public virtual void Teardown()
         {
-            Acad.DeleteExtraObjects(ToolpathCurves);
             Acad.DeleteObjects(OriginObject);
             TechOperations.ForEach(to => to.Teardown());
         }

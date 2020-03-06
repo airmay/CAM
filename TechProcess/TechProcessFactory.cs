@@ -26,7 +26,7 @@ namespace CAM
 
         public ITechProcess CreateTechProcess(string techProcessCaption) => Activator.CreateInstance(_techProcessTypes[techProcessCaption], new object[] { techProcessCaption, _settings }) as ITechProcess;
 
-        public List<ITechOperation> CreateTechOperations(ITechProcess techProcess, string techOperationName) => 
+        public List<ITechOperation> CreateTechOperations(ITechProcess techProcess, string techOperationName = "Все операции") => 
             !techProcess.Validate() 
                 ? new List<ITechOperation>()
                 : techOperationName == "Все операции"

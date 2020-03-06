@@ -16,13 +16,18 @@ namespace CAM
         public const int UpperZ = 80;
 
         private int _toolIndex;
+
+        public Transaction Transaction { get; set; }
+
+        public BlockTableRecord CurrentSpace { get; set; }
+
         private Location _location;
         private int _GCode;
         private int _feed;
         private double _originX, _originY;
         private int _frequency;
         private int _zSafety;
-
+        private ObjectId _layerId = Acad.GetProcessLayerId();
         private readonly Dictionary<string, Color> Colors = new Dictionary<string, Color>()
         {
             [CommandNames.Cutting] = Color.FromColor(System.Drawing.Color.Green),
@@ -235,12 +240,20 @@ namespace CAM
                 $"{Format("Z", point.Value.Z, _location.Point.Z, withThick: WithThick)}{Format("C", angleC, _location.AngleC)}{Format("A", angleA, _location.AngleA)}" +
                 $"{Format("F", feed, _feed)}";
 
+            var toolpathObjectId = ObjectId.Null;
             if (_location.IsDefined)
             {
                 if (curve == null && (point.Value - _location.Point).Length > 1)
                     curve = NoDraw.Line(_location.Point, point.Value);
-                if (curve != null && Colors.ContainsKey(name))
-                    curve.Color = Colors[name];
+
+                if (curve != null)
+                {
+                    if (Colors.ContainsKey(name))
+                        curve.Color = Colors[name];
+                    curve.LayerId = _layerId;
+                    toolpathObjectId = CurrentSpace.AppendEntity(curve);
+                    Transaction.AddNewlyCreatedDBObject(curve, true);
+                }
             }
 
             _GCode = gCode;
@@ -251,7 +264,7 @@ namespace CAM
             {
                 Name = name,
                 Text = commandText,
-                ToolpathCurve = curve,
+                ToolpathObjectId = toolpathObjectId,
                 ToolIndex = _toolIndex,
                 ToolLocation = _location
             });
