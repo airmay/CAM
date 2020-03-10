@@ -72,6 +72,8 @@ namespace CAM
             techProcessNode.ExpandAll();
             bCreateTechOperation.Enabled = true;
             bRemove.Enabled = true;
+            bBuildProcessing.Enabled = true;
+
             return techProcessNode;
         }
 
@@ -157,7 +159,6 @@ namespace CAM
                 techProcessNode.Nodes.AddRange(techOperations.ConvertAll(CreateTechOperationNode).ToArray());
                 treeView.SelectedNode = techProcessNode.Nodes[techProcessNode.Nodes.Count - 1];
             }
-            SetButtonsEnabled();
         }
 
 	    private void bRemove_Click(object sender, EventArgs e)
@@ -219,6 +220,12 @@ namespace CAM
 	        {
                 treeView.Focus();
                 _camDocument.BuildProcessing(CurrentTechProcess);
+                var node = treeView.SelectedNode;
+                if (node.Parent == null && node.Nodes.Count == 0)
+                {
+                    node.Nodes.AddRange(CurrentTechProcess.TechOperations.ConvertAll(CreateTechOperationNode).ToArray());
+                    node.Expand();
+                }
                 RefreshView();
 	        }
 	    }

@@ -7,7 +7,7 @@ using System.Linq;
 namespace CAM.Tactile
 {
     [Serializable]
-    [TechOperation(TechProcessNames.Tactile, "Фаска")]
+    [TechOperation(2, TechProcessNames.Tactile, "Фаска")]
     public class ChamfersTechOperation : TechOperationBase
     {
         public double BandStart { get; set; }

@@ -16,12 +16,14 @@ namespace CAM
             _settings = settings;
             _techProcessTypes = Assembly.GetExecutingAssembly().GetTypes()
                             .Where(p => p.IsClass && !p.IsAbstract && typeof(ITechProcess).IsAssignableFrom(p))
-                            .ToDictionary(p => (Attribute.GetCustomAttribute(p, typeof(TechProcessAttribute)) as TechProcessAttribute).Caption);
+                            .Select(p => new { Type = p, Attr = Attribute.GetCustomAttribute(p, typeof(TechProcessAttribute)) as TechProcessAttribute })
+                            .OrderBy(p => p.Attr.Number)
+                            .ToDictionary(p => p.Attr.Caption, v => v.Type);
             _techOperationTypes = Assembly.GetExecutingAssembly().GetTypes()
                             .Where(p => p.IsClass && !p.IsAbstract && typeof(ITechOperation).IsAssignableFrom(p))
-                            .Select(p => new { Attr = Attribute.GetCustomAttribute(p, typeof(TechOperationAttribute)) as TechOperationAttribute, Type = p })
+                            .Select(p => new { Type = p, Attr = Attribute.GetCustomAttribute(p, typeof(TechOperationAttribute)) as TechOperationAttribute})
                             .GroupBy(p => p.Attr.TechProcessCaption)
-                            .ToDictionary(p => _techProcessTypes[p.Key], p => p.ToDictionary(k => k.Attr.TechOperationCaption, v => v.Type));
+                            .ToDictionary(p => _techProcessTypes[p.Key], p => p.OrderBy(k => k.Attr.Number).ToDictionary(k => k.Attr.TechOperationCaption, v => v.Type));
         }
 
         public ITechProcess CreateTechProcess(string techProcessCaption) => Activator.CreateInstance(_techProcessTypes[techProcessCaption], new object[] { techProcessCaption, _settings }) as ITechProcess;

@@ -8,7 +8,7 @@ using System.Linq;
 namespace CAM.Tactile
 {
     [Serializable]
-    [TechProcess(TechProcessNames.Tactile)]
+    [TechProcess(2, TechProcessNames.Tactile)]
     public class TactileTechProcess: TechProcessBase
     {
         public AcadObjects Objects { get; set; }
@@ -178,16 +178,6 @@ namespace CAM.Tactile
                 return false;
             }
             return true;
-        }
-
-        public override void BuildProcessing()
-        {
-            if (!TechOperations.Any())
-            {
-                Acad.Alert("Нет операций");
-                return;
-            }
-            base.BuildProcessing();
         }
     }
 }

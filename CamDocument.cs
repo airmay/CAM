@@ -72,6 +72,13 @@ namespace CAM
         {
             try
             {
+                if (!techProcess.TechOperations.Any())
+                {
+                    Acad.Write($"Создание операций по техпроцессу {techProcess.Caption}");
+                    if (!_techProcessFactory.CreateTechOperations(techProcess).Any())
+                        return;
+                }
+
                 Acad.Write($"Выполняется расчет обработки по техпроцессу {techProcess.Caption} ...");
 
                 Acad.DeleteObjects(techProcess.ToolpathObjectIds);

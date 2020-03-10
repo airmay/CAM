@@ -7,7 +7,7 @@ using System.Linq;
 namespace CAM.Tactile
 {
     [Serializable]
-    [TechOperation(TechProcessNames.Tactile, "Измерение")]
+    [TechOperation(4, TechProcessNames.Tactile, "Измерение")]
     public class MeasurementTechOperation : TechOperationBase
     {
         public List<double> PointsX { get; set; } = new List<double>();

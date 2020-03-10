@@ -8,7 +8,7 @@ using System.Linq;
 namespace CAM.Tactile
 {
     [Serializable]
-    [TechOperation(TechProcessNames.Tactile, "Конусы")]
+    [TechOperation(3, TechProcessNames.Tactile, "Конусы")]
     public class ConesTechOperation : TechOperationBase
     {
         public int CuttingFeed { get; set; }

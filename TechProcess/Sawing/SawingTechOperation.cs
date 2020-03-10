@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace CAM.Sawing
 {
     [Serializable]
-    [TechOperation(TechProcessNames.Sawing)]
+    [TechOperation(1, TechProcessNames.Sawing)]
     public class SawingTechOperation : TechOperationBase
     {
         public SawingTechOperation(ITechProcess techProcess, string caption) : base(techProcess, caption)

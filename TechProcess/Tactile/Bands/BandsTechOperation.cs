@@ -8,7 +8,7 @@ using System.Linq;
 namespace CAM.Tactile
 {
     [Serializable]
-    [TechOperation(TechProcessNames.Tactile, "Полосы")]
+    [TechOperation(1, TechProcessNames.Tactile, "Полосы")]
     public class BandsTechOperation : TechOperationBase
     {
         public int ProcessingAngle { get; set; }
