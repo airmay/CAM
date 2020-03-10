@@ -143,6 +143,13 @@
     <Compile Include="TechProcess\IHasProcessCommands.cs" />
     <Compile Include="TechProcess\ITechProcess.cs" />
     <Compile Include="TechProcess\MachineSettings.cs" />
+    <Compile Include="TechProcess\Sawing\SawingMode.cs" />
+    <Compile Include="TechProcess\Sawing\SawingModesView.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="TechProcess\Sawing\SawingModesView.Designer.cs">
+      <DependentUpon>SawingModesView.cs</DependentUpon>
+    </Compile>
     <Compile Include="TechProcess\Sawing\SawingTechOperation.cs" />
     <Compile Include="TechProcess\Sawing\SawingTechOperationView.cs">
       <SubType>UserControl</SubType>
@@ -349,6 +356,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="TechOperation\Sawing\SawingParamsView.resx">
       <DependentUpon>SawingParamsView.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="TechProcess\Sawing\SawingModesView.resx">
+      <DependentUpon>SawingModesView.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="TechProcess\Sawing\SawingTechProcessView.resx">
       <DependentUpon>SawingTechProcessView.cs</DependentUpon>

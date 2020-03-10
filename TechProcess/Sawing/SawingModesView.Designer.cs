@@ -1,4 +1,4 @@
-﻿namespace CAM.TechOperation.Sawing
+﻿namespace CAM.Sawing
 {
     partial class SawingModesView
     {
@@ -30,10 +30,10 @@
         {
             this.components = new System.ComponentModel.Container();
             this.gvSawingModes = new System.Windows.Forms.DataGridView();
-            this.sawingModesBindingSource = new System.Windows.Forms.BindingSource(this.components);
             this.depthDataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.depthStepDataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.feedDataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.sawingModesBindingSource = new System.Windows.Forms.BindingSource(this.components);
             ((System.ComponentModel.ISupportInitialize)(this.gvSawingModes)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.sawingModesBindingSource)).BeginInit();
             this.SuspendLayout();
@@ -58,16 +58,12 @@
             this.gvSawingModes.TabIndex = 1;
             this.gvSawingModes.DataError += new System.Windows.Forms.DataGridViewDataErrorEventHandler(this.gvSawingModes_DataError);
             // 
-            // sawingModesBindingSource
-            // 
-            this.sawingModesBindingSource.DataSource = typeof(CAM.TechOperation.Sawing.SawingMode);
-            // 
             // depthDataGridViewTextBoxColumn
             // 
             this.depthDataGridViewTextBoxColumn.DataPropertyName = "Depth";
-            this.depthDataGridViewTextBoxColumn.HeaderText = "ГлубинаСТ";
+            this.depthDataGridViewTextBoxColumn.HeaderText = "Глубина";
             this.depthDataGridViewTextBoxColumn.Name = "depthDataGridViewTextBoxColumn";
-            this.depthDataGridViewTextBoxColumn.Width = 87;
+            this.depthDataGridViewTextBoxColumn.Width = 73;
             // 
             // depthStepDataGridViewTextBoxColumn
             // 
@@ -83,6 +79,10 @@
             this.feedDataGridViewTextBoxColumn.HeaderText = "Подача";
             this.feedDataGridViewTextBoxColumn.Name = "feedDataGridViewTextBoxColumn";
             this.feedDataGridViewTextBoxColumn.Width = 69;
+            // 
+            // sawingModesBindingSource
+            // 
+            this.sawingModesBindingSource.DataSource = typeof(SawingMode);
             // 
             // SawingModesView
             // 
@@ -100,9 +100,9 @@
         #endregion
 
         private System.Windows.Forms.DataGridView gvSawingModes;
-        public System.Windows.Forms.BindingSource sawingModesBindingSource;
         private System.Windows.Forms.DataGridViewTextBoxColumn depthDataGridViewTextBoxColumn;
         private System.Windows.Forms.DataGridViewTextBoxColumn depthStepDataGridViewTextBoxColumn;
         private System.Windows.Forms.DataGridViewTextBoxColumn feedDataGridViewTextBoxColumn;
+        public System.Windows.Forms.BindingSource sawingModesBindingSource;
     }
 }
