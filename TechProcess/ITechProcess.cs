@@ -7,8 +7,8 @@ namespace CAM
     {
         int Frequency { get; set; }
         MachineSettings MachineSettings { get; }
-        MachineType MachineType { get; set; }
-        Material Material { get; set; }
+        MachineType? MachineType { get; set; }
+        Material? Material { get; set; }
         string Caption { get; set; }
         double OriginX { get; set; }
         double OriginY { get; set; }

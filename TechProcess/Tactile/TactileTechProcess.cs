@@ -32,7 +32,7 @@ namespace CAM.Tactile
         public TactileTechProcess(string caption, Settings settings) : base(caption, settings)
         {
             TactileTechProcessParams = settings.TactileTechProcessParams.Clone();
-            Material = Material.Granite;
+            Material = CAM.Material.Granite;
         }
 
         public Polyline GetContour()

@@ -79,7 +79,7 @@ namespace CAM
 
         public List<MachineSettings> MachineSettingsList { get; set; }
        
-        public MachineSettings GetMachineSettings(MachineType type) => MachineSettingsList.Single(p => p.MachineType == type);
+        public MachineSettings GetMachineSettings(MachineType? type) => MachineSettingsList.Single(p => p.MachineType == type);
       
         //public Dictionary<ProcessingType, IProcessingParams> GetProcessingParams() => new Dictionary<ProcessingType, IProcessingParams> { { ProcessingType.Sawing, new SawingDefaultParams{
         //    SawingCurveTechOperationParams = this.SawingCurveTechOperationParams,
@@ -88,9 +88,11 @@ namespace CAM
 
         #region TechOperationParams
 
-        public SawingTechOperationParams SawingLineTechOperationParams { get; set; }
+        //public SawingTechOperationParams SawingLineTechOperationParams { get; set; }
 
-        public SawingTechOperationParams SawingCurveTechOperationParams { get; set; }
+        //public SawingTechOperationParams SawingCurveTechOperationParams { get; set; }
+
+        public Sawing.SawingTechProcessParams SawingTechProcessParams { get; set; }
 
         public Tactile.TactileTechProcessParams TactileTechProcessParams { get; set; }
 

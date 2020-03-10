@@ -49,18 +49,15 @@
       <ProgramFileExtension>txt</ProgramFileExtension>
     </MachineSettings>
   </MachineSettingsList>
-  <SawingLineTechOperationParams>
-    <Modes>
+  <SawingTechProcessParams>
+    <SawingLineModes>
       <SawingMode>
         <Depth>0</Depth>
         <DepthStep>10</DepthStep>
         <Feed>2000</Feed>
       </SawingMode>
-    </Modes>
-    <IsFirstPassOnSurface>false</IsFirstPassOnSurface>
-  </SawingLineTechOperationParams>
-  <SawingCurveTechOperationParams>
-    <Modes>
+    </SawingLineModes>
+    <SawingCurveModes>
       <SawingMode>
         <Depth>0</Depth>
         <DepthStep>3</DepthStep>
@@ -76,9 +73,8 @@
         <DepthStep>2</DepthStep>
         <Feed>2000</Feed>
       </SawingMode>
-    </Modes>
-    <IsFirstPassOnSurface>true</IsFirstPassOnSurface>
-  </SawingCurveTechOperationParams>
+    </SawingCurveModes>
+  </SawingTechProcessParams>
   <TactileTechProcessParams>
     <BandWidth>25</BandWidth>
     <BandSpacing>25</BandSpacing>

@@ -28,7 +28,9 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             this.tbFrequency = new System.Windows.Forms.TextBox();
+            this.sawingTechProcessBindingSource = new System.Windows.Forms.BindingSource(this.components);
             this.lbFrequency = new System.Windows.Forms.Label();
             this.bObjects = new System.Windows.Forms.Button();
             this.tbObjects = new System.Windows.Forms.TextBox();
@@ -43,9 +45,10 @@
             this.cbMaterial = new System.Windows.Forms.ComboBox();
             this.label1 = new System.Windows.Forms.Label();
             this.gbSawingModes = new System.Windows.Forms.GroupBox();
+            this.sawingModesView = new CAM.Sawing.SawingModesView();
             this.cbObjectType = new System.Windows.Forms.ComboBox();
             this.label2 = new System.Windows.Forms.Label();
-            this.sawingModesView1 = new CAM.Sawing.SawingModesView();
+            ((System.ComponentModel.ISupportInitialize)(this.sawingTechProcessBindingSource)).BeginInit();
             this.gbSawingModes.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -53,10 +56,15 @@
             // 
             this.tbFrequency.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.tbFrequency.DataBindings.Add(new System.Windows.Forms.Binding("Text", this.sawingTechProcessBindingSource, "Frequency", true));
             this.tbFrequency.Location = new System.Drawing.Point(102, 106);
             this.tbFrequency.Name = "tbFrequency";
             this.tbFrequency.Size = new System.Drawing.Size(152, 20);
             this.tbFrequency.TabIndex = 52;
+            // 
+            // sawingTechProcessBindingSource
+            // 
+            this.sawingTechProcessBindingSource.DataSource = typeof(CAM.Sawing.SawingTechProcess);
             // 
             // lbFrequency
             // 
@@ -77,6 +85,7 @@
             this.bObjects.TabStop = false;
             this.bObjects.Text = "۞";
             this.bObjects.UseVisualStyleBackColor = true;
+            this.bObjects.Click += new System.EventHandler(this.bObjects_Click);
             // 
             // tbObjects
             // 
@@ -87,6 +96,7 @@
             this.tbObjects.ReadOnly = true;
             this.tbObjects.Size = new System.Drawing.Size(130, 20);
             this.tbObjects.TabIndex = 57;
+            this.tbObjects.Enter += new System.EventHandler(this.tbObjects_Enter);
             // 
             // label8
             // 
@@ -133,6 +143,7 @@
             // 
             this.tbThickness.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.tbThickness.DataBindings.Add(new System.Windows.Forms.Binding("Text", this.sawingTechProcessBindingSource, "Thickness", true));
             this.tbThickness.Location = new System.Drawing.Point(102, 51);
             this.tbThickness.Name = "tbThickness";
             this.tbThickness.Size = new System.Drawing.Size(152, 20);
@@ -151,11 +162,9 @@
             // 
             this.cbMachine.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.cbMachine.DataBindings.Add(new System.Windows.Forms.Binding("SelectedValue", this.sawingTechProcessBindingSource, "MachineType", true));
             this.cbMachine.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cbMachine.FormattingEnabled = true;
-            this.cbMachine.Items.AddRange(new object[] {
-            "ScemaLogic",
-            "Donatoni"});
             this.cbMachine.Location = new System.Drawing.Point(102, 3);
             this.cbMachine.Name = "cbMachine";
             this.cbMachine.Size = new System.Drawing.Size(152, 21);
@@ -174,6 +183,7 @@
             // 
             this.cbMaterial.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.cbMaterial.DataBindings.Add(new System.Windows.Forms.Binding("SelectedValue", this.sawingTechProcessBindingSource, "Material", true));
             this.cbMaterial.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cbMaterial.FormattingEnabled = true;
             this.cbMaterial.Location = new System.Drawing.Point(102, 27);
@@ -195,7 +205,7 @@
             this.gbSawingModes.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.gbSawingModes.Controls.Add(this.sawingModesView1);
+            this.gbSawingModes.Controls.Add(this.sawingModesView);
             this.gbSawingModes.Controls.Add(this.cbObjectType);
             this.gbSawingModes.Controls.Add(this.label2);
             this.gbSawingModes.Location = new System.Drawing.Point(3, 176);
@@ -204,6 +214,16 @@
             this.gbSawingModes.TabIndex = 75;
             this.gbSawingModes.TabStop = false;
             this.gbSawingModes.Text = "Режимы обработки объектов";
+            // 
+            // sawingModesView
+            // 
+            this.sawingModesView.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.sawingModesView.Location = new System.Drawing.Point(6, 46);
+            this.sawingModesView.Name = "sawingModesView";
+            this.sawingModesView.Size = new System.Drawing.Size(240, 309);
+            this.sawingModesView.TabIndex = 77;
             // 
             // cbObjectType
             // 
@@ -218,6 +238,7 @@
             this.cbObjectType.Name = "cbObjectType";
             this.cbObjectType.Size = new System.Drawing.Size(152, 21);
             this.cbObjectType.TabIndex = 75;
+            this.cbObjectType.SelectedIndexChanged += new System.EventHandler(this.cbObjectType_SelectedIndexChanged);
             // 
             // label2
             // 
@@ -227,16 +248,6 @@
             this.label2.Size = new System.Drawing.Size(71, 13);
             this.label2.TabIndex = 76;
             this.label2.Text = "Тип объекта";
-            // 
-            // sawingModesView1
-            // 
-            this.sawingModesView1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.sawingModesView1.Location = new System.Drawing.Point(6, 46);
-            this.sawingModesView1.Name = "sawingModesView1";
-            this.sawingModesView1.Size = new System.Drawing.Size(240, 309);
-            this.sawingModesView1.TabIndex = 77;
             // 
             // SawingTechProcessView
             // 
@@ -259,6 +270,7 @@
             this.Controls.Add(this.lbMachine);
             this.Name = "SawingTechProcessView";
             this.Size = new System.Drawing.Size(257, 540);
+            ((System.ComponentModel.ISupportInitialize)(this.sawingTechProcessBindingSource)).EndInit();
             this.gbSawingModes.ResumeLayout(false);
             this.gbSawingModes.PerformLayout();
             this.ResumeLayout(false);
@@ -284,6 +296,7 @@
         private System.Windows.Forms.GroupBox gbSawingModes;
         private System.Windows.Forms.ComboBox cbObjectType;
         private System.Windows.Forms.Label label2;
-        private SawingModesView sawingModesView1;
+        private SawingModesView sawingModesView;
+        private System.Windows.Forms.BindingSource sawingTechProcessBindingSource;
     }
 }

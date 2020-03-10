@@ -14,7 +14,8 @@ namespace CAM
     {
         public static string GetDesc(this ObjectId[] ids) => ids.QOpenForRead<Curve>().GetDesc();
 
-        public static string GetDesc(this Curve[] curves) => string.Join(",", curves.GroupBy(p => p.GetName(), (k, c) => $"{k}({c.Count()})"));
+        public static string GetDesc(this Curve[] curves) => string.Join(",", 
+            curves.GroupBy(p => p.GetName(), (k, c) => new { name = $"{k}({c.Count()})", count = c.Count() }).OrderByDescending(p => p.count).Select(p => p.name));
 
         public static string GetName(this Curve curve)
         {

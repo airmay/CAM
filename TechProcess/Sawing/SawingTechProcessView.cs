@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Dreambuild.AutoCAD;
+using System;
 using System.Windows.Forms;
 
 namespace CAM.Sawing
@@ -11,28 +12,55 @@ namespace CAM.Sawing
         {
             InitializeComponent();
 
+            cbMachine.BindEnum(MachineType.Donatoni, MachineType.ScemaLogic);
             cbMaterial.BindEnum<Material>();
-            cbMaterial.SelectedIndex = -1;
-
-            cbObjectType.SelectedIndex = 0;
         }
 
         public void BindData(SawingTechProcess data)
         {
-            _techProcess = data;
+            sawingTechProcessBindingSource.DataSource = _techProcess = data;
+            tbTool.Text = _techProcess.Tool?.ToString();
+            tbObjects.Text = _techProcess.ProcessingArea?.ToString();
+
+            cbObjectType.SelectedIndex = 0;
+            cbObjectType_SelectedIndexChanged(cbObjectType, EventArgs.Empty);
         }
 
-        private void bTool_Click(object sender, System.EventArgs e)
+        private void bTool_Click(object sender, EventArgs e)
         {
-            var tool = ToolsForm.Select(_techProcess.MachineSettings.Tools, _techProcess.MachineType);
+            if (_techProcess.MachineType.CheckIsNull("станок")) return;
+            if (_techProcess.Material.CheckIsNull("материал")) return;
+
+            var tool = ToolsForm.Select(_techProcess.MachineSettings.Tools, _techProcess.MachineType.Value);
             if (tool != null)
             {
                 _techProcess.Tool = tool;
                 tbTool.Text = tool.ToString();
                 if (_techProcess.Frequency == 0)
-                    _techProcess.Frequency = Math.Min(tool.CalcFrequency(_techProcess.Material), _techProcess.MachineSettings.MaxFrequency);
-                //tactileTechProcessBindingSource.ResetBindings(false);
+                    _techProcess.Frequency = Math.Min(tool.CalcFrequency(_techProcess.Material.Value), _techProcess.MachineSettings.MaxFrequency);
+                sawingTechProcessBindingSource.ResetBindings(false);
             }
+        }
+
+        private void bObjects_Click(object sender, EventArgs e)
+        {
+            Interaction.SetActiveDocFocus();
+            var ids = Interaction.GetSelection("\nВыберите объекты контура для раскроя", "LINE,ARC,POLYLINE");
+            if (ids.Length == 0)
+                return;
+            _techProcess.ProcessingArea = new AcadObjects(ids);
+            tbObjects.Text = _techProcess.ProcessingArea.ToString();
+        }
+
+        private void tbObjects_Enter(object sender, EventArgs e)
+        {
+            Acad.SelectObjectIds(_techProcess.ProcessingArea?.ObjectIds);
+        }
+
+        private void cbObjectType_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            sawingModesView.sawingModesBindingSource.DataSource = 
+                cbObjectType.SelectedIndex == 0 ? _techProcess.SawingTechProcessParams.SawingLineModes : _techProcess.SawingTechProcessParams.SawingCurveModes;
         }
     }
 }

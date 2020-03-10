@@ -24,11 +24,11 @@ namespace CAM.TechOperation.Sawing
         /// </summary>
         public SawingTechOperationFactory(Settings settings)
         {
-            _sawingTechOperationParams = new SawingDefaultParams
-            {
-                SawingCurveTechOperationParams = settings.SawingCurveTechOperationParams.Clone(),
-                SawingLineTechOperationParams = settings.SawingLineTechOperationParams.Clone()
-            };
+            //_sawingTechOperationParams = new SawingDefaultParams
+            //{
+            //    SawingCurveTechOperationParams = settings.SawingCurveTechOperationParams.Clone(),
+            //    SawingLineTechOperationParams = settings.SawingLineTechOperationParams.Clone()
+            //};
         }
 
         /// <summary>

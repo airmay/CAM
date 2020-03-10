@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CAM.Sawing
 {
@@ -10,8 +6,13 @@ namespace CAM.Sawing
     [TechProcess(1, TechProcessNames.Sawing)]
     public class SawingTechProcess : TechProcessBase
     {
+        public SawingTechProcessParams SawingTechProcessParams { get; }
+
+        public double? Thickness { get; set; }
+
         public SawingTechProcess(string caption, Settings settings) : base(caption, settings)
         {
+            SawingTechProcessParams = settings.SawingTechProcessParams.Clone();
         }
     }
 }

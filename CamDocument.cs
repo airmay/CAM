@@ -26,7 +26,7 @@ namespace CAM
         public ITechProcess CreateTechProcess(string techProcessName)
         {
             var techProcess = _techProcessFactory.CreateTechProcess(techProcessName);
-            techProcess.MachineType = MachineType.Donatoni; ////////////////////////
+            //techProcess.MachineType = MachineType.Donatoni; ////////////////////////
             TechProcessList.Add(techProcess);
             return techProcess;
         }

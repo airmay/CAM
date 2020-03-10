@@ -13,14 +13,7 @@ namespace CAM.Tactile
         {
             InitializeComponent();
 
-            cbMachine.DisplayMember = "Description";
-            cbMachine.ValueMember = "Value";
-            cbMachine.DataSource = new List<MachineType>() { MachineType.ScemaLogic, MachineType.Donatoni }
-                .ConvertAll(value => new
-                {
-                    Description = value.ToString(),
-                    value
-                });
+            cbMachine.BindEnum(MachineType.Donatoni, MachineType.ScemaLogic);
         }
 
         public void BindData(TactileTechProcess data)
@@ -36,13 +29,16 @@ namespace CAM.Tactile
 
         private void bTool_Click(object sender, EventArgs e)
         {
-            var tool = ToolsForm.Select(_techProcess.MachineSettings.Tools, _techProcess.MachineType);
+            if (_techProcess.MachineType.CheckIsNull("станок")) return;
+            if (_techProcess.Material.CheckIsNull("материал")) return;
+
+            var tool = ToolsForm.Select(_techProcess.MachineSettings.Tools, _techProcess.MachineType.Value);
             if (tool != null)
             {
                 _techProcess.Tool = tool;
                 tbTool.Text = tool.ToString();
                 if (_techProcess.Frequency == 0)
-                    _techProcess.Frequency = Math.Min(tool.CalcFrequency(_techProcess.Material), _techProcess.MachineSettings.MaxFrequency);
+                    _techProcess.Frequency = Math.Min(tool.CalcFrequency(_techProcess.Material.Value), _techProcess.MachineSettings.MaxFrequency);
                 tactileTechProcessBindingSource.ResetBindings(false);
             }
         }

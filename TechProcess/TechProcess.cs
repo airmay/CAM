@@ -19,9 +19,9 @@ namespace CAM
 
         public string Caption { get; set; }
 
-        public MachineType MachineType { get; set; }
+        public MachineType? MachineType { get; set; }
 
-        public Material Material { get; set; }
+        public Material? Material { get; set; }
 
         public Tool Tool { get; set; }
 
@@ -87,7 +87,7 @@ namespace CAM
             
             //BorderProcessingArea.ProcessBorders(TechOperations.Select(p => p.ProcessingArea).OfType<BorderProcessingArea>().ToList(), startBorder);
 
-            var builder = new ScemaLogicProcessBuilder(MachineType, Caption, OriginX, OriginY, MachineSettings.ZSafety);
+            var builder = new ScemaLogicProcessBuilder(MachineType.Value, Caption, OriginX, OriginY, MachineSettings.ZSafety);
             TechOperations.ForEach(p =>
             {
                 builder.StartTechOperation();

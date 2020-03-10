@@ -13,16 +13,16 @@ namespace CAM
             FieldInfo fieldInfo = value.GetType().GetField(value.ToString());
             if (fieldInfo == null) return null;
             var attribute = (DescriptionAttribute)fieldInfo.GetCustomAttribute(typeof(DescriptionAttribute));
-            return attribute.Description;
+            return attribute?.Description ?? value.ToString();
         }
 
         public static double Round(this double value, int digits) => Math.Round(value, digits);
 
-        public static void BindEnum<T>(this ComboBox comboBox) where T: struct
+        public static void BindEnum<T>(this ComboBox comboBox, params T[] values) where T: struct
         {
             comboBox.DisplayMember = "Description";
             comboBox.ValueMember = "Value";
-            comboBox.DataSource = Enum.GetValues(typeof(T))
+            comboBox.DataSource = (values.Any() ? values : Enum.GetValues(typeof(T)))
                 .Cast<Enum>()
                 .Select(value => new
                 {
@@ -33,5 +33,11 @@ namespace CAM
                 .ToList();
         }
 
+        public static bool CheckIsNull(this object value, string field)
+        {
+            if (value == null)
+                Acad.Alert($"Укажите {field}");
+            return value == null;
+        }
     }
 }
