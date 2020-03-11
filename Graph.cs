@@ -87,7 +87,7 @@ namespace CAM
 
         public static double AngleDeg(this Line line) => Math.Round(line.Angle * 180 / Math.PI, 6);
 
-        private static bool IsTurnRight(Point3d px, Point3d py, Point3d pz)
+        public static bool IsTurnRight(Point3d px, Point3d py, Point3d pz)
         {
             double num = 0;
             num = ((pz.Y - py.Y) * (py.X - px.X)) - ((py.Y - px.Y) * (pz.X - py.X));
