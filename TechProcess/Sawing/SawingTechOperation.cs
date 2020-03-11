@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CAM.Sawing
 {
@@ -10,7 +7,15 @@ namespace CAM.Sawing
     [TechOperation(1, TechProcessNames.Sawing)]
     public class SawingTechOperation : TechOperationBase
     {
-        public SawingTechOperation(ITechProcess techProcess, string caption) : base(techProcess, caption)
+        public bool IsExactlyBegin { get; set; }
+
+        public bool IsExactlyEnd { get; set; }
+
+        public double AngleA { get; set; }
+
+        public List<SawingMode> SawingModes { get; set; }
+
+        public SawingTechOperation(ITechProcess techProcess, string caption = null) : base(techProcess, caption)
         {
         }
 
@@ -20,3 +25,4 @@ namespace CAM.Sawing
         }
     }
 }
+    

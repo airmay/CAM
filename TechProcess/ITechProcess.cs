@@ -14,7 +14,7 @@ namespace CAM
         double OriginY { get; set; }
         ObjectId[] OriginObject { get; set; }
         List<ProcessCommand> ProcessCommands { get; set; }
-        AcadObjects ProcessingArea { get; set; } 
+        AcadObjectGroup ProcessingArea { get; set; } 
         List<ITechOperation> TechOperations { get; }
         Tool Tool { get; set; }
         

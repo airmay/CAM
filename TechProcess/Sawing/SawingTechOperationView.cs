@@ -13,7 +13,9 @@ namespace CAM.Sawing
 
         public void BindData(SawingTechOperation data)
         {
-            _techOperation = data;
+            sawingTechOperationBindingSource.DataSource = _techOperation = data;
+            tbObject.Text = _techOperation.ProcessingArea?.ToString();
+            sawingModesView.sawingModesBindingSource.DataSource = _techOperation.SawingModes;
         }
     }
 }

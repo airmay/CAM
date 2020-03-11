@@ -57,7 +57,8 @@ namespace CAM
 
         public void SelectTechOperation(ITechOperation techOperation)
         {
-            //Acad.SelectObjectIds(techOperation.ProcessingArea.AcadObjectIds.ToArray());
+            if (techOperation.ProcessingArea != null)
+                Acad.SelectObjectIds(techOperation.ProcessingArea.ObjectId);
             techOperation.TechProcess.TechOperations.ForEach(p => p.SetToolpathVisible(p == techOperation));
             Acad.Editor.UpdateScreen();
         }

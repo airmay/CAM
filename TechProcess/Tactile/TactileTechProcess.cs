@@ -11,7 +11,7 @@ namespace CAM.Tactile
     [TechProcess(2, TechProcessNames.Tactile)]
     public class TactileTechProcess: TechProcessBase
     {
-        public AcadObjects Objects { get; set; }
+        public AcadObjectGroup Objects { get; set; }
 
         public TactileTechProcessParams TactileTechProcessParams { get; }
 

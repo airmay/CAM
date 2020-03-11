@@ -98,6 +98,7 @@
     <Compile Include="PaletteSet\UtilsView.Designer.cs">
       <DependentUpon>UtilsView.cs</DependentUpon>
     </Compile>
+    <Compile Include="ProcessingArea\AcadObject.cs" />
     <Compile Include="TechOperation\DefaultParamsViewAttribute.cs" />
     <Compile Include="TechOperation\ParamsForm.cs">
       <SubType>Form</SubType>
@@ -360,6 +361,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="TechProcess\Sawing\SawingModesView.resx">
       <DependentUpon>SawingModesView.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="TechProcess\Sawing\SawingTechOperationView.resx">
+      <DependentUpon>SawingTechOperationView.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="TechProcess\Sawing\SawingTechProcessView.resx">
       <DependentUpon>SawingTechProcessView.cs</DependentUpon>

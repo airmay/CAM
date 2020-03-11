@@ -12,6 +12,8 @@ namespace CAM
     /// </summary>
     public static class Graph
     {
+        public static string GetDesc(this ObjectId id) => id.QOpenForRead<Curve>().GetName();
+
         public static string GetDesc(this ObjectId[] ids) => ids.QOpenForRead<Curve>().GetDesc();
 
         public static string GetDesc(this Curve[] curves) => string.Join(",", 
@@ -28,6 +30,8 @@ namespace CAM
                 default: return "Объект";
             }
         }
+
+        public static bool IsLine(this ObjectId id) => id.ObjectClass.DxfName == AcadObjectNames.Line;
 
         public static Point3d GetClosestPoint(this Curve curve, Point3d point) => (curve.StartPoint - point).Length <= (curve.EndPoint - point).Length ? curve.StartPoint : curve.EndPoint;
 
@@ -173,5 +177,57 @@ namespace CAM
                 Acad.Alert("Ошибка при построении штриховки", ex);
             }
         }
+    }
+
+    public static class AcadObjectNames
+    {
+        public const string Line = "LINE";
+        public const string Arc = "ARC";
+        public const string Circle = "CIRCLE";
+        public const string EllipsE = "ELLIPSE";
+        public const string Hatch = "HATCH";
+        public const string Image = "IMAGE";
+        public const string Lwpolyline = "LWPOLYLINE";
+        public const string Point = "POINT";
+        public const string Polyline = "POLYLINE";
+        public const string Ray = "RAY";
+
+//        3DFACE
+//3DSOLID
+//ACAD_PROXY_ENTITY
+//ARC
+//ARCALIGNEDTEXT
+//ATTDEF
+//ATTRIB
+//BODY
+//CIRCLE
+//DIMENSION
+//ELLIPSE
+//HATCH
+//IMAGE
+//INSERT
+//LEADER
+//LINE
+//LWPOLYLINE
+//MLINE
+//MTEXT
+//OLEFRAME
+//OLE2FRAME
+//POINT
+//POLYLINE
+//RAY
+//REGION
+//RTEXT
+//SEQEND
+//SHAPE
+//SOLID
+//SPLINE
+//TEXT
+//TOLERANCE
+//TRACE
+//VERTEX
+//VIEWPORT
+//WIPEOUT
+//XLINE
     }
 }

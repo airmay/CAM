@@ -5,7 +5,7 @@ using System;
 namespace CAM
 {
     [Serializable]
-    public class AcadObjects
+    public class AcadObjectGroup
     {
         public long[] Handles { get; set; }
 
@@ -19,13 +19,13 @@ namespace CAM
 
         public Curve[] Curves => ObjectIds.QOpenForRead<Curve>();
 
-        public AcadObjects(Curve[] curves)
+        public AcadObjectGroup(Curve[] curves)
         {
             Handles = Array.ConvertAll(curves, p => p.Handle.Value);
             _objectIds = Array.ConvertAll(curves, p => p.ObjectId);
         }
 
-        public AcadObjects(ObjectId[] ids)
+        public AcadObjectGroup(ObjectId[] ids)
         {
             Handles = Array.ConvertAll(ids, p => p.Handle.Value);
             _objectIds = ids;

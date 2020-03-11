@@ -48,7 +48,7 @@ namespace CAM.Sawing
             var ids = Interaction.GetSelection("\nВыберите объекты контура для раскроя", "LINE,ARC,POLYLINE");
             if (ids.Length == 0)
                 return;
-            _techProcess.ProcessingArea = new AcadObjects(ids);
+            _techProcess.ProcessingArea = new AcadObjectGroup(ids);
             tbObjects.Text = _techProcess.ProcessingArea.ToString();
         }
 

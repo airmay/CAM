@@ -27,7 +27,7 @@ namespace CAM
 
         public int Frequency { get; set; }
 
-        public AcadObjects ProcessingArea { get; set; }
+        public AcadObjectGroup ProcessingArea { get; set; }
 
         public List<ITechOperation> TechOperations { get; } = new List<ITechOperation>();
 

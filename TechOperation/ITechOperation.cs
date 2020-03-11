@@ -12,6 +12,8 @@ namespace CAM
 
         string Caption { get; set; }
 
+        AcadObject ProcessingArea { get; set; }
+
         IEnumerable<ObjectId> ToolpathObjectIds { get; }
 
         void BuildProcessing(ScemaLogicProcessBuilder builder);

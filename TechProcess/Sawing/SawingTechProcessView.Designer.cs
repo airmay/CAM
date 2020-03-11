@@ -30,7 +30,6 @@
         {
             this.components = new System.ComponentModel.Container();
             this.tbFrequency = new System.Windows.Forms.TextBox();
-            this.sawingTechProcessBindingSource = new System.Windows.Forms.BindingSource(this.components);
             this.lbFrequency = new System.Windows.Forms.Label();
             this.bObjects = new System.Windows.Forms.Button();
             this.tbObjects = new System.Windows.Forms.TextBox();
@@ -48,8 +47,9 @@
             this.sawingModesView = new CAM.Sawing.SawingModesView();
             this.cbObjectType = new System.Windows.Forms.ComboBox();
             this.label2 = new System.Windows.Forms.Label();
-            ((System.ComponentModel.ISupportInitialize)(this.sawingTechProcessBindingSource)).BeginInit();
+            this.sawingTechProcessBindingSource = new System.Windows.Forms.BindingSource(this.components);
             this.gbSawingModes.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.sawingTechProcessBindingSource)).BeginInit();
             this.SuspendLayout();
             // 
             // tbFrequency
@@ -60,11 +60,7 @@
             this.tbFrequency.Location = new System.Drawing.Point(102, 106);
             this.tbFrequency.Name = "tbFrequency";
             this.tbFrequency.Size = new System.Drawing.Size(152, 20);
-            this.tbFrequency.TabIndex = 52;
-            // 
-            // sawingTechProcessBindingSource
-            // 
-            this.sawingTechProcessBindingSource.DataSource = typeof(CAM.Sawing.SawingTechProcess);
+            this.tbFrequency.TabIndex = 50;
             // 
             // lbFrequency
             // 
@@ -95,7 +91,7 @@
             this.tbObjects.Name = "tbObjects";
             this.tbObjects.ReadOnly = true;
             this.tbObjects.Size = new System.Drawing.Size(130, 20);
-            this.tbObjects.TabIndex = 57;
+            this.tbObjects.TabIndex = 60;
             this.tbObjects.Enter += new System.EventHandler(this.tbObjects_Enter);
             // 
             // label8
@@ -116,7 +112,7 @@
             this.tbTool.Name = "tbTool";
             this.tbTool.ReadOnly = true;
             this.tbTool.Size = new System.Drawing.Size(130, 20);
-            this.tbTool.TabIndex = 51;
+            this.tbTool.TabIndex = 40;
             // 
             // bTool
             // 
@@ -147,7 +143,7 @@
             this.tbThickness.Location = new System.Drawing.Point(102, 51);
             this.tbThickness.Name = "tbThickness";
             this.tbThickness.Size = new System.Drawing.Size(152, 20);
-            this.tbThickness.TabIndex = 53;
+            this.tbThickness.TabIndex = 30;
             // 
             // label4
             // 
@@ -168,7 +164,7 @@
             this.cbMachine.Location = new System.Drawing.Point(102, 3);
             this.cbMachine.Name = "cbMachine";
             this.cbMachine.Size = new System.Drawing.Size(152, 21);
-            this.cbMachine.TabIndex = 49;
+            this.cbMachine.TabIndex = 10;
             // 
             // lbMachine
             // 
@@ -189,7 +185,7 @@
             this.cbMaterial.Location = new System.Drawing.Point(102, 27);
             this.cbMaterial.Name = "cbMaterial";
             this.cbMaterial.Size = new System.Drawing.Size(152, 21);
-            this.cbMaterial.TabIndex = 73;
+            this.cbMaterial.TabIndex = 20;
             // 
             // label1
             // 
@@ -211,7 +207,7 @@
             this.gbSawingModes.Location = new System.Drawing.Point(3, 176);
             this.gbSawingModes.Name = "gbSawingModes";
             this.gbSawingModes.Size = new System.Drawing.Size(252, 361);
-            this.gbSawingModes.TabIndex = 75;
+            this.gbSawingModes.TabIndex = 70;
             this.gbSawingModes.TabStop = false;
             this.gbSawingModes.Text = "Режимы обработки объектов";
             // 
@@ -249,6 +245,10 @@
             this.label2.TabIndex = 76;
             this.label2.Text = "Тип объекта";
             // 
+            // sawingTechProcessBindingSource
+            // 
+            this.sawingTechProcessBindingSource.DataSource = typeof(CAM.Sawing.SawingTechProcess);
+            // 
             // SawingTechProcessView
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -270,9 +270,9 @@
             this.Controls.Add(this.lbMachine);
             this.Name = "SawingTechProcessView";
             this.Size = new System.Drawing.Size(257, 540);
-            ((System.ComponentModel.ISupportInitialize)(this.sawingTechProcessBindingSource)).EndInit();
             this.gbSawingModes.ResumeLayout(false);
             this.gbSawingModes.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.sawingTechProcessBindingSource)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 

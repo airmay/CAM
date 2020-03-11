@@ -31,7 +31,7 @@ namespace CAM
         /// <summary>
         /// Обрабатываемая область
         /// </summary>
-        //public ProcessingArea ProcessingArea { get; }
+        public AcadObject ProcessingArea { get; set; }
 
         /// <summary>
         /// Команды
