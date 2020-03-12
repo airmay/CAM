@@ -32,13 +32,13 @@
             this.gbSawingModes = new System.Windows.Forms.GroupBox();
             this.sawingModesView = new CAM.Sawing.SawingModesView();
             this.tbAngleA = new System.Windows.Forms.TextBox();
+            this.sawingTechOperationBindingSource = new System.Windows.Forms.BindingSource(this.components);
             this.lbAngleA = new System.Windows.Forms.Label();
             this.bObject = new System.Windows.Forms.Button();
             this.tbObject = new System.Windows.Forms.TextBox();
             this.label8 = new System.Windows.Forms.Label();
             this.checkBox1 = new System.Windows.Forms.CheckBox();
             this.checkBox2 = new System.Windows.Forms.CheckBox();
-            this.sawingTechOperationBindingSource = new System.Windows.Forms.BindingSource(this.components);
             this.gbSawingModes.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.sawingTechOperationBindingSource)).BeginInit();
             this.SuspendLayout();
@@ -74,6 +74,10 @@
             this.tbAngleA.Size = new System.Drawing.Size(152, 20);
             this.tbAngleA.TabIndex = 30;
             // 
+            // sawingTechOperationBindingSource
+            // 
+            this.sawingTechOperationBindingSource.DataSource = typeof(CAM.Sawing.SawingTechOperation);
+            // 
             // lbAngleA
             // 
             this.lbAngleA.AutoSize = true;
@@ -93,6 +97,7 @@
             this.bObject.TabStop = false;
             this.bObject.Text = "۞";
             this.bObject.UseVisualStyleBackColor = true;
+            this.bObject.Click += new System.EventHandler(this.bObject_Click);
             // 
             // tbObject
             // 
@@ -134,10 +139,6 @@
             this.checkBox2.TabIndex = 20;
             this.checkBox2.Text = "Конец точно";
             this.checkBox2.UseVisualStyleBackColor = true;
-            // 
-            // sawingTechOperationBindingSource
-            // 
-            this.sawingTechOperationBindingSource.DataSource = typeof(CAM.Sawing.SawingTechOperation);
             // 
             // SawingTechOperationView
             // 

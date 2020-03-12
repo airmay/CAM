@@ -1,4 +1,5 @@
-﻿using System.Windows.Forms;
+﻿using Dreambuild.AutoCAD;
+using System.Windows.Forms;
 
 namespace CAM.Sawing
 {
@@ -15,6 +16,21 @@ namespace CAM.Sawing
         {
             sawingTechOperationBindingSource.DataSource = _techOperation = data;
             tbObject.Text = _techOperation.ProcessingArea?.ToString();
+            sawingModesView.sawingModesBindingSource.DataSource = _techOperation.SawingModes;
+        }
+
+        private void bObject_Click(object sender, System.EventArgs e)
+        {
+            Acad.SelectObjectIds();
+            Interaction.SetActiveDocFocus();
+            var ids = Interaction.GetSelection("\nВыберите объект", $"{AcadObjectNames.Line},{AcadObjectNames.Arc},{AcadObjectNames.Lwpolyline}");
+            if (ids.Length == 0)
+                return;
+            Acad.DeleteExtraObjects();
+            var border = ((SawingTechProcess)_techOperation.TechProcess).CreateBorders(ids[0])[0];
+            _techOperation.SetFromBorder(border);
+            tbObject.Text = _techOperation.ProcessingArea.ToString();
+            sawingTechOperationBindingSource.ResetBindings(false);
             sawingModesView.sawingModesBindingSource.DataSource = _techOperation.SawingModes;
         }
     }

@@ -83,7 +83,7 @@ namespace CAM
                     borders.Remove(startBorder);
                 }
                 var sign = startBorder.OuterSide == Side.Left ? 1 : -1;
-                Graph.CreateHatch(contour, sign);
+                //Graph.CreateHatch(contour, sign);
             }
 
             List<Curve> CalcBordersChain(Corner corner)

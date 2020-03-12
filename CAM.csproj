@@ -22,7 +22,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <PlatformTarget>AnyCPU</PlatformTarget>
-    <LangVersion>7.1</LangVersion>
+    <LangVersion>7.3</LangVersion>
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
@@ -33,7 +33,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <Prefer32Bit>false</Prefer32Bit>
-    <LangVersion>7.3</LangVersion>
+    <LangVersion>7.2</LangVersion>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="AcCui, Version=18.2.0.0, Culture=neutral, processorArchitecture=MSIL">
@@ -144,6 +144,7 @@
     <Compile Include="TechProcess\IHasProcessCommands.cs" />
     <Compile Include="TechProcess\ITechProcess.cs" />
     <Compile Include="TechProcess\MachineSettings.cs" />
+    <Compile Include="TechProcess\Sawing\Border.cs" />
     <Compile Include="TechProcess\Sawing\SawingMode.cs" />
     <Compile Include="TechProcess\Sawing\SawingModesView.cs">
       <SubType>UserControl</SubType>
