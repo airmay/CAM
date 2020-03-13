@@ -236,7 +236,13 @@ namespace CAM
             if (point == null)
                 point = new Point3d(x ?? _location.Point.X, y ?? _location.Point.Y, z ?? _location.Point.Z);
 
-            var commandText = $"G{gCode}{Format("X", point.Value.X, _location.Point.X, _originX)}{Format("Y", point.Value.Y, _location.Point.Y, _originY)}" +
+            var IJ = "";
+            if (curve is Arc arc)
+            {
+                gCode = point == arc.EndPoint ? 2 : 3;
+                IJ = $" I{(arc.Center.X - _originX).Round(4)} J{(arc.Center.Y - _originY).Round(4)}";
+            }
+            var commandText = $"G{gCode}{Format("X", point.Value.X, _location.Point.X, _originX)}{Format("Y", point.Value.Y, _location.Point.Y, _originY)}{IJ}" +
                 $"{Format("Z", point.Value.Z, _location.Point.Z, withThick: WithThick)}{Format("C", angleC, _location.AngleC)}{Format("A", angleA, _location.AngleA)}" +
                 $"{Format("F", feed, _feed)}";
 
@@ -270,7 +276,7 @@ namespace CAM
             });
 
             string Format(string label, double? value, double oldValue, double origin = 0, bool withThick = false) =>
-                 (paramsString == null || paramsString.Contains(label)) && (value.GetValueOrDefault(oldValue) != oldValue || (_GCode != gCode))
+                 (paramsString == null || paramsString.Contains(label)) && (value.GetValueOrDefault(oldValue) != oldValue || (_GCode == 0 ^ gCode == 0))
                         ? $" {label}{FormatValue((value.GetValueOrDefault(oldValue) - origin).Round(4), withThick)}"
                         : null;
 

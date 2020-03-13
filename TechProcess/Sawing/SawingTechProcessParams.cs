@@ -9,9 +9,12 @@ namespace CAM.Sawing
     [Serializable]
     public class SawingTechProcessParams
     {
-        public List<SawingMode> SawingLineModes { get; set; } = new List<SawingMode>();
+        public int PenetrationFeed { get; set; }
 
-        public List<SawingMode> SawingCurveModes { get; set; } = new List<SawingMode>();
+        public List<SawingMode> SawingLineModes { get; set; }
+
+        public List<SawingMode> SawingCurveModes { get; set; }
+
 
         public SawingTechProcessParams Clone() => MemberwiseClone() as SawingTechProcessParams;
     }

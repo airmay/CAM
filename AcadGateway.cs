@@ -249,7 +249,7 @@ namespace CAM
         /// <summary>
         /// Запил
         /// </summary>
-        public static void CreateGash(Curve curve, Point3d point, Side side, int depth, double diam, double thickness, Point3d? pointС = null)
+        public static void CreateGash(Curve curve, Point3d point, Side side, double depth, double diam, double thickness, Point3d? pointС = null)
         {
             var gashLength = Math.Sqrt(depth * (diam - depth));
             var normal = curve.GetFirstDerivative(point).GetNormal();

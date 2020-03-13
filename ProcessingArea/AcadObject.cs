@@ -18,7 +18,7 @@ namespace CAM
 
         public ObjectId ObjectId => _objectId == ObjectId.Null ? (_objectId = Acad.Database.GetObjectId(false, new Handle(Handle), 0)) : _objectId;
 
-        public Curve Curve => ObjectId.QOpenForRead<Curve>();
+        public Curve GetCurve() => ObjectId.QOpenForRead<Curve>();
 
         public AcadObject(ObjectId id)
         {

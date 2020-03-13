@@ -37,7 +37,7 @@ namespace CAM.Tactile
 
         public Polyline GetContour()
         {
-            var points = ProcessingArea.Curves.SelectMany(p => p.GetStartEndPoints());
+            var points = ProcessingArea.GetCurves().SelectMany(p => p.GetStartEndPoints());
             return NoDraw.Rectang(new Point3d(points.Min(p => p.X), points.Min(p => p.Y), 0), new Point3d(points.Max(p => p.X), points.Max(p => p.Y), 0));
         }
 
@@ -167,17 +167,6 @@ namespace CAM.Tactile
             return techOperations;
         }
 
-        public override bool Validate()
-        {
-            if (!base.Validate())
-                return false;
-
-            if (Type == null)
-            {
-                Acad.Alert("Не определен тип плитки");
-                return false;
-            }
-            return true;
-        }
+        public override bool Validate() => base.Validate() && Type.CheckNotNull("Тип плитки");
     }
 }

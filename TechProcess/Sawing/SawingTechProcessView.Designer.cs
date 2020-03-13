@@ -30,6 +30,7 @@
         {
             this.components = new System.ComponentModel.Container();
             this.tbFrequency = new System.Windows.Forms.TextBox();
+            this.sawingTechProcessBindingSource = new System.Windows.Forms.BindingSource(this.components);
             this.lbFrequency = new System.Windows.Forms.Label();
             this.bObjects = new System.Windows.Forms.Button();
             this.tbObjects = new System.Windows.Forms.TextBox();
@@ -47,9 +48,10 @@
             this.sawingModesView = new CAM.Sawing.SawingModesView();
             this.cbObjectType = new System.Windows.Forms.ComboBox();
             this.label2 = new System.Windows.Forms.Label();
-            this.sawingTechProcessBindingSource = new System.Windows.Forms.BindingSource(this.components);
-            this.gbSawingModes.SuspendLayout();
+            this.tbPenetrationFeed = new System.Windows.Forms.TextBox();
+            this.label9 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.sawingTechProcessBindingSource)).BeginInit();
+            this.gbSawingModes.SuspendLayout();
             this.SuspendLayout();
             // 
             // tbFrequency
@@ -61,6 +63,10 @@
             this.tbFrequency.Name = "tbFrequency";
             this.tbFrequency.Size = new System.Drawing.Size(152, 20);
             this.tbFrequency.TabIndex = 50;
+            // 
+            // sawingTechProcessBindingSource
+            // 
+            this.sawingTechProcessBindingSource.DataSource = typeof(CAM.Sawing.SawingTechProcess);
             // 
             // lbFrequency
             // 
@@ -74,7 +80,7 @@
             // bObjects
             // 
             this.bObjects.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.bObjects.Location = new System.Drawing.Point(234, 140);
+            this.bObjects.Location = new System.Drawing.Point(234, 162);
             this.bObjects.Name = "bObjects";
             this.bObjects.Size = new System.Drawing.Size(21, 21);
             this.bObjects.TabIndex = 68;
@@ -87,7 +93,7 @@
             // 
             this.tbObjects.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.tbObjects.Location = new System.Drawing.Point(102, 140);
+            this.tbObjects.Location = new System.Drawing.Point(102, 162);
             this.tbObjects.Name = "tbObjects";
             this.tbObjects.ReadOnly = true;
             this.tbObjects.Size = new System.Drawing.Size(130, 20);
@@ -97,7 +103,7 @@
             // label8
             // 
             this.label8.AutoSize = true;
-            this.label8.Location = new System.Drawing.Point(3, 144);
+            this.label8.Location = new System.Drawing.Point(3, 166);
             this.label8.Name = "label8";
             this.label8.Size = new System.Drawing.Size(53, 13);
             this.label8.TabIndex = 66;
@@ -204,9 +210,9 @@
             this.gbSawingModes.Controls.Add(this.sawingModesView);
             this.gbSawingModes.Controls.Add(this.cbObjectType);
             this.gbSawingModes.Controls.Add(this.label2);
-            this.gbSawingModes.Location = new System.Drawing.Point(3, 176);
+            this.gbSawingModes.Location = new System.Drawing.Point(3, 202);
             this.gbSawingModes.Name = "gbSawingModes";
-            this.gbSawingModes.Size = new System.Drawing.Size(252, 361);
+            this.gbSawingModes.Size = new System.Drawing.Size(252, 335);
             this.gbSawingModes.TabIndex = 70;
             this.gbSawingModes.TabStop = false;
             this.gbSawingModes.Text = "Режимы обработки объектов";
@@ -218,7 +224,7 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.sawingModesView.Location = new System.Drawing.Point(6, 46);
             this.sawingModesView.Name = "sawingModesView";
-            this.sawingModesView.Size = new System.Drawing.Size(240, 309);
+            this.sawingModesView.Size = new System.Drawing.Size(240, 283);
             this.sawingModesView.TabIndex = 77;
             // 
             // cbObjectType
@@ -245,14 +251,31 @@
             this.label2.TabIndex = 76;
             this.label2.Text = "Тип объекта";
             // 
-            // sawingTechProcessBindingSource
+            // tbPenetrationFeed
             // 
-            this.sawingTechProcessBindingSource.DataSource = typeof(CAM.Sawing.SawingTechProcess);
+            this.tbPenetrationFeed.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.tbPenetrationFeed.DataBindings.Add(new System.Windows.Forms.Binding("Text", this.sawingTechProcessBindingSource, "PenetrationFeed", true));
+            this.tbPenetrationFeed.Location = new System.Drawing.Point(102, 129);
+            this.tbPenetrationFeed.Name = "tbPenetrationFeed";
+            this.tbPenetrationFeed.Size = new System.Drawing.Size(152, 20);
+            this.tbPenetrationFeed.TabIndex = 55;
+            // 
+            // label9
+            // 
+            this.label9.AutoSize = true;
+            this.label9.Location = new System.Drawing.Point(3, 132);
+            this.label9.Name = "label9";
+            this.label9.Size = new System.Drawing.Size(70, 13);
+            this.label9.TabIndex = 76;
+            this.label9.Text = "Скор. малая";
             // 
             // SawingTechProcessView
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.Controls.Add(this.tbPenetrationFeed);
+            this.Controls.Add(this.label9);
             this.Controls.Add(this.gbSawingModes);
             this.Controls.Add(this.cbMaterial);
             this.Controls.Add(this.label1);
@@ -270,9 +293,9 @@
             this.Controls.Add(this.lbMachine);
             this.Name = "SawingTechProcessView";
             this.Size = new System.Drawing.Size(257, 540);
+            ((System.ComponentModel.ISupportInitialize)(this.sawingTechProcessBindingSource)).EndInit();
             this.gbSawingModes.ResumeLayout(false);
             this.gbSawingModes.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.sawingTechProcessBindingSource)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -298,5 +321,7 @@
         private System.Windows.Forms.Label label2;
         private SawingModesView sawingModesView;
         private System.Windows.Forms.BindingSource sawingTechProcessBindingSource;
+        private System.Windows.Forms.TextBox tbPenetrationFeed;
+        private System.Windows.Forms.Label label9;
     }
 }

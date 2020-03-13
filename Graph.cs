@@ -12,24 +12,10 @@ namespace CAM
     /// </summary>
     public static class Graph
     {
-        public static string GetDesc(this ObjectId id) => id.QOpenForRead<Curve>().GetName();
+        public static string GetDesc(this ObjectId id) => AcadObjectNames.RusNames[id.ObjectClass.DxfName];
 
-        public static string GetDesc(this ObjectId[] ids) => ids.QOpenForRead<Curve>().GetDesc();
-
-        public static string GetDesc(this Curve[] curves) => string.Join(",", 
-            curves.GroupBy(p => p.GetName(), (k, c) => new { name = $"{k}({c.Count()})", count = c.Count() }).OrderByDescending(p => p.count).Select(p => p.name));
-
-        public static string GetName(this Curve curve)
-        {
-            switch (curve)
-            {
-                case Line _: return "Отрезок";
-                case Arc _: return "Дуга";
-                case Circle _: return "Круг";
-                case Polyline _: return "Полилиния";
-                default: return "Объект";
-            }
-        }
+        public static string GetDesc(this ObjectId[] ids) => string.Join(",",
+            ids.GroupBy(p => p.GetDesc(), (k, c) => new { name = $"{k}({c.Count()})", count = c.Count() }).OrderByDescending(p => p.count).Select(p => p.name));
 
         public static bool IsLine(this ObjectId id) => id.ObjectClass.DxfName == AcadObjectNames.Line;
 
@@ -55,7 +41,7 @@ namespace CAM
             var tangent = curve.GetTangent(curve.StartParam);
             return Math.Abs(tangent.Y) > Consts.Epsilon
                 ? tangent.Y > 0
-                : tangent.X > 0;
+                : tangent.X < 0;
         }
         public static IEnumerable<Point3d> GetStartEndPoints(this Curve curve)
         {
@@ -192,42 +178,50 @@ namespace CAM
         public const string Polyline = "POLYLINE";
         public const string Ray = "RAY";
 
-//        3DFACE
-//3DSOLID
-//ACAD_PROXY_ENTITY
-//ARC
-//ARCALIGNEDTEXT
-//ATTDEF
-//ATTRIB
-//BODY
-//CIRCLE
-//DIMENSION
-//ELLIPSE
-//HATCH
-//IMAGE
-//INSERT
-//LEADER
-//LINE
-//LWPOLYLINE
-//MLINE
-//MTEXT
-//OLEFRAME
-//OLE2FRAME
-//POINT
-//POLYLINE
-//RAY
-//REGION
-//RTEXT
-//SEQEND
-//SHAPE
-//SOLID
-//SPLINE
-//TEXT
-//TOLERANCE
-//TRACE
-//VERTEX
-//VIEWPORT
-//WIPEOUT
-//XLINE
+        public static Dictionary<string, string> RusNames { get; } = new Dictionary<string, string>
+        {
+            [Line] = "Отрезок",
+            [Arc] = "Дуга",
+            [Lwpolyline] = "Полилиния",
+            [Circle] = "Круг"
+        };
+
+        //        3DFACE
+        //3DSOLID
+        //ACAD_PROXY_ENTITY
+        //ARC
+        //ARCALIGNEDTEXT
+        //ATTDEF
+        //ATTRIB
+        //BODY
+        //CIRCLE
+        //DIMENSION
+        //ELLIPSE
+        //HATCH
+        //IMAGE
+        //INSERT
+        //LEADER
+        //LINE
+        //LWPOLYLINE
+        //MLINE
+        //MTEXT
+        //OLEFRAME
+        //OLE2FRAME
+        //POINT
+        //POLYLINE
+        //RAY
+        //REGION
+        //RTEXT
+        //SEQEND
+        //SHAPE
+        //SOLID
+        //SPLINE
+        //TEXT
+        //TOLERANCE
+        //TRACE
+        //VERTEX
+        //VIEWPORT
+        //WIPEOUT
+        //XLINE
     }
 }

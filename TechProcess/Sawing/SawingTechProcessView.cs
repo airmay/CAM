@@ -1,8 +1,5 @@
-﻿using Autodesk.AutoCAD.DatabaseServices;
-using Dreambuild.AutoCAD;
+﻿using Dreambuild.AutoCAD;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Windows.Forms;
 
 namespace CAM.Sawing
@@ -31,8 +28,8 @@ namespace CAM.Sawing
 
         private void bTool_Click(object sender, EventArgs e)
         {
-            if (_techProcess.MachineType.CheckIsNull("станок")) return;
-            if (_techProcess.Material.CheckIsNull("материал")) return;
+            if (!_techProcess.MachineType.CheckNotNull("Станок") || !_techProcess.Material.CheckNotNull("Материал"))
+                return;
 
             var tool = ToolsForm.Select(_techProcess.MachineSettings.Tools, _techProcess.MachineType.Value);
             if (tool != null)
@@ -53,7 +50,7 @@ namespace CAM.Sawing
             if (ids.Length == 0)
                 return;
             Acad.DeleteExtraObjects();
-            _techProcess.CreateBorders(ids);
+            _techProcess.CreateExtraObjects(ids);
             tbObjects.Text = _techProcess.ProcessingArea.ToString();            
         }
 

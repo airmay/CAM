@@ -33,11 +33,11 @@ namespace CAM
                 .ToList();
         }
 
-        public static bool CheckIsNull(this object value, string field)
+        public static bool CheckNotNull(this object value, string field)
         {
             if (value == null)
-                Acad.Alert($"Укажите {field}");
-            return value == null;
+                Acad.Alert($"Не заполнено поле {field}");
+            return value != null;
         }
     }
 }

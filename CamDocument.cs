@@ -75,6 +75,8 @@ namespace CAM
             {
                 if (!techProcess.TechOperations.Any())
                 {
+                    if (!techProcess.Validate())
+                        return;
                     Acad.Write($"Создание операций по техпроцессу {techProcess.Caption}");
                     if (!techProcess.CreateTechOperations().Any())
                         return;

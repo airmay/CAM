@@ -50,6 +50,7 @@
     </MachineSettings>
   </MachineSettingsList>
   <SawingTechProcessParams>
+    <PenetrationFeed>200</PenetrationFeed>
     <SawingLineModes>
       <SawingMode>
         <Depth>0</Depth>

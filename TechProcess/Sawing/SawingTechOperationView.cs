@@ -27,7 +27,7 @@ namespace CAM.Sawing
             if (ids.Length == 0)
                 return;
             Acad.DeleteExtraObjects();
-            var border = ((SawingTechProcess)_techOperation.TechProcess).CreateBorders(ids[0])[0];
+            var border = ((SawingTechProcess)_techOperation.TechProcess).CreateExtraObjects(ids[0])[0];
             _techOperation.SetFromBorder(border);
             tbObject.Text = _techOperation.ProcessingArea.ToString();
             sawingTechOperationBindingSource.ResetBindings(false);

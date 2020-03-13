@@ -13,6 +13,8 @@ namespace CAM.Sawing
     {
         public SawingTechProcessParams SawingTechProcessParams { get; }
 
+        public int PenetrationFeed { get; set; }
+
         public double? Thickness { get; set; }
 
         [NonSerialized]
@@ -21,15 +23,16 @@ namespace CAM.Sawing
         public SawingTechProcess(string caption, Settings settings) : base(caption, settings)
         {
             SawingTechProcessParams = settings.SawingTechProcessParams.Clone();
+            PenetrationFeed = SawingTechProcessParams.PenetrationFeed;
         }
 
         public override void Setup(Settings settings)
         {
             base.Setup(settings);
-            CreateBorders();
+            CreateExtraObjects();
         }
 
-        public List<Border> CreateBorders(params ObjectId[] ids)
+        public List<Border> CreateExtraObjects(params ObjectId[] ids)
         {
             var techOperations = TechOperations.FindAll(p => p.ProcessingArea != null);
             _borders = ids.Except(techOperations.Select(p => p.ProcessingArea.ObjectId)).Select(p => new Border(p)).ToList();
@@ -99,5 +102,13 @@ namespace CAM.Sawing
         }
 
         public override List<ITechOperation> CreateTechOperations() => _borders?.ConvertAll(p => new SawingTechOperation(this, p) as ITechOperation);
+
+        public override bool Validate() => base.Validate() && Thickness.CheckNotNull("Толщина");
+
+        public override void BuildProcessing()
+        {
+            CreateExtraObjects();
+            base.BuildProcessing();
+        }
     }
 }

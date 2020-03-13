@@ -18,7 +18,7 @@ namespace CAM
         {
         }
 
-        public Curve Curve => Curves[0];
+        public Curve Curve => GetCurves()[0];
 
         public Side OuterSide { get; set; }
 

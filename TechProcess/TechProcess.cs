@@ -100,15 +100,7 @@ namespace CAM
 
         public virtual List<ITechOperation> CreateTechOperations() => new List<ITechOperation>();
 
-        public virtual bool Validate()
-        {
-            if (Tool == null)
-            {
-                Acad.Alert("Не указан инструмент");
-                return false;
-            }
-            return true;
-        }
+        public virtual bool Validate() => Tool.CheckNotNull("Инструмент");
 
         public virtual void Teardown()
         {

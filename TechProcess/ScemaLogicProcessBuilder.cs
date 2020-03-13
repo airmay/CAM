@@ -180,24 +180,24 @@ namespace CAM
         /// <summary>
         /// Построчный рез
         /// </summary>
-        public void LineCut(Curve curve, List<CuttingMode> modes, bool isZeroPass, bool isExactlyBegin, bool isExactlyEnd, Side toolSide, int depthAll, double compensation)
+        public void LineCut(Curve curve, List<CuttingMode> modes, bool isZeroPass, bool isExactlyBegin, bool isExactlyEnd, Side toolSide, double depthAll, double compensation, int penetrationFeed, double toolDiameter)
         {
             var passList = GetPassList(modes, depthAll, isZeroPass);
             _startCorner = curve.IsUpward() ^ (passList.Count() % 2 == 1) ? Corner.End : Corner.Start;
             foreach (var item in passList)
             {
-                var toolpathCurve = CreateToolpath(curve, compensation, item.Key, isExactlyBegin, isExactlyEnd);
-                //Cutting(toolpathCurve, item.Value, _techProcessParams.PenetrationRate);
+                var toolpathCurve = CreateToolpath(curve, compensation, item.Key, isExactlyBegin, isExactlyEnd, toolDiameter);
+                Cutting(toolpathCurve, item.Value, penetrationFeed);
             }
         }
 
-        public Curve CreateToolpath(Curve curve, double offset, double depth, bool isExactlyBegin, bool isExactlyEnd)
+        public Curve CreateToolpath(Curve curve, double offset, double depth, bool isExactlyBegin, bool isExactlyEnd, double toolDiameter)
         {
             var toolpathCurve = curve.GetOffsetCurves(offset)[0] as Curve;
             if (depth != 0)
                 toolpathCurve.TransformBy(Matrix3d.Displacement(-Vector3d.ZAxis * depth));
 
-            var indent = CalcIndent(depth);
+            var indent = CalcIndent(depth, toolDiameter);
             switch (toolpathCurve)
             {
                 case Line line:
@@ -265,19 +265,17 @@ namespace CAM
             return angle;
         }
 
-        public double CalcCompensation(Curve curve, Side toolSide)
+        public double CalcCompensation(Curve curve, Side toolSide, double depth, double toolDiameter, double toolThickness, bool isFrontPlaneZero)
         {
-            return 0;
-            //var depth = _techProcessParams.BilletThickness;
-            //var offset = 0d;
-            //if (curve.IsUpward() ^ toolSide == Side.Left)
-            //    offset = _techProcessParams.ToolThickness;
-            //if (curve is Arc arc && toolSide == Side.Left)
-            //    offset += arc.Radius - Math.Sqrt(arc.Radius * arc.Radius - depth * (_techProcessParams.ToolDiameter - depth));
-            //return toolSide == Side.Left ^ curve is Arc ? offset : -offset;
+            var offset = 0d;
+            if (curve.IsUpward() ^ toolSide == Side.Left ^ isFrontPlaneZero)
+                offset = toolThickness;
+            if (curve is Arc arc && toolSide == Side.Left)
+                offset += arc.Radius - Math.Sqrt(arc.Radius * arc.Radius - depth * (toolDiameter - depth));
+            return toolSide == Side.Left ^ curve is Arc ? offset : -offset;
         }
 
-        public double CalcIndent(double depth) => 0; // Math.Sqrt(depth * (_techProcessParams.ToolDiameter - depth)) + CornerIndentIncrease;
+        public double CalcIndent(double depth, double toolDiameter) => Math.Sqrt(depth * (toolDiameter - depth)) + CornerIndentIncrease;
 
     }
 }

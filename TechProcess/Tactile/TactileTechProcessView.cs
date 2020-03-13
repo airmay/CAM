@@ -29,8 +29,8 @@ namespace CAM.Tactile
 
         private void bTool_Click(object sender, EventArgs e)
         {
-            if (_techProcess.MachineType.CheckIsNull("станок")) return;
-            if (_techProcess.Material.CheckIsNull("материал")) return;
+            if (!_techProcess.MachineType.CheckNotNull("Станок"))
+                return;
 
             var tool = ToolsForm.Select(_techProcess.MachineSettings.Tools, _techProcess.MachineType.Value);
             if (tool != null)

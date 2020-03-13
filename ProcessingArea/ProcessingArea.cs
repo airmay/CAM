@@ -17,7 +17,7 @@ namespace CAM
             get => _objectIds ?? (_objectIds = Array.ConvertAll(Handles, p => Acad.Database.GetObjectId(false, new Handle(p), 0)));
         }
 
-        public Curve[] Curves => ObjectIds.QOpenForRead<Curve>();
+        public Curve[] GetCurves() => ObjectIds.QOpenForRead<Curve>();
 
         public AcadObjectGroup(Curve[] curves)
         {
