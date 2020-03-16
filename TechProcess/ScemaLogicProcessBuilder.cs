@@ -14,7 +14,6 @@ namespace CAM
     /// </summary>
     public class ScemaLogicProcessBuilder
     {
-        const int CornerIndentIncrease = 5;
         private int ZSafety;
 
         private static readonly Dictionary<string, Color> Colors = new Dictionary<string, Color>()
@@ -31,7 +30,6 @@ namespace CAM
         private readonly DonatoniCommandGenerator _generator = new DonatoniCommandGenerator();
         //private Point3d _currentPoint = Algorithms.NullPoint3d;
         //private double _currentAngle;
-        private Corner? _startCorner;
 
         private DocumentLock _documentLock;
         private Transaction _transaction;
@@ -112,32 +110,13 @@ namespace CAM
         /// <summary>
         /// Рез по кривой
         /// </summary>
-        public void Cutting(Curve curve, int cuttingFeed, int transitionFeed, double angleA = 0, Side engineSide = Side.Right)
+        public void Cutting(Curve curve, int cuttingFeed, int transitionFeed, double angleA = 0, Side engineSide = Side.Right, Corner? corner = null)
         {
-            var point = _startCorner.HasValue ? curve.GetPoint(_startCorner.Value) : curve.GetClosestPoint(_generator.ToolPosition);
-            _startCorner = null;
+            var point = corner.HasValue ? curve.GetPoint(corner.Value) : curve.GetClosestPoint(_generator.ToolPosition);
             var angleC = CalcToolAngle(curve, point, engineSide);
             if (_generator.IsUpperTool)
                 _generator.Move(point.X, point.Y, angleC, angleA);
 
-            //double angle = 0;
-            //if (_generator.ToolPosition.Z >= ZSafety)
-            //{
-            //    if (_startCorner.HasValue)
-            //    {
-            //        point = curve.GetPoint(_startCorner.Value);
-            //        _startCorner = null;
-            //    }
-            //    else if (_generator.EngineStarted)
-            //        point = curve.GetClosestPoint(_generator.ToolPosition);
-
-            //    Move(point, CalcToolAngle(curve, point, engineSide), angleA);
-            //}
-            //else
-            //{
-            //    point = curve.GetClosestPoint(_generator.ToolPosition);
-            //    angle = CalcToolAngle(curve, point, engineSide);
-            //}
             _generator.CreateCommand(point.Z != _generator.ToolPosition.Z ? CommandNames.Penetration : CommandNames.Transition, 1, point: point, angleC: angleC, angleA: angleA, feed: transitionFeed);
             point = curve.NextPoint(point);
             if (!(curve is Line))
@@ -165,66 +144,7 @@ namespace CAM
             _generator.WithThick = true;
         }
 
-        /// <summary>
-        /// Команда реза
-        /// </summary>
-        //private void CuttingCommand(string command, Point3d point, int feed) => _generator.Cutting(command, LineTo(point, command), feed, point, _currentAngle);
-
-        //private Line LineTo(Point3d point, string command = CommandNames.Fast)
-        //{
-        //    var line = new Line(_currentPoint, point) { Color = Colors[command] };
-        //    _currentPoint = point;
-        //    return line;
-        //}
-
-        /// <summary>
-        /// Построчный рез
-        /// </summary>
-        public void LineCut(Curve curve, List<CuttingMode> modes, bool isZeroPass, bool isExactlyBegin, bool isExactlyEnd, Side toolSide, double depthAll, double compensation, int penetrationFeed, double toolDiameter)
-        {
-            var passList = GetPassList(modes, depthAll, isZeroPass);
-            _startCorner = curve.IsUpward() ^ (passList.Count() % 2 == 1) ? Corner.End : Corner.Start;
-            foreach (var item in passList)
-            {
-                var toolpathCurve = CreateToolpath(curve, compensation, item.Key, isExactlyBegin, isExactlyEnd, toolDiameter);
-                Cutting(toolpathCurve, item.Value, penetrationFeed);
-            }
-        }
-
-        public Curve CreateToolpath(Curve curve, double offset, double depth, bool isExactlyBegin, bool isExactlyEnd, double toolDiameter)
-        {
-            var toolpathCurve = curve.GetOffsetCurves(offset)[0] as Curve;
-            if (depth != 0)
-                toolpathCurve.TransformBy(Matrix3d.Displacement(-Vector3d.ZAxis * depth));
-
-            var indent = CalcIndent(depth, toolDiameter);
-            switch (toolpathCurve)
-            {
-                case Line line:
-                    if (isExactlyBegin)
-                        line.StartPoint = line.GetPointAtDist(indent);
-                    if (isExactlyEnd)
-                        line.EndPoint = line.GetPointAtDist(line.Length - indent);
-                    break;
-
-                case Arc arc:
-                    var indentAngle = indent / ((Arc)curve).Radius;
-                    if (isExactlyBegin)
-                        arc.StartAngle = arc.StartAngle + indentAngle;
-                    if (isExactlyEnd)
-                        arc.EndAngle = arc.EndAngle - indentAngle;
-                    var deltaStart = arc.StartPoint.X - arc.Center.X;
-                    var deltaEnd = arc.EndPoint.X - arc.Center.X;
-                    // if ((arc.StartAngle >= 0.5 * Math.PI && arc.StartAngle < 1.5 * Math.PI) ^ (arc.EndAngle > 0.5 * Math.PI && arc.EndAngle <= 1.5 * Math.PI))
-                    if ((Math.Abs(deltaStart) > Consts.Epsilon && Math.Abs(deltaEnd) > Consts.Epsilon && (deltaStart > 0 ^ deltaEnd > 0)) || (arc.TotalAngle > Math.PI + Consts.Epsilon))
-                        throw new InvalidOperationException(
-                            $"Обработка дуги невозможна - дуга пересекает угол 90 или 270 градусов. Текущие углы: начальный {Graph.ToDeg(arc.StartAngle)}, конечный {Graph.ToDeg(arc.EndAngle)}");
-                    break;
-            }
-            return toolpathCurve;
-        }
-
-        private static List<KeyValuePair<double, int>> GetPassList(IEnumerable<CuttingMode> modes, double DepthAll, bool isZeroPass)
+        public static IEnumerable<KeyValuePair<double, int>> GetPassList(IEnumerable<CuttingMode> modes, double DepthAll, bool isZeroPass)
         {
             var passList = new List<KeyValuePair<double, int>>();
             var enumerator = modes.OrderBy(p => p.Depth).GetEnumerator();
@@ -245,14 +165,12 @@ namespace CAM
                 }
                 if (depth > DepthAll)
                     depth = DepthAll;
-                passList.Add(new KeyValuePair<double, int>(depth, mode.Feed));
+                yield return new KeyValuePair<double, int>(depth, mode.Feed);
             }
             while (depth < DepthAll);
-
-            return passList;
         }
 
-        public double CalcToolAngle(Curve curve, Point3d point, Side engineSide)
+        public static double CalcToolAngle(Curve curve, Point3d point, Side engineSide)
         {
             var tangent = curve.GetFirstDerivative(point).ToVector2d();
             if (!curve.IsUpward())
@@ -264,18 +182,5 @@ namespace CAM
                 angle += 180;
             return angle;
         }
-
-        public double CalcCompensation(Curve curve, Side toolSide, double depth, double toolDiameter, double toolThickness, bool isFrontPlaneZero)
-        {
-            var offset = 0d;
-            if (curve.IsUpward() ^ toolSide == Side.Left ^ isFrontPlaneZero)
-                offset = toolThickness;
-            if (curve is Arc arc && toolSide == Side.Left)
-                offset += arc.Radius - Math.Sqrt(arc.Radius * arc.Radius - depth * (toolDiameter - depth));
-            return toolSide == Side.Left ^ curve is Arc ? offset : -offset;
-        }
-
-        public double CalcIndent(double depth, double toolDiameter) => Math.Sqrt(depth * (toolDiameter - depth)) + CornerIndentIncrease;
-
     }
 }
