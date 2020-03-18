@@ -20,7 +20,6 @@ namespace CAM
             SetButtonsEnabled();
 
             bDeleteProcessing.Visible = false;
-            bSwapOuterSide.Visible = false;
             bAttachDrawing.Visible = false;
 #if DEBUG
             bClose.Visible = true;
@@ -62,7 +61,7 @@ namespace CAM
         }
 
         private void SetButtonsEnabled() => bCreateTechOperation.Enabled = bRemove.Enabled = bMoveUpTechOperation.Enabled = bMoveDownTechOperation.Enabled = 
-            bSwapOuterSide.Enabled = bBuildProcessing.Enabled = bSendProgramm.Enabled = treeView.Nodes.Count > 0;
+            bBuildProcessing.Enabled = bSendProgramm.Enabled = treeView.Nodes.Count > 0;
 
         private TreeNode CreateTechProcessNode(ITechProcess techProcess)
 	    {
@@ -233,12 +232,6 @@ namespace CAM
         private void bDeleteProcessing_Click(object sender, EventArgs e)
         {
             _camDocument.HideShowProcessing(CurrentTechProcess);
-        }
-
-        private void bSwapOuterSide_Click(object sender, EventArgs e)
-        {
-            _camDocument.SwapOuterSide(treeView.SelectedNode?.Tag as ITechProcess, treeView.SelectedNode?.Tag as TechOperationBase);
-            RefreshView();
         }
 
         private void bSend_Click(object sender, EventArgs e)

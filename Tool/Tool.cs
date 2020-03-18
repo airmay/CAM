@@ -1,5 +1,4 @@
 ﻿using System;
-using System.ComponentModel;
 
 namespace CAM
 {
@@ -41,14 +40,5 @@ namespace CAM
             var speed = material == Material.Granite ? 35 : 50;
             return (int)Math.Round(speed * 1000 / (Diameter * Math.PI) * 60);
         }
-    }
-
-    public enum ToolType
-    {
-        [Description("Диск")]
-        Disk,
-
-        [Description("Фреза")]
-        Mill
     }
 }

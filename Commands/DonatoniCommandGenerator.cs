@@ -23,6 +23,13 @@ namespace CAM
             Command("RTCP=1");
             Command("G600 X0 Y-2500 Z-370 U3800 V0 W0 N0");
             Command("G601");
+
+            //program.AppendLine($"; Программа обработки для станка Denver \"{techProcess.Caption}\"  {DateTime.Now}");
+            //program.AppendLine("98");
+            //program.AppendLine("97 2 1");
+            //program.AppendLine("17 XYCZ");
+            //program.AppendLine("28 XYCZ");
+            //program.AppendLine($"97 6 {techProcess.TechProcessParams.ToolNumber}");
         }
 
         protected override void StopMachineCommands()

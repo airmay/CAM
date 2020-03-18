@@ -7,7 +7,7 @@ using System.Reflection;
 
 namespace CAM
 {
-    public class CamManager : IExtensionApplication
+    public class EntryPoint : IExtensionApplication
     {
         private Dictionary<Document, CamDocument> _documents = new Dictionary<Document, CamDocument>();
         private Settings _settings;

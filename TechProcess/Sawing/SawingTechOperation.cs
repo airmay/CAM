@@ -59,7 +59,7 @@ namespace CAM.Sawing
             if (sumIndent < curve.Length())
             {
                 var modes = SawingModes.ConvertAll(p => new CuttingMode { Depth = p.Depth, DepthStep = p.DepthStep, Feed = p.Feed });
-                var passList = ScemaLogicProcessBuilder.GetPassList(modes, techProcess.Thickness.Value, !ProcessingArea.ObjectId.IsLine()).ToList();
+                var passList = BuilderUtils.GetPassList(modes, techProcess.Thickness.Value, !ProcessingArea.ObjectId.IsLine()).ToList();
                 Corner? startCorner = curve.IsUpward() ^ (passList.Count() % 2 == 1) ? Corner.End : Corner.Start;
                 foreach (var item in passList)
                 {
@@ -76,7 +76,7 @@ namespace CAM.Sawing
             {
                 var point = Scheduling(curve, compensation);
                 var line = NoDraw.Line(curve.StartPoint, curve.EndPoint);
-                var angle = ScemaLogicProcessBuilder.CalcToolAngle(line, curve.StartPoint, Side.Right);
+                var angle = BuilderUtils.CalcToolAngle(line, curve.StartPoint, Side.Right);
                 line.Dispose();
                 generator.Cutting(point.X, point.Y, point.Z, angle, techProcess.PenetrationFeed);
             }

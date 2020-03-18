@@ -1,6 +1,4 @@
 ﻿using Autodesk.AutoCAD.ApplicationServices;
-using Autodesk.AutoCAD.DatabaseServices;
-using Dreambuild.AutoCAD;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -26,7 +24,6 @@ namespace CAM
         public ITechProcess CreateTechProcess(string techProcessName)
         {
             var techProcess = _techProcessFactory.CreateTechProcess(techProcessName);
-            //techProcess.MachineType = MachineType.Donatoni; ////////////////////////
             TechProcessList.Add(techProcess);
             return techProcess;
         }
@@ -43,7 +40,7 @@ namespace CAM
             TechProcessList.Remove(techProcess);
         }
 
-        public void DeleteTechOperation(TechOperationBase techOperation)
+        public void DeleteTechOperation(ITechOperation techOperation)
         {
             techOperation.Teardown();
             techOperation.TechProcess.TechOperations.Remove(techOperation);
@@ -69,7 +66,7 @@ namespace CAM
             Acad.ShowToolObject(techProcess.Tool, processCommand.ToolIndex, processCommand.ToolLocation, techProcess.MachineType == MachineType.Donatoni);
         }
        
-        public void BuildProcessing(ITechProcess techProcess, BorderProcessingArea startBorder = null)
+        public void BuildProcessing(ITechProcess techProcess)
         {
             try
             {
@@ -83,11 +80,10 @@ namespace CAM
                 }
 
                 Acad.Write($"Выполняется расчет обработки по техпроцессу {techProcess.Caption} ...");
-
                 Acad.DeleteObjects(techProcess.ToolpathObjectIds);
                 Acad.DeleteExtraObjects();
 
-                techProcess.BuildProcessing(); // startBorder);
+                techProcess.BuildProcessing();
 
                 Acad.Write("Расчет обработки завершен");
             }
@@ -102,17 +98,7 @@ namespace CAM
         {
             //Acad.HideExtraObjects(techProcess.ToolpathCurves);
         }
-
-        public void SwapOuterSide(ITechProcess techProcess, TechOperationBase techOperation)
-        {
-            //var to = techOperation ?? techProcess?.TechOperations?.FirstOrDefault();
-            //if (to?.ProcessingArea is BorderProcessingArea border)
-            //{
-            //    border.OuterSide = border.OuterSide.Swap();
-            //    BuildProcessing(to.TechProcess, border);
-            //}
-        }
-
+       
         public void SendProgram(List<ProcessCommand> processCommands, ITechProcess techProcess)
         {
             if (processCommands == null || !processCommands.Any())
