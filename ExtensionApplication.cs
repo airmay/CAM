@@ -51,7 +51,6 @@ namespace CAM
 
         public void SetActiveDocument(Document document)
         {
-            Acad.Write(document == Acad.ActiveDocument ? "TRUE" : "false");
             if (!_documents.ContainsKey(document))
             {
                 document.CommandWillStart += Document_CommandWillStart;
