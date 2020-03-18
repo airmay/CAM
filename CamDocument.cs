@@ -1,5 +1,4 @@
-﻿using Autodesk.AutoCAD.ApplicationServices;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -8,15 +7,14 @@ namespace CAM
 {
     public class CamDocument
     {
-        public readonly Document Document;
         public int Hash;
         public List<ITechProcess> TechProcessList { get; set; } = new List<ITechProcess>();
+
         private Settings _settings;
         private readonly TechProcessFactory _techProcessFactory;
 
-        public CamDocument(Document document, Settings settings)
+        public CamDocument(Settings settings)
         {
-            Document = document;
             _settings = settings;
             _techProcessFactory = new TechProcessFactory(settings);
         }

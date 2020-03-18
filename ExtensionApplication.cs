@@ -7,7 +7,7 @@ using System.Reflection;
 
 namespace CAM
 {
-    public class EntryPoint : IExtensionApplication
+    public class ExtensionApplication : IExtensionApplication
     {
         private Dictionary<Document, CamDocument> _documents = new Dictionary<Document, CamDocument>();
         private Settings _settings;
@@ -51,11 +51,12 @@ namespace CAM
 
         public void SetActiveDocument(Document document)
         {
+            Acad.Write(document == Acad.ActiveDocument ? "TRUE" : "false");
             if (!_documents.ContainsKey(document))
             {
                 document.CommandWillStart += Document_CommandWillStart;
                 document.BeginDocumentClose += Document_BeginDocumentClose;
-                _documents[document] = new CamDocument(document, _settings);
+                _documents[document] = new CamDocument(_settings);
                 TechProcessLoader.LoadTechProsess(_documents[document], _settings);
             }
             Acad.ClearHighlighted();

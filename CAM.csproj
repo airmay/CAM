@@ -91,7 +91,7 @@
     <Compile Include="Commands\DonatoniCommandGenerator.cs" />
     <Compile Include="Commands\ICommandGenerator.cs" />
     <Compile Include="Commands\MachineTypeAttribute.cs" />
-    <Compile Include="EntryPoint.cs" />
+    <Compile Include="ExtensionApplication.cs" />
     <Compile Include="PaletteSet\TrimmingView.cs">
       <SubType>UserControl</SubType>
     </Compile>

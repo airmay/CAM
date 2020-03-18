@@ -19,7 +19,7 @@ namespace CAM
         {
             try
             {
-                using (Transaction tr = camDocument.Document.Database.TransactionManager.StartTransaction())
+                using (Transaction tr = Acad.Database.TransactionManager.StartTransaction())
                 using (DBDictionary dict = tr.GetObject(Acad.Database.NamedObjectsDictionaryId, OpenMode.ForRead) as DBDictionary)
                     if (dict.Contains(DataKey))
                         using (Xrecord xRecord = tr.GetObject(dict.GetAt(DataKey), OpenMode.ForRead) as Xrecord)
@@ -74,9 +74,9 @@ namespace CAM
                     if (newHash == camDocument.Hash)
                         return;
 
-                    using (DocumentLock acLckDoc = camDocument.Document.LockDocument())
-                    using (Transaction tr = camDocument.Document.Database.TransactionManager.StartTransaction())
-                    using (DBDictionary dict = tr.GetObject(camDocument.Document.Database.NamedObjectsDictionaryId, OpenMode.ForWrite) as DBDictionary)
+                    using (DocumentLock acLckDoc = Acad.ActiveDocument.LockDocument())
+                    using (Transaction tr = Acad.Database.TransactionManager.StartTransaction())
+                    using (DBDictionary dict = tr.GetObject(Acad.Database.NamedObjectsDictionaryId, OpenMode.ForWrite) as DBDictionary)
                     {
                         if (dict.Contains(DataKey))
                             using (var xrec = tr.GetObject(dict.GetAt(DataKey), OpenMode.ForWrite) as Xrecord)
