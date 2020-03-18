@@ -10,7 +10,7 @@ namespace CAM
     /// <summary>
     /// Генератор команд для станка типа Krea
     /// </summary>
-    public class DonatoniCommandGenerator
+    public class DonatoniCommandGeneratorOld
     {
         private int _startRangeIndex;
         public const int UpperZ = 80;

@@ -26,7 +26,7 @@ namespace CAM.Tactile
             Frequency = 5000;
         }
 
-        public override void BuildProcessing(ScemaLogicProcessBuilder builder)
+        public override void BuildProcessing(ICommandGenerator generator)
         {
             if (!(TechProcess.MachineType == MachineType.Donatoni || TechProcess.MachineType == MachineType.Krea))
                 return;
@@ -48,7 +48,7 @@ namespace CAM.Tactile
                 stepY /= Math.Sqrt(2);
                 stepX = stepY * 2;
             }
-            builder.SetTool(2, Frequency, 90);
+            generator.SetTool(2, Frequency, 90);
 
             while (y < contourPoints[1].Y)
             {
@@ -80,22 +80,24 @@ namespace CAM.Tactile
                 while (z >= zMin)
                 {
                     var feed = (int)((FeedMax - FeedMin) / zMin * (z * z / zMin - 2 * z) + FeedMax);
-                    builder.Cutting(x, y, z, 0, cuttingFeed: feed);
+                    generator.Cutting(x, y, z, 0, feed: feed);
                     if (z <= -2)
                     {
                         if (++counter == 5) // Подъем на 1мм для охлаждения
                         {
                             counter = 0;
-                            builder.Pause();
-                            builder.Uplifting(z + 1);
-                            builder.Cutting(x, y, z + 0.2, 0, cuttingFeed: 300);
-                            builder.Cutting(x, y, z, 0, cuttingFeed: feed);
+                            Pause();
+                            generator.Uplifting(z + 1);
+                            generator.Cutting(x, y, z + 0.2, 0, feed: 300);
+                            generator.Cutting(x, y, z, 0, feed: feed);
                         }
                     }
                     z -= 0.2;
                 }
-                builder.Pause();
-                builder.Uplifting();
+                Pause();
+                generator.Uplifting();
+
+                void Pause() => generator.Command("G4 F0.2", "Пауза");
             }
 
             contour.Dispose();

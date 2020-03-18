@@ -52,7 +52,7 @@ namespace CAM
             Setup(techProcess);
         }
 
-        public abstract void BuildProcessing(ScemaLogicProcessBuilder builder);
+        public abstract void BuildProcessing(ICommandGenerator generator);
 
         public void SetToolpathVisible(bool visible) => ToolpathObjectIds?.ForEach<Curve>(p => p.Visible = visible);
 

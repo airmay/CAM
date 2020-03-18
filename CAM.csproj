@@ -86,6 +86,12 @@
     <Compile Include="AcadGateway.cs" />
     <Compile Include="CamDocument.cs" />
     <Compile Include="CamManager.cs" />
+    <Compile Include="CommandGenerator\BuilderUtils.cs" />
+    <Compile Include="CommandGenerator\CommandGeneratorBase.cs" />
+    <Compile Include="CommandGenerator\CommandGeneratorFactory.cs" />
+    <Compile Include="CommandGenerator\DonatoniCommandGenerator.cs" />
+    <Compile Include="CommandGenerator\ICommandGenerator.cs" />
+    <Compile Include="CommandGenerator\MachineTypeAttribute.cs" />
     <Compile Include="PaletteSet\TrimmingView.cs">
       <SubType>UserControl</SubType>
     </Compile>

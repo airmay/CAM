@@ -21,9 +21,19 @@ namespace CAM.Tactile
         {
         }
 
-        public override void BuildProcessing(ScemaLogicProcessBuilder builder)
+        public override void BuildProcessing(ICommandGenerator generator)
         {
-            builder.Measure(PointsX, PointsY);
+            for (int i = 0; i < PointsX.Count; i++)
+            {
+                generator.GCommand(CommandNames.Fast, 0, x: PointsX[i], y: PointsY[i], z: 80);
+                generator.Command($"G0 Z80");
+                generator.Command("M131");
+                generator.Command($"DBL THICK{i} = %TastL.ZLastra - %TastL.ZBanco", "Измерение");
+                generator.Command($"G0 Z(THICK{i}/1000 + 100)");
+            }
+            var s = String.Join(" + ", Enumerable.Range(0, PointsX.Count).Select(p => $"THICK{p}"));
+            generator.Command($"DBL THICK = ({s})/{PointsX.Count}/1000");
+            generator.WithThick = true;
         }
 
         public override void Setup(ITechProcess techProcess)

@@ -67,7 +67,7 @@ namespace CAM.Tactile
             }
         }
 
-        public override void BuildProcessing(ScemaLogicProcessBuilder builder)
+        public override void BuildProcessing(ICommandGenerator generator)
         {
             if (!(TechProcess.MachineType == MachineType.ScemaLogic || TechProcess.MachineType == MachineType.Donatoni))
                 return;
@@ -126,7 +126,7 @@ namespace CAM.Tactile
                     var vector = (points[1] - points[0]).GetNormal() * tactileTechProcess.TactileTechProcessParams.Departure;
                     var startPoint = points[0] + passDir * s - vector - Vector3d.ZAxis * Depth;
                     var endPoint = points[1] + passDir * s + vector - Vector3d.ZAxis * Depth;
-                    builder.Cutting(startPoint, endPoint, feed, tactileTechProcess.TactileTechProcessParams.TransitionFeed);
+                    generator.Cutting(startPoint, endPoint, feed, tactileTechProcess.TactileTechProcessParams.TransitionFeed);
                 }
             }
             ray.Dispose();

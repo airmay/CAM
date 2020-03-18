@@ -87,15 +87,16 @@ namespace CAM
             
             //BorderProcessingArea.ProcessBorders(TechOperations.Select(p => p.ProcessingArea).OfType<BorderProcessingArea>().ToList(), startBorder);
 
-            var builder = new ScemaLogicProcessBuilder(MachineType.Value, Caption, OriginX, OriginY, MachineSettings.ZSafety);
+            var generator = CommandGeneratorFactory.Create(MachineType.Value);
+            generator.StartTechProcess(Caption, OriginX, OriginY, MachineSettings.ZSafety);
             TechOperations.ForEach(p =>
             {
-                builder.StartTechOperation();
-                builder.SetTool(1, Frequency);
-                p.BuildProcessing(builder);
-                p.ProcessCommands = builder.FinishTechOperation();
+                generator.StartTechOperation();
+                generator.SetTool(1, Frequency);
+                p.BuildProcessing(generator);
+                p.ProcessCommands = generator.FinishTechOperation();
             });
-            ProcessCommands = builder.FinishTechProcess();
+            ProcessCommands = generator.FinishTechProcess();
         }
 
         public virtual List<ITechOperation> CreateTechOperations() => new List<ITechOperation>();

@@ -25,7 +25,7 @@ namespace CAM.Tactile
             CuttingFeed = techProcess.TactileTechProcessParams.CuttingFeed;
         }
 
-        public override void BuildProcessing(ScemaLogicProcessBuilder builder)
+        public override void BuildProcessing(ICommandGenerator generator)
         {
             if (TechProcess.MachineType != MachineType.Donatoni)
                 return;
@@ -54,13 +54,13 @@ namespace CAM.Tactile
                     var vector = (points[1] - points[0]).GetNormal() * tactileParams.Departure;
                     var startPoint = points[0] - vector - Vector3d.ZAxis * tactileParams.Depth;
                     var endPoint = points[1] + vector - Vector3d.ZAxis * tactileParams.Depth;
-                    builder.Cutting(startPoint, endPoint, CuttingFeed, tactileParams.TransitionFeed, 45, step > 0 ^ ProcessingAngle == 45 ? Side.Right : Side.Left);
+                    generator.Cutting(startPoint, endPoint, CuttingFeed, tactileParams.TransitionFeed, 45, step > 0 ^ ProcessingAngle == 45 ? Side.Right : Side.Left);
                 }
                 else if (step > 0)
                 {
                     ray.BasePoint -= passDir * tactileTechProcess.BandSpacing.Value;
                     step = -step;
-                    builder.Uplifting();
+                    generator.Uplifting();
                 }
                 else
                     break;

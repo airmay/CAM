@@ -50,7 +50,7 @@ namespace CAM.Sawing
 
         const int CornerIndentIncrease = 5;
 
-        public override void BuildProcessing(ScemaLogicProcessBuilder builder)
+        public override void BuildProcessing(ICommandGenerator generator)
         {
             var techProcess = (SawingTechProcess)TechProcess;
             var curve = ProcessingArea.GetCurve();
@@ -64,7 +64,7 @@ namespace CAM.Sawing
                 foreach (var item in passList)
                 {
                     var toolpathCurve = CreateToolpath(item.Key, IsExactlyBegin, IsExactlyEnd, techProcess.Tool.Diameter);
-                    builder.Cutting(toolpathCurve, item.Value, techProcess.PenetrationFeed, corner: startCorner);
+                    generator.Cutting(toolpathCurve, item.Value, techProcess.PenetrationFeed, corner: startCorner);
                     startCorner = null;
                 }
                 if (!IsExactlyBegin)
@@ -78,9 +78,8 @@ namespace CAM.Sawing
                 var line = NoDraw.Line(curve.StartPoint, curve.EndPoint);
                 var angle = ScemaLogicProcessBuilder.CalcToolAngle(line, curve.StartPoint, Side.Right);
                 line.Dispose();
-                builder.Cutting(point.X, point.Y, point.Z, angle, techProcess.PenetrationFeed);
+                generator.Cutting(point.X, point.Y, point.Z, angle, techProcess.PenetrationFeed);
             }
-            ProcessCommands = builder.FinishTechOperation();
 
             Curve CreateToolpath(double depth, bool isExactlyBegin, bool isExactlyEnd, double toolDiameter)
             {

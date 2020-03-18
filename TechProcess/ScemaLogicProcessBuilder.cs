@@ -27,7 +27,7 @@ namespace CAM
 
         //private readonly TechProcessParams _techProcessParams;
         //private readonly ScemaLogicCommandGenerator _generator = new ScemaLogicCommandGenerator();
-        private readonly DonatoniCommandGenerator _generator = new DonatoniCommandGenerator();
+        private readonly DonatoniCommandGeneratorOld _generator = new DonatoniCommandGeneratorOld();
         //private Point3d _currentPoint = Algorithms.NullPoint3d;
         //private double _currentAngle;
 
@@ -133,8 +133,8 @@ namespace CAM
         {
             for (int i = 0; i < pointsX.Count; i++)
             {
-                _generator.CreateCommand(CommandNames.Fast, 0, paramsString: "XY", x: pointsX[i], y: pointsY[i], z: DonatoniCommandGenerator.UpperZ);
-                _generator.CreateCommand($"G0 Z{DonatoniCommandGenerator.UpperZ}");
+                _generator.CreateCommand(CommandNames.Fast, 0, paramsString: "XY", x: pointsX[i], y: pointsY[i], z: DonatoniCommandGeneratorOld.UpperZ);
+                _generator.CreateCommand($"G0 Z{DonatoniCommandGeneratorOld.UpperZ}");
                 _generator.CreateCommand("M131");
                 _generator.CreateCommand($"DBL THICK{i} = %TastL.ZLastra - %TastL.ZBanco", "Измерение");
                 _generator.CreateCommand($"G0 Z(THICK{i}/1000 + 100)");

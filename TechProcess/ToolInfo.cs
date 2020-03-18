@@ -16,7 +16,5 @@ namespace CAM
         }
 
         public bool IsDefined => !double.IsNaN(Point.X) && !double.IsNaN(Point.Y) && !double.IsNaN(Point.Z);
-
-        //public ToolPosition Clone() => (ToolPosition)this.MemberwiseClone();
     }
 }

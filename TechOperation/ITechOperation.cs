@@ -16,7 +16,7 @@ namespace CAM
 
         IEnumerable<ObjectId> ToolpathObjectIds { get; }
 
-        void BuildProcessing(ScemaLogicProcessBuilder builder);
+        void BuildProcessing(ICommandGenerator generator);
 
         void SetToolpathVisible(bool visible);
 
