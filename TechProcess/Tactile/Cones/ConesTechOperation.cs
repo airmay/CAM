@@ -26,11 +26,10 @@ namespace CAM.Tactile
             Frequency = 5000;
         }
 
+        public override bool Enabled => TechProcess.MachineType == MachineType.Donatoni || TechProcess.MachineType == MachineType.Krea;
+
         public override void BuildProcessing(ICommandGenerator generator)
         {
-            if (!(TechProcess.MachineType == MachineType.Donatoni || TechProcess.MachineType == MachineType.Krea))
-                return;
-
             var tactileTechProcess = (TactileTechProcess)TechProcess;
             var tactileParams = ((TactileTechProcess)TechProcess).TactileTechProcessParams;
             var isDiag = tactileTechProcess.ProcessingAngle1 != 0;

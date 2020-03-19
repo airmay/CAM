@@ -8,7 +8,7 @@ namespace CAM
     /// </summary>
     public interface ITechOperation : IHasProcessCommands
     {
-        ITechProcess TechProcess { get; set; }
+        ITechProcess TechProcess { get; }
 
         string Caption { get; set; }
 
@@ -23,5 +23,9 @@ namespace CAM
         void Setup(ITechProcess techProcess);
 
         void Teardown();
+
+        bool Enabled { get; }
+
+        bool Validate();
     }
 }

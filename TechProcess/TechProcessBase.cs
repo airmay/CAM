@@ -58,14 +58,8 @@ namespace CAM
             if (OriginX != 0 || OriginY != 0)
                 OriginObject = Acad.CreateOriginObject(new Point3d(OriginX, OriginY, 0));
 
-            TechOperations.ForEach(to =>
-            {
-                to.Setup(this);
-                //to.ProcessingArea.AcadObjectIds = Acad.GetObjectIds(to.ProcessingArea.Handles);
-            });
+            TechOperations.ForEach(p => p.Setup(this));
         }
-
-        //public abstract ITechOperation[] CreateTechOperations(string techOperationName);
 
         public IEnumerable<ObjectId> ToolpathObjectIds => TechOperations.Where(p => p.ToolpathObjectIds != null).SelectMany(p => p.ToolpathObjectIds);
 
@@ -79,24 +73,24 @@ namespace CAM
 
         public bool TechOperationMoveUp(ITechOperation techOperation) => TechOperations.SwapPrev(techOperation);
 
-        public virtual void BuildProcessing() //BorderProcessingArea startBorder = null)
+        public virtual void BuildProcessing()
         {
-            if (!Validate())
+            if (!Validate() || TechOperations.Any(p => p.Enabled && !p.Validate()))
                 return;
             DeleteProcessCommands();
-            
-            //BorderProcessingArea.ProcessBorders(TechOperations.Select(p => p.ProcessingArea).OfType<BorderProcessingArea>().ToList(), startBorder);
 
-            var generator = CommandGeneratorFactory.Create(MachineType.Value);
-            generator.StartTechProcess(Caption, OriginX, OriginY, MachineSettings.ZSafety);
-            TechOperations.ForEach(p =>
+            using (var generator = CommandGeneratorFactory.Create(MachineType.Value))
             {
-                generator.StartTechOperation();
-                generator.SetTool(1, Frequency);
-                p.BuildProcessing(generator);
-                p.ProcessCommands = generator.FinishTechOperation();
-            });
-            ProcessCommands = generator.FinishTechProcess();
+                generator.StartTechProcess(Caption, OriginX, OriginY, MachineSettings.ZSafety);
+                TechOperations.FindAll(p => p.Enabled).ForEach(p =>
+                {
+                    generator.StartTechOperation();
+                    generator.SetTool(1, Frequency);
+                    p.BuildProcessing(generator);
+                    p.ProcessCommands = generator.FinishTechOperation();
+                });
+                ProcessCommands = generator.FinishTechProcess();
+            }
         }
 
         public virtual List<ITechOperation> CreateTechOperations() => new List<ITechOperation>();

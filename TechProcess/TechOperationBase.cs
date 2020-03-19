@@ -22,11 +22,7 @@ namespace CAM
         [NonSerialized]
         private ITechProcess _techProcess;
 
-        public ITechProcess TechProcess
-        {
-            get => _techProcess;
-            set => _techProcess = value;
-        }
+        public ITechProcess TechProcess => _techProcess;
 
         /// <summary>
         /// Обрабатываемая область
@@ -56,16 +52,14 @@ namespace CAM
 
         public void SetToolpathVisible(bool visible) => ToolpathObjectIds?.ForEach<Curve>(p => p.Visible = visible);
 
-        public virtual void Setup(ITechProcess techProcess)
-        {
-            TechProcess = techProcess;
-        }
+        public virtual void Setup(ITechProcess techProcess) => _techProcess = techProcess;
 
-        public virtual void Teardown()
-        {
-            Acad.DeleteObjects(ToolpathObjectIds);
-        }
+        public virtual void Teardown() => Acad.DeleteObjects(ToolpathObjectIds);
 
         public IEnumerable<ObjectId> ToolpathObjectIds => ProcessCommands?.Select(p => p.ToolpathObjectId).Where(p => p != ObjectId.Null);
+
+        public virtual bool Enabled => true;
+
+        public virtual bool Validate() => true;
     }
 }

@@ -67,11 +67,10 @@ namespace CAM.Tactile
             }
         }
 
+        public override bool Enabled => TechProcess.MachineType == MachineType.ScemaLogic || TechProcess.MachineType == MachineType.Donatoni;
+
         public override void BuildProcessing(ICommandGenerator generator)
         {
-            if (!(TechProcess.MachineType == MachineType.ScemaLogic || TechProcess.MachineType == MachineType.Donatoni))
-                return;
-
             if (PassList?.Any() != true)
                 CalcPassList();
             var tactileTechProcess = (TactileTechProcess)TechProcess;

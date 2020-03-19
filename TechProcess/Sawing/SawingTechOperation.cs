@@ -48,10 +48,9 @@ namespace CAM.Sawing
             IsExactlyEnd = border.IsExactlyEnd;
         }
 
-        const int CornerIndentIncrease = 5;
-
         public override void BuildProcessing(ICommandGenerator generator)
         {
+            const int CornerIndentIncrease = 5;
             var techProcess = (SawingTechProcess)TechProcess;
             var curve = ProcessingArea.GetCurve();
             var thickness = techProcess.Thickness.Value;
@@ -134,7 +133,6 @@ namespace CAM.Sawing
             /// </summary>
             Point3d Scheduling()
             {
-                const int CornerIndentIncrease = 5;
                 var vector = curve.EndPoint - curve.StartPoint;
                 var depth = thickness;
                 var point = Point3d.Origin;

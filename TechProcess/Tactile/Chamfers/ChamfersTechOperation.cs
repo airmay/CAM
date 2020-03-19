@@ -25,11 +25,10 @@ namespace CAM.Tactile
             CuttingFeed = techProcess.TactileTechProcessParams.CuttingFeed;
         }
 
+        public override bool Enabled => TechProcess.MachineType == MachineType.Donatoni;
+
         public override void BuildProcessing(ICommandGenerator generator)
         {
-            if (TechProcess.MachineType != MachineType.Donatoni)
-                return;
-
             var tactileTechProcess = (TactileTechProcess)TechProcess;
             var contour = tactileTechProcess.GetContour();
             var contourPoints = contour.GetPolyPoints().ToArray();

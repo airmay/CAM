@@ -1,10 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
 
 namespace CAM
 {
-    public interface ICommandGenerator
+    public interface ICommandGenerator: IDisposable
     {
         void StartTechProcess(string caption, double originX, double originY, int zSafety);
 

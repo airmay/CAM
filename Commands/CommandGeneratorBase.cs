@@ -62,13 +62,17 @@ namespace CAM
             StopMachineCommands();
 
             _transaction.Commit();
-            _transaction.Dispose();
-            _documentLock.Dispose();
 
             int number = 0;
             _commands.ForEach(p => p.Number = ++number);
 
             return _commands;
+        }
+
+        public void Dispose()
+        {
+            _transaction.Dispose();
+            _documentLock.Dispose();
         }
 
         /// <summary>
