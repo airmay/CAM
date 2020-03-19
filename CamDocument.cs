@@ -108,7 +108,7 @@ namespace CAM
             if (fileName != null)
                 try
                 {
-                    var contents = processCommands?.Select(p => p.GetProgrammLine()).ToArray();
+                    var contents = processCommands?.Select(p => p.GetProgrammLine(techProcess.MachineType.Value)).ToArray();
                     File.WriteAllLines(fileName, contents);
                     Acad.Write($"Создан файл {fileName}");
                 }
