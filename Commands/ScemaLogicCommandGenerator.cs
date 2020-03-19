@@ -47,7 +47,10 @@ namespace CAM.Commands
 
         protected override string GCommandText(int gCode, string paramsString, Point3d point, Curve curve, double? angleC, double? angleA, int? feed)
         {
-            var text = $"; XYCZ; {feed ?? _feed}; {point.X.Round(4)}; {point.Y.Round(4)}; ";
+            var text = $"{point.X.Round(4)}; {point.Y.Round(4)}; ";
+            if (gCode == 0)
+                return angleC.HasValue ? $"0; XYC; {text} {angleC.Value.Round(4)};;" : $"0; XYZ; {text}{point.Z.Round(4)};;";
+
             if (curve is Arc arc)
             {
                 gCode = point == arc.EndPoint ? 2 : 3;
@@ -56,7 +59,7 @@ namespace CAM.Commands
             else
                 text += $"{point.Z.Round(4)};;";
 
-            return gCode + text;
+            return $"{gCode}; XYCZ; {feed ?? _feed}; {text}";
         }
     }
 }
