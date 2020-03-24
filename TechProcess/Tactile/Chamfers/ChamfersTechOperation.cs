@@ -43,8 +43,8 @@ namespace CAM.Tactile
             ray.BasePoint += passDir * tactileTechProcess.BandStart1.Value;
             var step = tactileTechProcess.BandWidth.Value + tactileTechProcess.BandSpacing.Value;
             var tactileParams = tactileTechProcess.TactileTechProcessParams;
-
-            while(true)
+            var engineSide = ProcessingAngle < 90 ? Side.Right : Side.Left;
+            while (true)
             {
                 var points = new Point3dCollection();
                 ray.IntersectWith(contour, Intersect.ExtendThis, new Plane(), points, IntPtr.Zero, IntPtr.Zero);
@@ -53,13 +53,16 @@ namespace CAM.Tactile
                     var vector = (points[1] - points[0]).GetNormal() * tactileParams.Departure;
                     var startPoint = points[0] - vector - Vector3d.ZAxis * tactileParams.Depth;
                     var endPoint = points[1] + vector - Vector3d.ZAxis * tactileParams.Depth;
-                    generator.Cutting(startPoint, endPoint, CuttingFeed, tactileParams.TransitionFeed, 45, step > 0 ^ ProcessingAngle == 45 ? Side.Right : Side.Left);
+                    if (generator.IsUpperTool)
+                        generator.Move(startPoint.X, startPoint.Y, BuilderUtils.CalcToolAngle(ProcessingAngle, engineSide), 45);
+                    generator.Cutting(startPoint, endPoint, CuttingFeed, tactileParams.TransitionFeed);
                 }
                 else if (step > 0)
                 {
                     ray.BasePoint -= passDir * tactileTechProcess.BandSpacing.Value;
                     step = -step;
                     generator.Uplifting();
+                    engineSide = engineSide.Opposite();
                 }
                 else
                     break;

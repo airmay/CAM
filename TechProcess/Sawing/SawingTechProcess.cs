@@ -68,7 +68,7 @@ namespace CAM.Sawing
                     contour.Add(nextBorder.Curve);
                     borders.Remove(nextBorder);
                     var nextCorner = nextBorder.Curve.GetCorner(point);
-                    nextBorder.OuterSide = nextCorner != corner ? border.OuterSide : border.OuterSide.Swap();
+                    nextBorder.OuterSide = nextCorner != corner ? border.OuterSide : border.OuterSide.Opposite();
 
                     if (border.TechOperation == null || nextBorder.TechOperation == null)
                     {

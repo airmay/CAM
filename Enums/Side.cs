@@ -9,7 +9,7 @@
 
     public static class SideExt
     {
-        public static Side Swap(this Side side)
+        public static Side Opposite(this Side side)
         {
             switch (side)
             {

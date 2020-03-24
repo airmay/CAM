@@ -54,82 +54,150 @@ namespace CAM.Sawing
             var techProcess = (SawingTechProcess)TechProcess;
             var curve = ProcessingArea.GetCurve();
             var thickness = techProcess.Thickness.Value;
-            var toolDiameter = techProcess.Tool.Diameter;
-            var toolThickness = techProcess.Tool.Thickness.Value;
-            var compensation = CalcCompensation();
+            var toolDiameter = techProcess.Tool.Diameter;          
+            var engineSide = Side.None;
+            double offsetArc = 0;
+            double angleA = 0;
+
+            if (techProcess.MachineType == MachineType.ScemaLogic)
+                AngleA = 0;
+
+            if (curve is Arc arc)
+                CalcArc();
+            if (curve is Line line)
+                CalcLine();
+
+            var outerSideSign = OuterSide == Side.Left ^ curve is Arc ? 1 : -1;
+            var offsetCoeff = Math.Tan(angleA) * outerSideSign;
+            var depthCoeff = 1 / Math.Cos(angleA);
+            var toolThickness = techProcess.Tool.Thickness.Value * depthCoeff;
+            var compensation = (offsetArc + (engineSide == OuterSide ^ techProcess.MachineType == MachineType.Donatoni ? toolThickness : 0)) * outerSideSign;
+            var shift = angleA > 0 ? -thickness * offsetCoeff : 0;
+
             var sumIndent = CalcIndent(thickness) * (Convert.ToInt32(IsExactlyBegin) + Convert.ToInt32(IsExactlyEnd));
-            if (sumIndent < curve.Length())
+            if (sumIndent >= curve.Length())
             {
-                var modes = SawingModes.ConvertAll(p => new CuttingMode { Depth = p.Depth, DepthStep = p.DepthStep, Feed = p.Feed });
-                var passList = BuilderUtils.GetPassList(modes, techProcess.Thickness.Value, !ProcessingArea.ObjectId.IsLine()).ToList();
-                Corner? startCorner = curve.IsUpward() ^ (passList.Count() % 2 == 1) ? Corner.End : Corner.Start;
-                foreach (var item in passList)
-                {
-                    var toolpathCurve = CreateToolpath(item.Key);
-                    generator.Cutting(toolpathCurve, item.Value, techProcess.PenetrationFeed, corner: startCorner);
-                    startCorner = null;
-                }
-                if (!IsExactlyBegin)
-                    Acad.CreateGash(curve, curve.StartPoint, OuterSide, techProcess.Thickness.Value, techProcess.Tool.Diameter, techProcess.Tool.Thickness.Value);
-                if (!IsExactlyEnd)
-                    Acad.CreateGash(curve, curve.EndPoint, OuterSide, techProcess.Thickness.Value, techProcess.Tool.Diameter, techProcess.Tool.Thickness.Value);
-            }
-            else
-            {
+                if (AngleA != 0)
+                    throw new InvalidOperationException("Расчет намечания выполняется только при нулевом вертикальном угле.");
                 var point = Scheduling();
-                var line = NoDraw.Line(curve.StartPoint, curve.EndPoint);
-                var angle = BuilderUtils.CalcToolAngle(line, curve.StartPoint, Side.Right);
-                line.Dispose();
+                var angle = BuilderUtils.CalcToolAngle((curve.EndPoint - curve.StartPoint).ToVector2d().Angle, engineSide);
                 generator.Cutting(point.X, point.Y, point.Z, angle, techProcess.PenetrationFeed);
+                return;
             }
 
-            Curve CreateToolpath(double depth)
-            {
-                var toolpathCurve = curve.GetOffsetCurves(compensation)[0] as Curve;
-                toolpathCurve.TransformBy(Matrix3d.Displacement(-Vector3d.ZAxis * depth));
+            var modes = SawingModes.ConvertAll(p => new CuttingMode { Depth = p.Depth, DepthStep = p.DepthStep, Feed = p.Feed });
+            var passList = BuilderUtils.GetPassList(modes, thickness, !ProcessingArea.ObjectId.IsLine()).ToList();
 
-                var indent = CalcIndent(depth);
+            Curve toolpathCurve = null;
+            foreach (var item in passList)
+            {
+                CreateToolpath(item.Key, compensation + shift + item.Key * offsetCoeff);
+                if (generator.IsUpperTool)
+                {
+                    var point = engineSide == Side.Right ^ (passList.Count() % 2 == 1) ? toolpathCurve.EndPoint : toolpathCurve.StartPoint;
+                    var vector = Vector3d.ZAxis * (item.Key + techProcess.MachineSettings.ZSafety);
+                    if (angleA != 0)
+                        vector = vector.RotateBy(-angleA, ((Line)toolpathCurve).Delta) * depthCoeff;
+                    generator.Move(point + vector, BuilderUtils.CalcToolAngle(toolpathCurve, point, engineSide), Math.Abs(AngleA));
+                }
+                generator.Cutting(toolpathCurve, item.Value, techProcess.PenetrationFeed, engineSide);
+            }
+            if (angleA != 0)
+                generator.Uplifting(Vector3d.ZAxis.RotateBy(-angleA, ((Line)toolpathCurve).Delta) * (thickness + techProcess.MachineSettings.ZSafety) * depthCoeff);
+
+            if (!IsExactlyBegin || !IsExactlyEnd)
+            {
+                var gashCurve = curve.GetOffsetCurves(shift)[0] as Curve;
+                if (!IsExactlyBegin)
+                    Acad.CreateGash(gashCurve, gashCurve.StartPoint, OuterSide, thickness * depthCoeff, toolDiameter, toolThickness);
+                if (!IsExactlyEnd)
+                    Acad.CreateGash(gashCurve, gashCurve.EndPoint, OuterSide, thickness * depthCoeff, toolDiameter, toolThickness);
+                gashCurve.Dispose();
+            }
+
+            // Locals
+
+            void CalcArc()
+            {
+                AngleA = 0;
+                var startSide = Math.Sign(Math.Cos(arc.StartAngle.Round(3)));
+                var endSide = Math.Sign(Math.Cos(arc.EndAngle.Round(3)));
+                var cornersOneSide = Math.Sign(startSide * endSide);
+
+                if (arc.TotalAngle.Round(3) > Math.PI && cornersOneSide > 0)
+                    throw new InvalidOperationException("Обработка дуги невозможна - дуга пересекает углы 90 и 270 градусов.");
+
+                if (cornersOneSide < 0) //  дуга пересекает углы 90 или 270 градусов
+                {
+                    if (techProcess.MachineType == MachineType.ScemaLogic)
+                        throw new InvalidOperationException("Обработка дуги невозможна - дуга пересекает угол 90 или 270 градусов.");
+
+                    engineSide = startSide > 0 ? Side.Left : Side.Right;
+                }
+                if (OuterSide == Side.Left) // внутренний рез дуги
+                {
+                    if (techProcess.MachineType == MachineType.Donatoni && engineSide != Side.Left) // подворот диска при вн. резе дуги
+                    {
+                        engineSide = Side.Right;
+                        //var comp = arc.Radius - Math.Sqrt(arc.Radius * arc.Radius - thickness * (toolDiameter - thickness));
+                        //AngleA = Math.Atan2(comp, thickness).ToDeg();
+
+                        var R = arc.Radius;
+                        var t = thickness;
+                        var d = toolDiameter;
+                        var comp = (2 * R * t * t - Math.Sqrt(-d * d * d * d * t * t + 4 * d * d * R * R * t * t + d * d * t * t * t * t)) / (d * d - 4 * R * R);
+                        AngleA = -Math.Atan2(comp, thickness).ToDeg();
+                    }
+                    else
+                        offsetArc = arc.Radius - Math.Sqrt(arc.Radius * arc.Radius - thickness * (toolDiameter - thickness));
+                }
+                if (engineSide == Side.None)
+                    engineSide = (startSide + endSide) > 0 ? Side.Right : Side.Left;
+            }
+
+            void CalcLine()
+            {
+                if (AngleA == 0)
+                {
+                    var angle = line.Angle.Round(3);
+                    var upDownSign = Math.Sign(Math.Sin(angle));
+                    engineSide = upDownSign > 0 ? Side.Right : upDownSign < 0 ? Side.Left : Math.Cos(angle) > 0 ? Side.Left : Side.Right;
+                }
+                else
+                    engineSide = AngleA > 0 ? OuterSide : OuterSide.Opposite();
+                angleA = AngleA.ToRad();
+            }
+
+            void CreateToolpath(double depth, double offset)
+            {
+                toolpathCurve = curve.GetOffsetCurves(offset)[0] as Curve;
+                toolpathCurve.TransformBy(Matrix3d.Displacement(-Vector3d.ZAxis * depth));
+                if (!IsExactlyBegin && !IsExactlyEnd)
+                    return;
+                var indent = CalcIndent(depth * depthCoeff);
                 switch (toolpathCurve)
                 {
-                    case Line line:
+                    case Line l:
                         if (IsExactlyBegin)
-                            line.StartPoint = line.GetPointAtDist(indent);
+                            l.StartPoint = l.GetPointAtDist(indent);
                         if (IsExactlyEnd)
-                            line.EndPoint = line.GetPointAtDist(line.Length - indent);
+                            l.EndPoint = l.GetPointAtDist(l.Length - indent);
                         break;
 
-                    case Arc arc:
+                    case Arc a:
                         var indentAngle = indent / ((Arc)curve).Radius;
                         if (IsExactlyBegin)
-                            arc.StartAngle = arc.StartAngle + indentAngle;
+                            a.StartAngle = a.StartAngle + indentAngle;
                         if (IsExactlyEnd)
-                            arc.EndAngle = arc.EndAngle - indentAngle;
-                        var deltaStart = arc.StartPoint.X - arc.Center.X;
-                        var deltaEnd = arc.EndPoint.X - arc.Center.X;
-                        // if ((arc.StartAngle >= 0.5 * Math.PI && arc.StartAngle < 1.5 * Math.PI) ^ (arc.EndAngle > 0.5 * Math.PI && arc.EndAngle <= 1.5 * Math.PI))
-                        if ((Math.Abs(deltaStart) > Consts.Epsilon && Math.Abs(deltaEnd) > Consts.Epsilon && (deltaStart > 0 ^ deltaEnd > 0)) || (arc.TotalAngle > Math.PI + Consts.Epsilon))
-                            throw new InvalidOperationException(
-                                $"Обработка дуги невозможна - дуга пересекает угол 90 или 270 градусов. Текущие углы: начальный {Graph.ToDeg(arc.StartAngle)}, конечный {Graph.ToDeg(arc.EndAngle)}");
+                            a.EndAngle = a.EndAngle - indentAngle;
                         break;
                 }
-                return toolpathCurve;
             }
 
             double CalcIndent(double depth) => Math.Sqrt(depth * (toolDiameter - depth)) + CornerIndentIncrease;
 
-            double CalcCompensation()
-            {
-                var offset = 0d;
-                var isFrontPlaneZero = techProcess.MachineType == MachineType.Donatoni;
-                if (curve.IsUpward() ^ OuterSide == Side.Left ^ isFrontPlaneZero)
-                    offset = toolThickness;
-                if (curve is Arc arc && OuterSide == Side.Left)
-                    offset += arc.Radius - Math.Sqrt(arc.Radius * arc.Radius - thickness * (toolDiameter - thickness));
-                return OuterSide == Side.Left ^ curve is Arc ? offset : -offset;
-            }
-
             /// <summary>
-            /// Намечание
+            /// Расчет точки намечания
             /// </summary>
             Point3d Scheduling()
             {

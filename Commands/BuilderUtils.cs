@@ -35,17 +35,11 @@ namespace CAM
             while (depth < DepthAll);
         }
 
-        public static double CalcToolAngle(Curve curve, Point3d point, Side engineSide)
+        public static double CalcToolAngle(Curve curve, Point3d point, Side engineSide) => CalcToolAngle(curve.GetFirstDerivative(point).ToVector2d().Angle, engineSide);
+
+        public static double CalcToolAngle(double angle, Side engineSide)
         {
-            var tangent = curve.GetFirstDerivative(point).ToVector2d();
-            if (!curve.IsUpward())
-                tangent = tangent.Negate();
-            var angle = Graph.ToDeg(Math.PI - tangent.Angle.Round(6));
-            if (curve is Line && angle == 180)
-                angle = 0;
-            if (engineSide == Side.Left)
-                angle += 180;
-            return angle;
+            return ((engineSide == Side.Right ? 180 : 360) + 360 - angle.ToDeg().Round(4)) % 360;
         }
     }
 }

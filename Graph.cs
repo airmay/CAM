@@ -21,9 +21,9 @@ namespace CAM
 
         public static Point3d GetClosestPoint(this Curve curve, Point3d point) => (curve.StartPoint - point).Length <= (curve.EndPoint - point).Length ? curve.StartPoint : curve.EndPoint;
 
-        internal static double ToRad(double angle) => angle * Math.PI / 180;
+        internal static double ToRad(this double angle) => angle * Math.PI / 180;
 
-        internal static double ToDeg(double angle) => angle * 180 / Math.PI;
+        internal static double ToDeg(this double angle) => angle * 180 / Math.PI;
 
         public static double Length(this Curve curve) => curve.GetDistanceAtParameter(curve.EndParam) - curve.GetDistanceAtParameter(curve.StartParam);
 

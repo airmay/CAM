@@ -21,7 +21,6 @@ namespace CAM
         private int _startRangeIndex;
         private int _zSafety;
         private bool _isEngineStarted = false;
-        private bool IsUpperTool => _location.Point.Z >= _zSafety;
 
         private DocumentLock _documentLock;
         private Transaction _transaction;
@@ -36,6 +35,7 @@ namespace CAM
             [CommandNames.Transition] = Color.FromColor(System.Drawing.Color.Yellow)
         };
 
+        public bool IsUpperTool => _location.Point.Z >= _zSafety;
         public bool WithThick { get; set; }
 
         public void StartTechProcess(string caption, double originX, double originY, int zSafety)
@@ -118,12 +118,16 @@ namespace CAM
         /// </summary>
         public void Uplifting(double? z = null) => GCommand(CommandNames.Uplifting, 0, z: z ?? _zSafety);
 
+        public void Uplifting(Vector3d vector) => GCommand(CommandNames.Uplifting, 0, point: _location.Point + vector);
+
         /// <summary>
         /// Подвод
         /// </summary>
-        private void Move(double x, double y, double angleC, double angleA)
+        public void Move(double x, double y, double angleC, double angleA = 0) => Move(new Point3d(x, y, _zSafety), angleC, angleA);
+
+        public void Move(Point3d point, double angleC, double angleA = 0)
         {
-            GCommand(_isEngineStarted ? CommandNames.Fast : CommandNames.InitialMove, 0, x: x, y: y, angleC: angleC);
+            GCommand(_isEngineStarted ? CommandNames.Fast : CommandNames.InitialMove, 0, point: point, angleC: angleC);
             if (!_isEngineStarted)
                 GCommand(CommandNames.InitialMove, 0, z: _zSafety);
 
@@ -152,24 +156,22 @@ namespace CAM
         /// <summary>
         /// Рез между точками
         /// </summary>
-        public void Cutting(Point3d startPoint, Point3d endPoint, int cuttingFeed, int transitionFeed, double angleA = 0, Side engineSide = Side.Right)
-            => Cutting(NoDraw.Line(startPoint, endPoint), cuttingFeed, transitionFeed, angleA, engineSide);
+        public void Cutting(Point3d startPoint, Point3d endPoint, int cuttingFeed, int transitionFeed) => Cutting(NoDraw.Line(startPoint, endPoint), cuttingFeed, transitionFeed);
 
         /// <summary>
         /// Рез по кривой
         /// </summary>
-        public void Cutting(Curve curve, int cuttingFeed, int transitionFeed, double angleA = 0, Side engineSide = Side.Right, Corner? corner = null)
+        public void Cutting(Curve curve, int cuttingFeed, int transitionFeed, Side engineSide = Side.None)
         {
-            var point = corner.HasValue ? curve.GetPoint(corner.Value) : curve.GetClosestPoint(_location.Point);
-            var angleC = BuilderUtils.CalcToolAngle(curve, point, engineSide);
-            if (IsUpperTool)
-                Move(point.X, point.Y, angleC, angleA);
-
-            GCommand(point.Z != _location.Point.Z ? CommandNames.Penetration : CommandNames.Transition, 1, point: point, angleC: angleC, angleA: angleA, feed: transitionFeed);
-            point = curve.NextPoint(point);
-            if (!(curve is Line))
+            var point = curve.GetClosestPoint(_location.Point);
+            var angleC = _location.AngleC;
+            if (curve is Arc)
                 angleC = BuilderUtils.CalcToolAngle(curve, point, engineSide);
-            GCommand(CommandNames.Cutting, 1, point: point, angleC: angleC, curve: curve, feed: cuttingFeed);
+            GCommand(point.Z != _location.Point.Z ? CommandNames.Penetration : CommandNames.Transition, 1, point: point, angleC: angleC, feed: transitionFeed);
+
+            if (curve is Arc arc)
+                angleC += arc.TotalAngle.ToDeg() * (point == curve.StartPoint ? -1 : 1);
+            GCommand(CommandNames.Cutting, 1, point: curve.NextPoint(point), angleC: angleC, curve: curve, feed: cuttingFeed);
         }
 
         public void Command(string text, string name = null) => _commands.Add(new ProcessCommand

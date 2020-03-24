@@ -16,6 +16,6 @@ namespace CAM
 
         public ObjectId ToolpathObjectId { get; set; }
 
-        public string GetProgrammLine(MachineType machineType) => $"{Number}{(machineType == MachineType.ScemaLogic ? ";" : "")} {Text}";
+        public string GetProgrammLine(string separator) => $"{Number}{separator} {Text}";
     }
 }
