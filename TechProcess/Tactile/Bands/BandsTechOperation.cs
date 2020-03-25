@@ -81,7 +81,7 @@ namespace CAM.Tactile
             var ray = new Ray
             {
                 BasePoint = basePoint,
-                UnitDir = Vector3d.XAxis.RotateBy(Graph.ToRad(ProcessingAngle), Vector3d.ZAxis)
+                UnitDir = Vector3d.XAxis.RotateBy(ProcessingAngle.ToRad(), Vector3d.ZAxis)
             };
             var passDir = ray.UnitDir.GetPerpendicularVector();
             if (ProcessingAngle >= 90)
@@ -113,6 +113,9 @@ namespace CAM.Tactile
             if (ProcessingAngle == 45 ^ TechProcess.MachineType == MachineType.ScemaLogic)
                 Cutting(size - 0.8 * thickness, CuttingFeed, thickness);
 
+            ray.Dispose();
+            contour.Dispose();
+
             void Cutting(double pos, int feed, double s = 0)
             {
                 if (pos < 0 || pos > size)
@@ -125,11 +128,11 @@ namespace CAM.Tactile
                     var vector = (points[1] - points[0]).GetNormal() * tactileTechProcess.TactileTechProcessParams.Departure;
                     var startPoint = points[0] + passDir * s - vector - Vector3d.ZAxis * Depth;
                     var endPoint = points[1] + passDir * s + vector - Vector3d.ZAxis * Depth;
+                    if (generator.IsUpperTool)
+                        generator.Move(startPoint.X, startPoint.Y, BuilderUtils.CalcToolAngle(ProcessingAngle.ToRad()));
                     generator.Cutting(startPoint, endPoint, feed, tactileTechProcess.TactileTechProcessParams.TransitionFeed);
                 }
             }
-            ray.Dispose();
-            contour.Dispose();
         }
     }
 }

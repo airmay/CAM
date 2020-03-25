@@ -94,10 +94,10 @@ namespace CAM
             if (_toolIndex != toolNo)
             {
                 StopEngine();
-                SetToolCommands(toolNo, angleA);
 
                 _toolIndex = toolNo;
                 _location.Set(new Point3d(double.NaN, double.NaN, UpperZ), 0, 0);
+                SetToolCommands(toolNo, angleA);
             }
             _frequency = frequency;
         }

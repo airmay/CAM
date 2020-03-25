@@ -35,11 +35,21 @@ namespace CAM
             while (depth < DepthAll);
         }
 
-        public static double CalcToolAngle(Curve curve, Point3d point, Side engineSide) => CalcToolAngle(curve.GetFirstDerivative(point).ToVector2d().Angle, engineSide);
-
-        public static double CalcToolAngle(double angle, Side engineSide)
+        public static Side CalcEngineSide(double angle)
         {
-            return ((engineSide == Side.Right ? 180 : 360) + 360 - angle.ToDeg().Round(4)) % 360;
+            angle = angle.Round(3);
+            var upDownSign = Math.Sign(Math.Sin(angle));
+            return upDownSign > 0 ? Side.Right : upDownSign < 0 ? Side.Left : Math.Cos(angle) > 0 ? Side.Left : Side.Right;
+        }
+
+        public static double CalcToolAngle(Curve curve, Point3d point, Side engineSide = Side.None) 
+            => CalcToolAngle(curve.GetFirstDerivative(point).ToVector2d().Angle, engineSide);
+
+        public static double CalcToolAngle(double angle, Side engineSide = Side.None)
+        {
+            if (engineSide == Side.None)
+                engineSide = CalcEngineSide(angle);
+            return ((engineSide == Side.Right ? 180 : 360) + 360 - angle.Round(3).ToDeg()) % 360;
         }
     }
 }

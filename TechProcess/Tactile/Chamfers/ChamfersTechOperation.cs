@@ -29,6 +29,7 @@ namespace CAM.Tactile
 
         public override void BuildProcessing(ICommandGenerator generator)
         {
+            const int AngleA = 45;
             var tactileTechProcess = (TactileTechProcess)TechProcess;
             var contour = tactileTechProcess.GetContour();
             var contourPoints = contour.GetPolyPoints().ToArray();
@@ -54,7 +55,7 @@ namespace CAM.Tactile
                     var startPoint = points[0] - vector - Vector3d.ZAxis * tactileParams.Depth;
                     var endPoint = points[1] + vector - Vector3d.ZAxis * tactileParams.Depth;
                     if (generator.IsUpperTool)
-                        generator.Move(startPoint.X, startPoint.Y, BuilderUtils.CalcToolAngle(ProcessingAngle, engineSide), 45);
+                        generator.Move(startPoint.X, startPoint.Y, BuilderUtils.CalcToolAngle(ProcessingAngle.ToRad(), engineSide), AngleA);
                     generator.Cutting(startPoint, endPoint, CuttingFeed, tactileParams.TransitionFeed);
                 }
                 else if (step > 0)

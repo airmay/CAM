@@ -36,6 +36,7 @@ namespace CAM
         bool IsUpperTool { get; }
 
         void Uplifting(Vector3d vector3d);
+
         void Move(Point3d point3d, double v1, double v2);
     }
 }

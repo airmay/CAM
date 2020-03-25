@@ -23,6 +23,8 @@ namespace CAM
 
         internal static double ToRad(this double angle) => angle * Math.PI / 180;
 
+        internal static double ToRad(this int angle) => ToRad((double)angle);
+
         internal static double ToDeg(this double angle) => angle * 180 / Math.PI;
 
         public static double Length(this Curve curve) => curve.GetDistanceAtParameter(curve.EndParam) - curve.GetDistanceAtParameter(curve.StartParam);
@@ -31,18 +33,6 @@ namespace CAM
 
         public static Vector2d GetTangent(this Curve curve, Corner corner) => curve.GetTangent(corner == Corner.Start ? curve.StartParam : curve.EndParam);
 
-        /// <summary>
-        /// Кривая направлена вверх
-        /// </summary>
-        /// <param name="curve"></param>
-        /// <returns></returns>
-        public static bool IsUpward(this Curve curve)
-        {
-            var tangent = curve.GetTangent(curve.StartParam);
-            return Math.Abs(tangent.Y) > Consts.Epsilon
-                ? tangent.Y > 0
-                : tangent.X < 0;
-        }
         public static IEnumerable<Point3d> GetStartEndPoints(this Curve curve)
         {
             yield return curve.StartPoint;

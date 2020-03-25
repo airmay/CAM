@@ -115,7 +115,7 @@ namespace CAM.Sawing
                 gashCurve.Dispose();
             }
 
-            // Locals
+            // Local func ------------------------
 
             void CalcArc()
             {
@@ -157,15 +157,8 @@ namespace CAM.Sawing
 
             void CalcLine()
             {
-                if (AngleA == 0)
-                {
-                    var angle = line.Angle.Round(3);
-                    var upDownSign = Math.Sign(Math.Sin(angle));
-                    engineSide = upDownSign > 0 ? Side.Right : upDownSign < 0 ? Side.Left : Math.Cos(angle) > 0 ? Side.Left : Side.Right;
-                }
-                else
-                    engineSide = AngleA > 0 ? OuterSide : OuterSide.Opposite();
                 angleA = AngleA.ToRad();
+                engineSide = AngleA == 0 ? BuilderUtils.CalcEngineSide(angleA) : AngleA > 0 ? OuterSide : OuterSide.Opposite();
             }
 
             void CreateToolpath(double depth, double offset)
