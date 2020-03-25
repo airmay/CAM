@@ -35,8 +35,9 @@ namespace CAM.Sawing
         public List<Border> CreateExtraObjects(params ObjectId[] ids)
         {
             var techOperations = TechOperations.FindAll(p => p.ProcessingArea != null);
+            techOperations.FindAll(p => ids.Contains(p.ProcessingArea.ObjectId)).ForEach(p => ((SawingTechOperation)p).OuterSide = Side.None);
             _borders = ids.Except(techOperations.Select(p => p.ProcessingArea.ObjectId)).Select(p => new Border(p)).ToList();
-            var borders = _borders.Concat(techOperations.Select(p => new Border(p.ProcessingArea.ObjectId, (SawingTechOperation)p))).ToList();
+            var borders = _borders.Concat(techOperations.Select(p => new Border((SawingTechOperation)p))).ToList();
             borders.ForEach(p => p.Curve = p.ObjectId.QOpenForRead<Curve>());
             ProcessingArea = new AcadObjectGroup(borders.Select(p => p.ObjectId).ToArray());
 
@@ -68,14 +69,15 @@ namespace CAM.Sawing
                     contour.Add(nextBorder.Curve);
                     borders.Remove(nextBorder);
                     var nextCorner = nextBorder.Curve.GetCorner(point);
-                    nextBorder.OuterSide = nextCorner != corner ? border.OuterSide : border.OuterSide.Opposite();
 
-                    if (border.TechOperation == null || nextBorder.TechOperation == null)
+                    if (border.TechOperation == null || nextBorder.OuterSide == Side.None)
                     {
                         var isExactly = CalcIsExactly(border, corner, nextBorder, nextCorner, point);
                         border.SetIsExactly(corner, isExactly);
                         nextBorder.SetIsExactly(nextCorner, isExactly);
                     }
+                    nextBorder.OuterSide = nextCorner != corner ? border.OuterSide : border.OuterSide.Opposite();
+
                     border = nextBorder;
                     corner = nextCorner.Swap();
                     point = border.Curve.GetPoint(corner);

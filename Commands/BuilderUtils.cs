@@ -37,7 +37,7 @@ namespace CAM
 
         public static Side CalcEngineSide(double angle)
         {
-            angle = angle.Round(3);
+            angle = angle.Round(6);
             var upDownSign = Math.Sign(Math.Sin(angle));
             return upDownSign > 0 ? Side.Right : upDownSign < 0 ? Side.Left : Math.Cos(angle) > 0 ? Side.Left : Side.Right;
         }
@@ -49,7 +49,7 @@ namespace CAM
         {
             if (engineSide == Side.None)
                 engineSide = CalcEngineSide(angle);
-            return ((engineSide == Side.Right ? 180 : 360) + 360 - angle.Round(3).ToDeg()) % 360;
+            return ((engineSide == Side.Right ? 180 : 360) + 360 - angle.Round(6).ToDeg()) % 360;
         }
     }
 }

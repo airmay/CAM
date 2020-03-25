@@ -42,7 +42,8 @@ namespace CAM.Sawing
         {
             ProcessingArea = new AcadObject(border.ObjectId);
             var par = ((SawingTechProcess)TechProcess).SawingTechProcessParams;
-            SawingModes = (border.ObjectId.IsLine() ? par.SawingLineModes : par.SawingCurveModes).ConvertAll(x => x.Clone());
+            if (SawingModes == null)
+                SawingModes = (border.ObjectId.IsLine() ? par.SawingLineModes : par.SawingCurveModes).ConvertAll(x => x.Clone());
             OuterSide = border.OuterSide;
             IsExactlyBegin = border.IsExactlyBegin;
             IsExactlyEnd = border.IsExactlyEnd;

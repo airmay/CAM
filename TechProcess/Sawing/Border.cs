@@ -10,7 +10,7 @@ namespace CAM.Sawing
         public bool IsExactlyBegin { get; set; }
         public bool IsExactlyEnd { get; set; }
 
-        private Side _outerSide;
+        private Side _outerSide = Side.None;
         public Side OuterSide
         {
             get => TechOperation?.OuterSide ?? _outerSide;
@@ -23,11 +23,15 @@ namespace CAM.Sawing
             }
         }
 
-        public Border(ObjectId objectId, SawingTechOperation techOperation = null)
+        public Border(ObjectId objectId)
         {
             ObjectId = objectId;
+        }
+
+        public Border(SawingTechOperation techOperation)
+        {
+            ObjectId = techOperation.ProcessingArea.ObjectId;
             TechOperation = techOperation;
-            OuterSide = techOperation?.OuterSide ?? Side.None;
         }
 
         public void SetIsExactly(Corner corner, bool value)
