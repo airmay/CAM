@@ -69,15 +69,14 @@ namespace CAM.Sawing
                     contour.Add(nextBorder.Curve);
                     borders.Remove(nextBorder);
                     var nextCorner = nextBorder.Curve.GetCorner(point);
+                    nextBorder.OuterSide = nextCorner != corner ? border.OuterSide : border.OuterSide.Opposite();
 
-                    if (border.TechOperation == null || nextBorder.OuterSide == Side.None)
+                    if (border.MustCalc || nextBorder.MustCalc)
                     {
                         var isExactly = CalcIsExactly(border, corner, nextBorder, nextCorner, point);
                         border.SetIsExactly(corner, isExactly);
                         nextBorder.SetIsExactly(nextCorner, isExactly);
                     }
-                    nextBorder.OuterSide = nextCorner != corner ? border.OuterSide : border.OuterSide.Opposite();
-
                     border = nextBorder;
                     corner = nextCorner.Swap();
                     point = border.Curve.GetPoint(corner);

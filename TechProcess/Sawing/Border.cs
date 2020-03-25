@@ -22,16 +22,19 @@ namespace CAM.Sawing
                     _outerSide = value;
             }
         }
+        public bool MustCalc { get; }
 
         public Border(ObjectId objectId)
         {
             ObjectId = objectId;
+            MustCalc = true;
         }
 
         public Border(SawingTechOperation techOperation)
         {
             ObjectId = techOperation.ProcessingArea.ObjectId;
             TechOperation = techOperation;
+            MustCalc = techOperation.OuterSide == Side.None;
         }
 
         public void SetIsExactly(Corner corner, bool value)
