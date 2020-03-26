@@ -19,7 +19,6 @@ namespace CAM
         private const int UpperZ = 80;
         private List<ProcessCommand> _commands = new List<ProcessCommand>();
         private int _startRangeIndex;
-        private int _zSafety;
         private bool _isEngineStarted = false;
 
         private DocumentLock _documentLock;
@@ -35,14 +34,15 @@ namespace CAM
             [CommandNames.Transition] = Color.FromColor(System.Drawing.Color.Yellow)
         };
 
-        public bool IsUpperTool => _location.Point.Z >= _zSafety;
+        public int ZSafety { get; set; }
+        public bool IsUpperTool => _location.Point.Z >= ZSafety;
         public bool WithThick { get; set; }
 
         public void StartTechProcess(string caption, double originX, double originY, int zSafety)
         {
             _originX = originX;
             _originY = originY;
-            _zSafety = zSafety;
+            ZSafety = zSafety;
 
             _documentLock = Acad.ActiveDocument.LockDocument();
             _transaction = Acad.Database.TransactionManager.StartTransaction();
@@ -116,20 +116,20 @@ namespace CAM
         /// <summary>
         /// Поднятние
         /// </summary>
-        public void Uplifting(double? z = null) => GCommand(CommandNames.Uplifting, 0, z: z ?? _zSafety);
+        public void Uplifting(double? z = null) => GCommand(CommandNames.Uplifting, 0, z: z ?? ZSafety);
 
         public void Uplifting(Vector3d vector) => GCommand(CommandNames.Uplifting, 0, point: _location.Point + vector);
 
         /// <summary>
         /// Подвод
         /// </summary>
-        public void Move(double x, double y, double angleC, double angleA = 0) => Move(new Point3d(x, y, _zSafety), angleC, angleA);
+        public void Move(double x, double y, double angleC, double angleA = 0) => Move(new Point3d(x, y, ZSafety), angleC, angleA);
 
         public void Move(Point3d point, double angleC, double angleA = 0)
         {
             GCommand(_isEngineStarted ? CommandNames.Fast : CommandNames.InitialMove, 0, point: point, angleC: angleC);
             if (!_isEngineStarted)
-                GCommand(CommandNames.InitialMove, 0, z: _zSafety);
+                GCommand(CommandNames.InitialMove, 0, z: ZSafety);
 
             if (angleA != _location.AngleA)
                 GCommand("Наклон", 1, angleA: angleA);

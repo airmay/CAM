@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Reflection;
 using System.Xml.Serialization;
 
@@ -12,7 +11,7 @@ namespace CAM
     /// </summary>
     public class Settings
     {
-        #region static
+        #region static func
 
         private static string GetFilePath => Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "settings.xml");
 
@@ -22,7 +21,6 @@ namespace CAM
         /// <returns></returns>
         public static Settings Load()
         {
-            //Settings settings;
             try
             {
                 var formatter = new XmlSerializer(typeof(Settings));
@@ -76,29 +74,20 @@ namespace CAM
 
         #endregion
 
+        #region Tools
         public List<Tool> ToolsScemaLogic { get; set; }
 
         public List<Tool> ToolsDonatoni { get; set; }
 
-        public List<Tool> ToolsKrea { get; set; }
+        public List<Tool> ToolsKrea { get; set; } 
+        #endregion
 
         public List<MachineSettings> MachineSettings { get; set; }
        
-        public MachineSettings GetMachineSettings(MachineType? type) => MachineSettings.Single(p => p.MachineType == type);
-
-        #region TechOperationParams
-
-        //public SawingTechOperationParams SawingLineTechOperationParams { get; set; }
-
-        //public SawingTechOperationParams SawingCurveTechOperationParams { get; set; }
-
+        #region TechProcessParams
         public Sawing.SawingTechProcessParams SawingTechProcessParams { get; set; }
 
         public Tactile.TactileTechProcessParams TactileTechProcessParams { get; set; }
-
-        //        public SawingDefaultParams SawingDefaultParams { get; set; }
-
-
         #endregion
     }
 }

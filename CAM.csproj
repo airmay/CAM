@@ -172,7 +172,6 @@
       <DependentUpon>MeasurementTechOperationView.cs</DependentUpon>
     </Compile>
     <Compile Include="TechProcess\Tactile\TactileTechProcess.cs" />
-    <Compile Include="TechProcess\Tactile\TactileTechProcessFactory.cs" />
     <Compile Include="TechProcess\Tactile\TactileTechProcessParams.cs" />
     <Compile Include="TechProcess\Tactile\TactileTechProcessView.cs">
       <SubType>UserControl</SubType>

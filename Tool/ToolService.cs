@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Windows.Forms;
 
 namespace CAM
@@ -11,7 +10,7 @@ namespace CAM
         private static Dictionary<MachineType, MachineSettings> _machineSettings;
         private static Dictionary<MachineType, List<Tool>> _tools = new Dictionary<MachineType, List<Tool>>();
 
-        public static void SetMachineSettings(List<MachineSettings> list) => _machineSettings = list.ToDictionary(p => p.MachineType);
+        public static void SetMachineSettings(Dictionary<MachineType, MachineSettings> machineSettings) => _machineSettings = machineSettings;
 
         public static void AddMachineTools(MachineType machineType, List<Tool> tools) => _tools.Add(machineType, tools);
 

@@ -20,15 +20,15 @@ namespace CAM.Sawing
         [NonSerialized]
         private List<Border> _borders;
 
-        public SawingTechProcess(string caption, Settings settings) : base(caption, settings)
+        public SawingTechProcess(string caption, SawingTechProcessParams @params) : base(caption)
         {
-            SawingTechProcessParams = settings.SawingTechProcessParams.Clone();
+            SawingTechProcessParams = @params.Clone();
             PenetrationFeed = SawingTechProcessParams.PenetrationFeed;
         }
 
-        public override void Setup(Settings settings)
+        public override void Setup()
         {
-            base.Setup(settings);
+            base.Setup();
             CreateExtraObjects();
         }
 
@@ -106,10 +106,10 @@ namespace CAM.Sawing
 
         public override bool Validate() => base.Validate() && Thickness.CheckNotNull("Толщина");
 
-        public override void BuildProcessing()
+        public override void BuildProcessing(int zSafety)
         {
             CreateExtraObjects();
-            base.BuildProcessing();
+            base.BuildProcessing(zSafety);
         }
     }
 }

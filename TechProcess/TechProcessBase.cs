@@ -12,11 +12,6 @@ namespace CAM
     [Serializable]
     public abstract class TechProcessBase : ITechProcess, IHasProcessCommands
     {
-        [NonSerialized]
-        protected Settings _settings;
-
-        public MachineSettings MachineSettings => _settings.GetMachineSettings(MachineType);
-
         public string Caption { get; set; }
 
         public MachineType? MachineType { get; set; }
@@ -46,15 +41,10 @@ namespace CAM
             set => _originObject = value;
         }
 
-        public TechProcessBase(string caption, Settings settings)
-        {
-            Caption = caption;
-            _settings = settings;
-        }
+        public TechProcessBase(string caption) => Caption = caption;
 
-        public virtual void Setup(Settings settings)
+        public virtual void Setup()
         {
-            _settings = settings;
             if (OriginX != 0 || OriginY != 0)
                 OriginObject = Acad.CreateOriginObject(new Point3d(OriginX, OriginY, 0));
 
@@ -73,7 +63,7 @@ namespace CAM
 
         public bool TechOperationMoveUp(ITechOperation techOperation) => TechOperations.SwapPrev(techOperation);
 
-        public virtual void BuildProcessing()
+        public virtual void BuildProcessing(int zSafety)
         {
             if (!Validate() || TechOperations.Any(p => p.Enabled && !p.Validate()))
                 return;
@@ -81,7 +71,7 @@ namespace CAM
 
             using (var generator = CommandGeneratorFactory.Create(MachineType.Value))
             {
-                generator.StartTechProcess(Caption, OriginX, OriginY, MachineSettings.ZSafety);
+                generator.StartTechProcess(Caption, OriginX, OriginY, zSafety);
                 TechOperations.FindAll(p => p.Enabled).ForEach(p =>
                 {
                     generator.StartTechOperation();

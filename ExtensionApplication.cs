@@ -11,6 +11,8 @@ namespace CAM
     {
         private Dictionary<Document, CamDocument> _documents = new Dictionary<Document, CamDocument>();
         private Settings _settings;
+        private Dictionary<MachineType, MachineSettings> _machineSettings;
+        private TechProcessFactory _techProcessFactory;
         private CamPaletteSet _camPaletteSet;
 
         public void Initialize()
@@ -19,7 +21,10 @@ namespace CAM
 
             _settings = Settings.Load();
 
-            ToolService.SetMachineSettings(_settings.MachineSettings);
+            _machineSettings = _settings.MachineSettings.ToDictionary(p => p.MachineType);
+            _techProcessFactory = new TechProcessFactory(_settings);
+
+            ToolService.SetMachineSettings(_machineSettings);
             ToolService.AddMachineTools(MachineType.ScemaLogic, _settings.ToolsScemaLogic);
             ToolService.AddMachineTools(MachineType.Donatoni, _settings.ToolsDonatoni);
             ToolService.AddMachineTools(MachineType.Krea, _settings.ToolsKrea);
@@ -60,8 +65,8 @@ namespace CAM
             {
                 document.CommandWillStart += Document_CommandWillStart;
                 document.BeginDocumentClose += Document_BeginDocumentClose;
-                _documents[document] = new CamDocument(_settings);
-                TechProcessLoader.LoadTechProsess(_documents[document], _settings);
+                _documents[document] = new CamDocument(_machineSettings, _techProcessFactory);
+                TechProcessLoader.LoadTechProsess(_documents[document]);
             }
             Acad.ClearHighlighted();
             _camPaletteSet.SetCamDocument(_documents[document]);

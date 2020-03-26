@@ -26,7 +26,16 @@ namespace CAM
                             .ToDictionary(p => _techProcessTypes[p.Key], p => p.OrderBy(k => k.Attr.Number).ToDictionary(k => k.Attr.TechOperationCaption, v => v.Type));
         }
 
-        public ITechProcess CreateTechProcess(string techProcessCaption) => Activator.CreateInstance(_techProcessTypes[techProcessCaption], new object[] { techProcessCaption, _settings }) as ITechProcess;
+        public ITechProcess CreateTechProcess(string techProcessCaption)
+        {
+            var args = _techProcessTypes[techProcessCaption].GetConstructors().Single().GetParameters()
+                .Select(par => par.ParameterType == typeof(string) 
+                    ? techProcessCaption
+                    : typeof(Settings).GetProperties().Single(prop => prop.PropertyType == par.ParameterType).GetValue(_settings))
+                .ToArray();
+            
+            return Activator.CreateInstance(_techProcessTypes[techProcessCaption], args) as ITechProcess;
+        }
 
         public List<ITechOperation> CreateTechOperations(ITechProcess techProcess, string techOperationName = "Все операции") => 
             !techProcess.Validate() 

@@ -10,13 +10,13 @@ namespace CAM
         public int Hash;
         public List<ITechProcess> TechProcessList { get; set; } = new List<ITechProcess>();
 
-        private Settings _settings;
+        private readonly Dictionary<MachineType, MachineSettings> _machineSettings;    
         private readonly TechProcessFactory _techProcessFactory;
 
-        public CamDocument(Settings settings)
+        public CamDocument(Dictionary<MachineType, MachineSettings> machineSettings, TechProcessFactory techProcessFactory)
         {
-            _settings = settings;
-            _techProcessFactory = new TechProcessFactory(settings);
+            _machineSettings = machineSettings;
+            _techProcessFactory = techProcessFactory;
         }
 
         public ITechProcess CreateTechProcess(string techProcessName)
@@ -81,7 +81,7 @@ namespace CAM
                 Acad.DeleteObjects(techProcess.ToolpathObjectIds);
                 Acad.DeleteExtraObjects();
 
-                techProcess.BuildProcessing();
+                techProcess.BuildProcessing(_machineSettings[techProcess.MachineType.Value].ZSafety);
 
                 Acad.Write("Расчет обработки завершен");
             }
@@ -104,7 +104,7 @@ namespace CAM
                 Acad.Alert("Программа не сформирована");
                 return;
             }
-            var fileName = Acad.SaveFileDialog(techProcess.Caption, techProcess.MachineSettings.ProgramFileExtension, techProcess.MachineType.ToString());
+            var fileName = Acad.SaveFileDialog(techProcess.Caption, _machineSettings[techProcess.MachineType.Value].ProgramFileExtension, techProcess.MachineType.ToString());
             if (fileName != null)
                 try
                 {

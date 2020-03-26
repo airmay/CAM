@@ -15,7 +15,7 @@ namespace CAM
         /// <summary>
         /// Загрузить технологические процессы из файла чертежа
         /// </summary>
-        public static void LoadTechProsess(CamDocument camDocument, Settings settings)
+        public static void LoadTechProsess(CamDocument camDocument)
         {
             try
             {
@@ -39,7 +39,7 @@ namespace CAM
 
                 if (camDocument.TechProcessList != null)
                 {
-                    camDocument.TechProcessList.ForEach(p => p.Setup(settings));
+                    camDocument.TechProcessList.ForEach(p => p.Setup());
                     Acad.Write($"Загружены техпроцессы: {string.Join(", ", camDocument.TechProcessList.Select(p => p.Caption))}");
                 }
             }

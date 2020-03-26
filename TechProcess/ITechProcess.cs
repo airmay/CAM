@@ -6,7 +6,6 @@ namespace CAM
     public interface ITechProcess
     {
         int Frequency { get; set; }
-        MachineSettings MachineSettings { get; }
         MachineType? MachineType { get; set; }
         Material? Material { get; set; }
         string Caption { get; set; }
@@ -20,7 +19,7 @@ namespace CAM
         
         IEnumerable<ObjectId> ToolpathObjectIds { get; }
 
-        void BuildProcessing();
+        void BuildProcessing(int zSafety);
         void DeleteProcessCommands();
 
         bool TechOperationMoveDown(ITechOperation techOperation);
@@ -30,7 +29,7 @@ namespace CAM
 
         bool Validate();
 
-        void Setup(Settings settings);
+        void Setup();
 
         void Teardown();
     }

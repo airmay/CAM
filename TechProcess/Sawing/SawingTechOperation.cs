@@ -96,7 +96,7 @@ namespace CAM.Sawing
                 if (generator.IsUpperTool)
                 {
                     var point = engineSide == Side.Right ^ (passList.Count() % 2 == 1) ? toolpathCurve.EndPoint : toolpathCurve.StartPoint;
-                    var vector = Vector3d.ZAxis * (item.Key + techProcess.MachineSettings.ZSafety);
+                    var vector = Vector3d.ZAxis * (item.Key + generator.ZSafety);
                     if (angleA != 0)
                         vector = vector.RotateBy(-angleA, ((Line)toolpathCurve).Delta) * depthCoeff;
                     generator.Move(point + vector, BuilderUtils.CalcToolAngle(toolpathCurve, point, engineSide), Math.Abs(AngleA));
@@ -104,7 +104,7 @@ namespace CAM.Sawing
                 generator.Cutting(toolpathCurve, item.Value, techProcess.PenetrationFeed, engineSide);
             }
             if (angleA != 0)
-                generator.Uplifting(Vector3d.ZAxis.RotateBy(-angleA, ((Line)toolpathCurve).Delta) * (thickness + techProcess.MachineSettings.ZSafety) * depthCoeff);
+                generator.Uplifting(Vector3d.ZAxis.RotateBy(-angleA, ((Line)toolpathCurve).Delta) * (thickness + generator.ZSafety) * depthCoeff);
 
             if (!IsExactlyBegin || !IsExactlyEnd)
             {
@@ -159,7 +159,7 @@ namespace CAM.Sawing
             void CalcLine()
             {
                 angleA = AngleA.ToRad();
-                engineSide = AngleA == 0 ? BuilderUtils.CalcEngineSide(angleA) : AngleA > 0 ? OuterSide : OuterSide.Opposite();
+                engineSide = AngleA == 0 ? BuilderUtils.CalcEngineSide(line.Angle) : AngleA > 0 ? OuterSide : OuterSide.Opposite();
             }
 
             void CreateToolpath(double depth, double offset)

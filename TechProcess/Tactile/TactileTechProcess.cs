@@ -29,9 +29,9 @@ namespace CAM.Tactile
 
         public string Type { get; set; }
 
-        public TactileTechProcess(string caption, Settings settings) : base(caption, settings)
+        public TactileTechProcess(string caption, TactileTechProcessParams @params) : base(caption)
         {
-            TactileTechProcessParams = settings.TactileTechProcessParams.Clone();
+            TactileTechProcessParams = @params.Clone();
             Material = CAM.Material.Granite;
         }
 
