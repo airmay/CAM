@@ -192,6 +192,7 @@
     <Compile Include="TechProcess\TechProcessNames.cs" />
     <Compile Include="Tool\Tool.cs" />
     <Compile Include="Tool\ToolObject.cs" />
+    <Compile Include="Tool\ToolService.cs" />
     <Compile Include="Tool\ToolsForm.cs">
       <SubType>Form</SubType>
     </Compile>

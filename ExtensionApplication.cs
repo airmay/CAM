@@ -18,7 +18,12 @@ namespace CAM
             Acad.Write($"Инициализация плагина. Версия сборки от {File.GetLastWriteTime(Assembly.GetExecutingAssembly().Location)}");
 
             _settings = Settings.Load();
-
+            ToolService.Init(new Dictionary<MachineType, List<Tool>>
+            {
+                [MachineType.ScemaLogic] = _settings.GetMachineSettings(MachineType.ScemaLogic).Tools,
+                [MachineType.Donatoni] = _settings.GetMachineSettings(MachineType.Donatoni).Tools,
+                [MachineType.Krea] = null
+            });
             _camPaletteSet = new CamPaletteSet();
 
             //var manager = new CamManager();

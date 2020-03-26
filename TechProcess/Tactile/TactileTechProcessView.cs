@@ -32,8 +32,7 @@ namespace CAM.Tactile
             if (!_techProcess.MachineType.CheckNotNull("Станок"))
                 return;
 
-            var tool = ToolsForm.Select(_techProcess.MachineSettings.Tools, _techProcess.MachineType.Value);
-            if (tool != null)
+            if (ToolService.Select(_techProcess.MachineType.Value) is Tool tool)
             {
                 _techProcess.Tool = tool;
                 tbTool.Text = tool.ToString();
