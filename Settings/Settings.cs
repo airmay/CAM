@@ -76,14 +76,15 @@ namespace CAM
 
         #endregion
 
-        public List<MachineSettings> MachineSettingsList { get; set; }
+        public List<Tool> ToolsScemaLogic { get; set; }
+
+        public List<Tool> ToolsDonatoni { get; set; }
+
+        public List<Tool> ToolsKrea { get; set; }
+
+        public List<MachineSettings> MachineSettings { get; set; }
        
-        public MachineSettings GetMachineSettings(MachineType? type) => MachineSettingsList.Single(p => p.MachineType == type);
-      
-        //public Dictionary<ProcessingType, IProcessingParams> GetProcessingParams() => new Dictionary<ProcessingType, IProcessingParams> { { ProcessingType.Sawing, new SawingDefaultParams{
-        //    SawingCurveTechOperationParams = this.SawingCurveTechOperationParams,
-        //    SawingLineTechOperationParams = this.SawingLineTechOperationParams
-        //} } };
+        public MachineSettings GetMachineSettings(MachineType? type) => MachineSettings.Single(p => p.MachineType == type);
 
         #region TechOperationParams
 

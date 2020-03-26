@@ -1,54 +1,54 @@
 <?xml version="1.0"?>
 <Settings xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-  <MachineSettingsList>
+  <ToolsScemaLogic>
+    <Tool>
+      <Number>1</Number>
+      <Type>Disk</Type>
+      <Diameter>400</Diameter>
+      <Thickness>7</Thickness>
+    </Tool>
+    <Tool>
+      <Number>2</Number>
+      <Type>Mill</Type>
+      <Diameter>0</Diameter>
+      <Thickness xsi:nil="true" />
+    </Tool>
+  </ToolsScemaLogic>
+  <ToolsDonatoni>
+    <Tool>
+      <Number>1</Number>
+      <Type>Disk</Type>
+      <Diameter>400</Diameter>
+      <Thickness>5</Thickness>
+    </Tool>
+    <Tool>
+      <Number>2</Number>
+      <Type>Mill</Type>
+      <Diameter>100</Diameter>
+      <Thickness xsi:nil="true" />
+    </Tool>
+  </ToolsDonatoni>
+  <ToolsKrea />
+  <MachineSettings>
     <MachineSettings>
       <MachineType>ScemaLogic</MachineType>
-      <Tools>
-        <Tool>
-          <Number>1</Number>
-          <Type>Disk</Type>
-          <Diameter>400</Diameter>
-          <Thickness>7</Thickness>
-        </Tool>
-        <Tool>
-          <Number>2</Number>
-          <Type>Mill</Type>
-          <Diameter>0</Diameter>
-          <Thickness xsi:nil="true" />
-        </Tool>
-      </Tools>
       <MaxFrequency>3000</MaxFrequency>
       <ZSafety>20</ZSafety>
       <ProgramFileExtension>csv</ProgramFileExtension>
     </MachineSettings>
     <MachineSettings>
       <MachineType>Donatoni</MachineType>
-      <Tools>
-        <Tool>
-          <Number>1</Number>
-          <Type>Disk</Type>
-          <Diameter>400</Diameter>
-          <Thickness>5</Thickness>
-        </Tool>
-        <Tool>
-          <Number>2</Number>
-          <Type>Mill</Type>
-          <Diameter>100</Diameter>
-          <Thickness xsi:nil="true" />
-        </Tool>
-      </Tools>
       <MaxFrequency>5000</MaxFrequency>
       <ZSafety>20</ZSafety>
       <ProgramFileExtension>pgm</ProgramFileExtension>
     </MachineSettings>
     <MachineSettings>
       <MachineType>Krea</MachineType>
-      <Tools />
       <MaxFrequency>10000</MaxFrequency>
       <ZSafety>20</ZSafety>
       <ProgramFileExtension>txt</ProgramFileExtension>
     </MachineSettings>
-  </MachineSettingsList>
+  </MachineSettings>
   <SawingTechProcessParams>
     <PenetrationFeed>200</PenetrationFeed>
     <SawingLineModes>

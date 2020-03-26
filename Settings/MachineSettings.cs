@@ -11,8 +11,6 @@ namespace CAM
     {
         public MachineType MachineType { get; set; }
 
-        public List<Tool> Tools { get; set; }
-
         public int MaxFrequency { get; set; }
 
         public int ZSafety { get; set; }

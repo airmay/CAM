@@ -6,9 +6,9 @@ namespace CAM
     public static class ToolService
     {
         private static ToolsForm _toolsForm;
-        private static Dictionary<MachineType, List<Tool>> _tools;
+        private static Dictionary<MachineType, List<Tool>> _tools = new Dictionary<MachineType, List<Tool>>();
 
-        public static void Init(Dictionary<MachineType, List<Tool>> tools) => _tools = tools;
+        public static void AddMachineTools(MachineType machineType, List<Tool> tools) => _tools.Add(machineType, tools);
 
         public static Tool Select(MachineType machineType)
         {
