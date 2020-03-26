@@ -31,12 +31,12 @@ namespace CAM.Sawing
             if (!_techProcess.MachineType.CheckNotNull("Станок") || !_techProcess.Material.CheckNotNull("Материал"))
                 return;
 
-            if (ToolService.Select(_techProcess.MachineType.Value) is Tool tool)
+            if (ToolService.SelectTool(_techProcess.MachineType.Value) is Tool tool)
             {
                 _techProcess.Tool = tool;
                 tbTool.Text = tool.ToString();
-                if (_techProcess.Frequency == 0)
-                    _techProcess.Frequency = Math.Min(tool.CalcFrequency(_techProcess.Material.Value), _techProcess.MachineSettings.MaxFrequency);
+                _techProcess.Frequency = ToolService.CalcFrequency(tool, _techProcess.MachineType.Value, _techProcess.Material.Value);
+                   
                 sawingTechProcessBindingSource.ResetBindings(false);
             }
         }

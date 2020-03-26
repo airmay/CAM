@@ -19,6 +19,7 @@ namespace CAM
 
             _settings = Settings.Load();
 
+            ToolService.SetMachineSettings(_settings.MachineSettings);
             ToolService.AddMachineTools(MachineType.ScemaLogic, _settings.ToolsScemaLogic);
             ToolService.AddMachineTools(MachineType.Donatoni, _settings.ToolsDonatoni);
             ToolService.AddMachineTools(MachineType.Krea, _settings.ToolsKrea);

@@ -13,6 +13,12 @@
       <Diameter>0</Diameter>
       <Thickness xsi:nil="true" />
     </Tool>
+    <Tool>
+      <Number>3</Number>
+      <Type>Disk</Type>
+      <Diameter>600</Diameter>
+      <Thickness>8</Thickness>
+    </Tool>
   </ToolsScemaLogic>
   <ToolsDonatoni>
     <Tool>
