@@ -49,13 +49,12 @@
             this.bMoveDownTechOperation = new System.Windows.Forms.ToolStripButton();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.bBuildProcessing = new System.Windows.Forms.ToolStripButton();
+            this.bDeleteExtraObjects = new System.Windows.Forms.ToolStripButton();
             this.bDeleteProcessing = new System.Windows.Forms.ToolStripButton();
             this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
             this.bSendProgramm = new System.Windows.Forms.ToolStripButton();
-            this.bAttachDrawing = new System.Windows.Forms.ToolStripButton();
             this.bClose = new System.Windows.Forms.ToolStripButton();
             this.panel2 = new System.Windows.Forms.Panel();
-            this.bDeleteExtraObjects = new System.Windows.Forms.ToolStripButton();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
@@ -217,7 +216,6 @@
             this.bDeleteProcessing,
             this.toolStripSeparator2,
             this.bSendProgramm,
-            this.bAttachDrawing,
             this.bClose});
             this.toolStrip1.Location = new System.Drawing.Point(0, 0);
             this.toolStrip1.Name = "toolStrip1";
@@ -286,6 +284,16 @@
             this.bBuildProcessing.Text = "Рассчитать обработку";
             this.bBuildProcessing.Click += new System.EventHandler(this.bBuildProcessing_Click);
             // 
+            // bDeleteExtraObjects
+            // 
+            this.bDeleteExtraObjects.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.bDeleteExtraObjects.Image = global::CAM.Properties.Resources.eraser;
+            this.bDeleteExtraObjects.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.bDeleteExtraObjects.Name = "bDeleteExtraObjects";
+            this.bDeleteExtraObjects.Size = new System.Drawing.Size(23, 22);
+            this.bDeleteExtraObjects.Text = "Удалить доп. объекты";
+            this.bDeleteExtraObjects.Click += new System.EventHandler(this.bDeleteExtraObjects_Click);
+            // 
             // bDeleteProcessing
             // 
             this.bDeleteProcessing.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
@@ -311,16 +319,6 @@
             this.bSendProgramm.Text = "Записать файл с программой";
             this.bSendProgramm.Click += new System.EventHandler(this.bSend_Click);
             // 
-            // bAttachDrawing
-            // 
-            this.bAttachDrawing.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.bAttachDrawing.Image = global::CAM.Properties.Resources.paper_clip;
-            this.bAttachDrawing.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.bAttachDrawing.Name = "bAttachDrawing";
-            this.bAttachDrawing.Size = new System.Drawing.Size(23, 22);
-            this.bAttachDrawing.Text = "Прикрепить чертеж";
-            this.bAttachDrawing.Click += new System.EventHandler(this.bAttachDrawing_Click);
-            // 
             // bClose
             // 
             this.bClose.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
@@ -340,16 +338,6 @@
             this.panel2.Name = "panel2";
             this.panel2.Size = new System.Drawing.Size(337, 675);
             this.panel2.TabIndex = 3;
-            // 
-            // bDeleteExtraObjects
-            // 
-            this.bDeleteExtraObjects.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.bDeleteExtraObjects.Image = global::CAM.Properties.Resources.eraser;
-            this.bDeleteExtraObjects.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.bDeleteExtraObjects.Name = "bDeleteExtraObjects";
-            this.bDeleteExtraObjects.Size = new System.Drawing.Size(23, 22);
-            this.bDeleteExtraObjects.Text = "Удалить доп. объекты";
-            this.bDeleteExtraObjects.Click += new System.EventHandler(this.bDeleteExtraObjects_Click);
             // 
             // TechProcessView
             // 
@@ -406,7 +394,6 @@
         private System.Windows.Forms.ToolStripButton bClose;
         private System.Windows.Forms.ToolStripDropDownButton bCreateTechProcess;
         private System.Windows.Forms.ToolStripButton bDeleteProcessing;
-        private System.Windows.Forms.ToolStripButton bAttachDrawing;
         private System.Windows.Forms.ToolStripDropDownButton bCreateTechOperation;
         private System.Windows.Forms.DataGridViewTextBoxColumn numberDataGridViewTextBoxColumn;
         private System.Windows.Forms.DataGridViewTextBoxColumn nameDataGridViewTextBoxColumn;

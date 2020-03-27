@@ -20,7 +20,6 @@ namespace CAM
             SetButtonsEnabled();
 
             bDeleteProcessing.Visible = false;
-            bAttachDrawing.Visible = false;
 #if DEBUG
             bClose.Visible = true;
 #endif
@@ -229,6 +228,12 @@ namespace CAM
 	        }
 	    }
 
+        private void bDeleteExtraObjects_Click(object sender, EventArgs e)
+        {
+            Acad.DeleteExtraObjects();
+            Acad.Editor.UpdateScreen();
+        }
+
         private void bDeleteProcessing_Click(object sender, EventArgs e)
         {
             _camDocument.HideShowProcessing(CurrentTechProcess);
@@ -236,8 +241,6 @@ namespace CAM
 
         private void bSend_Click(object sender, EventArgs e)
         {
-            //Acad.Register();
-            //Acad.SaveToPdf();
             dataGridViewCommand.EndEdit();
             _camDocument.SendProgram(((IHasProcessCommands)treeView.SelectedNode.Tag).ProcessCommands, CurrentTechProcess);
         }
@@ -250,23 +253,12 @@ namespace CAM
             //Autodesk.AutoCAD.ApplicationServices.Application.DocumentManager.CloseAll();
             Autodesk.AutoCAD.ApplicationServices.Application.Quit();
         }
-
-        private void bAttachDrawing_Click(object sender, EventArgs e)
-        {
-            Acad.SaveToPdf();
-        }
         #endregion
 
         private void EndEdit()
         {
             //if (treeView.SelectedNode != null && treeView.SelectedNode.IsEditing)
             // treeView.SelectedNode.EndEdit(false);
-        }
-
-        private void bDeleteExtraObjects_Click(object sender, EventArgs e)
-        {
-            Acad.DeleteExtraObjects();
-            Acad.Editor.UpdateScreen();
         }
     }
 }
