@@ -96,7 +96,7 @@ namespace CAM.Sawing
 
             Side GetOuterSide(Curve curve)
             {
-                var point = Interaction.GetLineEndPoint("Выберите направление внешней нормали к объекту", curve.StartPoint);
+                var point = Interaction.GetLineEndPoint("Выберите направление внешней нормали к объекту", curve.GetPointAtParameter((curve.EndParam + curve.StartParam) / 2));
                 var vector = curve.GetFirstDerivative(curve.StartParam);
                 return Graph.IsTurnRight(curve.StartPoint, curve.StartPoint + vector, point) ? Side.Right : Side.Left;
             }
