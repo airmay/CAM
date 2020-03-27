@@ -55,6 +55,7 @@
             this.bAttachDrawing = new System.Windows.Forms.ToolStripButton();
             this.bClose = new System.Windows.Forms.ToolStripButton();
             this.panel2 = new System.Windows.Forms.Panel();
+            this.bDeleteExtraObjects = new System.Windows.Forms.ToolStripButton();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
@@ -212,6 +213,7 @@
             this.bMoveDownTechOperation,
             this.toolStripSeparator1,
             this.bBuildProcessing,
+            this.bDeleteExtraObjects,
             this.bDeleteProcessing,
             this.toolStripSeparator2,
             this.bSendProgramm,
@@ -339,6 +341,16 @@
             this.panel2.Size = new System.Drawing.Size(337, 675);
             this.panel2.TabIndex = 3;
             // 
+            // bDeleteExtraObjects
+            // 
+            this.bDeleteExtraObjects.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.bDeleteExtraObjects.Image = global::CAM.Properties.Resources.eraser;
+            this.bDeleteExtraObjects.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.bDeleteExtraObjects.Name = "bDeleteExtraObjects";
+            this.bDeleteExtraObjects.Size = new System.Drawing.Size(23, 22);
+            this.bDeleteExtraObjects.Text = "Удалить доп. объекты";
+            this.bDeleteExtraObjects.Click += new System.EventHandler(this.bDeleteExtraObjects_Click);
+            // 
             // TechProcessView
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -399,5 +411,6 @@
         private System.Windows.Forms.DataGridViewTextBoxColumn numberDataGridViewTextBoxColumn;
         private System.Windows.Forms.DataGridViewTextBoxColumn nameDataGridViewTextBoxColumn;
         private System.Windows.Forms.DataGridViewTextBoxColumn textDataGridViewTextBoxColumn;
+        private System.Windows.Forms.ToolStripButton bDeleteExtraObjects;
     }
 }

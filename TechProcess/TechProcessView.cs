@@ -262,5 +262,11 @@ namespace CAM
             //if (treeView.SelectedNode != null && treeView.SelectedNode.IsEditing)
             // treeView.SelectedNode.EndEdit(false);
         }
+
+        private void bDeleteExtraObjects_Click(object sender, EventArgs e)
+        {
+            Acad.DeleteExtraObjects();
+            Acad.Editor.UpdateScreen();
+        }
     }
 }
