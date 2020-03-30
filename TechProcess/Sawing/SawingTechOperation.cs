@@ -102,6 +102,8 @@ namespace CAM.Sawing
                     if (angleA != 0)
                         vector = vector.RotateBy(outerSideSign * angleA, ((Line)toolpathCurve).Delta) * depthCoeff;
                     generator.Move(point + vector, BuilderUtils.CalcToolAngle(toolpathCurve, point, engineSide), Math.Abs(AngleA));
+                    if (techProcess.MachineType == MachineType.ScemaLogic)
+                        generator.Command("28;;XYCZ;;;;;;", "Цикл");
                 }
                 generator.Cutting(toolpathCurve, item.Value, techProcess.PenetrationFeed, engineSide);
             }

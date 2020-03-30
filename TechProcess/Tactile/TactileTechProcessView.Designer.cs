@@ -30,8 +30,10 @@
         {
             this.components = new System.ComponentModel.Container();
             this.cbMachine = new System.Windows.Forms.ComboBox();
+            this.tactileTechProcessBindingSource = new System.Windows.Forms.BindingSource(this.components);
             this.lbMachine = new System.Windows.Forms.Label();
             this.tbTransitionFeed = new System.Windows.Forms.TextBox();
+            this.tactileTechProcessParamsBindingSource = new System.Windows.Forms.BindingSource(this.components);
             this.label11 = new System.Windows.Forms.Label();
             this.tbDeparture = new System.Windows.Forms.TextBox();
             this.label5 = new System.Windows.Forms.Label();
@@ -64,8 +66,6 @@
             this.tbBandStart2 = new System.Windows.Forms.TextBox();
             this.label13 = new System.Windows.Forms.Label();
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
-            this.tactileTechProcessBindingSource = new System.Windows.Forms.BindingSource(this.components);
-            this.tactileTechProcessParamsBindingSource = new System.Windows.Forms.BindingSource(this.components);
             ((System.ComponentModel.ISupportInitialize)(this.tactileTechProcessBindingSource)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.tactileTechProcessParamsBindingSource)).BeginInit();
             this.SuspendLayout();
@@ -74,13 +74,17 @@
             // 
             this.cbMachine.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.cbMachine.DataBindings.Add(new System.Windows.Forms.Binding("Text", this.tactileTechProcessBindingSource, "MachineType", true));
+            this.cbMachine.DataBindings.Add(new System.Windows.Forms.Binding("SelectedValue", this.tactileTechProcessBindingSource, "MachineType", true));
             this.cbMachine.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cbMachine.FormattingEnabled = true;
             this.cbMachine.Location = new System.Drawing.Point(102, 3);
             this.cbMachine.Name = "cbMachine";
             this.cbMachine.Size = new System.Drawing.Size(152, 21);
             this.cbMachine.TabIndex = 1;
+            // 
+            // tactileTechProcessBindingSource
+            // 
+            this.tactileTechProcessBindingSource.DataSource = typeof(CAM.Tactile.TactileTechProcess);
             // 
             // lbMachine
             // 
@@ -100,6 +104,10 @@
             this.tbTransitionFeed.Name = "tbTransitionFeed";
             this.tbTransitionFeed.Size = new System.Drawing.Size(152, 20);
             this.tbTransitionFeed.TabIndex = 11;
+            // 
+            // tactileTechProcessParamsBindingSource
+            // 
+            this.tactileTechProcessParamsBindingSource.DataSource = typeof(CAM.Tactile.TactileTechProcessParams);
             // 
             // label11
             // 
@@ -413,14 +421,6 @@
             this.label13.Size = new System.Drawing.Size(94, 13);
             this.label13.TabIndex = 53;
             this.label13.Text = "Начало полосы 2";
-            // 
-            // tactileTechProcessBindingSource
-            // 
-            this.tactileTechProcessBindingSource.DataSource = typeof(CAM.Tactile.TactileTechProcess);
-            // 
-            // tactileTechProcessParamsBindingSource
-            // 
-            this.tactileTechProcessParamsBindingSource.DataSource = typeof(CAM.Tactile.TactileTechProcessParams);
             // 
             // TactileTechProcessView
             // 

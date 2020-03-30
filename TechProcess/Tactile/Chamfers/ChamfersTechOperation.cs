@@ -41,7 +41,7 @@ namespace CAM.Tactile
             var passDir = ray.UnitDir.GetPerpendicularVector();
             if (ProcessingAngle >= 90)
                 passDir = passDir.Negate();
-            ray.BasePoint += passDir * tactileTechProcess.BandStart1.Value;
+            ray.BasePoint += passDir * (tactileTechProcess.BandStart1.Value - tactileTechProcess.BandSpacing.Value);
             var step = tactileTechProcess.BandWidth.Value + tactileTechProcess.BandSpacing.Value;
             var tactileParams = tactileTechProcess.TactileTechProcessParams;
             var engineSide = ProcessingAngle < 90 ? Side.Right : Side.Left;
@@ -60,7 +60,7 @@ namespace CAM.Tactile
                 }
                 else if (step > 0)
                 {
-                    ray.BasePoint -= passDir * tactileTechProcess.BandSpacing.Value;
+                    ray.BasePoint += passDir * tactileTechProcess.BandSpacing.Value;
                     step = -step;
                     generator.Uplifting();
                     engineSide = engineSide.Opposite();
