@@ -127,7 +127,8 @@ namespace CAM
 
         private void treeView_AfterLabelEdit(object sender, NodeLabelEditEventArgs e)
         {
-            switch (treeView.SelectedNode.Tag)
+            e.Node.Text = e.Label;
+            switch (e.Node.Tag)
             {
                 case ITechProcess techProcess:
                     techProcess.Caption = e.Label;
@@ -136,7 +137,6 @@ namespace CAM
                     techOperation.Caption = e.Label;
                     break;
             }
-            treeView.LabelEdit = false;
         } 
         #endregion
 

@@ -55,7 +55,7 @@ namespace CAM.Sawing
             var techProcess = (SawingTechProcess)TechProcess;
             var curve = ProcessingArea.GetCurve();
             var thickness = techProcess.Thickness.Value;
-            var toolDiameter = techProcess.Tool.Diameter;          
+            var toolDiameter = techProcess.Tool.Diameter;
             var engineSide = Side.None;
             double offsetArc = 0;
             double angleA = 0;
@@ -67,6 +67,8 @@ namespace CAM.Sawing
                 CalcArc();
             if (curve is Line line)
                 CalcLine();
+            if (curve is Polyline polyline)
+                CalcPolyline();
 
             var outerSideSign = OuterSide == Side.Left ^ curve is Arc ? 1 : -1;
             var offsetCoeff = Math.Tan(angleA) * outerSideSign;
@@ -98,13 +100,13 @@ namespace CAM.Sawing
                     var point = engineSide == Side.Right ^ (passList.Count() % 2 == 1) ? toolpathCurve.EndPoint : toolpathCurve.StartPoint;
                     var vector = Vector3d.ZAxis * (item.Key + generator.ZSafety);
                     if (angleA != 0)
-                        vector = vector.RotateBy(-angleA, ((Line)toolpathCurve).Delta) * depthCoeff;
+                        vector = vector.RotateBy(outerSideSign * angleA, ((Line)toolpathCurve).Delta) * depthCoeff;
                     generator.Move(point + vector, BuilderUtils.CalcToolAngle(toolpathCurve, point, engineSide), Math.Abs(AngleA));
                 }
                 generator.Cutting(toolpathCurve, item.Value, techProcess.PenetrationFeed, engineSide);
             }
             if (angleA != 0)
-                generator.Uplifting(Vector3d.ZAxis.RotateBy(-angleA, ((Line)toolpathCurve).Delta) * (thickness + generator.ZSafety) * depthCoeff);
+                generator.Uplifting(Vector3d.ZAxis.RotateBy(outerSideSign * angleA, ((Line)toolpathCurve).Delta) * (thickness + generator.ZSafety) * depthCoeff);
 
             if (!IsExactlyBegin || !IsExactlyEnd)
             {
@@ -211,6 +213,34 @@ namespace CAM.Sawing
                     Acad.CreateGash(curve, IsExactlyBegin ? curve.EndPoint : curve.StartPoint, OuterSide, depth, toolDiameter, toolThickness, point);
                 }
                 return point + vector.GetPerpendicularVector().GetNormal() * compensation - Vector3d.ZAxis * depth;
+            }
+
+            void CalcPolyline()
+            {
+                var explodeResult = new DBObjectCollection();
+                polyline.Explode(explodeResult);
+                var point = polyline.StartPoint;
+                int sign = 0;
+                var side = Side.None;
+                foreach (Curve item in explodeResult)
+                {
+                    var s = Math.Sign(Math.Sin(item.GetTangent(item.StartPoint).Angle));
+                    if (s == 0)
+                        continue;
+                    if (sign == 0)
+                    {
+                        sign = s;
+                        continue;
+                    }
+                    if (s != sign)
+                    {
+                        if (techProcess.MachineType == MachineType.ScemaLogic)
+                            throw new InvalidOperationException("Обработка полилинии невозможна - кривая пересекает углы 90 или 270 градусов.");
+                        if (side == Side.None)
+                            side = sign > 0 ? Side.Left : Side.Right;
+                    }
+                }
+                
             }
         }
     }

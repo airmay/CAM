@@ -86,7 +86,7 @@ namespace CAM
                 $"{Format("F", feed, _feed)}";
 
             string Format(string label, double? value, double oldValue, double origin = 0, bool withThick = false) =>
-                 (paramsString == null || paramsString.Contains(label)) && (value.GetValueOrDefault(oldValue) != oldValue || (_GCode == 0 ^ gCode == 0))
+                 (paramsString == null || paramsString.Contains(label)) && (value.GetValueOrDefault(oldValue) != oldValue) // || (_GCode == 0 ^ gCode == 0))
                         ? $" {label}{FormatValue((value.GetValueOrDefault(oldValue) - origin).Round(4), withThick)}"
                         : null;
 
