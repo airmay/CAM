@@ -123,11 +123,9 @@ namespace CAM
         /// <summary>
         /// Подвод
         /// </summary>
-        public void Move(double x, double y, double angleC, double angleA = 0) => Move(new Point3d(x, y, ZSafety), angleC, angleA);
-
-        public void Move(Point3d point, double angleC, double angleA = 0)
+        public void Move(double? x = null, double? y = null, double? z = null, double? angleC = null, double angleA = 0)
         {
-            GCommand(_isEngineStarted ? CommandNames.Fast : CommandNames.InitialMove, 0, point: point, angleC: angleC);
+            GCommand(_isEngineStarted ? CommandNames.Fast : CommandNames.InitialMove, 0, x: x, y: y, z: z, angleC: angleC);
             if (!_isEngineStarted)
                 GCommand(CommandNames.InitialMove, 0, z: ZSafety);
 
@@ -146,12 +144,7 @@ namespace CAM
         /// <summary>
         /// Рез к точке
         /// </summary>
-        public void Cutting(double x, double y, double z, double angleC, int feed, double angleA = 0)
-        {
-            if (IsUpperTool)
-                Move(x, y, angleC, angleA);
-            GCommand(CommandNames.Penetration, 1, x: x, y: y, z: z, angleC: angleC, angleA: angleA, feed: feed);
-        }
+        public void Cutting(double x, double y, double z, int feed) => GCommand(CommandNames.Penetration, 1, x: x, y: y, z: z, feed: feed);
 
         /// <summary>
         /// Рез между точками

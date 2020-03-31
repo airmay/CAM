@@ -19,11 +19,17 @@ namespace CAM.Tactile
 
         public int Frequency { get; set; }
 
+        public int ZSafety { get; set; }
+
+        public int ZEntry { get; set; }
+        
         public ConesTechOperation(TactileTechProcess techProcess, string name) : base(techProcess, name)
         {
             FeedMax = 200;
             FeedMin = 80;
             Frequency = 5000;
+            ZSafety = 5;
+            ZEntry = 1;
         }
 
         public override bool Enabled => TechProcess.MachineType == MachineType.Donatoni || TechProcess.MachineType == MachineType.Krea;
@@ -48,6 +54,7 @@ namespace CAM.Tactile
                 stepX = stepY * 2;
             }
             generator.SetTool(2, Frequency, 90);
+            generator.ZSafety = ZSafety;
 
             while (y < contourPoints[1].Y)
             {
@@ -73,13 +80,15 @@ namespace CAM.Tactile
 
             void Cutting()
             {
+                generator.Move(x, y);
+                generator.Move(z: ZEntry);
                 var zMin = -tactileParams.Depth;
                 double z = 0;
                 int counter = 0;
                 while (z >= zMin)
                 {
                     var feed = (int)((FeedMax - FeedMin) / zMin * (z * z / zMin - 2 * z) + FeedMax);
-                    generator.Cutting(x, y, z, 0, feed: feed);
+                    generator.Cutting(x, y, z, feed);
                     if (z <= -2)
                     {
                         if (++counter == 5) // Подъем на 1мм для охлаждения
@@ -87,8 +96,8 @@ namespace CAM.Tactile
                             counter = 0;
                             Pause();
                             generator.Uplifting(z + 1);
-                            generator.Cutting(x, y, z + 0.2, 0, feed: 300);
-                            generator.Cutting(x, y, z, 0, feed: feed);
+                            generator.Cutting(x, y, z + 0.2, (int)(FeedMax * 1.5));
+                            generator.Cutting(x, y, z, feed);
                         }
                     }
                     z -= 0.2;

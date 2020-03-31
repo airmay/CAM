@@ -84,7 +84,8 @@ namespace CAM.Sawing
                     throw new InvalidOperationException("Расчет намечания выполняется только при нулевом вертикальном угле.");
                 var point = Scheduling();
                 var angle = BuilderUtils.CalcToolAngle((curve.EndPoint - curve.StartPoint).ToVector2d().Angle, engineSide);
-                generator.Cutting(point.X, point.Y, point.Z, angle, techProcess.PenetrationFeed);
+                generator.Move(point.X, point.Y, angle);
+                generator.Cutting(point.X, point.Y, point.Z, techProcess.PenetrationFeed);
                 return;
             }
 
@@ -101,7 +102,9 @@ namespace CAM.Sawing
                     var vector = Vector3d.ZAxis * (item.Key + generator.ZSafety);
                     if (angleA != 0)
                         vector = vector.RotateBy(outerSideSign * angleA, ((Line)toolpathCurve).Delta) * depthCoeff;
-                    generator.Move(point + vector, BuilderUtils.CalcToolAngle(toolpathCurve, point, engineSide), Math.Abs(AngleA));
+                    var p0 = point + vector;
+                    var angleC = BuilderUtils.CalcToolAngle(toolpathCurve, point, engineSide);
+                    generator.Move(p0.X, p0.Y, angleC: angleC, angleA: Math.Abs(AngleA));
                     if (techProcess.MachineType == MachineType.ScemaLogic)
                         generator.Command("28;;XYCZ;;;;;;", "Цикл");
                 }

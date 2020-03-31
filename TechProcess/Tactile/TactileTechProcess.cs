@@ -167,6 +167,6 @@ namespace CAM.Tactile
             return techOperations;
         }
 
-        public override bool Validate() => base.Validate() && Type.CheckNotNull("Тип плитки");
+        public override bool Validate() => Type.CheckNotNull("Тип плитки");
     }
 }

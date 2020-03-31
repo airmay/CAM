@@ -30,6 +30,7 @@
         {
             this.components = new System.ComponentModel.Container();
             this.tbFrequency = new System.Windows.Forms.TextBox();
+            this.conesTechOperationBindingSource = new System.Windows.Forms.BindingSource(this.components);
             this.lbFrequency = new System.Windows.Forms.Label();
             this.tbFeedMax = new System.Windows.Forms.TextBox();
             this.label2 = new System.Windows.Forms.Label();
@@ -37,7 +38,10 @@
             this.label1 = new System.Windows.Forms.Label();
             this.textBox2 = new System.Windows.Forms.TextBox();
             this.label3 = new System.Windows.Forms.Label();
-            this.conesTechOperationBindingSource = new System.Windows.Forms.BindingSource(this.components);
+            this.tbZEntry = new System.Windows.Forms.TextBox();
+            this.label4 = new System.Windows.Forms.Label();
+            this.tbZSafety = new System.Windows.Forms.TextBox();
+            this.label5 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.conesTechOperationBindingSource)).BeginInit();
             this.SuspendLayout();
             // 
@@ -50,6 +54,10 @@
             this.tbFrequency.Name = "tbFrequency";
             this.tbFrequency.Size = new System.Drawing.Size(152, 20);
             this.tbFrequency.TabIndex = 46;
+            // 
+            // conesTechOperationBindingSource
+            // 
+            this.conesTechOperationBindingSource.DataSource = typeof(CAM.Tactile.ConesTechOperation);
             // 
             // lbFrequency
             // 
@@ -119,14 +127,52 @@
             this.label3.Text = "Начало полосы 2";
             this.label3.Visible = false;
             // 
-            // conesTechOperationBindingSource
+            // tbZEntry
             // 
-            this.conesTechOperationBindingSource.DataSource = typeof(CAM.Tactile.ConesTechOperation);
+            this.tbZEntry.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.tbZEntry.DataBindings.Add(new System.Windows.Forms.Binding("Text", this.conesTechOperationBindingSource, "ZEntry", true));
+            this.tbZEntry.Location = new System.Drawing.Point(102, 135);
+            this.tbZEntry.Name = "tbZEntry";
+            this.tbZEntry.Size = new System.Drawing.Size(152, 20);
+            this.tbZEntry.TabIndex = 61;
+            // 
+            // label4
+            // 
+            this.label4.AutoSize = true;
+            this.label4.Location = new System.Drawing.Point(3, 138);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(46, 13);
+            this.label4.TabIndex = 62;
+            this.label4.Text = "Z входа";
+            // 
+            // tbZSafety
+            // 
+            this.tbZSafety.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.tbZSafety.DataBindings.Add(new System.Windows.Forms.Binding("Text", this.conesTechOperationBindingSource, "ZSafety", true));
+            this.tbZSafety.Location = new System.Drawing.Point(102, 109);
+            this.tbZSafety.Name = "tbZSafety";
+            this.tbZSafety.Size = new System.Drawing.Size(152, 20);
+            this.tbZSafety.TabIndex = 59;
+            // 
+            // label5
+            // 
+            this.label5.AutoSize = true;
+            this.label5.Location = new System.Drawing.Point(3, 112);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(88, 13);
+            this.label5.TabIndex = 60;
+            this.label5.Text = "Z безопасности";
             // 
             // ConesTechOperationView
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.Controls.Add(this.tbZEntry);
+            this.Controls.Add(this.label4);
+            this.Controls.Add(this.tbZSafety);
+            this.Controls.Add(this.label5);
             this.Controls.Add(this.textBox2);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.tbFeedMin);
@@ -154,5 +200,9 @@
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.TextBox textBox2;
         private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.TextBox tbZEntry;
+        private System.Windows.Forms.Label label4;
+        private System.Windows.Forms.TextBox tbZSafety;
+        private System.Windows.Forms.Label label5;
     }
 }

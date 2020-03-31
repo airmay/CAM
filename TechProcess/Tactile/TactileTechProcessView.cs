@@ -1,6 +1,5 @@
 ﻿using Dreambuild.AutoCAD;
 using System;
-using System.Collections.Generic;
 using System.Windows.Forms;
 
 namespace CAM.Tactile
@@ -13,7 +12,7 @@ namespace CAM.Tactile
         {
             InitializeComponent();
 
-            cbMachine.BindEnum(MachineType.Donatoni, MachineType.ScemaLogic);
+            cbMachine.BindEnum(MachineType.Donatoni, MachineType.ScemaLogic, MachineType.Krea);
         }
 
         public void BindData(TactileTechProcess data)

@@ -19,9 +19,9 @@ namespace CAM
 
         void Uplifting(double? z = null);
 
-        void Move(double x, double y, double angleC, double angleA = 0);
+        void Move(double? x = null, double? y = null, double? z = null, double? angleC = null, double angleA = 0);
 
-        void Cutting(double x, double y, double z, double angleC, int feed, double angleA = 0);
+        void Cutting(double x, double y, double z, int feed);
 
         void Cutting(Point3d startPoint, Point3d endPoint, int cuttingFeed, int transitionFeed);
 
@@ -36,8 +36,6 @@ namespace CAM
         bool IsUpperTool { get; }
 
         void Uplifting(Vector3d vector3d);
-
-        void Move(Point3d point3d, double v1, double v2);
 
         int ZSafety { get; set; }
 

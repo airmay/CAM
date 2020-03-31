@@ -69,6 +69,8 @@ namespace CAM.Tactile
 
         public override bool Enabled => TechProcess.MachineType == MachineType.ScemaLogic || TechProcess.MachineType == MachineType.Donatoni;
 
+        public override bool Validate() => base.Validate() && TechProcess.Tool.CheckNotNull("Инструмент");
+
         public override void BuildProcessing(ICommandGenerator generator)
         {
             if (PassList?.Any() != true)
@@ -129,7 +131,7 @@ namespace CAM.Tactile
                     var startPoint = points[0] + passDir * s - vector - Vector3d.ZAxis * Depth;
                     var endPoint = points[1] + passDir * s + vector - Vector3d.ZAxis * Depth;
                     if (generator.IsUpperTool)
-                        generator.Move(startPoint.X, startPoint.Y, BuilderUtils.CalcToolAngle(ProcessingAngle.ToRad()));
+                        generator.Move(startPoint.X, startPoint.Y, angleC: BuilderUtils.CalcToolAngle(ProcessingAngle.ToRad()));
                     generator.Cutting(startPoint, endPoint, feed, tactileTechProcess.TactileTechProcessParams.TransitionFeed);
                 }
             }

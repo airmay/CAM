@@ -75,7 +75,8 @@ namespace CAM
                 TechOperations.FindAll(p => p.Enabled).ForEach(p =>
                 {
                     generator.StartTechOperation();
-                    generator.SetTool(1, Frequency);
+                    if (Tool != null)
+                        generator.SetTool(1, Frequency);
                     p.BuildProcessing(generator);
                     p.ProcessCommands = generator.FinishTechOperation();
                 });
