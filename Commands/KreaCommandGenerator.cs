@@ -5,56 +5,44 @@ using System;
 namespace CAM
 {
     /// <summary>
-    /// Генератор команд для станка типа Donatoni
+    /// Генератор команд для станка типа Krea
     /// </summary>
-    [MachineType(MachineType.Donatoni)]
-    public class DonatoniCommandGenerator : CommandGeneratorBase
+    [MachineType(MachineType.Krea)]
+    public class KreaCommandGenerator : CommandGeneratorBase
     {
         protected override void StartMachineCommands(string caption)
         {
-            Command($"; Donatoni \"{caption}\"");
+            Command($"; Krea \"{caption}\"");
             Command($"; DATE {DateTime.Now}");
-
-            Command("%300");
-            Command("RTCP=1");
-            Command("G600 X0 Y-2500 Z-370 U3800 V0 W0 N0");
-            Command("G601");
+            Command("(UAO,E30)");
+            Command("(UIO,Z(E31))");
         }
 
         protected override void StopMachineCommands()
         {
-            Command("G0 G53 Z0 ");
-            Command("G0 G53 A0 C0");
-            Command("G0 G53 X0 Y0");
+            Command("G0 G79 Z(@ZUP)", "Подъем");
+            Command("G0 Y300");
             Command("M30", "Конец");
         }
 
         protected override void SetToolCommands(int toolNo, double angleA)
         {
-            Command("G0 G53 Z0");
-            Command($"G0 G53 C0 A{angleA}");
-            Command("G64");
-            Command("G154O10");
-            Command($"T{toolNo}", "Инструмент№");
-            Command("M6", "Инструмент");
-            Command("G172 T1 H1 D1");
-            Command("M300");
+            Command($"T1", "Инструмент№");
+            Command("G17", "Плоскость");
+            Command("G79Z(@ZUP)");
         }
 
         protected override void StartEngineCommands()
         {
-            Command(_toolIndex == 2 ? "M8" : "M7", "Охлаждение");
+            Command("M7", "Охлаждение");
+            Command("M8", "Охлаждение");
             Command($"M3 S{_frequency}", "Шпиндель");
         }
 
         protected override void StopEngineCommands()
         {
             Command("M5", "Шпиндель откл.");
-            Command("M9", "Охлаждение откл.");
-            Command("G61");
-            Command("G153");
-            Command("G0 G53 Z0");
-            Command("SETMSP=1");
+            Command("M9 M10", "Охлаждение откл.");
         }
 
         protected override string GCommandText(int gCode, string paramsString, Point3d point, Curve curve, double? angleC, double? angleA, int? feed)

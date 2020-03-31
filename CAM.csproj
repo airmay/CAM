@@ -88,6 +88,7 @@
     <Compile Include="Commands\BuilderUtils.cs" />
     <Compile Include="Commands\CommandGeneratorBase.cs" />
     <Compile Include="Commands\CommandGeneratorFactory.cs" />
+    <Compile Include="Commands\KreaCommandGenerator.cs" />
     <Compile Include="Commands\DonatoniCommandGenerator.cs" />
     <Compile Include="Commands\ICommandGenerator.cs" />
     <Compile Include="Commands\MachineTypeAttribute.cs" />
