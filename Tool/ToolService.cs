@@ -32,5 +32,29 @@ namespace CAM
             var frequency = (int)Math.Round(speed * 1000 / (tool.Diameter * Math.PI) * 60);
             return Math.Min(frequency, _machineSettings[machineType].MaxFrequency);
         }
+
+        public static bool Validate(Tool tool, ToolType toolType)
+        {
+            string message = null;
+            if (tool == null)
+                message = "Выберите инструмент";
+            if (tool.Type != toolType)
+                message = $"Выберите инструмент типа {toolType.GetDescription()}";
+            else
+            {
+                if (tool.Type == ToolType.Disk)
+                {
+                    if (tool.Diameter == 0)
+                        message = $"Не указан диаметр инструмента";
+                    if (tool.Thickness.GetValueOrDefault() == 0)
+                        message = $"Не указана толщина инструмента";
+                }
+            }
+            if (message != null)
+                Acad.Alert(message);
+
+            return message == null;
+        }
+
     }
 }

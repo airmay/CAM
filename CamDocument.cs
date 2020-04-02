@@ -92,8 +92,10 @@ namespace CAM
             }
         }
 
-        public void HideShowProcessing(ITechProcess techProcess)
+        public void DeleteExtraObjects(ITechProcess techProcess)
         {
+            techProcess.TechOperations.ForEach(p => p.SetToolpathVisible(false));
+            Acad.DeleteExtraObjects();
             //Acad.HideExtraObjects(techProcess.ToolpathCurves);
         }
        

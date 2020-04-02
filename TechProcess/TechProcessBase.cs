@@ -86,7 +86,7 @@ namespace CAM
 
         public virtual List<ITechOperation> CreateTechOperations() => new List<ITechOperation>();
 
-        public virtual bool Validate() => Tool.CheckNotNull("Инструмент");
+        public virtual bool Validate() => true;
 
         public virtual void Teardown()
         {

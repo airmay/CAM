@@ -63,14 +63,22 @@ namespace CAM.Sawing
             if (techProcess.MachineType == MachineType.ScemaLogic)
                 AngleA = 0;
 
-            if (curve is Arc arc)
-                CalcArc();
-            if (curve is Line line)
-                CalcLine();
-            if (curve is Polyline polyline)
-                CalcPolyline();
+            switch (curve)
+            {
+                case Arc arc:
+                    CalcArc(arc);
+                    break;
+                case Line line:
+                    CalcLine(line);
+                    break;
+                case Polyline polyline:
+                    CalcPolyline(polyline);
+                    break;
+                default:
+                    throw new InvalidOperationException($"Кривая типа {curve.GetType()} не может быть обработана.");
+            }
 
-            var outerSideSign = OuterSide == Side.Left ^ curve is Arc ? 1 : -1;
+            var outerSideSign = OuterSide == Side.Left ^ curve is Line ? -1 : 1;
             var offsetCoeff = Math.Tan(angleA) * outerSideSign;
             var depthCoeff = 1 / Math.Cos(angleA);
             var toolThickness = techProcess.Tool.Thickness.Value * depthCoeff;
@@ -84,7 +92,7 @@ namespace CAM.Sawing
                     throw new InvalidOperationException("Расчет намечания выполняется только при нулевом вертикальном угле.");
                 var point = Scheduling();
                 var angle = BuilderUtils.CalcToolAngle((curve.EndPoint - curve.StartPoint).ToVector2d().Angle, engineSide);
-                generator.Move(point.X, point.Y, angle);
+                generator.Move(point.X, point.Y, angleC: angle);
                 generator.Cutting(point.X, point.Y, point.Z, techProcess.PenetrationFeed);
                 return;
             }
@@ -110,8 +118,7 @@ namespace CAM.Sawing
                 }
                 generator.Cutting(toolpathCurve, item.Value, techProcess.PenetrationFeed, engineSide);
             }
-            if (angleA != 0)
-                generator.Uplifting(Vector3d.ZAxis.RotateBy(outerSideSign * angleA, ((Line)toolpathCurve).Delta) * (thickness + generator.ZSafety) * depthCoeff);
+            generator.Uplifting(Vector3d.ZAxis.RotateBy(outerSideSign * angleA, toolpathCurve.EndPoint - toolpathCurve.StartPoint) * (thickness + generator.ZSafety) * depthCoeff);
 
             if (!IsExactlyBegin || !IsExactlyEnd)
             {
@@ -125,7 +132,7 @@ namespace CAM.Sawing
 
             // Local func ------------------------
 
-            void CalcArc()
+            void CalcArc(Arc arc)
             {
                 AngleA = 0;
                 var startSide = Math.Sign(Math.Cos(arc.StartAngle.Round(3)));
@@ -163,10 +170,50 @@ namespace CAM.Sawing
                     engineSide = (startSide + endSide) > 0 ? Side.Right : Side.Left;
             }
 
-            void CalcLine()
+            void CalcLine(Line line)
             {
                 angleA = AngleA.ToRad();
                 engineSide = AngleA == 0 ? BuilderUtils.CalcEngineSide(line.Angle) : AngleA > 0 ? OuterSide : OuterSide.Opposite();
+            }
+
+            void CalcPolyline(Polyline polyline)
+            {
+                int sign = 0;
+                for (int i = 0; i < polyline.NumberOfVertices; i++)
+                {
+                    var point = polyline.GetPoint3dAt(i);
+                    var s = Math.Sign(Math.Sin(polyline.GetTangent(point).Angle.Round(6)));
+                    if (s == 0)
+                        continue;
+                    if (sign == 0)
+                    {
+                        sign = s;
+                        continue;
+                    }
+                    var bulge = polyline.GetBulgeAt(i - 1);
+                    if (bulge == 0)
+                        bulge = polyline.GetBulgeAt(i);
+
+                    if (s != sign)
+                    {
+                        if (techProcess.MachineType == MachineType.ScemaLogic)
+                            throw new InvalidOperationException("Обработка полилинии невозможна - кривая пересекает углы 90 или 270 градусов.");
+                        var side = sign > 0 ^ bulge < 0 ? Side.Left : Side.Right;
+                        if (engineSide != Side.None)
+                        {
+                            if (engineSide != side)
+                                throw new InvalidOperationException("Обработка полилинии невозможна.");
+                        }
+                        else
+                            engineSide = side;
+                        sign = s;
+                    }
+                    else
+                        if (Math.Abs(bulge) > 1)
+                            throw new InvalidOperationException("Обработка невозможна - дуга полилинии пересекает углы 90 и 270 градусов.");
+                }
+                if (engineSide == Side.None)
+                    engineSide = BuilderUtils.CalcEngineSide(polyline.GetTangent(polyline.StartPoint).Angle);
             }
 
             void CreateToolpath(double depth, double offset)
@@ -176,6 +223,7 @@ namespace CAM.Sawing
                 if (!IsExactlyBegin && !IsExactlyEnd)
                     return;
                 var indent = CalcIndent(depth * depthCoeff);
+                
                 switch (toolpathCurve)
                 {
                     case Line l:
@@ -192,7 +240,16 @@ namespace CAM.Sawing
                         if (IsExactlyEnd)
                             a.EndAngle = a.EndAngle - indentAngle;
                         break;
-                }
+
+                    case Polyline p:
+                        if (IsExactlyBegin)
+                            p.SetPointAt(0, p.GetPointAtDist(indent).ToPoint2d());
+                        //p.StartPoint = p.GetPointAtDist(indent);
+                        if (IsExactlyEnd)
+                            //p.EndPoint = p.GetPointAtDist(p.Length - indent);
+                            p.SetPointAt(p.NumberOfVertices - 1, p.GetPointAtDist(p.Length - indent).ToPoint2d());
+                        break;
+                };
             }
 
             double CalcIndent(double depth) => Math.Sqrt(depth * (toolDiameter - depth)) + CornerIndentIncrease;
@@ -218,34 +275,6 @@ namespace CAM.Sawing
                     Acad.CreateGash(curve, IsExactlyBegin ? curve.EndPoint : curve.StartPoint, OuterSide, depth, toolDiameter, toolThickness, point);
                 }
                 return point + vector.GetPerpendicularVector().GetNormal() * compensation - Vector3d.ZAxis * depth;
-            }
-
-            void CalcPolyline()
-            {
-                var explodeResult = new DBObjectCollection();
-                polyline.Explode(explodeResult);
-                var point = polyline.StartPoint;
-                int sign = 0;
-                var side = Side.None;
-                foreach (Curve item in explodeResult)
-                {
-                    var s = Math.Sign(Math.Sin(item.GetTangent(item.StartPoint).Angle));
-                    if (s == 0)
-                        continue;
-                    if (sign == 0)
-                    {
-                        sign = s;
-                        continue;
-                    }
-                    if (s != sign)
-                    {
-                        if (techProcess.MachineType == MachineType.ScemaLogic)
-                            throw new InvalidOperationException("Обработка полилинии невозможна - кривая пересекает углы 90 или 270 градусов.");
-                        if (side == Side.None)
-                            side = sign > 0 ? Side.Left : Side.Right;
-                    }
-                }
-                
             }
         }
     }

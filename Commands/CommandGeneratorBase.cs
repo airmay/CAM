@@ -158,13 +158,38 @@ namespace CAM
         {
             var point = curve.GetClosestPoint(_location.Point);
             var angleC = _location.AngleC;
-            if (curve is Arc)
+            if (!(curve is Line))
                 angleC = BuilderUtils.CalcToolAngle(curve, point, engineSide);
             GCommand(point.Z != _location.Point.Z ? CommandNames.Penetration : CommandNames.Transition, 1, point: point, angleC: angleC, feed: transitionFeed);
 
-            if (curve is Arc arc)
-                angleC += arc.TotalAngle.ToDeg() * (point == curve.StartPoint ? -1 : 1);
-            GCommand(CommandNames.Cutting, 1, point: curve.NextPoint(point), angleC: angleC, curve: curve, feed: cuttingFeed);
+            if (curve is Polyline polyline)
+            {
+                if (point == polyline.EndPoint)
+                {
+                    polyline.ReverseCurve();
+                    engineSide = engineSide.Opposite();
+                }
+                for (int i = 1; i < polyline.NumberOfVertices; i++)
+                {
+                    point = polyline.GetPoint3dAt(i);
+                    angleC = BuilderUtils.CalcToolAngle(polyline, point, engineSide);
+                    if (polyline.GetSegmentType(i-1) == SegmentType.Arc)
+                    {
+                        var arcSeg = polyline.GetArcSegment2dAt(i-1);
+                        GCommand(CommandNames.Cutting, arcSeg.IsClockWise ? 3 : 2, point: point, angleC: angleC, curve: polyline, feed: cuttingFeed, center: arcSeg.Center);
+                    }
+                    else
+                        GCommand(CommandNames.Cutting, 1, point: point, angleC: angleC, curve: polyline, feed: cuttingFeed);
+                }
+            }
+            else
+            {
+                var arc = curve as Arc;
+                if (arc != null)
+                    angleC += arc.TotalAngle.ToDeg() * (point == curve.StartPoint ? -1 : 1);
+                var gCode = curve is Line ? 1 : point == curve.StartPoint ? 3 : 2;
+                GCommand(CommandNames.Cutting, gCode, point: curve.NextPoint(point), angleC: angleC, curve: curve, feed: cuttingFeed, center: arc?.Center.ToPoint2d());
+            }
         }
 
         public void Command(string text, string name = null) => _commands.Add(new ProcessCommand
@@ -176,20 +201,20 @@ namespace CAM
         });
 
         public void GCommand(string name, int gCode, string paramsString = null, Point3d? point = null, double? x = null, double? y = null, double? z = null,
-            double? angleC = null, double? angleA = null, Curve curve = null, int? feed = null)
+            double? angleC = null, double? angleA = null, Curve curve = null, int? feed = null, Point2d? center = null)
         {
             if (point == null)
                 point = new Point3d(x ?? _location.Point.X, y ?? _location.Point.Y, z ?? _location.Point.Z);
 
-            var commandText = GCommandText(gCode, paramsString, point.Value, curve, angleC, angleA, feed);
+            var commandText = GCommandText(gCode, paramsString, point.Value, curve, angleC, angleA, feed, center);
 
             var toolpathObjectId = ObjectId.Null;
             if (_location.IsDefined)
             {
-                if (curve == null && (point.Value - _location.Point).Length > 1)
+                if (curve == null && _location.Point.DistanceTo(point.Value) > 1)
                     curve = NoDraw.Line(_location.Point, point.Value);
 
-                if (curve != null)
+                if (curve != null && curve.IsNewObject)
                 {
                     if (Colors.ContainsKey(name))
                         curve.Color = Colors[name];
@@ -213,6 +238,6 @@ namespace CAM
             });
         }
 
-        protected abstract string GCommandText(int gCode, string paramsString, Point3d point, Curve curve, double? angleC, double? angleA, int? feed);
+        protected abstract string GCommandText(int gCode, string paramsString, Point3d point, Curve curve, double? angleC, double? angleA, int? feed, Point2d? center);
     }
 }

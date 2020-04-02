@@ -27,7 +27,7 @@ namespace CAM.Tactile
 
         public override bool Enabled => TechProcess.MachineType == MachineType.Donatoni;
 
-        public override bool Validate() => base.Validate() && TechProcess.Tool.CheckNotNull("Инструмент");
+        public override bool Validate() => ToolService.Validate(TechProcess.Tool, ToolType.Disk);
 
         public override void BuildProcessing(ICommandGenerator generator)
         {

@@ -74,6 +74,8 @@ namespace CAM
 
         public static bool IsTurnRight(this Line line, Point3d point) => IsTurnRight(line.StartPoint, line.EndPoint, point);
 
+        public static bool IsTurnRight(this Vector2d vector1, Vector2d vector2) => vector1.Kross(vector2) < 0;
+
         public static List<Point3d> Intersect(this Curve entity, List<Curve> entitys, Intersect intersectType = default)
         {
             var result = new List<Point3d>();
@@ -94,8 +96,17 @@ namespace CAM
                 var i = 0;
                 foreach (var curve in contour)
                 {
-                    var bulge = curve is Arc ? Algorithms.GetArcBulge(curve as Arc, next) : 0;
-                    polyline.AddVertexAt(i++, next.ToPoint2d(), bulge, 0, 0);
+                    if (curve is Polyline pcurve)
+                    {
+                        polyline.JoinPolyline(pcurve);
+                        i = polyline.NumberOfVertices - 1;
+                        polyline.RemoveVertexAt(i);
+                    }
+                    else
+                    {
+                        var bulge = curve is Arc ? Algorithms.GetArcBulge(curve as Arc, next) : 0;
+                        polyline.AddVertexAt(i++, next.ToPoint2d(), bulge, 0, 0);
+                    }
                     next = curve.NextPoint(next);
                 }
                 polyline.Closed = next == start;
@@ -109,6 +120,7 @@ namespace CAM
                     polyline.JoinPolyline(offsetPolyline);
                     polyline.SetBulgeAt(polyline.NumberOfVertices - 1, 0);
                     polyline.Closed = true;
+                    offsetPolyline.Dispose();
                     offsetPolyline = null;
                 }
                 else

@@ -230,13 +230,13 @@ namespace CAM
 
         private void bDeleteExtraObjects_Click(object sender, EventArgs e)
         {
-            Acad.DeleteExtraObjects();
+            _camDocument.DeleteExtraObjects(CurrentTechProcess);
             Acad.Editor.UpdateScreen();
         }
 
         private void bDeleteProcessing_Click(object sender, EventArgs e)
         {
-            _camDocument.HideShowProcessing(CurrentTechProcess);
+            _camDocument.DeleteExtraObjects(CurrentTechProcess);
         }
 
         private void bSend_Click(object sender, EventArgs e)

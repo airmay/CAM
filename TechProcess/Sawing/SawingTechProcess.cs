@@ -96,15 +96,16 @@ namespace CAM.Sawing
 
             Side GetOuterSide(Curve curve)
             {
-                var point = Interaction.GetLineEndPoint("Выберите направление внешней нормали к объекту", curve.GetPointAtParameter((curve.EndParam + curve.StartParam) / 2));
-                var vector = curve.GetFirstDerivative(curve.StartParam);
-                return Graph.IsTurnRight(curve.StartPoint, curve.StartPoint + vector, point) ? Side.Right : Side.Left;
+                var startPoint = curve.GetPointAtParameter((curve.EndParam + curve.StartParam) / 2);
+                var point = Interaction.GetLineEndPoint("Выберите направление внешней нормали к объекту", startPoint);
+                var vector = curve.GetTangent(startPoint);
+                return vector.IsTurnRight((point - startPoint).ToVector2d()) ? Side.Right : Side.Left;
             }
         }
 
         public override List<ITechOperation> CreateTechOperations() => _borders?.ConvertAll(p => new SawingTechOperation(this, p) as ITechOperation);
 
-        public override bool Validate() => base.Validate() && Thickness.CheckNotNull("Толщина");
+        public override bool Validate() => ToolService.Validate(Tool, ToolType.Disk) && Thickness.CheckNotNull("Толщина");
 
         public override void BuildProcessing(int zSafety)
         {

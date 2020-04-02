@@ -45,15 +45,10 @@ namespace CAM
             Command("M9 M10", "Охлаждение откл.");
         }
 
-        protected override string GCommandText(int gCode, string paramsString, Point3d point, Curve curve, double? angleC, double? angleA, int? feed)
+        protected override string GCommandText(int gCode, string paramsString, Point3d point, Curve curve, double? angleC, double? angleA, int? feed, Point2d? center)
         {
-            var IJ = "";
-            if (curve is Arc arc)
-            {
-                gCode = point == arc.EndPoint ? 2 : 3;
-                IJ = $" I{(arc.Center.X - _originX).Round(4)} J{(arc.Center.Y - _originY).Round(4)}";
-            }
-            return $"G{gCode}{Format("X", point.X, _location.Point.X, _originX)}{Format("Y", point.Y, _location.Point.Y, _originY)}{IJ}" +
+            return $"G{gCode}{Format("X", point.X, _location.Point.X, _originX)}{Format("Y", point.Y, _location.Point.Y, _originY)}" +
+                $"{FormatIJ("I", center?.X, _originX)}{FormatIJ("J", center?.Y, _originY)}" +
                 $"{Format("Z", point.Z, _location.Point.Z, withThick: WithThick)}{Format("C", angleC, _location.AngleC)}{Format("A", angleA, _location.AngleA)}" +
                 $"{Format("F", feed, _feed)}";
 
@@ -61,6 +56,8 @@ namespace CAM
                  (paramsString == null || paramsString.Contains(label)) && (value.GetValueOrDefault(oldValue) != oldValue) // || (_GCode == 0 ^ gCode == 0))
                         ? $" {label}{FormatValue((value.GetValueOrDefault(oldValue) - origin).Round(4), withThick)}"
                         : null;
+
+            string FormatIJ(string label, double? value, double origin) => value.HasValue ? $" {label}{(value.Value - origin).Round(4)}" : null;
 
             string FormatValue(double value, bool withThick) => withThick ? $"({value} + THICK)" : value.ToString();
         }
