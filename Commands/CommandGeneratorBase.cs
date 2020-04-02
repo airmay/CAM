@@ -208,7 +208,6 @@ namespace CAM
 
             var commandText = GCommandText(gCode, paramsString, point.Value, curve, angleC, angleA, feed, center);
 
-            var toolpathObjectId = ObjectId.Null;
             if (_location.IsDefined)
             {
                 if (curve == null && _location.Point.DistanceTo(point.Value) > 1)
@@ -219,7 +218,7 @@ namespace CAM
                     if (Colors.ContainsKey(name))
                         curve.Color = Colors[name];
                     curve.LayerId = _layerId;
-                    toolpathObjectId = _currentSpace.AppendEntity(curve);
+                    _currentSpace.AppendEntity(curve);
                     _transaction.AddNewlyCreatedDBObject(curve, true);
                 }
             }
@@ -232,7 +231,7 @@ namespace CAM
             {
                 Name = name,
                 Text = commandText,
-                ToolpathObjectId = toolpathObjectId,
+                ToolpathObjectId = curve?.ObjectId,
                 ToolIndex = _toolIndex,
                 ToolLocation = _location
             });

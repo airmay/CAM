@@ -60,7 +60,8 @@ namespace CAM
 
         public void SelectProcessCommand(ITechProcess techProcess, ProcessCommand processCommand)
         {
-            Acad.SelectObjectIds(processCommand.ToolpathObjectId);
+            if (processCommand.ToolpathObjectId.HasValue)
+                Acad.SelectObjectIds(processCommand.ToolpathObjectId.Value);
             Acad.ShowToolObject(techProcess.Tool, processCommand.ToolIndex, processCommand.ToolLocation, techProcess.MachineType == MachineType.Donatoni);
         }
        

@@ -56,7 +56,7 @@ namespace CAM
 
         public virtual void Teardown() => Acad.DeleteObjects(ToolpathObjectIds);
 
-        public IEnumerable<ObjectId> ToolpathObjectIds => ProcessCommands?.Select(p => p.ToolpathObjectId).Where(p => p != ObjectId.Null);
+        public IEnumerable<ObjectId> ToolpathObjectIds => ProcessCommands?.Where(p => p.ToolpathObjectId != null).Select(p => p.ToolpathObjectId.Value);
 
         public virtual bool Enabled => true;
 

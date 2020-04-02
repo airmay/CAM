@@ -148,7 +148,6 @@ namespace CAM
         {
             if (objectIds == null)
                 objectIds = Array.Empty<ObjectId>();
-            objectIds = Array.FindAll(objectIds, p => p != ObjectId.Null);
             App.LockAndExecute(() =>
             {
                 try

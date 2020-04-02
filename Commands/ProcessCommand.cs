@@ -14,7 +14,7 @@ namespace CAM
 
         public Location ToolLocation;
 
-        public ObjectId ToolpathObjectId { get; set; }
+        public ObjectId? ToolpathObjectId { get; set; }
 
         public string GetProgrammLine(string separator) => $"{Number}{separator} {Text}";
     }
