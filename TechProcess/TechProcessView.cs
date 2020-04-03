@@ -106,11 +106,13 @@ namespace CAM
         {
             if (CurrentTechProcess.GetType() != _currentTechProcessType)
             {
-                bCreateTechOperation.DropDownItems.Clear();
-                var items = new List<ToolStripItem> { new ToolStripMenuItem("Все операции", null, new EventHandler(bCreateTechOperation_Click)), new ToolStripSeparator() }
-                    .Concat(_techOperationItems[CurrentTechProcess.GetType()]).ToArray();
-                bCreateTechOperation.DropDownItems.AddRange(items);
                 _currentTechProcessType = CurrentTechProcess.GetType();
+                bCreateTechOperation.DropDownItems.Clear();
+                if (_techOperationItems.ContainsKey(_currentTechProcessType))
+                    bCreateTechOperation.DropDownItems.AddRange(
+                        new List<ToolStripItem> { new ToolStripMenuItem("Все операции", null, new EventHandler(bCreateTechOperation_Click)), new ToolStripSeparator() }
+                        .Concat(_techOperationItems[CurrentTechProcess.GetType()]).ToArray());
+                bCreateTechOperation.Enabled = bCreateTechOperation.DropDownItems.Count > 0;
             }
             RefreshView();
             if (treeView.SelectedNode.Tag is ITechProcess)

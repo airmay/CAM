@@ -181,13 +181,17 @@ namespace CAM
         public const string Point = "POINT";
         public const string Polyline = "POLYLINE";
         public const string Ray = "RAY";
+        public const string Surface = "SURFACE";
+        public const string Region = "REGION";
 
         public static Dictionary<string, string> RusNames { get; } = new Dictionary<string, string>
         {
             [Line] = "Отрезок",
             [Arc] = "Дуга",
             [Lwpolyline] = "Полилиния",
-            [Circle] = "Круг"
+            [Circle] = "Круг",
+            [Surface] = "Поверхность",
+            [Region] = "Область",
         };
 
         //        3DFACE

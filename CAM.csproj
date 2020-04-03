@@ -111,6 +111,20 @@
     <Compile Include="Enums\Material.cs" />
     <Compile Include="Commands\ProcessCommand.cs" />
     <Compile Include="AcadObject\AcadObjectGroup.cs" />
+    <Compile Include="TechProcess\Disk3D\Comb\CombTechOperation.cs" />
+    <Compile Include="TechProcess\Disk3D\Comb\CombTechOperationView.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="TechProcess\Disk3D\Comb\CombTechOperationView.Designer.cs">
+      <DependentUpon>CombTechOperationView.cs</DependentUpon>
+    </Compile>
+    <Compile Include="TechProcess\Disk3D\Disk3DTechProcess.cs" />
+    <Compile Include="TechProcess\Disk3D\Disk3DTechProcessView.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="TechProcess\Disk3D\Disk3DTechProcessView.Designer.cs">
+      <DependentUpon>Disk3DTechProcessView.cs</DependentUpon>
+    </Compile>
     <Compile Include="TechProcess\TechProcessBase.cs" />
     <Compile Include="Tool\Location.cs" />
     <Compile Include="TechProcess\TechOperationBase.cs" />
@@ -234,6 +248,8 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+    <None Include="Properties\DataSources\CAM.Disk3D.CombTechOperation.datasource" />
+    <None Include="Properties\DataSources\CAM.Disk3D.Disk3DTechProcess.datasource" />
     <None Include="Properties\DataSources\CAM.Domain.BorderProcessingArea.datasource" />
     <None Include="Properties\DataSources\CAM.Domain.ProcessCommand.datasource" />
     <None Include="Properties\DataSources\CAM.Domain.SawingMode.datasource" />
@@ -250,6 +266,12 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
       <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="TechProcess\Disk3D\Comb\CombTechOperationView.resx">
+      <DependentUpon>CombTechOperationView.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="TechProcess\Disk3D\Disk3DTechProcessView.resx">
+      <DependentUpon>Disk3DTechProcessView.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="TechProcess\ProgramView.resx">
       <DependentUpon>ProgramView.cs</DependentUpon>
