@@ -21,8 +21,8 @@ namespace CAM.Tactile
             tactileTechProcessParamsBindingSource.DataSource = _techProcess.TactileTechProcessParams;
             tbTool.Text = _techProcess.Tool?.ToString();
             tbOrigin.Text = $"{{{_techProcess.OriginX}, {_techProcess.OriginY}}}";
-            tbContour.Text = _techProcess.ProcessingArea?.ToString();
-            tbObjects.Text = _techProcess.Objects?.ToString();
+            tbContour.Text = _techProcess.ProcessingArea?.GetDesc();
+            tbObjects.Text = _techProcess.Objects?.GetDesc();
             SetParamsEnabled();
         }
 
@@ -47,8 +47,8 @@ namespace CAM.Tactile
             var ids = Interaction.GetSelection("\nВыберите объекты контура плитки", "LINE");
             if (ids.Length == 0)
                 return;
-            _techProcess.ProcessingArea = new AcadObjectGroup(ids);
-            tbContour.Text = _techProcess.ProcessingArea.ToString();
+            _techProcess.ProcessingArea = AcadObject.CreateList(ids);
+            tbContour.Text = _techProcess.ProcessingArea.GetDesc();
             Acad.SelectObjectIds(ids);
             SetParamsEnabled();
         }
@@ -80,8 +80,8 @@ namespace CAM.Tactile
             if (ids.Length > 0)
             {
                 _techProcess.CalcType(ids);
-                _techProcess.Objects = new AcadObjectGroup(ids);
-                tbObjects.Text = _techProcess.Objects.ToString();
+                _techProcess.Objects = AcadObject.CreateList(ids);
+                tbObjects.Text = _techProcess.Objects.GetDesc();
                 tactileTechProcessBindingSource.ResetBindings(false);
                 SetParamsEnabled();
             }
@@ -98,12 +98,12 @@ namespace CAM.Tactile
 
         private void tbContour_Enter(object sender, EventArgs e)
         {
-            Acad.SelectObjectIds(_techProcess.ProcessingArea?.ObjectIds);
+            Acad.SelectAcadObjects(_techProcess.ProcessingArea);
         }
 
         private void tbObjects_Enter(object sender, EventArgs e)
         {
-            Acad.SelectObjectIds(_techProcess.Objects?.ObjectIds);
+            Acad.SelectAcadObjects(_techProcess.Objects);
         }
 
         private void tbOrigin_Enter(object sender, EventArgs e)

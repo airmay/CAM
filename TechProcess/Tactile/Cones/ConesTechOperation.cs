@@ -1,8 +1,6 @@
 ﻿using Autodesk.AutoCAD.DatabaseServices;
-using Autodesk.AutoCAD.Geometry;
 using Dreambuild.AutoCAD;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 
 namespace CAM.Tactile
@@ -43,7 +41,7 @@ namespace CAM.Tactile
             var contour = tactileTechProcess.GetContour();
             var contourPoints = contour.GetPolyPoints().ToArray();
 
-            var point = tactileTechProcess.Objects.GetCurves().OfType<Circle>().Select(p => p.Center).OrderBy(p => (int)p.Y).ThenBy(p => p.X).First();
+            var point = tactileTechProcess.Objects.Select(p => p.GetCurve()).OfType<Circle>().Select(p => p.Center).OrderBy(p => (int)p.Y).ThenBy(p => p.X).First();
             var x = point.X;
             var y = point.Y;
             var stepX = tactileTechProcess.BandSpacing.Value + tactileTechProcess.BandWidth.Value;

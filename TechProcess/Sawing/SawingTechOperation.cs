@@ -40,7 +40,7 @@ namespace CAM.Sawing
 
         public void SetFromBorder(Border border)
         {
-            ProcessingArea = new AcadObject(border.ObjectId);
+            ProcessingArea = AcadObject.Create(border.ObjectId);
             var par = ((SawingTechProcess)TechProcess).SawingTechProcessParams;
             if (SawingModes == null)
                 SawingModes = (border.ObjectId.IsLine() ? par.SawingLineModes : par.SawingCurveModes).ConvertAll(x => x.Clone());

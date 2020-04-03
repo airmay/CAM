@@ -39,7 +39,7 @@ namespace CAM.Sawing
             _borders = ids.Except(techOperations.Select(p => p.ProcessingArea.ObjectId)).Select(p => new Border(p)).ToList();
             var borders = _borders.Concat(techOperations.Select(p => new Border((SawingTechOperation)p))).ToList();
             borders.ForEach(p => p.Curve = p.ObjectId.QOpenForRead<Curve>());
-            ProcessingArea = new AcadObjectGroup(borders.Select(p => p.ObjectId).ToArray());
+            ProcessingArea = AcadObject.CreateList(borders.Select(p => p.ObjectId));
 
             while ((borders.Find(p => p.OuterSide != Side.None) ?? borders.FirstOrDefault()) is Border startBorder)
             {

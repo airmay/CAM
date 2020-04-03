@@ -14,8 +14,10 @@ namespace CAM
     {
         public static string GetDesc(this ObjectId id) => AcadObjectNames.RusNames[id.ObjectClass.DxfName];
 
-        public static string GetDesc(this ObjectId[] ids) => string.Join(",",
+        public static string GetDesc(this IEnumerable<ObjectId> ids) => string.Join(",",
             ids.GroupBy(p => p.GetDesc(), (k, c) => new { name = $"{k}({c.Count()})", count = c.Count() }).OrderByDescending(p => p.count).Select(p => p.name));
+
+        public static string GetDesc(this List<AcadObject> ids) => ids.Select(p => p.ObjectId).GetDesc();
 
         public static bool IsLine(this ObjectId id) => id.ObjectClass.DxfName == AcadObjectNames.Line;
 

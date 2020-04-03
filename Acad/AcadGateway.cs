@@ -4,7 +4,6 @@ using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.EditorInput;
 using Autodesk.AutoCAD.Geometry;
 using Autodesk.AutoCAD.GraphicsInterface;
-using Autodesk.AutoCAD.PlottingServices;
 using Autodesk.AutoCAD.Windows;
 using Dreambuild.AutoCAD;
 using System;
@@ -143,6 +142,8 @@ namespace CAM
         private static ObjectId[] _highlightedObjects = Array.Empty<ObjectId>();
 
         public static void ClearHighlighted() => _highlightedObjects = Array.Empty<ObjectId>();
+
+        public static void SelectAcadObjects(List<AcadObject> objects) => SelectObjectIds(objects?.Select(p => p.ObjectId).ToArray());
 
         public static void SelectObjectIds(params ObjectId[] objectIds)
         {

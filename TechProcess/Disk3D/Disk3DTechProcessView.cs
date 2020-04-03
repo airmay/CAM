@@ -20,7 +20,7 @@ namespace CAM.Disk3D
         {
             disk3DTechProcessBindingSource.DataSource = _techProcess = data;
             tbTool.Text = _techProcess.Tool?.ToString();
-            tbObjects.Text = _techProcess.ProcessingArea?.ToString();
+            tbObjects.Text = _techProcess.ProcessingArea?.GetDesc();
         }
 
         private void bTool_Click(object sender, EventArgs e)
@@ -45,13 +45,13 @@ namespace CAM.Disk3D
             var ids = Interaction.GetSelection("\nВыберите объекты"); //, $"{AcadObjectNames.Line},{AcadObjectNames.Arc},{AcadObjectNames.Lwpolyline}");
             if (ids.Length == 0)
                 return;
-            _techProcess.ProcessingArea = new AcadObjectGroup(ids);
-            tbObjects.Text = _techProcess.ProcessingArea.ToString();
+            _techProcess.ProcessingArea = AcadObject.CreateList(ids);
+            tbObjects.Text = _techProcess.ProcessingArea.GetDesc();
         }
 
         private void tbObjects_Enter(object sender, EventArgs e)
         {
-            Acad.SelectObjectIds(_techProcess.ProcessingArea?.ObjectIds);
+            Acad.SelectAcadObjects(_techProcess.ProcessingArea);
         }
     }
 }

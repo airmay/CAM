@@ -11,7 +11,7 @@ namespace CAM.Tactile
     [TechProcess(2, TechProcessNames.Tactile)]
     public class TactileTechProcess: TechProcessBase
     {
-        public AcadObjectGroup Objects { get; set; }
+        public List<AcadObject> Objects { get; set; }
 
         public TactileTechProcessParams TactileTechProcessParams { get; }
 
@@ -37,7 +37,7 @@ namespace CAM.Tactile
 
         public Polyline GetContour()
         {
-            var points = ProcessingArea.GetCurves().SelectMany(p => p.GetStartEndPoints());
+            var points = ProcessingArea.SelectMany(p => p.GetCurve().GetStartEndPoints());
             return NoDraw.Rectang(new Point3d(points.Min(p => p.X), points.Min(p => p.Y), 0), new Point3d(points.Max(p => p.X), points.Max(p => p.Y), 0));
         }
 

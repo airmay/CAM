@@ -15,7 +15,7 @@ namespace CAM.Sawing
         public void BindData(SawingTechOperation data)
         {
             sawingTechOperationBindingSource.DataSource = _techOperation = data;
-            tbObject.Text = _techOperation.ProcessingArea?.ToString();
+            tbObject.Text = _techOperation.ProcessingArea?.GetDesc();
             sawingModesView.sawingModesBindingSource.DataSource = _techOperation.SawingModes;
         }
 
@@ -30,7 +30,7 @@ namespace CAM.Sawing
             _techOperation.ProcessingArea = null;
             var border = ((SawingTechProcess)_techOperation.TechProcess).CreateExtraObjects(ids[0])[0];
             _techOperation.SetFromBorder(border);
-            tbObject.Text = _techOperation.ProcessingArea.ToString();
+            tbObject.Text = _techOperation.ProcessingArea.GetDesc();
             sawingTechOperationBindingSource.ResetBindings(false);
             sawingModesView.sawingModesBindingSource.DataSource = _techOperation.SawingModes;
         }

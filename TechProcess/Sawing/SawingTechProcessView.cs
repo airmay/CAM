@@ -20,7 +20,7 @@ namespace CAM.Sawing
         {
             sawingTechProcessBindingSource.DataSource = _techProcess = data;
             tbTool.Text = _techProcess.Tool?.ToString();
-            tbObjects.Text = _techProcess.ProcessingArea?.ToString();
+            tbObjects.Text = _techProcess.ProcessingArea?.GetDesc();
 
             cbObjectType.SelectedIndex = 0;
             cbObjectType_SelectedIndexChanged(cbObjectType, EventArgs.Empty);
@@ -50,12 +50,12 @@ namespace CAM.Sawing
                 return;
             Acad.DeleteExtraObjects();
             _techProcess.CreateExtraObjects(ids);
-            tbObjects.Text = _techProcess.ProcessingArea.ToString();            
+            tbObjects.Text = _techProcess.ProcessingArea.GetDesc();            
         }
 
         private void tbObjects_Enter(object sender, EventArgs e)
         {
-            Acad.SelectObjectIds(_techProcess.ProcessingArea?.ObjectIds);
+            Acad.SelectAcadObjects(_techProcess.ProcessingArea);
         }
 
         private void cbObjectType_SelectedIndexChanged(object sender, EventArgs e)

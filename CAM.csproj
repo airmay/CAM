@@ -83,7 +83,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AcadGateway.cs" />
+    <Compile Include="Acad\AcadGateway.cs" />
     <Compile Include="CamDocument.cs" />
     <Compile Include="Commands\BuilderUtils.cs" />
     <Compile Include="Commands\CommandGeneratorBase.cs" />
@@ -106,11 +106,10 @@
     <Compile Include="PaletteSet\UtilsView.Designer.cs">
       <DependentUpon>UtilsView.cs</DependentUpon>
     </Compile>
-    <Compile Include="AcadObject\AcadObject.cs" />
+    <Compile Include="Acad\AcadObject.cs" />
     <Compile Include="Enums\MachineType.cs" />
     <Compile Include="Enums\Material.cs" />
     <Compile Include="Commands\ProcessCommand.cs" />
-    <Compile Include="AcadObject\AcadObjectGroup.cs" />
     <Compile Include="TechProcess\Disk3D\Comb\CombTechOperation.cs" />
     <Compile Include="TechProcess\Disk3D\Comb\CombTechOperationView.cs">
       <SubType>UserControl</SubType>
@@ -217,7 +216,7 @@
     <Compile Include="UI\IDataView.cs" />
     <Compile Include="UI\ViewsContainer.cs" />
     <Compile Include="Utils\Exceptions.cs" />
-    <Compile Include="Graph.cs" />
+    <Compile Include="Acad\Graph.cs" />
     <Compile Include="Utils\Extensions.cs" />
     <Compile Include="Utils\IListExtensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
