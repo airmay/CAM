@@ -12,7 +12,7 @@ namespace CAM
     /// </summary>
     public static class Graph
     {
-        public static string GetDesc(this ObjectId id) => AcadObjectNames.RusNames[id.ObjectClass.DxfName];
+        public static string GetDesc(this ObjectId id) => Autodesk.AutoCAD.Internal.PropertyInspector.ObjectPropertyManagerProperties.GetDisplayName(id);
 
         public static string GetDesc(this IEnumerable<ObjectId> ids) => string.Join(",",
             ids.GroupBy(p => p.GetDesc(), (k, c) => new { name = $"{k}({c.Count()})", count = c.Count() }).OrderByDescending(p => p.count).Select(p => p.name));
@@ -186,17 +186,7 @@ namespace CAM
         public const string Surface = "SURFACE";
         public const string Region = "REGION";
 
-        public static Dictionary<string, string> RusNames { get; } = new Dictionary<string, string>
-        {
-            [Line] = "Отрезок",
-            [Arc] = "Дуга",
-            [Lwpolyline] = "Полилиния",
-            [Circle] = "Круг",
-            [Surface] = "Поверхность",
-            [Region] = "Область",
-        };
-
-        //        3DFACE
+        //3DFACE
         //3DSOLID
         //ACAD_PROXY_ENTITY
         //ARC
