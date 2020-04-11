@@ -61,7 +61,7 @@ namespace CAM
 
         public void SetActiveDocument(Document document)
         {
-            if (!_documents.ContainsKey(document))
+            if (document != null && !_documents.ContainsKey(document))
             {
                 document.CommandWillStart += Document_CommandWillStart;
                 document.BeginDocumentClose += Document_BeginDocumentClose;
@@ -69,7 +69,7 @@ namespace CAM
                 TechProcessLoader.LoadTechProsess(_documents[document]);
             }
             Acad.ClearHighlighted();
-            _camPaletteSet.SetCamDocument(_documents[document]);
+            _camPaletteSet.SetCamDocument(document != null ? _documents[document] : null);
         }
 
         private void Document_CommandWillStart(object sender, CommandEventArgs e)

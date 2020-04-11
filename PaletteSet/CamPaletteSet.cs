@@ -16,8 +16,9 @@ namespace CAM
             {
                 Style = PaletteSetStyles.NameEditable | PaletteSetStyles.ShowPropertiesMenu | PaletteSetStyles.ShowAutoHideButton | PaletteSetStyles.ShowCloseButton,
                 MinimumSize = new Size(300, 200),
-                KeepFocus = true,
-                Visible = true
+                KeepFocus = false,
+                Visible = true,
+                Dock = DockSides.Left
             };
 
             paletteSet.Add("Объекты", _techProcessView);

@@ -20,7 +20,7 @@ namespace CAM
     /// </summary>
     public static class Acad
     {
-        public static Document ActiveDocument => Application.DocumentManager.MdiActiveDocument;
+        public static Document ActiveDocument => AcadApplication.DocumentManager.MdiActiveDocument;
 
         public static Database Database => Application.DocumentManager.MdiActiveDocument.Database;
 

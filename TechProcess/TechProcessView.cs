@@ -249,11 +249,13 @@ namespace CAM
 
         private void bClose_Click(object sender, EventArgs e)
         {
-            foreach (Autodesk.AutoCAD.ApplicationServices.Document doc in Autodesk.AutoCAD.ApplicationServices.Application.DocumentManager)
-                doc.CloseAndDiscard();
+            //foreach (Document doc in Application.DocumentManager)
+            //    if (!doc.IsActive)
+            //        doc.CloseAndDiscard();
 
-            //Autodesk.AutoCAD.ApplicationServices.Application.DocumentManager.CloseAll();
-            Autodesk.AutoCAD.ApplicationServices.Application.Quit();
+            Autodesk.AutoCAD.ApplicationServices.DocumentExtension.CloseAndDiscard(Autodesk.AutoCAD.ApplicationServices.Core.Application.DocumentManager.CurrentDocument);
+            //Autodesk.AutoCAD.ApplicationServices.DocumentCollectionExtension.CloseAll(Autodesk.AutoCAD.ApplicationServices.Application.DocumentManager);
+            Autodesk.AutoCAD.ApplicationServices.Core.Application.Quit();
         }
         #endregion
 

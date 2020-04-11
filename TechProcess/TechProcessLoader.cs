@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
 
 namespace CAM
@@ -11,6 +12,12 @@ namespace CAM
     static class TechProcessLoader
     {
         private const string DataKey = "TechProcessList";
+
+        // https://adn-cis.org/serilizacziya-klassa-.net-v-bazu-chertezha-autocad.html или  https://www.rsdn.org/forum/dotnet/2900485.all
+        public sealed class MyBinder : SerializationBinder
+        {
+            public override Type BindToType(string assemblyName, string typeName) => Type.GetType(string.Format("{0}, {1}", typeName, assemblyName));
+        }
 
         /// <summary>
         /// Загрузить технологические процессы из файла чертежа
@@ -33,7 +40,7 @@ namespace CAM
                                 stream.Write(datachunk, 0, datachunk.Length);
                             }
                             stream.Position = 0;
-                            var formatter = new BinaryFormatter();
+                            var formatter = new BinaryFormatter { Binder = new MyBinder() };
                             camDocument.TechProcessList = (List<ITechProcess>)formatter.Deserialize(stream);
                         }
 
