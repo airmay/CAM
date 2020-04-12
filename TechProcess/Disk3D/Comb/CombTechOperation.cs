@@ -33,6 +33,7 @@ namespace CAM.Disk3D
         {
             var boundsModel = new Extents3d();
             var surfaces = new List<DbSurface>();
+            DbSurface unionSurface = null;
             foreach (var dBObject in TechProcess.ProcessingArea.Select(p => p.ObjectId.QOpenForRead()))
             {
                 var surface = dBObject as DbSurface;
@@ -47,15 +48,28 @@ namespace CAM.Disk3D
                 }
                 if (surface == null)
                     throw new Exception($"Объект типа {dBObject.GetType()} не может быть обработан (1)");
- //               var s = DbSurface.CreateOffsetSurface(surface, 2, true);
-                //s.AddToCurrentSpace();
-                boundsModel.AddExtents(surface.GeometricExtents);
+
+                var us  = unionSurface == null ? surface : unionSurface.BooleanUnion(surface);
+                if (us == null)
+                    break;
+                    //Acad.Write("ttt");
+                else
+                    unionSurface = us;
+                    //               var s = DbSurface.CreateOffsetSurface(surface, 2, true);
+                    //s.AddToCurrentSpace();
+                    boundsModel.AddExtents(surface.GeometricExtents);
                 surfaces.Add(surface);
             }
-            var ressuf = surfaces[0];
-            for (int i = 1; i < surfaces.Count; i++)
-                ressuf = ressuf.BooleanUnion(surfaces[i]) ?? ressuf;
-            var s = DbSurface.CreateOffsetSurface(ressuf, 2);
+
+            var tt = surfaces.OrderBy(p => p.GeometricExtents.MinPoint.Y).ToList();
+            var tt1 = surfaces.First();
+            var tt2 = surfaces.Last();
+            var tt0 = tt1.BooleanUnion(tt2);
+
+            //var ressuf = surfaces[0];
+            //for (int i = 1; i < surfaces.Count; i++)
+            //    ressuf = ressuf.BooleanUnion(surfaces[i]) ?? ressuf;
+            var s = DbSurface.CreateOffsetSurface(unionSurface, 2);
             s.AddToCurrentSpace();
             //Autodesk.AutoCAD.Geometry.NurbSurface
             return;

@@ -111,8 +111,9 @@ namespace CAM
             if (fileName != null)
                 try
                 {
-                    var separator = techProcess.MachineType.Value == MachineType.ScemaLogic ? ";" : "";
-                    var contents = processCommands?.Select(p => p.GetProgrammLine(separator)).ToArray();
+                    var prefix = techProcess.MachineType.Value == MachineType.ScemaLogic ? "" : "N";
+                    var separator = techProcess.MachineType.Value == MachineType.ScemaLogic ? ";" : " ";
+                    var contents = processCommands?.Select(p => p.GetProgrammLine(prefix, separator)).ToArray();
                     File.WriteAllLines(fileName, contents);
                     Acad.Write($"Создан файл {fileName}");
                 }

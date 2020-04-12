@@ -47,16 +47,16 @@ namespace CAM.Commands
 
         protected override string GCommandText(int gCode, string paramsString, Point3d point, Curve curve, double? angleC, double? angleA, int? feed, Point2d? center)
         {
-            var text = $"{(point.X - _originX).Round(4)}; {(point.Y - _originY).Round(4)}; ";
+            var text = $"{(point.X - _originX).Round(4)};{(point.Y - _originY).Round(4)};";
             if (gCode == 0)
-                return angleC.HasValue ? $"0; XYC; {text} {angleC.Value.Round(4)};;" : $"0; XYZ; {text}{point.Z.Round(4)};;";
+                return angleC.HasValue ? $"0;XYC;{text}{angleC.Value.Round(4)};;" : $"0;XYZ;{text}{point.Z.Round(4)};;";
 
             if (center!= null)
-                text += $"{(center.Value.X - _originX).Round(4)}; {(center.Value.Y - _originY).Round(4)};";
+                text += $"{(center.Value.X - _originX).Round(4)};{(center.Value.Y - _originY).Round(4)};";
             else
-                text += $"{point.Z.Round(4)};;";
+                text += $"{(angleC ?? _location.AngleC).Round(4)};{point.Z.Round(4)};";
 
-            return $"{gCode}; XYCZ; {feed ?? _feed}; {text}";
+            return $"{gCode};;XYCZ;{feed ?? _feed};{text}";
         }
     }
 }
