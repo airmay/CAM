@@ -16,5 +16,7 @@ namespace CAM
         public int ZSafety { get; set; }
 
         public string ProgramFileExtension { get; set; }
+
+        public string ProgramLineNumberFormat { get; set; }
     }
 }

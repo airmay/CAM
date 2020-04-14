@@ -1,6 +1,5 @@
 ﻿using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
-using System;
 
 namespace CAM
 {
@@ -12,8 +11,8 @@ namespace CAM
     {
         protected override void StartMachineCommands(string caption)
         {
-            Command($"; Donatoni \"{caption}\"");
-            Command($"; DATE {DateTime.Now}");
+            //Command($"; Donatoni \"{caption}\"");
+            //Command($"; DATE {DateTime.Now}");
 
             Command("%300");
             Command("RTCP=1");
@@ -43,7 +42,7 @@ namespace CAM
 
         protected override void StartEngineCommands()
         {
-            Command(_toolIndex == 2 ? "M8" : "M7", "Охлаждение");
+            Command(_toolNo == 2 ? "M8" : "M7", "Охлаждение");
             Command($"M3 S{_frequency}", "Шпиндель");
         }
 

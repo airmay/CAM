@@ -227,6 +227,7 @@ namespace CAM
                     node.Expand();
                 }
                 RefreshView();
+                SetButtonsEnabled();
 	        }
 	    }
 

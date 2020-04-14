@@ -76,7 +76,7 @@ namespace CAM
                 {
                     generator.StartTechOperation();
                     if (Tool != null)
-                        generator.SetTool(1, Frequency);
+                        generator.SetTool(MachineType.Value == CAM.MachineType.ScemaLogic ? Tool.Number : 1, Frequency);
                     p.BuildProcessing(generator);
                     p.ProcessCommands = generator.FinishTechOperation();
                 });

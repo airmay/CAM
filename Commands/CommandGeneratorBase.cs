@@ -10,7 +10,7 @@ namespace CAM
     public abstract class CommandGeneratorBase : ICommandGenerator
     {
         protected Location _location;
-        protected int _toolIndex;
+        protected int _toolNo;
         protected int _GCode;
         protected int _feed;
         protected double _originX, _originY;
@@ -91,11 +91,11 @@ namespace CAM
 
         public void SetTool(int toolNo, int frequency, double angleA = 0)
         {
-            if (_toolIndex != toolNo)
+            if (_toolNo != toolNo)
             {
                 StopEngine();
 
-                _toolIndex = toolNo;
+                _toolNo = toolNo;
                 _location.Set(new Point3d(double.NaN, double.NaN, UpperZ), 0, 0);
                 SetToolCommands(toolNo, angleA);
             }
@@ -130,7 +130,7 @@ namespace CAM
                 GCommand(CommandNames.InitialMove, 0, z: ZSafety);
 
             if (angleA != _location.AngleA)
-                GCommand("Наклон", 1, angleA: angleA);
+                GCommand("Наклон", 1, angleA: angleA, feed: 500);
 
             if (!_isEngineStarted)
             {
@@ -196,7 +196,7 @@ namespace CAM
         {
             Name = name,
             Text = text,
-            ToolIndex = _toolIndex,
+            ToolIndex = _toolNo,
             ToolLocation = _location
         });
 
@@ -232,7 +232,7 @@ namespace CAM
                 Name = name,
                 Text = commandText,
                 ToolpathObjectId = curve?.ObjectId,
-                ToolIndex = _toolIndex,
+                ToolIndex = _toolNo,
                 ToolLocation = _location
             });
         }

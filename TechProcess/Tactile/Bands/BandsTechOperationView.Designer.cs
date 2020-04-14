@@ -30,6 +30,7 @@
         {
             this.components = new System.ComponentModel.Container();
             this.tbFeed = new System.Windows.Forms.TextBox();
+            this.bandsTechOperationBindingSource = new System.Windows.Forms.BindingSource(this.components);
             this.label11 = new System.Windows.Forms.Label();
             this.tbProcessingAngle = new System.Windows.Forms.TextBox();
             this.label5 = new System.Windows.Forms.Label();
@@ -43,6 +44,8 @@
             this.label1 = new System.Windows.Forms.Label();
             this.bCalculate = new System.Windows.Forms.Button();
             this.gvPassList = new System.Windows.Forms.DataGridView();
+            this.posDataGridViewTextBoxColumn1 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.cuttingTypeDataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewComboBoxColumn();
             this.passListBindingSource = new System.Windows.Forms.BindingSource(this.components);
             this.tbMaxCrestWidth = new System.Windows.Forms.TextBox();
             this.label6 = new System.Windows.Forms.Label();
@@ -50,12 +53,10 @@
             this.label7 = new System.Windows.Forms.Label();
             this.bUp = new System.Windows.Forms.Button();
             this.bDown = new System.Windows.Forms.Button();
-            this.bandsTechOperationBindingSource = new System.Windows.Forms.BindingSource(this.components);
-            this.posDataGridViewTextBoxColumn1 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.cuttingTypeDataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewComboBoxColumn();
+            this.checkBox1 = new System.Windows.Forms.CheckBox();
+            ((System.ComponentModel.ISupportInitialize)(this.bandsTechOperationBindingSource)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.gvPassList)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.passListBindingSource)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.bandsTechOperationBindingSource)).BeginInit();
             this.SuspendLayout();
             // 
             // tbFeed
@@ -67,6 +68,10 @@
             this.tbFeed.Name = "tbFeed";
             this.tbFeed.Size = new System.Drawing.Size(152, 20);
             this.tbFeed.TabIndex = 33;
+            // 
+            // bandsTechOperationBindingSource
+            // 
+            this.bandsTechOperationBindingSource.DataSource = typeof(CAM.Tactile.BandsTechOperation);
             // 
             // label11
             // 
@@ -174,7 +179,7 @@
             // 
             // bCalculate
             // 
-            this.bCalculate.Location = new System.Drawing.Point(0, 220);
+            this.bCalculate.Location = new System.Drawing.Point(0, 252);
             this.bCalculate.Name = "bCalculate";
             this.bCalculate.Size = new System.Drawing.Size(75, 23);
             this.bCalculate.TabIndex = 50;
@@ -197,11 +202,28 @@
             this.posDataGridViewTextBoxColumn1,
             this.cuttingTypeDataGridViewTextBoxColumn});
             this.gvPassList.DataSource = this.passListBindingSource;
-            this.gvPassList.Location = new System.Drawing.Point(0, 249);
+            this.gvPassList.Location = new System.Drawing.Point(0, 278);
             this.gvPassList.MultiSelect = false;
             this.gvPassList.Name = "gvPassList";
-            this.gvPassList.Size = new System.Drawing.Size(257, 268);
+            this.gvPassList.Size = new System.Drawing.Size(257, 239);
             this.gvPassList.TabIndex = 60;
+            // 
+            // posDataGridViewTextBoxColumn1
+            // 
+            this.posDataGridViewTextBoxColumn1.DataPropertyName = "Pos";
+            this.posDataGridViewTextBoxColumn1.HeaderText = "Pos";
+            this.posDataGridViewTextBoxColumn1.Name = "posDataGridViewTextBoxColumn1";
+            // 
+            // cuttingTypeDataGridViewTextBoxColumn
+            // 
+            this.cuttingTypeDataGridViewTextBoxColumn.DataPropertyName = "CuttingType";
+            this.cuttingTypeDataGridViewTextBoxColumn.DisplayStyleForCurrentCellOnly = true;
+            this.cuttingTypeDataGridViewTextBoxColumn.HeaderText = "CuttingType";
+            this.cuttingTypeDataGridViewTextBoxColumn.Items.AddRange(new object[] {
+            "Гребенка",
+            "Чистка"});
+            this.cuttingTypeDataGridViewTextBoxColumn.Name = "cuttingTypeDataGridViewTextBoxColumn";
+            this.cuttingTypeDataGridViewTextBoxColumn.Resizable = System.Windows.Forms.DataGridViewTriState.True;
             // 
             // passListBindingSource
             // 
@@ -250,7 +272,7 @@
             // 
             this.bUp.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.bUp.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.bUp.Location = new System.Drawing.Point(142, 220);
+            this.bUp.Location = new System.Drawing.Point(142, 252);
             this.bUp.Name = "bUp";
             this.bUp.Size = new System.Drawing.Size(53, 23);
             this.bUp.TabIndex = 61;
@@ -262,7 +284,7 @@
             // 
             this.bDown.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.bDown.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.bDown.Location = new System.Drawing.Point(201, 220);
+            this.bDown.Location = new System.Drawing.Point(201, 252);
             this.bDown.Name = "bDown";
             this.bDown.Size = new System.Drawing.Size(53, 23);
             this.bDown.TabIndex = 62;
@@ -270,31 +292,22 @@
             this.bDown.UseVisualStyleBackColor = true;
             this.bDown.Click += new System.EventHandler(this.bDown_Click);
             // 
-            // bandsTechOperationBindingSource
+            // checkBox1
             // 
-            this.bandsTechOperationBindingSource.DataSource = typeof(CAM.Tactile.BandsTechOperation);
-            // 
-            // posDataGridViewTextBoxColumn1
-            // 
-            this.posDataGridViewTextBoxColumn1.DataPropertyName = "Pos";
-            this.posDataGridViewTextBoxColumn1.HeaderText = "Pos";
-            this.posDataGridViewTextBoxColumn1.Name = "posDataGridViewTextBoxColumn1";
-            // 
-            // cuttingTypeDataGridViewTextBoxColumn
-            // 
-            this.cuttingTypeDataGridViewTextBoxColumn.DataPropertyName = "CuttingType";
-            this.cuttingTypeDataGridViewTextBoxColumn.DisplayStyleForCurrentCellOnly = true;
-            this.cuttingTypeDataGridViewTextBoxColumn.HeaderText = "CuttingType";
-            this.cuttingTypeDataGridViewTextBoxColumn.Items.AddRange(new object[] {
-            "Гребенка",
-            "Чистка"});
-            this.cuttingTypeDataGridViewTextBoxColumn.Name = "cuttingTypeDataGridViewTextBoxColumn";
-            this.cuttingTypeDataGridViewTextBoxColumn.Resizable = System.Windows.Forms.DataGridViewTriState.True;
+            this.checkBox1.AutoSize = true;
+            this.checkBox1.DataBindings.Add(new System.Windows.Forms.Binding("Checked", this.bandsTechOperationBindingSource, "IsEdgeProcessing", true));
+            this.checkBox1.Location = new System.Drawing.Point(6, 220);
+            this.checkBox1.Name = "checkBox1";
+            this.checkBox1.Size = new System.Drawing.Size(114, 17);
+            this.checkBox1.TabIndex = 49;
+            this.checkBox1.Text = "Обработка краев";
+            this.checkBox1.UseVisualStyleBackColor = true;
             // 
             // BandsTechOperationView
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.Controls.Add(this.checkBox1);
             this.Controls.Add(this.bDown);
             this.Controls.Add(this.bUp);
             this.Controls.Add(this.tbFeedFinishing);
@@ -317,9 +330,9 @@
             this.Controls.Add(this.label1);
             this.Name = "BandsTechOperationView";
             this.Size = new System.Drawing.Size(257, 517);
+            ((System.ComponentModel.ISupportInitialize)(this.bandsTechOperationBindingSource)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.gvPassList)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.passListBindingSource)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.bandsTechOperationBindingSource)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -351,5 +364,6 @@
         private System.Windows.Forms.Button bDown;
         private System.Windows.Forms.DataGridViewTextBoxColumn posDataGridViewTextBoxColumn1;
         private System.Windows.Forms.DataGridViewComboBoxColumn cuttingTypeDataGridViewTextBoxColumn;
+        private System.Windows.Forms.CheckBox checkBox1;
     }
 }

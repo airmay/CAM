@@ -91,6 +91,7 @@ namespace CAM
                 techProcess.DeleteProcessCommands();
                 Acad.Alert("Ошибка при выполнении расчета", ex);
             }
+            Acad.Editor.UpdateScreen();
         }
 
         public void DeleteExtraObjects(ITechProcess techProcess)
@@ -111,9 +112,7 @@ namespace CAM
             if (fileName != null)
                 try
                 {
-                    var prefix = techProcess.MachineType.Value == MachineType.ScemaLogic ? "" : "N";
-                    var separator = techProcess.MachineType.Value == MachineType.ScemaLogic ? ";" : " ";
-                    var contents = processCommands?.Select(p => p.GetProgrammLine(prefix, separator)).ToArray();
+                    var contents = processCommands?.Select(p => p.GetProgrammLine(_machineSettings[techProcess.MachineType.Value].ProgramLineNumberFormat)).ToArray();
                     File.WriteAllLines(fileName, contents);
                     Acad.Write($"Создан файл {fileName}");
                 }

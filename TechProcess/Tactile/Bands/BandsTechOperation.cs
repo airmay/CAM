@@ -29,6 +29,8 @@ namespace CAM.Tactile
 
         public List<Pass> PassList { get; set; }
 
+        public bool IsEdgeProcessing { get; set; }
+        
         public BandsTechOperation(TactileTechProcess techProcess, string caption) : this(techProcess, caption, null, null) { }
 
         public BandsTechOperation(TactileTechProcess techProcess, string caption, int? processingAngle, double? bandStart) : base(techProcess, caption)
@@ -41,6 +43,7 @@ namespace CAM.Tactile
             CuttingFeed = techProcess.TactileTechProcessParams.CuttingFeed;
             FeedFinishing = techProcess.TactileTechProcessParams.FinishingFeed;
             MaxCrestWidth = (TechProcess.Tool?.Thickness).GetValueOrDefault();
+            IsEdgeProcessing = true;
         }
 
         public void CalcPassList()
@@ -91,15 +94,17 @@ namespace CAM.Tactile
             double offset = BandStart - BandSpacing - BandWidth;
             var size = (contourPoints[ProcessingAngle == 0 ? 3 : ProcessingAngle == 90 ? 1 : 2] - contourPoints[0]).Length;
 
-            if (ProcessingAngle == 45 ^ TechProcess.MachineType == MachineType.Donatoni)
-                Cutting(0.8 * thickness, CuttingFeed, -thickness);
-
-            if (offset > 0)
+            if (IsEdgeProcessing)
             {
-                var count = (int)Math.Ceiling(offset / (0.8 * thickness));
-                Algorithms.Range(-0.8 * thickness * count, -0.1, 0.8 * thickness).ForEach(p => Cutting(offset + PassList[0].Pos + p, CuttingFeed));
-            }
+                if (ProcessingAngle == 45 ^ TechProcess.MachineType == MachineType.Donatoni)
+                    Cutting(0.8 * thickness, CuttingFeed, -thickness);
 
+                if (offset > 0)
+                {
+                    var count = (int)Math.Ceiling(offset / (0.8 * thickness));
+                    Algorithms.Range(-0.8 * thickness * count, -0.1, 0.8 * thickness).ForEach(p => Cutting(offset + PassList[0].Pos + p, CuttingFeed));
+                }
+            }
             do
             {
                 foreach (var pass in PassList)
@@ -109,12 +114,14 @@ namespace CAM.Tactile
             }
             while (offset < size);
 
-            if (offset - BandSpacing < size)
-                Algorithms.Range(offset - BandSpacing, size, 0.8 * thickness).ForEach(p => Cutting(p, CuttingFeed));
+            if (IsEdgeProcessing)
+            {
+                if (offset - BandSpacing < size)
+                    Algorithms.Range(offset - BandSpacing, size, 0.8 * thickness).ForEach(p => Cutting(p, CuttingFeed));
 
-            if (ProcessingAngle == 45 ^ TechProcess.MachineType == MachineType.ScemaLogic)
-                Cutting(size - 0.8 * thickness, CuttingFeed, thickness);
-
+                if (ProcessingAngle == 45 ^ TechProcess.MachineType == MachineType.ScemaLogic)
+                    Cutting(size - 0.8 * thickness, CuttingFeed, thickness);
+            }
             ray.Dispose();
             contour.Dispose();
 

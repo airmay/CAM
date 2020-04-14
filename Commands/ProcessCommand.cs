@@ -16,6 +16,6 @@ namespace CAM
 
         public ObjectId? ToolpathObjectId { get; set; }
 
-        public string GetProgrammLine(string prefix, string separator) => $"{prefix}{Number}{separator}{Text}";
+        public string GetProgrammLine(string formatString) => string.Format(formatString, Number) + Text;
     }
 }
