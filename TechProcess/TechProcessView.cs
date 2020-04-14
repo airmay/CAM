@@ -65,8 +65,8 @@ namespace CAM
         private TreeNode CreateTechProcessNode(ITechProcess techProcess)
 	    {
             var children = techProcess.TechOperations.ConvertAll(CreateTechOperationNode).ToArray();
-            var techProcessNode = new TreeNode(techProcess.Caption, 0, 0, children) {Tag = techProcess};
-		    treeView.Nodes.Add(techProcessNode);
+            var techProcessNode = new TreeNode(techProcess.Caption + "   ", 0, 0, children) {Tag = techProcess, Checked = true, NodeFont = new Font(treeView.Font, FontStyle.Bold) };
+            treeView.Nodes.Add(techProcessNode);
             techProcessNode.ExpandAll();
             bCreateTechOperation.Enabled = true;
             bRemove.Enabled = true;
@@ -75,7 +75,7 @@ namespace CAM
             return techProcessNode;
         }
 
-        private static TreeNode CreateTechOperationNode(ITechOperation techOperation) => new TreeNode(techOperation.Caption, 1, 1) { Tag = techOperation };
+        private static TreeNode CreateTechOperationNode(ITechOperation techOperation) => new TreeNode(techOperation.Caption, 1, 1) { Tag = techOperation, Checked = techOperation.Enabled };
 
         private void ClearParamsViews()
         {
@@ -129,6 +129,12 @@ namespace CAM
 
         private void treeView_AfterLabelEdit(object sender, NodeLabelEditEventArgs e)
         {
+            treeView.LabelEdit = false;
+            if (String.IsNullOrWhiteSpace(e.Label))
+            {
+                e.CancelEdit = true;
+                return;
+            }
             e.Node.Text = e.Label;
             switch (e.Node.Tag)
             {
@@ -139,7 +145,21 @@ namespace CAM
                     techOperation.Caption = e.Label;
                     break;
             }
-        } 
+        }
+
+        private void treeView_BeforeCheck(object sender, TreeViewCancelEventArgs e) => e.Cancel = e.Node.Parent == null;
+
+        private void treeView_AfterCheck(object sender, TreeViewEventArgs e)
+        {
+            e.Node.ForeColor = e.Node.Checked ? Color.Black : Color.Gray;
+            ((ITechOperation)e.Node.Tag).Enabled = e.Node.Checked;
+        }
+
+        private void EndEdit()
+        {
+            //if (treeView.SelectedNode != null && treeView.SelectedNode.IsEditing)
+            // treeView.SelectedNode.EndEdit(false);
+        }
         #endregion
 
         #region Toolbar handlers
@@ -259,11 +279,5 @@ namespace CAM
             Autodesk.AutoCAD.ApplicationServices.Core.Application.Quit();
         }
         #endregion
-
-        private void EndEdit()
-        {
-            //if (treeView.SelectedNode != null && treeView.SelectedNode.IsEditing)
-            // treeView.SelectedNode.EndEdit(false);
-        }
     }
 }

@@ -65,14 +65,14 @@ namespace CAM
 
         public virtual void BuildProcessing(int zSafety)
         {
-            if (!Validate() || TechOperations.Any(p => p.Enabled && !p.Validate()))
+            if (!Validate() || TechOperations.Any(p => p.Enabled && p.CanProcess && !p.Validate()))
                 return;
             DeleteProcessCommands();
 
             using (var generator = CommandGeneratorFactory.Create(MachineType.Value))
             {
                 generator.StartTechProcess(Caption, OriginX, OriginY, zSafety);
-                TechOperations.FindAll(p => p.Enabled).ForEach(p =>
+                TechOperations.FindAll(p => p.Enabled && p.CanProcess).ForEach(p =>
                 {
                     generator.StartTechOperation();
                     if (Tool != null)

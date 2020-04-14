@@ -30,7 +30,7 @@ namespace CAM.Tactile
             ZEntry = 1;
         }
 
-        public override bool Enabled => TechProcess.MachineType == MachineType.Donatoni || TechProcess.MachineType == MachineType.Krea;
+        public override bool CanProcess => TechProcess.MachineType == MachineType.Donatoni || TechProcess.MachineType == MachineType.Krea;
 
         public override void BuildProcessing(ICommandGenerator generator)
         {

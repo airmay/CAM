@@ -70,7 +70,7 @@ namespace CAM.Tactile
             }
         }
 
-        public override bool Enabled => TechProcess.MachineType == MachineType.ScemaLogic || TechProcess.MachineType == MachineType.Donatoni;
+        public override bool CanProcess => TechProcess.MachineType == MachineType.ScemaLogic || TechProcess.MachineType == MachineType.Donatoni;
 
         public override bool Validate() => ToolService.Validate(TechProcess.Tool, ToolType.Disk);
 

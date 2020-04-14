@@ -58,7 +58,9 @@ namespace CAM
 
         public IEnumerable<ObjectId> ToolpathObjectIds => ProcessCommands?.Where(p => p.ToolpathObjectId != null).Select(p => p.ToolpathObjectId.Value);
 
-        public virtual bool Enabled => true;
+        public virtual bool CanProcess => true;
+
+        public bool Enabled { get; set; } = true;
 
         public virtual bool Validate() => true;
     }

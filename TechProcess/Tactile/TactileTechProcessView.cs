@@ -44,6 +44,7 @@ namespace CAM.Tactile
         private void bProcessingArea_Click(object sender, EventArgs e)
         {
             Interaction.SetActiveDocFocus();
+            Acad.SelectObjectIds();
             var ids = Interaction.GetSelection("\nВыберите объекты контура плитки", "LINE");
             if (ids.Length == 0)
                 return;
@@ -76,6 +77,7 @@ namespace CAM.Tactile
                 return;
             }
             Interaction.SetActiveDocFocus();
+            Acad.SelectObjectIds();
             var ids = Interaction.GetSelection("\nВыберите 2 элемента плитки");
             if (ids.Length > 0)
             {

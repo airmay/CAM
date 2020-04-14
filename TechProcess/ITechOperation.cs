@@ -24,7 +24,9 @@ namespace CAM
 
         void Teardown();
 
-        bool Enabled { get; }
+        bool Enabled { get; set; }
+
+        bool CanProcess { get; }
 
         bool Validate();
     }

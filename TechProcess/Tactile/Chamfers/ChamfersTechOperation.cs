@@ -25,7 +25,7 @@ namespace CAM.Tactile
             CuttingFeed = techProcess.TactileTechProcessParams.CuttingFeed;
         }
 
-        public override bool Enabled => TechProcess.MachineType == MachineType.Donatoni;
+        public override bool CanProcess => TechProcess.MachineType == MachineType.Donatoni;
 
         public override bool Validate() => ToolService.Validate(TechProcess.Tool, ToolType.Disk);
 
