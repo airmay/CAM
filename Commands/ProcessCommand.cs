@@ -10,11 +10,13 @@ namespace CAM
 
         public string Text { get; set; }
 
-        public int ToolIndex { get; set; }
+        public int ToolNumber { get; set; }
 
         public Location ToolLocation;
 
         public ObjectId? ToolpathObjectId { get; set; }
+
+        public double Duration { get; set; }
 
         public string GetProgrammLine(string formatString) => string.Format(formatString, Number) + Text;
     }

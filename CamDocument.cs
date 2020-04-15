@@ -62,7 +62,7 @@ namespace CAM
         {
             if (processCommand.ToolpathObjectId.HasValue)
                 Acad.SelectObjectIds(processCommand.ToolpathObjectId.Value);
-            Acad.ShowToolObject(techProcess.Tool, processCommand.ToolIndex, processCommand.ToolLocation, techProcess.MachineType == MachineType.Donatoni);
+            Acad.ShowToolObject(techProcess.Tool, processCommand.ToolNumber, processCommand.ToolLocation, techProcess.MachineType == MachineType.Donatoni);
         }
        
         public void BuildProcessing(ITechProcess techProcess)

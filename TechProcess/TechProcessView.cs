@@ -75,7 +75,8 @@ namespace CAM
             return techProcessNode;
         }
 
-        private static TreeNode CreateTechOperationNode(ITechOperation techOperation) => new TreeNode(techOperation.Caption, 1, 1) { Tag = techOperation, Checked = techOperation.Enabled };
+        private static TreeNode CreateTechOperationNode(ITechOperation techOperation) => 
+            new TreeNode(techOperation.Caption, 1, 1) { Tag = techOperation, Checked = techOperation.Enabled, ForeColor = techOperation.Enabled ? Color.Black : Color.Gray };
 
         private void ClearParamsViews()
         {
@@ -246,10 +247,19 @@ namespace CAM
                     node.Nodes.AddRange(CurrentTechProcess.TechOperations.ConvertAll(CreateTechOperationNode).ToArray());
                     node.Expand();
                 }
+                else
+                    UpdateCaptions();
                 RefreshView();
                 SetButtonsEnabled();
 	        }
 	    }
+
+        private void UpdateCaptions()
+        {
+            var techProcessNode = treeView.SelectedNode.Parent ?? treeView.SelectedNode;
+            techProcessNode.Text = ((ITechProcess)techProcessNode.Tag).Caption;
+            techProcessNode.Nodes.Cast<TreeNode>().ToList().ForEach(p => p.Text = ((ITechOperation)p.Tag).Caption);
+        }
 
         private void bDeleteExtraObjects_Click(object sender, EventArgs e)
         {

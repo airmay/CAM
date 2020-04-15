@@ -78,10 +78,11 @@ namespace CAM
                     if (Tool != null)
                         generator.SetTool(MachineType.Value == CAM.MachineType.ScemaLogic ? Tool.Number : 1, Frequency);
                     p.BuildProcessing(generator);
-                    p.ProcessCommands = generator.FinishTechOperation();
+                    p.ProcessCommands = generator.FinishTechOperation();                    
                 });
                 ProcessCommands = generator.FinishTechProcess();
             }
+            UpdateCaptions();
         }
 
         public virtual List<ITechOperation> CreateTechOperations() => new List<ITechOperation>();
@@ -92,6 +93,24 @@ namespace CAM
         {
             Acad.DeleteObjects(OriginObject);
             TechOperations.ForEach(to => to.Teardown());
+        }
+
+        private void UpdateCaptions()
+        {
+            var duration = 0D;
+            TechOperations.ForEach(op =>
+            {
+                var d = op.ProcessCommands?.Sum(p => p.Duration) ?? 0;
+                op.Caption = GetCaption(op.Caption, d);
+                duration += d;
+            });
+            Caption = GetCaption(Caption, duration);
+
+            string GetCaption(string text, double value)
+            {
+                var ind = text.IndexOf('(');
+                return $"{(ind > 0 ? text.Substring(0, ind).Trim() : text)} ({new TimeSpan(0, 0, 0, (int)value)})";
+            }
         }
     }
 }

@@ -196,18 +196,20 @@ namespace CAM
         {
             Name = name,
             Text = text,
-            ToolIndex = _toolNo,
+            ToolNumber = _toolNo,
             ToolLocation = _location
         });
 
         public void GCommand(string name, int gCode, string paramsString = null, Point3d? point = null, double? x = null, double? y = null, double? z = null,
             double? angleC = null, double? angleA = null, Curve curve = null, int? feed = null, Point2d? center = null)
         {
+            var command = new ProcessCommand { Name = name };
+
             if (point == null)
                 point = new Point3d(x ?? _location.Point.X, y ?? _location.Point.Y, z ?? _location.Point.Z);
 
-            var commandText = GCommandText(gCode, paramsString, point.Value, curve, angleC, angleA, feed, center);
-
+            command.Text = GCommandText(gCode, paramsString, point.Value, curve, angleC, angleA, feed, center);
+            
             if (_location.IsDefined)
             {
                 if (curve == null && _location.Point.DistanceTo(point.Value) > 1)
@@ -220,21 +222,20 @@ namespace CAM
                     curve.LayerId = _layerId;
                     _currentSpace.AppendEntity(curve);
                     _transaction.AddNewlyCreatedDBObject(curve, true);
+
+                    command.Duration = curve.Length() / (gCode == 0 ? 10000 : feed ?? _feed) * 60;
                 }
+                command.ToolpathObjectId = curve?.ObjectId;
             }
 
             _GCode = gCode;
             _location.Set(point.Value, angleC, angleA);
             _feed = feed ?? _feed;
 
-            _commands.Add(new ProcessCommand
-            {
-                Name = name,
-                Text = commandText,
-                ToolpathObjectId = curve?.ObjectId,
-                ToolIndex = _toolNo,
-                ToolLocation = _location
-            });
+            command.ToolNumber = _toolNo;
+            command.ToolLocation = _location;
+
+            _commands.Add(command);
         }
 
         protected abstract string GCommandText(int gCode, string paramsString, Point3d point, Curve curve, double? angleC, double? angleA, int? feed, Point2d? center);
