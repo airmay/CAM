@@ -55,6 +55,7 @@ namespace CAM
             if (techOperation.ProcessingArea != null)
                 Acad.SelectObjectIds(techOperation.ProcessingArea.ObjectId);
             techOperation.TechProcess.TechOperations.ForEach(p => p.SetToolpathVisible(p == techOperation));
+            Acad.DeleteToolObject();
             Acad.Editor.UpdateScreen();
         }
 
@@ -83,7 +84,6 @@ namespace CAM
                 Acad.DeleteExtraObjects();
 
                 techProcess.BuildProcessing(_machineSettings[techProcess.MachineType.Value].ZSafety);
-
                 Acad.Write("Расчет обработки завершен");
             }
             catch (Exception ex)
@@ -91,6 +91,17 @@ namespace CAM
                 techProcess.DeleteProcessCommands();
                 Acad.Alert("Ошибка при выполнении расчета", ex);
             }
+            Acad.Editor.UpdateScreen();
+        }
+
+        public void PartialProcessing(ITechProcess techProcess, ProcessCommand processCommand)
+        {
+            Acad.Write($"Выполняется формирование программы обработки по техпроцессу {techProcess.Caption} с команды номер {processCommand.Number}");
+
+            var toolpathObjectIds = techProcess.ToolpathObjectIds.ToList();
+            techProcess.SkipProcessing(processCommand, _machineSettings[techProcess.MachineType.Value].ZSafety);
+
+            Acad.DeleteObjects(toolpathObjectIds.Except(techProcess.ToolpathObjectIds));
             Acad.Editor.UpdateScreen();
         }
 

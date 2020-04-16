@@ -235,10 +235,11 @@ namespace CAM
 		    }
 	    }
 
-	    private void bBuildProcessing_Click(object sender, EventArgs e)
-	    {
-	        if (CurrentTechProcess != null)
-	        {
+
+        private void bBuildProcessing_ButtonClick(object sender, EventArgs e)
+        {
+            if (CurrentTechProcess != null)
+            {
                 treeView.Focus();
                 _camDocument.BuildProcessing(CurrentTechProcess);
                 var node = treeView.SelectedNode;
@@ -251,14 +252,21 @@ namespace CAM
                     UpdateCaptions();
                 RefreshView();
                 SetButtonsEnabled();
-	        }
-	    }
+            }
+        }
 
         private void UpdateCaptions()
         {
             var techProcessNode = treeView.SelectedNode.Parent ?? treeView.SelectedNode;
             techProcessNode.Text = ((ITechProcess)techProcessNode.Tag).Caption;
             techProcessNode.Nodes.Cast<TreeNode>().ToList().ForEach(p => p.Text = ((ITechOperation)p.Tag).Caption);
+        }
+
+        private void bPartialProcessing_Click(object sender, EventArgs e)
+        {
+            _camDocument.PartialProcessing(CurrentTechProcess, processCommandBindingSource.Current as ProcessCommand);
+            UpdateCaptions();
+            RefreshView();
         }
 
         private void bDeleteExtraObjects_Click(object sender, EventArgs e)

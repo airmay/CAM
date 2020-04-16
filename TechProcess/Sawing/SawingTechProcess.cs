@@ -13,8 +13,6 @@ namespace CAM.Sawing
     {
         public SawingTechProcessParams SawingTechProcessParams { get; }
 
-        public int PenetrationFeed { get; set; }
-
         public double? Thickness { get; set; }
 
         [NonSerialized]

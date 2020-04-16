@@ -22,6 +22,8 @@ namespace CAM
 
         public int Frequency { get; set; }
 
+        public int PenetrationFeed { get; set; }
+
         public List<AcadObject> ProcessingArea { get; set; }
 
         public List<ITechOperation> TechOperations { get; } = new List<ITechOperation>();
@@ -78,6 +80,8 @@ namespace CAM
                     if (Tool != null)
                         generator.SetTool(MachineType.Value == CAM.MachineType.ScemaLogic ? Tool.Number : 1, Frequency);
                     p.BuildProcessing(generator);
+                    if (!generator.IsUpperTool)
+                        generator.Uplifting();
                     p.ProcessCommands = generator.FinishTechOperation();                    
                 });
                 ProcessCommands = generator.FinishTechProcess();
@@ -85,14 +89,34 @@ namespace CAM
             UpdateCaptions();
         }
 
-        public virtual List<ITechOperation> CreateTechOperations() => new List<ITechOperation>();
-
-        public virtual bool Validate() => true;
-
-        public virtual void Teardown()
+        public virtual void SkipProcessing(ProcessCommand processCommand, int zSafety)
         {
-            Acad.DeleteObjects(OriginObject);
-            TechOperations.ForEach(to => to.Teardown());
+            List<ProcessCommand> techOperationCommands;
+            List<ProcessCommand> techProcessCommands;
+            using (var generator = CommandGeneratorFactory.Create(MachineType.Value))
+            {
+                generator.StartTechProcess(Caption, OriginX, OriginY, zSafety);
+                generator.StartTechOperation();
+                generator.SetTool(processCommand.ToolNumber, Frequency);
+                var loc = ProcessCommands[ProcessCommands.IndexOf(processCommand) - 1].ToolLocation;
+                generator.Move(loc.Point.X, loc.Point.Y, angleC: loc.AngleC, angleA: loc.AngleA);
+                generator.GCommand(CommandNames.Penetration, 1, point: loc.Point, feed: PenetrationFeed);
+                techOperationCommands = generator.FinishTechOperation();
+                techProcessCommands = generator.FinishTechProcess();
+            }
+            foreach (var techOperation in TechOperations)
+            {
+                if (techOperation.ProcessCommands?.Last().Number >= processCommand.Number)
+                {
+                    techOperation.ProcessCommands = techOperationCommands.Concat(techOperation.ProcessCommands.SkipWhile(p => p.Number < processCommand.Number)).ToList();
+                    break;
+                }
+                else
+                    techOperation.ProcessCommands = null;
+            }
+            ProcessCommands = techProcessCommands.TakeWhile(p => !techOperationCommands.Contains(p)).Concat(techOperationCommands)
+                .Concat(ProcessCommands.SkipWhile(p => p.Number < processCommand.Number)).ToList();
+            UpdateCaptions();
         }
 
         private void UpdateCaptions()
@@ -111,6 +135,16 @@ namespace CAM
                 var ind = text.IndexOf('(');
                 return $"{(ind > 0 ? text.Substring(0, ind).Trim() : text)} ({new TimeSpan(0, 0, 0, (int)value)})";
             }
+        }
+
+        public virtual List<ITechOperation> CreateTechOperations() => new List<ITechOperation>();
+
+        public virtual bool Validate() => true;
+
+        public virtual void Teardown()
+        {
+            Acad.DeleteObjects(OriginObject);
+            TechOperations.ForEach(to => to.Teardown());
         }
     }
 }

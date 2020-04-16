@@ -32,5 +32,7 @@ namespace CAM
         void Setup();
 
         void Teardown();
+
+        void SkipProcessing(ProcessCommand processCommand, int zSafety);
     }
 }

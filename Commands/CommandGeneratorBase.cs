@@ -82,12 +82,7 @@ namespace CAM
 
         public void StartTechOperation() => _startRangeIndex = _commands.Count;
 
-        public List<ProcessCommand> FinishTechOperation()
-        {
-            if (!IsUpperTool)
-                Uplifting();
-            return _commands.GetRange(_startRangeIndex, _commands.Count - _startRangeIndex);
-        }
+        public List<ProcessCommand> FinishTechOperation() => _commands.GetRange(_startRangeIndex, _commands.Count - _startRangeIndex);
 
         public void SetTool(int toolNo, int frequency, double angleA = 0)
         {
@@ -223,7 +218,8 @@ namespace CAM
                     _currentSpace.AppendEntity(curve);
                     _transaction.AddNewlyCreatedDBObject(curve, true);
 
-                    command.Duration = curve.Length() / (gCode == 0 ? 10000 : feed ?? _feed) * 60;
+                    if ((feed ?? _feed) != 0)
+                        command.Duration = curve.Length() / (gCode == 0 ? 10000 : feed ?? _feed) * 60;
                 }
                 command.ToolpathObjectId = curve?.ObjectId;
             }

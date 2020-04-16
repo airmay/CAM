@@ -33,6 +33,7 @@ namespace CAM.Tactile
         {
             TactileTechProcessParams = @params.Clone();
             Material = CAM.Material.Granite;
+            PenetrationFeed = TactileTechProcessParams.PenetrationFeed;
         }
 
         public Polyline GetContour()
