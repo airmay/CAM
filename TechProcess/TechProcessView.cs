@@ -17,7 +17,7 @@ namespace CAM
             InitializeComponent();
 
             imageList.Images.AddRange(new Image[] { Properties.Resources.drive, Properties.Resources.drive_download });
-            SetButtonsEnabled();
+            RefreshToolButtonsState();
 
             bDeleteProcessing.Visible = false;
 #if DEBUG
@@ -30,18 +30,18 @@ namespace CAM
         public void SetCamDocument(CamDocument camDocument)
         {
             _camDocument = camDocument;
-
+            _currentTechProcessType = null;
             if (bCreateTechProcess.DropDownItems.Count == 0)
-                CreateTechProcessItems();
+                Init();
             ClearParamsViews();
             treeView.Nodes.Clear();
             _camDocument?.TechProcessList.ForEach(p => CreateTechProcessNode(p));
             treeView.SelectedNode = treeView.Nodes.Count > 0 ? treeView.Nodes[0] : null;
             toolStrip1.Enabled = _camDocument != null;
-            SetButtonsEnabled();
+            RefreshToolButtonsState();
         }
 
-        private void CreateTechProcessItems()
+        private void Init()
         {
             bCreateTechProcess.DropDownItems.AddRange(_camDocument.GetTechProcessNames().Select(p =>
             {
@@ -59,25 +59,7 @@ namespace CAM
             .ToArray());
         }
 
-        private void SetButtonsEnabled() => bCreateTechOperation.Enabled = bRemove.Enabled = bMoveUpTechOperation.Enabled = bMoveDownTechOperation.Enabled = 
-            bBuildProcessing.Enabled = bSendProgramm.Enabled = treeView.Nodes.Count > 0;
-
-        private TreeNode CreateTechProcessNode(ITechProcess techProcess)
-	    {
-            var children = techProcess.TechOperations.ConvertAll(CreateTechOperationNode).ToArray();
-            var techProcessNode = new TreeNode(techProcess.Caption + "   ", 0, 0, children) {Tag = techProcess, Checked = true, NodeFont = new Font(treeView.Font, FontStyle.Bold) };
-            treeView.Nodes.Add(techProcessNode);
-            techProcessNode.ExpandAll();
-            bCreateTechOperation.Enabled = true;
-            bRemove.Enabled = true;
-            bBuildProcessing.Enabled = true;
-
-            return techProcessNode;
-        }
-
-        private static TreeNode CreateTechOperationNode(ITechOperation techOperation) => 
-            new TreeNode(techOperation.Caption, 1, 1) { Tag = techOperation, Checked = techOperation.Enabled, ForeColor = techOperation.Enabled ? Color.Black : Color.Gray };
-
+        #region Views
         private void ClearParamsViews()
         {
             foreach (Control control in tabPageParams.Controls)
@@ -98,11 +80,24 @@ namespace CAM
             var dataObject = treeView.SelectedNode.Tag;
             ViewsContainer.BindData(dataObject, tabPageParams);
             processCommandBindingSource.DataSource = ((IHasProcessCommands)dataObject).ProcessCommands;
-            bDeleteProcessing.Enabled = CurrentTechProcess.ProcessCommands != null;
+        }
+        #endregion
+
+        #region Tree
+        private TreeNode CreateTechProcessNode(ITechProcess techProcess)
+        {
+            var children = techProcess.TechOperations.ConvertAll(CreateTechOperationNode).ToArray();
+            var techProcessNode = new TreeNode(techProcess.Caption + "   ", 0, 0, children) { Tag = techProcess, Checked = true, NodeFont = new Font(treeView.Font, FontStyle.Bold) };
+            treeView.Nodes.Add(techProcessNode);
+            techProcessNode.ExpandAll();
+            RefreshToolButtonsState();
+
+            return techProcessNode;
         }
 
+        private static TreeNode CreateTechOperationNode(ITechOperation techOperation) =>
+            new TreeNode(techOperation.Caption, 1, 1) { Tag = techOperation, Checked = techOperation.Enabled, ForeColor = techOperation.Enabled ? Color.Black : Color.Gray };
 
-        #region treeView
         private void treeView_AfterSelect(object sender, TreeViewEventArgs e)
         {
             if (CurrentTechProcess.GetType() != _currentTechProcessType)
@@ -112,8 +107,8 @@ namespace CAM
                 if (_techOperationItems.ContainsKey(_currentTechProcessType))
                     bCreateTechOperation.DropDownItems.AddRange(
                         new List<ToolStripItem> { new ToolStripMenuItem("Все операции", null, new EventHandler(bCreateTechOperation_Click)), new ToolStripSeparator() }
-                        .Concat(_techOperationItems[CurrentTechProcess.GetType()]).ToArray());
-                bCreateTechOperation.Enabled = bCreateTechOperation.DropDownItems.Count > 0;
+                        .Concat(_techOperationItems[CurrentTechProcess.GetType()]).ToArray());                
+                RefreshToolButtonsState();
             }
             RefreshView();
             if (treeView.SelectedNode.Tag is ITechProcess)
@@ -163,7 +158,14 @@ namespace CAM
         }
         #endregion
 
-        #region Toolbar handlers
+        #region ToolButtons
+
+        private void RefreshToolButtonsState()
+        {
+            bRemove.Enabled = bMoveUpTechOperation.Enabled = bMoveDownTechOperation.Enabled = bBuildProcessing.Enabled = treeView.SelectedNode != null;
+            bCreateTechOperation.Enabled = treeView.SelectedNode != null && bCreateTechOperation.DropDownItems.Count > 0;
+            bDeleteExtraObjects.Enabled = bSendProgramm.Enabled = bPartialProcessing.Enabled = CurrentTechProcess?.ProcessCommands != null;
+        }
 
         private void createTechProcessItem_Click(object sender, EventArgs e)
         {
@@ -201,7 +203,7 @@ namespace CAM
                 Acad.SelectObjectIds();
                 ClearParamsViews();
                 treeView.SelectedNode.Remove();
-                SetButtonsEnabled();
+                RefreshToolButtonsState();
             }
         }
 
@@ -235,7 +237,6 @@ namespace CAM
 		    }
 	    }
 
-
         private void bBuildProcessing_ButtonClick(object sender, EventArgs e)
         {
             if (CurrentTechProcess != null)
@@ -251,15 +252,8 @@ namespace CAM
                 else
                     UpdateCaptions();
                 RefreshView();
-                SetButtonsEnabled();
+                RefreshToolButtonsState();
             }
-        }
-
-        private void UpdateCaptions()
-        {
-            var techProcessNode = treeView.SelectedNode.Parent ?? treeView.SelectedNode;
-            techProcessNode.Text = ((ITechProcess)techProcessNode.Tag).Caption;
-            techProcessNode.Nodes.Cast<TreeNode>().ToList().ForEach(p => p.Text = ((ITechOperation)p.Tag).Caption);
         }
 
         private void bPartialProcessing_Click(object sender, EventArgs e)
@@ -267,6 +261,13 @@ namespace CAM
             _camDocument.PartialProcessing(CurrentTechProcess, processCommandBindingSource.Current as ProcessCommand);
             UpdateCaptions();
             RefreshView();
+        }
+
+        private void UpdateCaptions()
+        {
+            var techProcessNode = treeView.SelectedNode.Parent ?? treeView.SelectedNode;
+            techProcessNode.Text = ((ITechProcess)techProcessNode.Tag).Caption;
+            techProcessNode.Nodes.Cast<TreeNode>().ToList().ForEach(p => p.Text = ((ITechOperation)p.Tag).Caption);
         }
 
         private void bDeleteExtraObjects_Click(object sender, EventArgs e)

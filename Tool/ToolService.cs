@@ -38,7 +38,7 @@ namespace CAM
             string message = null;
             if (tool == null)
                 message = "Выберите инструмент";
-            if (tool.Type != toolType)
+            else if(tool.Type != toolType)
                 message = $"Выберите инструмент типа {toolType.GetDescription()}";
             else
             {
