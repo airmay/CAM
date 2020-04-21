@@ -35,7 +35,6 @@ namespace CAM.Disk3D
 
         public override void BuildProcessing(ICommandGenerator generator)
         {
-            Departure = 150;
             generator.ZSafety += (int)TechProcess.Thickness.Value;
             generator.ToolLocation.Point += Vector3d.ZAxis * TechProcess.Thickness.Value;
 

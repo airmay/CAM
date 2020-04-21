@@ -1,5 +1,4 @@
 ﻿using Autodesk.AutoCAD.Windows;
-using CAM.UI;
 using System.Drawing;
 
 namespace CAM
