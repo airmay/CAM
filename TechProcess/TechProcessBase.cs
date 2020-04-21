@@ -18,6 +18,8 @@ namespace CAM
 
         public Material? Material { get; set; }
 
+        public double? Thickness { get; set; }
+
         public Tool Tool { get; set; }
 
         public int Frequency { get; set; }

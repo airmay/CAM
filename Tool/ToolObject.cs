@@ -14,7 +14,7 @@ namespace CAM
 
         public int Index { get; set; }
 
-        public Location Location;
+        public Location Location { get; set; }
 
         public static ToolObject CreateToolObject(Tool tool, int index, bool isFrontPlaneZero)
         {
@@ -24,11 +24,11 @@ namespace CAM
                 var toolModel = new ToolObject
                 {
                     Tool = tool,
-                    Index = index
+                    Index = index,
+                    Location = new Location { Point = Point3d.Origin }
                 };
                 if (index == 1)
                 {
-
                     var circle0 = new Circle(new Point3d(0, isFrontPlaneZero ? 0 : -tool.Thickness.Value, tool.Diameter / 2), Vector3d.YAxis, tool.Diameter / 2);
                     var circle1 = new Circle(circle0.Center + Vector3d.YAxis * tool.Thickness.Value, Vector3d.YAxis, tool.Diameter / 2);
                     var axis = new Line(circle1.Center, circle1.Center + Vector3d.YAxis * tool.Diameter / 4);

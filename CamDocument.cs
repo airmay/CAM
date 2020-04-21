@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 
@@ -80,11 +81,14 @@ namespace CAM
                 }
 
                 Acad.Write($"Выполняется расчет обработки по техпроцессу {techProcess.Caption} ...");
+                var stopwatch = Stopwatch.StartNew();
                 Acad.DeleteObjects(techProcess.ToolpathObjectIds);
                 Acad.DeleteExtraObjects();
 
                 techProcess.BuildProcessing(_machineSettings[techProcess.MachineType.Value].ZSafety);
-                Acad.Write("Расчет обработки завершен");
+
+                stopwatch.Stop();
+                Acad.Write($"Расчет обработки завершен {stopwatch.Elapsed}");
             }
             catch (Exception ex)
             {

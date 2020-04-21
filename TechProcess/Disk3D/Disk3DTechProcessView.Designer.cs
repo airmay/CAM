@@ -134,6 +134,7 @@
             this.tbObjects.Size = new System.Drawing.Size(130, 20);
             this.tbObjects.TabIndex = 84;
             this.tbObjects.Enter += new System.EventHandler(this.tbObjects_Enter);
+            this.tbObjects.Leave += new System.EventHandler(this.tbObjects_Leave);
             // 
             // label8
             // 

@@ -9,7 +9,6 @@ namespace CAM
 {
     public abstract class CommandGeneratorBase : ICommandGenerator
     {
-        protected Location _location;
         protected int _toolNo;
         protected int _GCode;
         protected int _feed;
@@ -35,8 +34,9 @@ namespace CAM
         };
 
         public int ZSafety { get; set; }
-        public bool IsUpperTool => _location.Point.Z >= ZSafety;
+        public bool IsUpperTool => !ToolLocation.IsDefined || ToolLocation.Point.Z >= ZSafety;
         public bool WithThick { get; set; }
+        public Location ToolLocation { get; set; } = new Location();
 
         public void StartTechProcess(string caption, double originX, double originY, int zSafety)
         {
@@ -91,7 +91,7 @@ namespace CAM
                 StopEngine();
 
                 _toolNo = toolNo;
-                _location.Set(new Point3d(double.NaN, double.NaN, UpperZ), 0, 0);
+                ToolLocation.Set(new Point3d(double.NaN, double.NaN, UpperZ), 0, 0);
                 SetToolCommands(toolNo, angleA);
             }
             _frequency = frequency;
@@ -113,7 +113,7 @@ namespace CAM
         /// </summary>
         public void Uplifting(double? z = null) => GCommand(CommandNames.Uplifting, 0, z: z ?? ZSafety);
 
-        public void Uplifting(Vector3d vector) => GCommand(CommandNames.Uplifting, 0, point: _location.Point + vector);
+        public void Uplifting(Vector3d vector) => GCommand(CommandNames.Uplifting, 0, point: ToolLocation.Point + vector);
 
         /// <summary>
         /// Подвод
@@ -124,7 +124,7 @@ namespace CAM
             if (!_isEngineStarted)
                 GCommand(CommandNames.InitialMove, 0, z: ZSafety);
 
-            if (angleA != _location.AngleA)
+            if (angleA != ToolLocation.AngleA)
                 GCommand("Наклон", 1, angleA: angleA, feed: 500);
 
             if (!_isEngineStarted)
@@ -151,11 +151,11 @@ namespace CAM
         /// </summary>
         public void Cutting(Curve curve, int cuttingFeed, int transitionFeed, Side engineSide = Side.None)
         {
-            var point = curve.GetClosestPoint(_location.Point);
-            var angleC = _location.AngleC;
+            var point = curve.GetClosestPoint(ToolLocation.Point);
+            var angleC = ToolLocation.AngleC;
             if (!(curve is Line))
                 angleC = BuilderUtils.CalcToolAngle(curve, point, engineSide);
-            GCommand(point.Z != _location.Point.Z ? CommandNames.Penetration : CommandNames.Transition, 1, point: point, angleC: angleC, feed: transitionFeed);
+            GCommand(point.Z != ToolLocation.Point.Z ? CommandNames.Penetration : CommandNames.Transition, 1, point: point, angleC: angleC, feed: transitionFeed);
 
             if (curve is Polyline polyline)
             {
@@ -192,7 +192,7 @@ namespace CAM
             Name = name,
             Text = text,
             ToolNumber = _toolNo,
-            ToolLocation = _location
+            ToolLocation = ToolLocation.Clone()
         });
 
         public void GCommand(string name, int gCode, string paramsString = null, Point3d? point = null, double? x = null, double? y = null, double? z = null,
@@ -201,14 +201,14 @@ namespace CAM
             var command = new ProcessCommand { Name = name };
 
             if (point == null)
-                point = new Point3d(x ?? _location.Point.X, y ?? _location.Point.Y, z ?? _location.Point.Z);
+                point = new Point3d(x ?? ToolLocation.Point.X, y ?? ToolLocation.Point.Y, z ?? ToolLocation.Point.Z);
 
             command.Text = GCommandText(gCode, paramsString, point.Value, curve, angleC, angleA, feed, center);
             
-            if (_location.IsDefined)
+            if (ToolLocation.IsDefined)
             {
-                if (curve == null && _location.Point.DistanceTo(point.Value) > 1)
-                    curve = NoDraw.Line(_location.Point, point.Value);
+                if (curve == null && ToolLocation.Point.DistanceTo(point.Value) > 1)
+                    curve = NoDraw.Line(ToolLocation.Point, point.Value);
 
                 if (curve != null && curve.IsNewObject)
                 {
@@ -225,11 +225,11 @@ namespace CAM
             }
 
             _GCode = gCode;
-            _location.Set(point.Value, angleC, angleA);
+            ToolLocation.Set(point.Value, angleC, angleA);
             _feed = feed ?? _feed;
 
             command.ToolNumber = _toolNo;
-            command.ToolLocation = _location;
+            command.ToolLocation = ToolLocation.Clone();
 
             _commands.Add(command);
         }

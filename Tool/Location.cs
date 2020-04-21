@@ -2,9 +2,9 @@
 
 namespace CAM
 {
-    public struct Location
+    public class Location
     {
-        public Point3d Point { get; set; }
+        public Point3d Point { get; set; } = new Point3d(double.NaN, double.NaN, double.NaN);
         public double AngleC { get; set; }
         public double AngleA { get; set; }
 
@@ -16,5 +16,7 @@ namespace CAM
         }
 
         public bool IsDefined => !double.IsNaN(Point.X) && !double.IsNaN(Point.Y) && !double.IsNaN(Point.Z);
+
+        public Location Clone() => (Location)this.MemberwiseClone();
     }
 }

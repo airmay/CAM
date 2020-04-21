@@ -40,5 +40,7 @@ namespace CAM
 
         int ZSafety { get; set; }
 
+        Location ToolLocation { get; set; }
+
     }
 }

@@ -58,9 +58,9 @@ namespace CAM
 
         protected override string GCommandText(int gCode, string paramsString, Point3d point, Curve curve, double? angleC, double? angleA, int? feed, Point2d? center)
         {
-            return $"G{gCode}{Format("X", point.X, _location.Point.X, _originX)}{Format("Y", point.Y, _location.Point.Y, _originY)}" +
+            return $"G{gCode}{Format("X", point.X, ToolLocation.Point.X, _originX)}{Format("Y", point.Y, ToolLocation.Point.Y, _originY)}" +
                 $"{FormatIJ("I", center?.X, _originX)}{FormatIJ("J", center?.Y, _originY)}" +
-                $"{Format("Z", point.Z, _location.Point.Z, withThick: WithThick)}{Format("C", angleC, _location.AngleC)}{Format("A", angleA, _location.AngleA)}" +
+                $"{Format("Z", point.Z, ToolLocation.Point.Z, withThick: WithThick)}{Format("C", angleC, ToolLocation.AngleC)}{Format("A", angleA, ToolLocation.AngleA)}" +
                 $"{Format("F", feed, _feed)}";
 
             string Format(string label, double? value, double oldValue, double origin = 0, bool withThick = false) =>

@@ -42,7 +42,7 @@ namespace CAM.Disk3D
         {
             Acad.SelectObjectIds();
             Interaction.SetActiveDocFocus();
-            var ids = Interaction.GetSelection("\nВыберите объекты"); //, $"{AcadObjectNames.Line},{AcadObjectNames.Arc},{AcadObjectNames.Lwpolyline}");
+            var ids = Interaction.GetSelection("\nВыберите объекты", $"{AcadObjectNames.Surface},{AcadObjectNames.Region}");
             if (ids.Length == 0)
                 return;
             _techProcess.ProcessingArea = AcadObject.CreateList(ids);
@@ -52,6 +52,11 @@ namespace CAM.Disk3D
         private void tbObjects_Enter(object sender, EventArgs e)
         {
             Acad.SelectAcadObjects(_techProcess.ProcessingArea);
+        }
+
+        private void tbObjects_Leave(object sender, EventArgs e)
+        {
+            Acad.SelectObjectIds();
         }
     }
 }
