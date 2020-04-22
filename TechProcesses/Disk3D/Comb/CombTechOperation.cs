@@ -38,26 +38,8 @@ namespace CAM.Disk3D
             generator.ZSafety += (int)TechProcess.Thickness.Value;
             generator.ToolLocation.Point += Vector3d.ZAxis * TechProcess.Thickness.Value;
 
-            var bounds = new Extents3d();
-            DbSurface unionSurface = null;
-            foreach (var dBObject in TechProcess.ProcessingArea.Select(p => p.ObjectId.QOpenForRead()))
-            {
-                var surface = dBObject as DbSurface;
-                if (dBObject is Region region)
-                {
-                    surface = new PlaneSurface();
-                    ((PlaneSurface)surface).CreateFromRegion(region);
-                }
-                if (surface == null)
-                    throw new Exception($"Объект типа {dBObject.GetType()} не может быть обработан (1)");
-
-                var us = unionSurface == null ? surface : unionSurface.BooleanUnion(surface);
-                if (us != null)
-                    unionSurface = us;
-                bounds.AddExtents(surface.GeometricExtents);
-            }
-            var offsetSurfaces = DbSurface.CreateOffsetSurface(unionSurface, Delta) as DbSurface;
-
+            var offsetSurface = CreateOffsetSurface();
+            var bounds = offsetSurface.GeometricExtents;
 
             //var ray = new Ray { UnitDir = Vector3d.XAxis };
             //var y = StartPass;
@@ -151,14 +133,13 @@ namespace CAM.Disk3D
                     {
                         if (y + s > bounds.MaxPoint.Y)
                             break;
-                        offsetSurfaces.RayTest(new Point3d(x, y + s, bounds.MinPoint.Z), Vector3d.ZAxis, 0.0001, out SubentityId[] col, out DoubleCollection par);
+                        offsetSurface.RayTest(new Point3d(x, y + s, bounds.MinPoint.Z), Vector3d.ZAxis, 0.0001, out SubentityId[] col, out DoubleCollection par);
                         if (par.Count == 0)
                         {
                             z = 0;
                             break;
                         }
-                        else if (par[0] > z)
-                            z = par[0];
+                        z = par[par.Count - 1] > z ? par[par.Count - 1] : z;
                     }
                     if (z > 0)
                     {
@@ -170,57 +151,101 @@ namespace CAM.Disk3D
                             points.Add(point);
                     }
                 }
-                var pline = new PolylineCurve3d(points);
-                var distance = TechProcess.Tool.Diameter / 2;
-                var offsetCurves = pline.GetTrimmedOffset(distance, -Vector3d.YAxis, OffsetCurveExtensionType.Fillet);
-                var matrix = Matrix3d.Displacement(Vector3d.ZAxis.Negate() * distance);
-                offsetCurves.ForEach(p => p.TransformBy(matrix));
+                if (points.Count == 0)
+                    continue;
 
-                var firstPoint = offsetCurves[0].StartPoint;
-                var departurePoint = new Point3d((IsDepartureOnBorderSection ? firstPoint.X : bounds.MinPoint.X) - Departure, firstPoint.Y, firstPoint.Z);
-                var offsetPoints = new List<Point3d> { departurePoint, firstPoint };
-
-                switch (offsetCurves[0])
-                {
-                    case LineSegment3d line:
-                        CalcLine(line);
-                        break;
-                    case CircularArc3d arc:
-                        CalcArc(arc);
-                        break;
-                    case CompositeCurve3d curve:
-                        curve.GetCurves().ForEach(p =>
-                            {
-                                if (p is CircularArc3d arc)
-                                    CalcArc(arc);
-                                else
-                                    CalcLine((LineSegment3d)p);
-                            });
-                        break;
-                    default:
-                        throw new Exception($"Полученный тип кривой не может быть обработан {offsetCurves[0].GetType()}");
-                }
-
-                var lastPoint = offsetPoints.Last();
-                offsetPoints.Add(new Point3d((IsDepartureOnBorderSection ? lastPoint.X : bounds.MaxPoint.X) + Departure, lastPoint.Y, lastPoint.Z));
+                var offsetPoints = CalcOffsetPoints(points, bounds);
 
                 var loc = generator.ToolLocation;
                 if (loc.IsDefined && loc.Point.DistanceTo(offsetPoints.First()) > loc.Point.DistanceTo(offsetPoints.Last()))
                     offsetPoints.Reverse();
 
                 BuildPass(generator, offsetPoints);
+            }
+            offsetSurface.Dispose();
+        }
 
-                void CalcLine(LineSegment3d line) => offsetPoints.Add(line.EndPoint);
+        private List<Point3d> CalcOffsetPoints(Point3dCollection points, Extents3d bounds)
+        {
+            var pline = new PolylineCurve3d(points);
+            var distance = TechProcess.Tool.Diameter / 2;
+            var offsetCurves = pline.GetTrimmedOffset(distance, -Vector3d.YAxis, OffsetCurveExtensionType.Fillet);
+            var matrix = Matrix3d.Displacement(Vector3d.ZAxis.Negate() * distance);
+            offsetCurves.ForEach(p => p.TransformBy(matrix));
 
-                void CalcArc(CircularArc3d arc)
-                {
-                    var num = (int)((arc.EndAngle - arc.StartAngle) / (Math.PI / 36)) + 4;
-                    offsetPoints.AddRange(arc.GetSamplePoints(num).Skip(1).Select(p => p.Point));
-                }
+            var firstPoint = offsetCurves[0].StartPoint;
+            var departurePoint = new Point3d((IsDepartureOnBorderSection ? firstPoint.X : bounds.MinPoint.X) - Departure, firstPoint.Y, firstPoint.Z);
+            var offsetPoints = new List<Point3d> { departurePoint, firstPoint };
+
+            switch (offsetCurves[0])
+            {
+                case LineSegment3d line:
+                    offsetPoints.Add(line.EndPoint);
+                    break;
+                case CircularArc3d arc:
+                    offsetPoints.AddRange(GetArcPoints(arc));
+                    break;
+                case CompositeCurve3d curve:
+                    curve.GetCurves().ForEach(p =>
+                    {
+                        if (p is CircularArc3d arc)
+                            offsetPoints.AddRange(GetArcPoints(arc));
+                        else
+                            offsetPoints.Add(p.EndPoint);
+                    });
+                    break;
+                default:
+                    throw new Exception($"Полученный тип кривой не может быть обработан {offsetCurves[0].GetType()}");
+            }
+
+            var lastPoint = offsetPoints.Last();
+            offsetPoints.Add(new Point3d((IsDepartureOnBorderSection ? lastPoint.X : bounds.MaxPoint.X) + Departure, lastPoint.Y, lastPoint.Z));
+            return offsetPoints;
+
+            IEnumerable<Point3d> GetArcPoints(CircularArc3d arc)
+            {
+                var num = (int)((arc.EndAngle - arc.StartAngle) / (Math.PI / 36)) + 4;
+                return arc.GetSamplePoints(num).Skip(1).Select(p => p.Point);
             }
         }
 
-        private void BuildPass(ICommandGenerator generator, List<Point3d> offsetPoints)
+        private DbSurface CreateOffsetSurface()
+        {
+            DbSurface unionSurface = null;
+            foreach (var dBObject in TechProcess.ProcessingArea.Select(p => p.ObjectId.QOpenForRead()))
+            {
+                DbSurface surface;
+                switch (dBObject)
+                {
+                    case DbSurface sf:
+                        surface = sf.Clone() as DbSurface;
+                        break;
+                    case Region region:
+                        surface = new PlaneSurface();
+                        ((PlaneSurface)surface).CreateFromRegion(region);
+                        break;
+                    default:
+                        throw new Exception($"Объект типа {dBObject.GetType()} не может быть обработан (1)");
+                }
+                if (unionSurface == null)
+                    unionSurface = surface;
+                else
+                {
+                    var res = unionSurface.BooleanUnion(surface);
+                    if (res != null)
+                    {
+                        unionSurface.Dispose();
+                        unionSurface = res;
+                    }
+                    surface.Dispose();
+                }
+            }
+            var offsetSurface = DbSurface.CreateOffsetSurface(unionSurface, Delta) as DbSurface;
+            unionSurface.Dispose();
+            return offsetSurface;
+        }
+
+        private void BuildPass(ICommandGenerator generator, List<Point3d> points)
         {
             var z = TechProcess.Thickness.Value;
             bool isComplete;
@@ -231,7 +256,7 @@ namespace CAM.Disk3D
                 var point0 = Algorithms.NullPoint3d;
                 var point = Algorithms.NullPoint3d;
 
-                foreach (var pt in offsetPoints)
+                foreach (var pt in points)
                 {
                     var p = pt;
                     if (z > p.Z)
@@ -257,7 +282,7 @@ namespace CAM.Disk3D
                     point = p;
                 }
                 generator.GCommand(CommandNames.Cutting, 1, point: point, feed: CuttingFeed);
-                offsetPoints.Reverse();
+                points.Reverse();
             }
             while (!isComplete);
 
