@@ -249,8 +249,7 @@ namespace CAM
                     node.Nodes.AddRange(CurrentTechProcess.TechOperations.ConvertAll(CreateTechOperationNode).ToArray());
                     node.Expand();
                 }
-                else
-                    UpdateCaptions();
+                UpdateCaptions();
                 RefreshView();
                 RefreshToolButtonsState();
             }

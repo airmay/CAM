@@ -89,6 +89,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Acad\AcadGateway.cs" />
+    <Compile Include="Acad\AcadObjectNames.cs" />
     <Compile Include="Core\CamDocument.cs" />
     <Compile Include="Commands\BuilderUtils.cs" />
     <Compile Include="Commands\CommandGeneratorBase.cs" />
@@ -130,6 +131,13 @@
       <DependentUpon>Disk3DTechProcessView.cs</DependentUpon>
     </Compile>
     <Compile Include="Core\TechProcessBase.cs" />
+    <Compile Include="TechProcesses\Drilling\DrillingTechProcess.cs" />
+    <Compile Include="TechProcesses\Drilling\DrillingTechProcessView.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="TechProcesses\Drilling\DrillingTechProcessView.Designer.cs">
+      <DependentUpon>DrillingTechProcessView.cs</DependentUpon>
+    </Compile>
     <Compile Include="Tool\Location.cs" />
     <Compile Include="Core\TechOperationBase.cs" />
     <Compile Include="Settings\CuttingMode.cs" />
@@ -283,6 +291,9 @@
     <EmbeddedResource Include="PaletteSet\PullingView.resx">
       <DependentUpon>PullingView.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="TechProcesses\Drilling\DrillingTechProcessView.resx">
+      <DependentUpon>DrillingTechProcessView.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="TechProcesses\Sawing\SawingModesView.resx">
       <DependentUpon>SawingModesView.cs</DependentUpon>
     </EmbeddedResource>
@@ -326,6 +337,8 @@
     <None Include="Properties\DataSources\CAM.Tactile.TactileTechProcessParams.datasource" />
     <None Include="Properties\DataSources\CAM.TechOperation.Tactile.TactileDefaultParams.datasource" />
     <None Include="Properties\DataSources\CAM.TechOperation.Tactile.TactileParams.datasource" />
+    <None Include="Properties\DataSources\CAM.TechProcesses.Drilling.DrillingTechProcess.datasource" />
+    <None Include="Properties\DataSources\CAM.TechProcesses.Drilling.DrillingTechProcessView.datasource" />
     <None Include="Resources\arrow-090_.png" />
   </ItemGroup>
   <ItemGroup>

@@ -4,6 +4,7 @@ using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
 using Dreambuild.AutoCAD;
 using System.Collections.Generic;
+using System.Globalization;
 
 namespace CAM
 {
@@ -187,13 +188,16 @@ namespace CAM
             }
         }
 
-        public void Command(string text, string name = null) => _commands.Add(new ProcessCommand
+        public void Command(string text, string name = null, double duration = 0) => _commands.Add(new ProcessCommand
         {
             Name = name,
             Text = text,
             ToolNumber = _toolNo,
-            ToolLocation = ToolLocation.Clone()
+            ToolLocation = ToolLocation.Clone(),
+            Duration = duration
         });
+
+        public void Pause(double duration) => Command("G4 F" + duration.ToString(CultureInfo.InvariantCulture), "Пауза", duration);
 
         public void GCommand(string name, int gCode, string paramsString = null, Point3d? point = null, double? x = null, double? y = null, double? z = null,
             double? angleC = null, double? angleA = null, Curve curve = null, int? feed = null, Point2d? center = null)
@@ -210,6 +214,7 @@ namespace CAM
                 if (curve == null && ToolLocation.Point.DistanceTo(point.Value) > 1)
                     curve = NoDraw.Line(ToolLocation.Point, point.Value);
 
+                double length = 0;
                 if (curve != null && curve.IsNewObject)
                 {
                     if (Colors.ContainsKey(name))
@@ -217,11 +222,12 @@ namespace CAM
                     curve.LayerId = _layerId;
                     _currentSpace.AppendEntity(curve);
                     _transaction.AddNewlyCreatedDBObject(curve, true);
-
-                    if ((feed ?? _feed) != 0)
-                        command.Duration = curve.Length() / (gCode == 0 ? 10000 : feed ?? _feed) * 60;
+                    length = curve.Length();
                 }
                 command.ToolpathObjectId = curve?.ObjectId;
+
+                if ((feed ?? _feed) != 0)
+                    command.Duration = (curve != null ? length : ToolLocation.Point.DistanceTo(point.Value)) / (gCode == 0 ? 10000 : feed ?? _feed) * 60;
             }
 
             _GCode = gCode;

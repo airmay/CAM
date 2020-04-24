@@ -55,7 +55,10 @@ namespace CAM
             TechOperations.ForEach(p => p.Setup(this));
         }
 
-        public IEnumerable<ObjectId> ToolpathObjectIds => TechOperations.Where(p => p.ToolpathObjectIds != null).SelectMany(p => p.ToolpathObjectIds);
+        public IEnumerable<ObjectId> ToolpathObjectIds => 
+            TechOperations.Any() 
+            ? TechOperations.Where(p => p.ToolpathObjectIds != null).SelectMany(p => p.ToolpathObjectIds)
+            : ProcessCommands?.Where(p => p.ToolpathObjectId != null).Select(p => p.ToolpathObjectId.Value);
 
         public void DeleteProcessCommands()
         {
@@ -69,6 +72,9 @@ namespace CAM
 
         public virtual void BuildProcessing(int zSafety)
         {
+            if (!TechOperations.Any())
+                CreateTechOperations();
+
             if (!Validate() || TechOperations.Any(p => p.Enabled && p.CanProcess && !p.Validate()))
                 return;
             DeleteProcessCommands();
@@ -76,6 +82,9 @@ namespace CAM
             using (var generator = CommandGeneratorFactory.Create(MachineType.Value))
             {
                 generator.StartTechProcess(Caption, OriginX, OriginY, zSafety);
+
+                BuildProcessing(generator);
+
                 TechOperations.FindAll(p => p.Enabled && p.CanProcess).ForEach(p =>
                 {
                     generator.StartTechOperation();
@@ -90,6 +99,8 @@ namespace CAM
             }
             UpdateCaptions();
         }
+
+        protected virtual void BuildProcessing(ICommandGenerator generator) { }
 
         public virtual void SkipProcessing(ProcessCommand processCommand, int zSafety)
         {
@@ -123,19 +134,14 @@ namespace CAM
 
         private void UpdateCaptions()
         {
-            var duration = 0D;
-            TechOperations.ForEach(op =>
-            {
-                var d = op.ProcessCommands?.Sum(p => p.Duration) ?? 0;
-                op.Caption = GetCaption(op.Caption, d);
-                duration += d;
-            });
-            Caption = GetCaption(Caption, duration);
+            TechOperations.ForEach(p => p.Caption = GetCaption(p, p.Caption));
+            Caption = GetCaption(this, Caption);
 
-            string GetCaption(string text, double value)
+            string GetCaption(IHasProcessCommands obj, string text)
             {
+                var duration = obj.ProcessCommands?.Sum(p => p.Duration) ?? 0;
                 var ind = text.IndexOf('(');
-                return $"{(ind > 0 ? text.Substring(0, ind).Trim() : text)} ({new TimeSpan(0, 0, 0, (int)value)})";
+                return $"{(ind > 0 ? text.Substring(0, ind).Trim() : text)} ({new TimeSpan(0, 0, 0, (int)duration)})";
             }
         }
 
