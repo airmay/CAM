@@ -13,8 +13,6 @@ namespace CAM.TechProcesses.Drilling
 
         public int FeedMin { get; set; }
 
-        public int ZSafety { get; set; }
-
         public int ZEntry { get; set; }
 
         public DrillingTechProcess(string caption) : base(caption)

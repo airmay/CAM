@@ -77,7 +77,7 @@ namespace CAM
                 Acad.DeleteObjects(techProcess.ToolpathObjectIds);
                 Acad.DeleteExtraObjects();
 
-                techProcess.BuildProcessing(_machineSettings[techProcess.MachineType.Value].ZSafety);
+                techProcess.BuildProcessing();
 
                 stopwatch.Stop();
                 Acad.Write($"Расчет обработки завершен {stopwatch.Elapsed}");
@@ -95,7 +95,7 @@ namespace CAM
             Acad.Write($"Выполняется формирование программы обработки по техпроцессу {techProcess.Caption} с команды номер {processCommand.Number}");
 
             var toolpathObjectIds = techProcess.ToolpathObjectIds.ToList();
-            techProcess.SkipProcessing(processCommand, _machineSettings[techProcess.MachineType.Value].ZSafety);
+            techProcess.SkipProcessing(processCommand);
 
             Acad.DeleteObjects(toolpathObjectIds.Except(techProcess.ToolpathObjectIds));
             Acad.Editor.UpdateScreen();

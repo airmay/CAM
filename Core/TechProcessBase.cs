@@ -26,6 +26,8 @@ namespace CAM
 
         public int PenetrationFeed { get; set; }
 
+        public int ZSafety { get; set; }
+
         public List<AcadObject> ProcessingArea { get; set; }
 
         public List<ITechOperation> TechOperations { get; } = new List<ITechOperation>();
@@ -45,7 +47,11 @@ namespace CAM
             set => _originObject = value;
         }
 
-        public TechProcessBase(string caption) => Caption = caption;
+        public TechProcessBase(string caption)
+        {
+            Caption = caption;
+            ZSafety = 20;
+        }
 
         public virtual void Setup()
         {
@@ -70,7 +76,7 @@ namespace CAM
 
         public bool TechOperationMoveUp(ITechOperation techOperation) => TechOperations.SwapPrev(techOperation);
 
-        public virtual void BuildProcessing(int zSafety)
+        public virtual void BuildProcessing()
         {
             if (!TechOperations.Any())
                 CreateTechOperations();
@@ -81,7 +87,7 @@ namespace CAM
 
             using (var generator = CommandGeneratorFactory.Create(MachineType.Value))
             {
-                generator.StartTechProcess(this.GetType().Name, OriginX, OriginY, zSafety);
+                generator.StartTechProcess(this.GetType().Name, OriginX, OriginY, ZSafety);
 
                 BuildProcessing(generator);
 
@@ -102,13 +108,13 @@ namespace CAM
 
         protected virtual void BuildProcessing(ICommandGenerator generator) { }
 
-        public virtual void SkipProcessing(ProcessCommand processCommand, int zSafety)
+        public virtual void SkipProcessing(ProcessCommand processCommand)
         {
             List<ProcessCommand> techOperationCommands;
             List<ProcessCommand> techProcessCommands;
             using (var generator = CommandGeneratorFactory.Create(MachineType.Value))
             {
-                generator.StartTechProcess(Caption, OriginX, OriginY, zSafety);
+                generator.StartTechProcess(Caption, OriginX, OriginY, ZSafety);
                 generator.StartTechOperation();
                 generator.SetTool(processCommand.ToolNumber, Frequency);
                 var loc = ProcessCommands[ProcessCommands.IndexOf(processCommand) - 1].ToolLocation;

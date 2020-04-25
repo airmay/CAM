@@ -23,7 +23,8 @@ namespace CAM
         
         IEnumerable<ObjectId> ToolpathObjectIds { get; }
 
-        void BuildProcessing(int zSafety);
+        void BuildProcessing();
+
         void DeleteProcessCommands();
 
         bool TechOperationMoveDown(ITechOperation techOperation);
@@ -37,6 +38,6 @@ namespace CAM
 
         void Teardown();
 
-        void SkipProcessing(ProcessCommand processCommand, int zSafety);
+        void SkipProcessing(ProcessCommand processCommand);
     }
 }

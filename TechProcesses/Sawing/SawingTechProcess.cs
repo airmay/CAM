@@ -13,8 +13,6 @@ namespace CAM.Sawing
     {
         public SawingTechProcessParams SawingTechProcessParams { get; }
 
-        public double? Thickness { get; set; }
-
         [NonSerialized]
         private List<Border> _borders;
 
@@ -105,10 +103,10 @@ namespace CAM.Sawing
 
         public override bool Validate() => ToolService.Validate(Tool, ToolType.Disk) && Thickness.CheckNotNull("Толщина");
 
-        public override void BuildProcessing(int zSafety)
+        public override void BuildProcessing()
         {
             CreateExtraObjects();
-            base.BuildProcessing(zSafety);
+            base.BuildProcessing();
         }
     }
 }

@@ -39,21 +39,18 @@
     <MachineSettings>
       <MachineType>ScemaLogic</MachineType>
       <MaxFrequency>3000</MaxFrequency>
-      <ZSafety>20</ZSafety>
       <ProgramFileExtension>csv</ProgramFileExtension>
       <ProgramLineNumberFormat>{0};</ProgramLineNumberFormat>
     </MachineSettings>
     <MachineSettings>
       <MachineType>Donatoni</MachineType>
       <MaxFrequency>5000</MaxFrequency>
-      <ZSafety>20</ZSafety>
       <ProgramFileExtension>pgm</ProgramFileExtension>
       <ProgramLineNumberFormat>N{0} </ProgramLineNumberFormat>
     </MachineSettings>
     <MachineSettings>
       <MachineType>Krea</MachineType>
       <MaxFrequency>10000</MaxFrequency>
-      <ZSafety>20</ZSafety>
       <ProgramFileExtension>txt</ProgramFileExtension>
       <ProgramLineNumberFormat>N{0} </ProgramLineNumberFormat>
     </MachineSettings>
