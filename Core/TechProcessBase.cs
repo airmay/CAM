@@ -81,7 +81,7 @@ namespace CAM
 
             using (var generator = CommandGeneratorFactory.Create(MachineType.Value))
             {
-                generator.StartTechProcess(Caption, OriginX, OriginY, zSafety);
+                generator.StartTechProcess(this.GetType().Name, OriginX, OriginY, zSafety);
 
                 BuildProcessing(generator);
 

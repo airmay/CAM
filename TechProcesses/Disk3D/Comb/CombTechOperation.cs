@@ -123,6 +123,33 @@ namespace CAM.Disk3D
             //Acad.Write("timer=" + resultTime);
             //Acad.Write("cnt=" + cnt);
 
+            //var contour = NoDraw.Rectang(new Point3d(bounds.MinPoint.X, bounds.MinPoint.Y, 0), new Point3d(bounds.MaxPoint.X, bounds.MaxPoint.Y, 0));
+            //var ray = new Ray
+            //{
+            //    BasePoint = contour.StartPoint,
+            //    UnitDir = Vector3d.XAxis.RotateBy(((Disk3DTechProcess)TechProcess).Angle.ToRad(), Vector3d.ZAxis)
+            //};
+            //ray.BasePoint += ray.UnitDir.GetPerpendicularVector() * StartPass;
+            //var crossVector = ray.UnitDir.GetPerpendicularVector() * StepPass;
+            //var plane = new Plane();
+            //while (true)
+            //{
+            //    var pc = new Point3dCollection();
+            //    ray.IntersectWith(contour, Intersect.ExtendThis, plane, pc, IntPtr.Zero, IntPtr.Zero);
+            //    if (pc.Count != 2)
+            //        break;
+                
+            //        var vector = (points[1] - points[0]).GetNormal() * tactileTechProcess.TactileTechProcessParams.Departure;
+            //        var startPoint = points[0] + passDir * s - vector - Vector3d.ZAxis * Depth;
+            //        var endPoint = points[1] + passDir * s + vector - Vector3d.ZAxis * Depth;
+            //        if (generator.IsUpperTool)
+            //            generator.Move(startPoint.X, startPoint.Y, angleC: BuilderUtils.CalcToolAngle(ProcessingAngle.ToRad()));
+            //        generator.Cutting(startPoint, endPoint, feed, tactileTechProcess.TactileTechProcessParams.TransitionFeed);
+                
+            //    ray.BasePoint += crossVector;
+            //}
+
+
             for (var y = bounds.MinPoint.Y + StartPass; y < bounds.MaxPoint.Y; y += StepPass)
             {
                 var points = new Point3dCollection();
@@ -247,6 +274,8 @@ namespace CAM.Disk3D
 
         private void BuildPass(ICommandGenerator generator, List<Point3d> points)
         {
+            if (TechProcess.MachineType == MachineType.ScemaLogic)
+                points = points.ConvertAll(p => new Point3d(p.X, p.Y + TechProcess.Tool.Thickness.Value, p.Z));
             var z = TechProcess.Thickness.Value;
             bool isComplete;
             do

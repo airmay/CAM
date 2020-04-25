@@ -338,7 +338,6 @@
     <None Include="Properties\DataSources\CAM.TechOperation.Tactile.TactileDefaultParams.datasource" />
     <None Include="Properties\DataSources\CAM.TechOperation.Tactile.TactileParams.datasource" />
     <None Include="Properties\DataSources\CAM.TechProcesses.Drilling.DrillingTechProcess.datasource" />
-    <None Include="Properties\DataSources\CAM.TechProcesses.Drilling.DrillingTechProcessView.datasource" />
     <None Include="Resources\arrow-090_.png" />
   </ItemGroup>
   <ItemGroup>

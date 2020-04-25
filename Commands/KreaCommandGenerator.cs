@@ -1,6 +1,7 @@
 ﻿using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
 using System;
+using System.Globalization;
 
 namespace CAM
 {
@@ -21,7 +22,6 @@ namespace CAM
         protected override void StopMachineCommands()
         {
             Command("G0 G79 Z(@ZUP)", "Подъем");
-            Command("G0 Y300");
             Command("M30", "Конец");
         }
 
@@ -44,6 +44,8 @@ namespace CAM
             Command("M5", "Шпиндель откл.");
             Command("M9 M10", "Охлаждение откл.");
         }
+
+        public override void Pause(double duration) => Command(string.Format(CultureInfo.InvariantCulture, "(DLY,{0})", duration), "Пауза", duration);
 
         protected override string GCommandText(int gCode, string paramsString, Point3d point, Curve curve, double? angleC, double? angleA, int? feed, Point2d? center)
         {

@@ -24,6 +24,7 @@ namespace CAM.TechProcesses.Drilling
 
         protected override void BuildProcessing(ICommandGenerator generator)
         {
+            generator.ZSafety = ZSafety;
             generator.SetTool(1, Frequency);
 
             ProcessingArea.ForEach(p =>

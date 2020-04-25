@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Autodesk.AutoCAD.DatabaseServices;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -102,7 +103,7 @@ namespace CAM
 
         public void DeleteExtraObjects(ITechProcess techProcess)
         {
-            techProcess.TechOperations.ForEach(p => p.SetToolpathVisible(false));
+            techProcess.ToolpathObjectIds?.ForEach<Curve>(p => p.Visible = !p.Visible);
             Acad.DeleteExtraObjects();
             //Acad.HideExtraObjects(techProcess.ToolpathCurves);
         }

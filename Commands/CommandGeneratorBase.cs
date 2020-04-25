@@ -4,7 +4,6 @@ using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
 using Dreambuild.AutoCAD;
 using System.Collections.Generic;
-using System.Globalization;
 
 namespace CAM
 {
@@ -169,9 +168,9 @@ namespace CAM
                 {
                     point = polyline.GetPoint3dAt(i);
                     angleC = BuilderUtils.CalcToolAngle(polyline, point, engineSide);
-                    if (polyline.GetSegmentType(i-1) == SegmentType.Arc)
+                    if (polyline.GetSegmentType(i - 1) == SegmentType.Arc)
                     {
-                        var arcSeg = polyline.GetArcSegment2dAt(i-1);
+                        var arcSeg = polyline.GetArcSegment2dAt(i - 1);
                         GCommand(CommandNames.Cutting, arcSeg.IsClockWise ? 3 : 2, point: point, angleC: angleC, curve: polyline, feed: cuttingFeed, center: arcSeg.Center);
                     }
                     else
@@ -197,7 +196,7 @@ namespace CAM
             Duration = duration
         });
 
-        public void Pause(double duration) => Command("G4 F" + duration.ToString(CultureInfo.InvariantCulture), "Пауза", duration);
+        public virtual void Pause(double duration) { }
 
         public void GCommand(string name, int gCode, string paramsString = null, Point3d? point = null, double? x = null, double? y = null, double? z = null,
             double? angleC = null, double? angleA = null, Curve curve = null, int? feed = null, Point2d? center = null)
