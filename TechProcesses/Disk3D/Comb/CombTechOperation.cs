@@ -1,5 +1,4 @@
-﻿using Autodesk.AutoCAD.Colors;
-using Autodesk.AutoCAD.DatabaseServices;
+﻿using Autodesk.AutoCAD.DatabaseServices;
 using Dreambuild.AutoCAD;
 using System;
 using System.Collections.Generic;
@@ -39,6 +38,8 @@ namespace CAM.Disk3D
             generator.ToolLocation.Point += Vector3d.ZAxis * TechProcess.Thickness.Value;
 
             var offsetSurface = CreateOffsetSurface();
+            var matrix = Matrix3d.Rotation(((Disk3DTechProcess)TechProcess).Angle.ToRad(), Vector3d.ZAxis, Point3d.Origin);
+            offsetSurface.TransformBy(matrix);
             var bounds = offsetSurface.GeometricExtents;
 
             //var ray = new Ray { UnitDir = Vector3d.XAxis };
@@ -138,18 +139,18 @@ namespace CAM.Disk3D
             //    ray.IntersectWith(contour, Intersect.ExtendThis, plane, pc, IntPtr.Zero, IntPtr.Zero);
             //    if (pc.Count != 2)
             //        break;
-                
+
             //        var vector = (points[1] - points[0]).GetNormal() * tactileTechProcess.TactileTechProcessParams.Departure;
             //        var startPoint = points[0] + passDir * s - vector - Vector3d.ZAxis * Depth;
             //        var endPoint = points[1] + passDir * s + vector - Vector3d.ZAxis * Depth;
             //        if (generator.IsUpperTool)
             //            generator.Move(startPoint.X, startPoint.Y, angleC: BuilderUtils.CalcToolAngle(ProcessingAngle.ToRad()));
             //        generator.Cutting(startPoint, endPoint, feed, tactileTechProcess.TactileTechProcessParams.TransitionFeed);
-                
+
             //    ray.BasePoint += crossVector;
             //}
 
-
+            var PassList = new List<List<Point3d>>();
             for (var y = bounds.MinPoint.Y + StartPass; y < bounds.MaxPoint.Y; y += StepPass)
             {
                 var points = new Point3dCollection();
@@ -178,18 +179,21 @@ namespace CAM.Disk3D
                             points.Add(point);
                     }
                 }
-                if (points.Count == 0)
-                    continue;
-
-                var offsetPoints = CalcOffsetPoints(points, bounds);
-
-                var loc = generator.ToolLocation;
-                if (loc.IsDefined && loc.Point.DistanceTo(offsetPoints.First()) > loc.Point.DistanceTo(offsetPoints.Last()))
-                    offsetPoints.Reverse();
-
-                BuildPass(generator, offsetPoints);
+                if (points.Count > 1)
+                    PassList.Add(CalcOffsetPoints(points, bounds));
             }
             offsetSurface.Dispose();
+
+            matrix = matrix.Inverse();
+            PassList.ForEach(p =>
+            {
+                var tp = p.ConvertAll(x => x.TransformBy(matrix));
+                var loc = generator.ToolLocation;
+                if (loc.IsDefined && loc.Point.DistanceTo(tp.First()) > loc.Point.DistanceTo(tp.Last()))
+                    tp.Reverse();
+
+                BuildPass(generator, tp);
+            });
         }
 
         private List<Point3d> CalcOffsetPoints(Point3dCollection points, Extents3d bounds)
@@ -294,7 +298,7 @@ namespace CAM.Disk3D
                         isComplete = false;
                     }
                     if (generator.IsUpperTool)
-                        generator.Move(p.X, p.Y, angleC: 0);
+                        generator.Move(p.X, p.Y, angleC: ((Disk3DTechProcess)TechProcess).Angle);
 
                     if (point.IsNull())
                     {

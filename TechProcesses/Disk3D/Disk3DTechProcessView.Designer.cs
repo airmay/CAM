@@ -46,6 +46,8 @@
             this.label4 = new System.Windows.Forms.Label();
             this.cbMachine = new System.Windows.Forms.ComboBox();
             this.lbMachine = new System.Windows.Forms.Label();
+            this.tbAngle = new System.Windows.Forms.TextBox();
+            this.label2 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.disk3DTechProcessBindingSource)).BeginInit();
             this.SuspendLayout();
             // 
@@ -217,10 +219,31 @@
             this.lbMachine.TabIndex = 82;
             this.lbMachine.Text = "Станок";
             // 
+            // tbAngle
+            // 
+            this.tbAngle.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.tbAngle.DataBindings.Add(new System.Windows.Forms.Binding("Text", this.disk3DTechProcessBindingSource, "Angle", true));
+            this.tbAngle.Location = new System.Drawing.Point(102, 199);
+            this.tbAngle.Name = "tbAngle";
+            this.tbAngle.Size = new System.Drawing.Size(152, 20);
+            this.tbAngle.TabIndex = 93;
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(3, 202);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(32, 13);
+            this.label2.TabIndex = 94;
+            this.label2.Text = "Угол";
+            // 
             // Disk3DTechProcessView
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.Controls.Add(this.tbAngle);
+            this.Controls.Add(this.label2);
             this.Controls.Add(this.tbPenetrationFeed);
             this.Controls.Add(this.label9);
             this.Controls.Add(this.cbMaterial);
@@ -264,5 +287,7 @@
         private System.Windows.Forms.ComboBox cbMachine;
         private System.Windows.Forms.Label lbMachine;
         private System.Windows.Forms.BindingSource disk3DTechProcessBindingSource;
+        private System.Windows.Forms.TextBox tbAngle;
+        private System.Windows.Forms.Label label2;
     }
 }
