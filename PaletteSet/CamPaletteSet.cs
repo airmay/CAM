@@ -7,8 +7,6 @@ namespace CAM
     {
         private TechProcessView _techProcessView { get; } = new TechProcessView();
 
-        private ProgramView _programView { get; } = new ProgramView();
-
         public CamPaletteSet()
         {
             PaletteSet paletteSet = new PaletteSet("Технология")

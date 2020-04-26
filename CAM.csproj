@@ -91,14 +91,14 @@
     <Compile Include="Acad\AcadGateway.cs" />
     <Compile Include="Acad\AcadObjectNames.cs" />
     <Compile Include="Core\CamDocument.cs" />
-    <Compile Include="Commands\BuilderUtils.cs" />
-    <Compile Include="Commands\CommandGeneratorBase.cs" />
-    <Compile Include="Commands\CommandGeneratorFactory.cs" />
-    <Compile Include="Commands\KreaCommandGenerator.cs" />
-    <Compile Include="Commands\DonatoniCommandGenerator.cs" />
-    <Compile Include="Commands\ICommandGenerator.cs" />
-    <Compile Include="Commands\MachineTypeAttribute.cs" />
-    <Compile Include="Commands\ScemaLogicCommandGenerator.cs" />
+    <Compile Include="Program\BuilderUtils.cs" />
+    <Compile Include="Program\CommandGeneratorBase.cs" />
+    <Compile Include="Program\CommandGeneratorFactory.cs" />
+    <Compile Include="Program\KreaCommandGenerator.cs" />
+    <Compile Include="Program\DonatoniCommandGenerator.cs" />
+    <Compile Include="Program\ICommandGenerator.cs" />
+    <Compile Include="Program\MachineTypeAttribute.cs" />
+    <Compile Include="Program\ScemaLogicCommandGenerator.cs" />
     <Compile Include="Core\ExtensionApplication.cs" />
     <Compile Include="PaletteSet\TrimmingView.cs">
       <SubType>UserControl</SubType>
@@ -113,9 +113,9 @@
       <DependentUpon>UtilsView.cs</DependentUpon>
     </Compile>
     <Compile Include="Acad\AcadObject.cs" />
-    <Compile Include="Enums\MachineType.cs" />
-    <Compile Include="Enums\Material.cs" />
-    <Compile Include="Commands\ProcessCommand.cs" />
+    <Compile Include="Core\Enums\MachineType.cs" />
+    <Compile Include="Core\Enums\Material.cs" />
+    <Compile Include="Program\ProcessCommand.cs" />
     <Compile Include="TechProcesses\Disk3D\Comb\CombTechOperation.cs" />
     <Compile Include="TechProcesses\Disk3D\Comb\CombTechOperationView.cs">
       <SubType>UserControl</SubType>
@@ -138,12 +138,12 @@
     <Compile Include="TechProcesses\Drilling\DrillingTechProcessView.Designer.cs">
       <DependentUpon>DrillingTechProcessView.cs</DependentUpon>
     </Compile>
-    <Compile Include="Tool\Location.cs" />
+    <Compile Include="Core\Tool\Location.cs" />
     <Compile Include="Core\TechOperationBase.cs" />
-    <Compile Include="Settings\CuttingMode.cs" />
-    <Compile Include="Commands\IHasProcessCommands.cs" />
+    <Compile Include="Core\Settings\CuttingMode.cs" />
+    <Compile Include="Program\IHasProcessCommands.cs" />
     <Compile Include="Core\ITechProcess.cs" />
-    <Compile Include="Settings\MachineSettings.cs" />
+    <Compile Include="Core\Settings\MachineSettings.cs" />
     <Compile Include="TechProcesses\Sawing\Border.cs" />
     <Compile Include="TechProcesses\Sawing\SawingMode.cs" />
     <Compile Include="TechProcesses\Sawing\SawingModesView.cs">
@@ -211,21 +211,21 @@
     <Compile Include="Core\TechProcessFactory.cs" />
     <Compile Include="Core\TechProcessLoader.cs" />
     <Compile Include="PaletteSet\CamPaletteSet.cs" />
-    <Compile Include="Commands\CommandNames.cs" />
-    <Compile Include="Enums\Corner.cs" />
-    <Compile Include="Settings\Settings.cs" />
+    <Compile Include="Program\CommandNames.cs" />
+    <Compile Include="Core\Enums\Corner.cs" />
+    <Compile Include="Core\Settings\Settings.cs" />
     <Compile Include="Core\ITechOperation.cs" />
     <Compile Include="Core\TechProcessNames.cs" />
-    <Compile Include="Tool\Tool.cs" />
-    <Compile Include="Tool\ToolObject.cs" />
-    <Compile Include="Tool\ToolService.cs" />
-    <Compile Include="Tool\ToolsForm.cs">
+    <Compile Include="Core\Tool\Tool.cs" />
+    <Compile Include="Core\Tool\ToolObject.cs" />
+    <Compile Include="Core\Tool\ToolService.cs" />
+    <Compile Include="Core\Tool\ToolsForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Tool\ToolsForm.Designer.cs">
+    <Compile Include="Core\Tool\ToolsForm.Designer.cs">
       <DependentUpon>ToolsForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="Enums\ToolType.cs" />
+    <Compile Include="Core\Enums\ToolType.cs" />
     <Compile Include="Core\UI\IDataView.cs" />
     <Compile Include="Core\UI\ViewsContainer.cs" />
     <Compile Include="Utils\Exceptions.cs" />
@@ -238,23 +238,17 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <Compile Include="Enums\Side.cs" />
-    <Compile Include="Core\ProgramView.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="Core\ProgramView.Designer.cs">
-      <DependentUpon>ProgramView.cs</DependentUpon>
-    </Compile>
+    <Compile Include="Core\Enums\Side.cs" />
     <Compile Include="PaletteSet\PullingView.cs">
       <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="PaletteSet\PullingView.Designer.cs">
       <DependentUpon>PullingView.cs</DependentUpon>
     </Compile>
-    <Compile Include="Core\TechProcessView.cs">
+    <Compile Include="Core\UI\TechProcessView.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Core\TechProcessView.Designer.cs">
+    <Compile Include="Core\UI\TechProcessView.Designer.cs">
       <DependentUpon>TechProcessView.cs</DependentUpon>
     </Compile>
   </ItemGroup>
@@ -284,9 +278,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="TechProcesses\Disk3D\Disk3DTechProcessView.resx">
       <DependentUpon>Disk3DTechProcessView.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Core\ProgramView.resx">
-      <DependentUpon>ProgramView.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="PaletteSet\PullingView.resx">
       <DependentUpon>PullingView.cs</DependentUpon>
@@ -318,10 +309,10 @@
     <EmbeddedResource Include="TechProcesses\Tactile\TactileTechProcessView.resx">
       <DependentUpon>TactileTechProcessView.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Core\TechProcessView.resx">
+    <EmbeddedResource Include="Core\UI\TechProcessView.resx">
       <DependentUpon>TechProcessView.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Tool\ToolsForm.resx">
+    <EmbeddedResource Include="Core\Tool\ToolsForm.resx">
       <DependentUpon>ToolsForm.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
