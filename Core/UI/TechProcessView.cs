@@ -252,6 +252,7 @@ namespace CAM
                 UpdateCaptions();
                 RefreshView();
                 RefreshToolButtonsState();
+                tabControl.SelectedTab = tabPageCommands;
             }
         }
 
@@ -260,6 +261,7 @@ namespace CAM
             _camDocument.PartialProcessing(CurrentTechProcess, processCommandBindingSource.Current as ProcessCommand);
             UpdateCaptions();
             RefreshView();
+            tabControl.SelectedTab = tabPageCommands;
         }
 
         private void UpdateCaptions()
