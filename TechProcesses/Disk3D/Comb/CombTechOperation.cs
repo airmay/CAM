@@ -38,8 +38,11 @@ namespace CAM.Disk3D
             generator.ToolLocation.Point += Vector3d.ZAxis * TechProcess.Thickness.Value;
 
             var offsetSurface = CreateOffsetSurface();
-            var matrix = Matrix3d.Rotation(((Disk3DTechProcess)TechProcess).Angle.ToRad(), Vector3d.ZAxis, Point3d.Origin);
-            offsetSurface.TransformBy(matrix);
+
+            var angle = ((Disk3DTechProcess)TechProcess).Angle;
+            var matrix = Matrix3d.Rotation(angle.ToRad(), Vector3d.ZAxis, Point3d.Origin);
+            if (angle != 0)
+                offsetSurface.TransformBy(matrix);
             var bounds = offsetSurface.GeometricExtents;
 
             //var ray = new Ray { UnitDir = Vector3d.XAxis };
@@ -187,7 +190,7 @@ namespace CAM.Disk3D
             matrix = matrix.Inverse();
             PassList.ForEach(p =>
             {
-                var tp = p.ConvertAll(x => x.TransformBy(matrix));
+                var tp = angle != 0 ? p.ConvertAll(x => x.TransformBy(matrix)) : p;
                 var loc = generator.ToolLocation;
                 if (loc.IsDefined && loc.Point.DistanceTo(tp.First()) > loc.Point.DistanceTo(tp.Last()))
                     tp.Reverse();

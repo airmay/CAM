@@ -39,5 +39,8 @@ namespace CAM
         void Teardown();
 
         void SkipProcessing(ProcessCommand processCommand);
+
+        void SetToolpathVisible(bool visible);
+
     }
 }

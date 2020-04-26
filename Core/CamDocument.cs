@@ -1,5 +1,4 @@
-﻿using Autodesk.AutoCAD.DatabaseServices;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -48,8 +47,8 @@ namespace CAM
 
         public void SelectTechProcess(ITechProcess techProcess)
         {
-            techProcess.TechOperations.ForEach(p => p.SetToolpathVisible(false));
-            Acad.SelectAcadObjects(techProcess.ProcessingArea);
+            techProcess.SetToolpathVisible(true);
+            Acad.Editor.UpdateScreen();
         }
 
         public void SelectTechOperation(ITechOperation techOperation)
@@ -67,7 +66,14 @@ namespace CAM
                 Acad.SelectObjectIds(processCommand.ToolpathObjectId.Value);
             Acad.ShowToolObject(techProcess.Tool, processCommand.ToolNumber, processCommand.ToolLocation, techProcess.MachineType == MachineType.Donatoni);
         }
-       
+
+        public void DeleteExtraObjects(ITechProcess techProcess)
+        {
+            techProcess.SetToolpathVisible(false);
+            Acad.DeleteExtraObjects();
+            //Acad.HideExtraObjects(techProcess.ToolpathCurves);
+        }
+
         public void BuildProcessing(ITechProcess techProcess)
         {
             try
@@ -101,13 +107,6 @@ namespace CAM
             Acad.Editor.UpdateScreen();
         }
 
-        public void DeleteExtraObjects(ITechProcess techProcess)
-        {
-            techProcess.ToolpathObjectIds?.ForEach<Curve>(p => p.Visible = !p.Visible);
-            Acad.DeleteExtraObjects();
-            //Acad.HideExtraObjects(techProcess.ToolpathCurves);
-        }
-       
         public void SendProgram(List<ProcessCommand> processCommands, ITechProcess techProcess)
         {
             if (processCommands == null || !processCommands.Any())

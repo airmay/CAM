@@ -227,13 +227,13 @@ namespace CAM
             DeleteToolObject();
         }
 
-        public static void HideExtraObjects(IEnumerable<Curve> curves)
-        {
-            curves.ForEach(p => p.Visible = !p.Visible);
-            DeleteToolObject();
-            Editor.UpdateScreen();
-            //Interaction.SetActiveDocFocus();
-        }
+        //public static void HideExtraObjects(IEnumerable<Curve> curves)
+        //{
+        //    curves.ForEach(p => p.Visible = !p.Visible);
+        //    DeleteToolObject();
+        //    Editor.UpdateScreen();
+        //    //Interaction.SetActiveDocFocus();
+        //}
 
         public static void DeleteByLayer(string layerName)
         {

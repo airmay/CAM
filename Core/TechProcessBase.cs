@@ -61,10 +61,9 @@ namespace CAM
             TechOperations.ForEach(p => p.Setup(this));
         }
 
-        public IEnumerable<ObjectId> ToolpathObjectIds => 
-            TechOperations.Any() 
-            ? TechOperations.Where(p => p.ToolpathObjectIds != null).SelectMany(p => p.ToolpathObjectIds)
-            : ProcessCommands?.Where(p => p.ToolpathObjectId != null).Select(p => p.ToolpathObjectId.Value);
+        public IEnumerable<ObjectId> ToolpathObjectIds => ProcessCommands?.Where(p => p.ToolpathObjectId != null).Select(p => p.ToolpathObjectId.Value);
+
+        public void SetToolpathVisible(bool visible) => ToolpathObjectIds?.ForEach<Curve>(p => p.Visible = visible);
 
         public void DeleteProcessCommands()
         {

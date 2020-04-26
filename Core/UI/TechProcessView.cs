@@ -277,7 +277,7 @@ namespace CAM
 
         private void bDeleteProcessing_Click(object sender, EventArgs e)
         {
-            _camDocument.DeleteExtraObjects(CurrentTechProcess);
+            //_camDocument.DeleteExtraObjects(CurrentTechProcess);
         }
 
         private void bSend_Click(object sender, EventArgs e)
