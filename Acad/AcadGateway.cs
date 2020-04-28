@@ -92,6 +92,14 @@ namespace CAM
             return Array.ConvertAll(curves, p => p.ObjectId);
         }
 
+        public static ObjectId? GetToolpathObjectId()
+        {
+            var res = Acad.Editor.SelectImplied();
+            if (res.Status == PromptStatus.OK && res.Value[res.Value.Count - 1].ObjectId.QOpenForRead<Entity>().Layer == ProcessLayerName)
+                return res.Value[res.Value.Count - 1].ObjectId;
+            return null;
+        }
+
         #region ToolObject
 
         public static ToolObject ToolObject { get; set; }
@@ -164,7 +172,13 @@ namespace CAM
                 }
                 _highlightedObjects = objectIds;
             });
-            Editor.UpdateScreen();
+            Editor.Regen();// UpdateScreen();
+        }
+
+        public static void SubscribeObjects(IEnumerable<ObjectId> objectIds, Action handler)
+        {
+            //objectIds.First().
+            //objectIds.ForEach<Curve>(p => p.)
         }
         #endregion
 

@@ -11,6 +11,7 @@ namespace CAM
 	    private CamDocument _camDocument;
         private Type _currentTechProcessType;
         private ITechProcess CurrentTechProcess => (treeView.SelectedNode?.Parent ?? treeView.SelectedNode)?.Tag as ITechProcess;
+        private ProcessCommand CurrentProcessCommand => processCommandBindingSource.Current as ProcessCommand;
 
         public TechProcessView()
         {
@@ -26,6 +27,8 @@ namespace CAM
         }
 
         private Dictionary<Type, ToolStripMenuItem[]> _techOperationItems;
+        private Dictionary<Autodesk.AutoCAD.DatabaseServices.ObjectId, int> _processCommandsIdx;
+        private int _startIdx;
 
         public void SetCamDocument(CamDocument camDocument)
         {
@@ -71,15 +74,29 @@ namespace CAM
 
         private void processCommandBindingSource_CurrentChanged(object sender, EventArgs e)
         {
-            if (processCommandBindingSource.Current is ProcessCommand)
-                _camDocument.SelectProcessCommand(CurrentTechProcess, processCommandBindingSource.Current as ProcessCommand);
+            if (CurrentProcessCommand != null)
+                _camDocument.SelectProcessCommand(CurrentTechProcess, CurrentProcessCommand);
         }
 
-        public void RefreshView()
+        public void SelectProcessCommand(Autodesk.AutoCAD.DatabaseServices.ObjectId id) => processCommandBindingSource.Position = _processCommandsIdx[id] - _startIdx;
+
+        public void RefreshViews()
         {
             var dataObject = treeView.SelectedNode.Tag;
             ViewsContainer.BindData(dataObject, tabPageParams);
-            processCommandBindingSource.DataSource = ((IHasProcessCommands)dataObject).ProcessCommands;
+            var commands = ((IHasProcessCommands)dataObject).ProcessCommands;
+            if (commands != null)
+                for (int i = 0; i < commands.Count; i++)
+                    if (commands[i].ToolpathObjectId != null)
+                    {
+                        _startIdx = _processCommandsIdx[commands[i].ToolpathObjectId.Value] - i;
+                        break;
+                    }
+            var position = commands != null && treeView.SelectedNode.Parent == null && CurrentProcessCommand?.ToolpathObjectId != null
+                ? _processCommandsIdx[CurrentProcessCommand.ToolpathObjectId.Value]
+                : 0;
+            processCommandBindingSource.DataSource = commands;
+            processCommandBindingSource.Position = position;
         }
         #endregion
 
@@ -110,7 +127,7 @@ namespace CAM
                         .Concat(_techOperationItems[CurrentTechProcess.GetType()]).ToArray());                
                 RefreshToolButtonsState();
             }
-            RefreshView();
+            RefreshViews();
             if (treeView.SelectedNode.Tag is ITechProcess)
                 _camDocument.SelectTechProcess((ITechProcess)treeView.SelectedNode.Tag);
             else
@@ -239,28 +256,30 @@ namespace CAM
 
         private void bBuildProcessing_ButtonClick(object sender, EventArgs e)
         {
-            if (CurrentTechProcess != null)
-            {
-                treeView.Focus();
-                _camDocument.BuildProcessing(CurrentTechProcess);
-                var node = treeView.SelectedNode;
-                if (node.Parent == null && node.Nodes.Count == 0)
-                {
-                    node.Nodes.AddRange(CurrentTechProcess.TechOperations.ConvertAll(CreateTechOperationNode).ToArray());
-                    node.Expand();
-                }
-                UpdateCaptions();
-                RefreshView();
-                RefreshToolButtonsState();
-                tabControl.SelectedTab = tabPageCommands;
-            }
-        }
+            var node = treeView.SelectedNode.Parent ?? treeView.SelectedNode;
+            treeView.SelectedNode = node;
 
-        private void bPartialProcessing_Click(object sender, EventArgs e)
-        {
-            _camDocument.PartialProcessing(CurrentTechProcess, processCommandBindingSource.Current as ProcessCommand);
-            UpdateCaptions();
-            RefreshView();
+            if (sender == bBuildProcessing)
+                _camDocument.BuildProcessing(CurrentTechProcess);
+            else
+                _camDocument.PartialProcessing(CurrentTechProcess, CurrentProcessCommand);
+
+            _processCommandsIdx = CurrentTechProcess.ProcessCommands
+                    .Select((p, ind) => new { p.ToolpathObjectId, ind })
+                    .Where(p => p.ToolpathObjectId != null)
+                    .ToDictionary(p => p.ToolpathObjectId.Value, p => p.ind);
+
+            if (node.Nodes.Count == 0)
+            {
+                node.Nodes.AddRange(CurrentTechProcess.TechOperations.ConvertAll(CreateTechOperationNode).ToArray());
+                node.Expand();
+            }
+
+            UpdateCaptions();            
+            RefreshToolButtonsState();
+
+            ClearCommandsView();
+            RefreshViews();
             tabControl.SelectedTab = tabPageCommands;
         }
 

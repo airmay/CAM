@@ -1,5 +1,8 @@
 ﻿using Autodesk.AutoCAD.ApplicationServices;
+using Autodesk.AutoCAD.DatabaseServices;
+using Autodesk.AutoCAD.EditorInput;
 using Autodesk.AutoCAD.Runtime;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -65,11 +68,19 @@ namespace CAM
             {
                 document.CommandWillStart += Document_CommandWillStart;
                 document.BeginDocumentClose += Document_BeginDocumentClose;
+                document.ImpliedSelectionChanged += ImpliedSelectionChanged;
                 _documents[document] = new CamDocument(_machineSettings, _techProcessFactory);
                 TechProcessLoader.LoadTechProsess(_documents[document]);
             }
             Acad.ClearHighlighted();
             _camPaletteSet.SetCamDocument(document != null ? _documents[document] : null);
+
+        }
+
+        private void ImpliedSelectionChanged(object sender, EventArgs e)
+        {
+            if (Acad.GetToolpathObjectId() is ObjectId id)
+                _camPaletteSet.SelectProcessCommand(id);
         }
 
         private void Document_CommandWillStart(object sender, CommandEventArgs e)

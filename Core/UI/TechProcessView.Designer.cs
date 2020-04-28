@@ -48,14 +48,14 @@
             this.bMoveUpTechOperation = new System.Windows.Forms.ToolStripButton();
             this.bMoveDownTechOperation = new System.Windows.Forms.ToolStripButton();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
+            this.bBuildProcessing = new System.Windows.Forms.ToolStripSplitButton();
+            this.bPartialProcessing = new System.Windows.Forms.ToolStripMenuItem();
             this.bDeleteExtraObjects = new System.Windows.Forms.ToolStripButton();
             this.bDeleteProcessing = new System.Windows.Forms.ToolStripButton();
             this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
             this.bSendProgramm = new System.Windows.Forms.ToolStripButton();
             this.bClose = new System.Windows.Forms.ToolStripButton();
             this.panel2 = new System.Windows.Forms.Panel();
-            this.bBuildProcessing = new System.Windows.Forms.ToolStripSplitButton();
-            this.bPartialProcessing = new System.Windows.Forms.ToolStripMenuItem();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
@@ -278,6 +278,26 @@
             this.toolStripSeparator1.Name = "toolStripSeparator1";
             this.toolStripSeparator1.Size = new System.Drawing.Size(6, 25);
             // 
+            // bBuildProcessing
+            // 
+            this.bBuildProcessing.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.bBuildProcessing.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.bPartialProcessing});
+            this.bBuildProcessing.Image = global::CAM.Properties.Resources.gear;
+            this.bBuildProcessing.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.bBuildProcessing.Name = "bBuildProcessing";
+            this.bBuildProcessing.Size = new System.Drawing.Size(32, 22);
+            this.bBuildProcessing.Text = "Рассчитать обработку";
+            this.bBuildProcessing.ButtonClick += new System.EventHandler(this.bBuildProcessing_ButtonClick);
+            // 
+            // bPartialProcessing
+            // 
+            this.bPartialProcessing.Name = "bPartialProcessing";
+            this.bPartialProcessing.Size = new System.Drawing.Size(185, 22);
+            this.bPartialProcessing.Text = "Частичная обработка";
+            this.bPartialProcessing.ToolTipText = "Формирование программы обработки с текущей команды";
+            this.bPartialProcessing.Click += new System.EventHandler(this.bBuildProcessing_ButtonClick);
+            // 
             // bDeleteExtraObjects
             // 
             this.bDeleteExtraObjects.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
@@ -332,26 +352,6 @@
             this.panel2.Name = "panel2";
             this.panel2.Size = new System.Drawing.Size(337, 675);
             this.panel2.TabIndex = 3;
-            // 
-            // bBuildProcessing
-            // 
-            this.bBuildProcessing.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.bBuildProcessing.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.bPartialProcessing});
-            this.bBuildProcessing.Image = global::CAM.Properties.Resources.gear;
-            this.bBuildProcessing.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.bBuildProcessing.Name = "bBuildProcessing";
-            this.bBuildProcessing.Size = new System.Drawing.Size(32, 22);
-            this.bBuildProcessing.Text = "Рассчитать обработку";
-            this.bBuildProcessing.ButtonClick += new System.EventHandler(this.bBuildProcessing_ButtonClick);
-            // 
-            // bPartialProcessing
-            // 
-            this.bPartialProcessing.Name = "bPartialProcessing";
-            this.bPartialProcessing.Size = new System.Drawing.Size(185, 22);
-            this.bPartialProcessing.Text = "Частичная обработка";
-            this.bPartialProcessing.ToolTipText = "Формирование программы обработки с текущей команды";
-            this.bPartialProcessing.Click += new System.EventHandler(this.bPartialProcessing_Click);
             // 
             // TechProcessView
             // 

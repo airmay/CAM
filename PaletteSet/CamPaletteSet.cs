@@ -1,4 +1,5 @@
-﻿using Autodesk.AutoCAD.Windows;
+﻿using Autodesk.AutoCAD.DatabaseServices;
+using Autodesk.AutoCAD.Windows;
 using System.Drawing;
 
 namespace CAM
@@ -42,5 +43,7 @@ namespace CAM
             _techProcessView.ClearCommandsView();
             //_programView.RefreshView();
         }
+
+        public void SelectProcessCommand(ObjectId id) => _techProcessView.SelectProcessCommand(id);
     }
 }
