@@ -43,7 +43,7 @@ namespace CAM
 
         protected override void StartEngineCommands()
         {
-            Command(_toolNo == 2 ? "M8" : "M7", "Охлаждение");
+            Command(_hasTool ? "M7" : "M8", "Охлаждение");
             Command($"M3 S{_frequency}", "Шпиндель");
         }
 

@@ -15,7 +15,7 @@ namespace CAM
 
         List<ProcessCommand> FinishTechOperation();
 
-        void SetTool(int toolNo, int frequency, double angleA = 0);
+        void SetTool(int toolNo, int frequency, double angleA = 0, bool hasTool = true);
 
         void Uplifting(double? z = null);
 

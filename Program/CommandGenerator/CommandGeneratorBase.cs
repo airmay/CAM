@@ -9,7 +9,7 @@ namespace CAM
 {
     public abstract class CommandGeneratorBase : ICommandGenerator
     {
-        protected int _toolNo;
+        protected bool _hasTool;
         protected int _GCode;
         protected int _feed;
         protected double _originX, _originY;
@@ -84,17 +84,14 @@ namespace CAM
 
         public List<ProcessCommand> FinishTechOperation() => _commands.GetRange(_startRangeIndex, _commands.Count - _startRangeIndex);
 
-        public void SetTool(int toolNo, int frequency, double angleA = 0)
+        public void SetTool(int toolNo, int frequency, double angleA = 0, bool hasTool = true)
         {
-            if (_toolNo != toolNo)
-            {
-                StopEngine();
+            StopEngine();
+            ToolLocation.Set(new Point3d(double.NaN, double.NaN, UpperZ), 0, 0);
+            SetToolCommands(toolNo, angleA);
 
-                _toolNo = toolNo;
-                ToolLocation.Set(new Point3d(double.NaN, double.NaN, UpperZ), 0, 0);
-                SetToolCommands(toolNo, angleA);
-            }
             _frequency = frequency;
+            _hasTool = hasTool;
         }
 
         protected abstract void SetToolCommands(int toolNo, double angleA);
@@ -191,7 +188,7 @@ namespace CAM
         {
             Name = name,
             Text = text,
-            ToolNumber = _toolNo,
+            HasTool = _hasTool,
             ToolLocation = ToolLocation.Clone(),
             Duration = duration
         });
@@ -233,7 +230,7 @@ namespace CAM
             ToolLocation.Set(point.Value, angleC, angleA);
             _feed = feed ?? _feed;
 
-            command.ToolNumber = _toolNo;
+            command.HasTool = _hasTool;
             command.ToolLocation = ToolLocation.Clone();
 
             _commands.Add(command);

@@ -92,11 +92,10 @@ namespace CAM
                         _startIdx = _processCommandsIdx[commands[i].ToolpathObjectId.Value] - i;
                         break;
                     }
-            var position = commands != null && treeView.SelectedNode.Parent == null && CurrentProcessCommand?.ToolpathObjectId != null
-                ? _processCommandsIdx[CurrentProcessCommand.ToolpathObjectId.Value]
-                : 0;
+            var tid = CurrentProcessCommand?.ToolpathObjectId;
             processCommandBindingSource.DataSource = commands;
-            processCommandBindingSource.Position = position;
+            if (commands != null && treeView.SelectedNode.Parent == null && tid != null)
+                processCommandBindingSource.Position = _processCommandsIdx[tid.Value];
         }
         #endregion
 

@@ -51,7 +51,7 @@ namespace CAM.Tactile
                 stepY /= Math.Sqrt(2);
                 stepX = stepY * 2;
             }
-            generator.SetTool(2, Frequency, 90);
+            generator.SetTool(2, Frequency, 90, false);
             generator.ZSafety = ZSafety;
 
             while (y < contourPoints[1].Y)

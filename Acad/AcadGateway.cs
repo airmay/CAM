@@ -104,12 +104,12 @@ namespace CAM
 
         public static ToolObject ToolObject { get; set; }
 
-        public static void ShowToolObject(Tool tool, int index, Location location, bool isFrontPlaneZero)
+        public static void RegenToolObject(Tool tool, bool hasTool, Location location, bool isFrontPlaneZero)
         {
-            if (ToolObject != null && (tool != ToolObject.Tool || index != ToolObject.Index || !location.IsDefined))
+            if (ToolObject != null && (hasTool != ToolObject.HasTool || !location.IsDefined))
                 DeleteToolObject();
-            if (ToolObject == null && index != 0 && location.IsDefined)
-                ToolObject = ToolObject.CreateToolObject(tool, index, isFrontPlaneZero);
+            if (ToolObject == null && location.IsDefined)
+                ToolObject = hasTool ? ToolObject.CreateToolObject(tool, isFrontPlaneZero) : ToolObject.CreateToolObject();
             if (ToolObject != null)
                 DrawToolObject(location);
         }

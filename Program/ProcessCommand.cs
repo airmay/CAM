@@ -10,7 +10,7 @@ namespace CAM
 
         public string Text { get; set; }
 
-        public int ToolNumber { get; set; }
+        public bool HasTool { get; set; }
 
         public Location ToolLocation;
 

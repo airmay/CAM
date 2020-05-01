@@ -88,16 +88,22 @@ namespace CAM
             {
                 generator.StartTechProcess(this.GetType().Name, OriginX, OriginY, ZSafety);
 
+                if (Tool != null)
+                    generator.SetTool(
+                        MachineType.Value != CAM.MachineType.Donatoni ? Tool.Number : 1,
+                        Frequency);
+
                 BuildProcessing(generator);
 
                 TechOperations.FindAll(p => p.Enabled && p.CanProcess).ForEach(p =>
                 {
                     generator.StartTechOperation();
-                    if (Tool != null)
-                        generator.SetTool(MachineType.Value == CAM.MachineType.ScemaLogic ? Tool.Number : 1, Frequency);
+
                     p.BuildProcessing(generator);
+
                     if (!generator.IsUpperTool)
                         generator.Uplifting();
+
                     p.ProcessCommands = generator.FinishTechOperation();                    
                 });
                 ProcessCommands = generator.FinishTechProcess();
@@ -115,7 +121,9 @@ namespace CAM
             {
                 generator.StartTechProcess(Caption, OriginX, OriginY, ZSafety);
                 generator.StartTechOperation();
-                generator.SetTool(processCommand.ToolNumber, Frequency);
+                generator.SetTool(
+                    MachineType.Value != CAM.MachineType.Donatoni ? Tool.Number : processCommand.HasTool ? 1 : 2, 
+                    Frequency);
                 var loc = ProcessCommands[ProcessCommands.IndexOf(processCommand) - 1].ToolLocation;
                 generator.Move(loc.Point.X, loc.Point.Y, angleC: loc.AngleC, angleA: loc.AngleA);
                 generator.GCommand(CommandNames.Penetration, 1, point: loc.Point, feed: PenetrationFeed);

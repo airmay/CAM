@@ -146,6 +146,7 @@
             // 
             // dataGridViewCommand
             // 
+            this.dataGridViewCommand.AllowUserToAddRows = false;
             this.dataGridViewCommand.AllowUserToResizeRows = false;
             this.dataGridViewCommand.AutoGenerateColumns = false;
             this.dataGridViewCommand.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.AllCellsExceptHeader;
@@ -173,7 +174,7 @@
             this.numberDataGridViewTextBoxColumn.DataPropertyName = "Number";
             this.numberDataGridViewTextBoxColumn.HeaderText = "Number";
             this.numberDataGridViewTextBoxColumn.Name = "numberDataGridViewTextBoxColumn";
-            this.numberDataGridViewTextBoxColumn.Width = 21;
+            this.numberDataGridViewTextBoxColumn.Width = 5;
             // 
             // nameDataGridViewTextBoxColumn
             // 
@@ -181,7 +182,7 @@
             this.nameDataGridViewTextBoxColumn.DataPropertyName = "Name";
             this.nameDataGridViewTextBoxColumn.HeaderText = "Name";
             this.nameDataGridViewTextBoxColumn.Name = "nameDataGridViewTextBoxColumn";
-            this.nameDataGridViewTextBoxColumn.Width = 21;
+            this.nameDataGridViewTextBoxColumn.Width = 5;
             // 
             // textDataGridViewTextBoxColumn
             // 
@@ -189,7 +190,7 @@
             this.textDataGridViewTextBoxColumn.DataPropertyName = "Text";
             this.textDataGridViewTextBoxColumn.HeaderText = "Text";
             this.textDataGridViewTextBoxColumn.Name = "textDataGridViewTextBoxColumn";
-            this.textDataGridViewTextBoxColumn.Width = 21;
+            this.textDataGridViewTextBoxColumn.Width = 5;
             // 
             // processCommandBindingSource
             // 

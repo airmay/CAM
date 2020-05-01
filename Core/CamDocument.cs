@@ -56,7 +56,8 @@ namespace CAM
             if (techOperation.ProcessingArea != null)
                 Acad.SelectObjectIds(techOperation.ProcessingArea.ObjectId);
             techOperation.TechProcess.TechOperations.ForEach(p => p.SetToolpathVisible(p == techOperation));
-            Acad.DeleteToolObject();
+            if (techOperation.ProcessCommands == null)
+                Acad.DeleteToolObject();
             Acad.Editor.UpdateScreen();
         }
 
@@ -64,7 +65,7 @@ namespace CAM
         {
             if (processCommand.ToolpathObjectId.HasValue)
                 Acad.SelectObjectIds(processCommand.ToolpathObjectId.Value);
-            Acad.ShowToolObject(techProcess.Tool, processCommand.ToolNumber, processCommand.ToolLocation, techProcess.MachineType == MachineType.Donatoni);
+            Acad.RegenToolObject(techProcess.Tool, processCommand.HasTool, processCommand.ToolLocation, techProcess.MachineType == MachineType.Donatoni);
         }
 
         public void DeleteExtraObjects(ITechProcess techProcess)
