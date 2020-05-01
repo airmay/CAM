@@ -30,6 +30,7 @@
         {
             this.components = new System.ComponentModel.Container();
             this.checkBox1 = new System.Windows.Forms.CheckBox();
+            this.longCleaningTechOperationBindingSource = new System.Windows.Forms.BindingSource(this.components);
             this.tbDeparture = new System.Windows.Forms.TextBox();
             this.label7 = new System.Windows.Forms.Label();
             this.textBox5 = new System.Windows.Forms.TextBox();
@@ -40,7 +41,7 @@
             this.label1 = new System.Windows.Forms.Label();
             this.tbStepPass = new System.Windows.Forms.TextBox();
             this.label4 = new System.Windows.Forms.Label();
-            this.longCleaningTechOperationBindingSource = new System.Windows.Forms.BindingSource(this.components);
+            this.checkBox2 = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)(this.longCleaningTechOperationBindingSource)).BeginInit();
             this.SuspendLayout();
             // 
@@ -48,19 +49,23 @@
             // 
             this.checkBox1.AutoSize = true;
             this.checkBox1.DataBindings.Add(new System.Windows.Forms.Binding("Checked", this.longCleaningTechOperationBindingSource, "IsDepartureOnBorderSection", true));
-            this.checkBox1.Location = new System.Drawing.Point(8, 215);
+            this.checkBox1.Location = new System.Drawing.Point(6, 75);
             this.checkBox1.Name = "checkBox1";
             this.checkBox1.Size = new System.Drawing.Size(162, 17);
             this.checkBox1.TabIndex = 107;
             this.checkBox1.Text = "Выезд по границе сечения";
             this.checkBox1.UseVisualStyleBackColor = true;
             // 
+            // longCleaningTechOperationBindingSource
+            // 
+            this.longCleaningTechOperationBindingSource.DataSource = typeof(CAM.TechProcesses.Disk3D.LongCleaningTechOperation);
+            // 
             // tbDeparture
             // 
             this.tbDeparture.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.tbDeparture.DataBindings.Add(new System.Windows.Forms.Binding("Text", this.longCleaningTechOperationBindingSource, "Departure", true));
-            this.tbDeparture.Location = new System.Drawing.Point(102, 86);
+            this.tbDeparture.Location = new System.Drawing.Point(102, 49);
             this.tbDeparture.Name = "tbDeparture";
             this.tbDeparture.Size = new System.Drawing.Size(152, 20);
             this.tbDeparture.TabIndex = 103;
@@ -68,7 +73,7 @@
             // label7
             // 
             this.label7.AutoSize = true;
-            this.label7.Location = new System.Drawing.Point(3, 89);
+            this.label7.Location = new System.Drawing.Point(3, 52);
             this.label7.Name = "label7";
             this.label7.Size = new System.Drawing.Size(40, 13);
             this.label7.TabIndex = 114;
@@ -79,7 +84,7 @@
             this.textBox5.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.textBox5.DataBindings.Add(new System.Windows.Forms.Binding("Text", this.longCleaningTechOperationBindingSource, "Delta", true));
-            this.textBox5.Location = new System.Drawing.Point(102, 180);
+            this.textBox5.Location = new System.Drawing.Point(102, 124);
             this.textBox5.Name = "textBox5";
             this.textBox5.Size = new System.Drawing.Size(152, 20);
             this.textBox5.TabIndex = 106;
@@ -87,7 +92,7 @@
             // label6
             // 
             this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(3, 183);
+            this.label6.Location = new System.Drawing.Point(3, 127);
             this.label6.Name = "label6";
             this.label6.Size = new System.Drawing.Size(50, 13);
             this.label6.TabIndex = 113;
@@ -98,7 +103,7 @@
             this.textBox4.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.textBox4.DataBindings.Add(new System.Windows.Forms.Binding("Text", this.longCleaningTechOperationBindingSource, "CuttingFeed", true));
-            this.textBox4.Location = new System.Drawing.Point(102, 145);
+            this.textBox4.Location = new System.Drawing.Point(102, 101);
             this.textBox4.Name = "textBox4";
             this.textBox4.Size = new System.Drawing.Size(152, 20);
             this.textBox4.TabIndex = 105;
@@ -106,7 +111,7 @@
             // label5
             // 
             this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(3, 148);
+            this.label5.Location = new System.Drawing.Point(3, 104);
             this.label5.Name = "label5";
             this.label5.Size = new System.Drawing.Size(44, 13);
             this.label5.TabIndex = 112;
@@ -117,7 +122,7 @@
             this.textBox1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.textBox1.DataBindings.Add(new System.Windows.Forms.Binding("Text", this.longCleaningTechOperationBindingSource, "StepLong", true));
-            this.textBox1.Location = new System.Drawing.Point(102, 63);
+            this.textBox1.Location = new System.Drawing.Point(102, 26);
             this.textBox1.Name = "textBox1";
             this.textBox1.Size = new System.Drawing.Size(152, 20);
             this.textBox1.TabIndex = 102;
@@ -125,7 +130,7 @@
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(3, 66);
+            this.label1.Location = new System.Drawing.Point(3, 29);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(92, 13);
             this.label1.TabIndex = 109;
@@ -150,14 +155,22 @@
             this.label4.TabIndex = 108;
             this.label4.Text = "Шаг межстрочный";
             // 
-            // longCleaningTechOperationBindingSource
+            // checkBox2
             // 
-            this.longCleaningTechOperationBindingSource.DataSource = typeof(CAM.TechProcesses.Disk3D.LongCleaningTechOperation);
+            this.checkBox2.AutoSize = true;
+            this.checkBox2.DataBindings.Add(new System.Windows.Forms.Binding("Checked", this.longCleaningTechOperationBindingSource, "IsUplifting", true));
+            this.checkBox2.Location = new System.Drawing.Point(6, 151);
+            this.checkBox2.Name = "checkBox2";
+            this.checkBox2.Size = new System.Drawing.Size(67, 17);
+            this.checkBox2.TabIndex = 115;
+            this.checkBox2.Text = "Подъем";
+            this.checkBox2.UseVisualStyleBackColor = true;
             // 
             // LongCleaningTechOperationView
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.Controls.Add(this.checkBox2);
             this.Controls.Add(this.checkBox1);
             this.Controls.Add(this.tbDeparture);
             this.Controls.Add(this.label7);
@@ -191,5 +204,6 @@
         private System.Windows.Forms.TextBox tbStepPass;
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.BindingSource longCleaningTechOperationBindingSource;
+        private System.Windows.Forms.CheckBox checkBox2;
     }
 }

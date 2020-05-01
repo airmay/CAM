@@ -257,6 +257,7 @@ namespace CAM
         {
             var node = treeView.SelectedNode.Parent ?? treeView.SelectedNode;
             treeView.SelectedNode = node;
+            SelectNextControl(ActiveControl, true, true, true, true);
 
             if (sender == bBuildProcessing)
                 _camDocument.BuildProcessing(CurrentTechProcess);

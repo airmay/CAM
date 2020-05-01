@@ -33,12 +33,12 @@ namespace CAM
             [CommandNames.Transition] = Color.FromColor(System.Drawing.Color.Yellow)
         };
 
-        public int ZSafety { get; set; }
+        public double ZSafety { get; set; }
         public bool IsUpperTool => !ToolLocation.IsDefined || ToolLocation.Point.Z >= ZSafety;
         public bool WithThick { get; set; }
         public Location ToolLocation { get; set; } = new Location();
 
-        public void StartTechProcess(string caption, double originX, double originY, int zSafety)
+        public void StartTechProcess(string caption, double originX, double originY, double zSafety)
         {
             _originX = originX;
             _originY = originY;

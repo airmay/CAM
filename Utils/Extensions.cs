@@ -16,7 +16,7 @@ namespace CAM
             return attribute?.Description ?? value.ToString();
         }
 
-        public static double Round(this double value, int digits) => Math.Round(value, digits);
+        public static double Round(this double value, int digits = 0) => Math.Round(value, digits);
 
         public static void BindEnum<T>(this ComboBox comboBox, params T[] values) where T: struct
         {

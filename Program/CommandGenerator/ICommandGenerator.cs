@@ -7,7 +7,7 @@ namespace CAM
 {
     public interface ICommandGenerator: IDisposable
     {
-        void StartTechProcess(string caption, double originX, double originY, int zSafety);
+        void StartTechProcess(string caption, double originX, double originY, double zSafety);
 
         List<ProcessCommand> FinishTechProcess();
 
@@ -38,7 +38,7 @@ namespace CAM
 
         void Uplifting(Vector3d vector3d);
 
-        int ZSafety { get; set; }
+        double ZSafety { get; set; }
 
         Location ToolLocation { get; set; }
 

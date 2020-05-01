@@ -9,9 +9,8 @@ namespace CAM
         int PenetrationFeed { get; set; }
         MachineType? MachineType { get; set; }
         Material? Material { get; set; }
-
         double? Thickness { get; set; }
-
+        double ZSafety { get; set; }
         string Caption { get; set; }
         double OriginX { get; set; }
         double OriginY { get; set; }

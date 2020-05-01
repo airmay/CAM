@@ -21,6 +21,7 @@ namespace CAM.Disk3D
             disk3DTechProcessBindingSource.DataSource = _techProcess = data;
             tbTool.Text = _techProcess.Tool?.ToString();
             tbObjects.Text = _techProcess.ProcessingArea?.GetDesc();
+            lbSize.Text = Acad.GetSize(_techProcess.ProcessingArea);
         }
 
         private void bTool_Click(object sender, EventArgs e)
@@ -47,6 +48,7 @@ namespace CAM.Disk3D
                 return;
             _techProcess.ProcessingArea = AcadObject.CreateList(ids);
             tbObjects.Text = _techProcess.ProcessingArea.GetDesc();
+            lbSize.Text = Acad.GetSize(_techProcess.ProcessingArea);
         }
 
         private void tbObjects_Enter(object sender, EventArgs e)

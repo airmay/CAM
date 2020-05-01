@@ -26,7 +26,7 @@ namespace CAM
 
         public int PenetrationFeed { get; set; }
 
-        public int ZSafety { get; set; }
+        public double ZSafety { get; set; }
 
         public List<AcadObject> ProcessingArea { get; set; }
 

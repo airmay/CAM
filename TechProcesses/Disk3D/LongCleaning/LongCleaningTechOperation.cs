@@ -27,26 +27,32 @@ namespace CAM.TechProcesses.Disk3D
 
         public bool IsDepartureOnBorderSection { get; set; }
 
+        public bool IsUplifting { get; set; }
+
         public LongCleaningTechOperation(ITechProcess techProcess, string caption) : base(techProcess, caption)
         {
         }
 
         public override void BuildProcessing(ICommandGenerator generator)
         {
-            generator.ZSafety += (int)TechProcess.Thickness.Value;
-            generator.ToolLocation.Point += Vector3d.ZAxis * TechProcess.Thickness.Value;
+            var disk3DTechProcess = (Disk3DTechProcess)TechProcess;
 
             var offsetSurface = CreateOffsetSurface();
 
-            var angle = ((Disk3DTechProcess)TechProcess).Angle;
-            var matrix = Matrix3d.Rotation(angle.ToRad(), Vector3d.ZAxis, Point3d.Origin);
-            if (angle != 0)
+            var matrix = Matrix3d.Rotation(disk3DTechProcess.Angle.ToRad(), Vector3d.ZAxis, Point3d.Origin);
+            if (disk3DTechProcess.Angle != 0)
                 offsetSurface.TransformBy(matrix);
             var bounds = offsetSurface.GeometricExtents;
             var minPoint = bounds.MinPoint;
             var maxPoint = bounds.MaxPoint;
+
+            generator.ZSafety = maxPoint.Z + TechProcess.ZSafety;
+            generator.ToolLocation.Point += Vector3d.ZAxis * generator.ZSafety;
+
             var PassList = new List<List<Point3d>>();
-            for (var y = minPoint.Y  - TechProcess.Tool.Thickness.Value + StepPass; y < maxPoint.Y; y += StepPass)
+            var startY = minPoint.Y - (disk3DTechProcess.IsExactlyBegin ? 0 : (TechProcess.Tool.Thickness.Value - StepPass));
+            var endY = maxPoint.Y - (disk3DTechProcess.IsExactlyEnd ? TechProcess.Tool.Thickness : 0);
+            for (var y = startY; y < endY; y += StepPass)
             {
                 var points = new Point3dCollection();
                 for (var x = minPoint.X; x <= maxPoint.X; x += StepLong)
@@ -54,8 +60,8 @@ namespace CAM.TechProcesses.Disk3D
                     double z = 0;
                     for (var s = 0; s <= TechProcess.Tool.Thickness; s += 1)
                     {
-                        if (y + s < minPoint.Y || y + s > maxPoint.Y)
-                            break;
+                        if (y + s < minPoint.Y + Consts.Epsilon || y + s > maxPoint.Y - Consts.Epsilon)
+                            continue;
                         offsetSurface.RayTest(new Point3d(x, y + s, minPoint.Z), Vector3d.ZAxis, 0.0001, out SubentityId[] col, out DoubleCollection par);
                         if (par.Count == 0)
                         {
@@ -82,14 +88,16 @@ namespace CAM.TechProcesses.Disk3D
             matrix = matrix.Inverse();
             PassList.ForEach(p =>
             {
-                var tp = angle != 0 ? p.ConvertAll(x => x.TransformBy(matrix)) : p;
+                var tp = disk3DTechProcess.Angle != 0 ? p.ConvertAll(x => x.TransformBy(matrix)) : p;
                 var loc = generator.ToolLocation;
                 if (loc.IsDefined && loc.Point.DistanceTo(tp.First()) > loc.Point.DistanceTo(tp.Last()))
                     tp.Reverse();
 
                 BuildPass(generator, tp);
+
+                if (IsUplifting)
+                    generator.Uplifting();
             });
-            generator.Uplifting();
         }
 
         private List<Point3d> CalcOffsetPoints(Point3dCollection points, Extents3d bounds)

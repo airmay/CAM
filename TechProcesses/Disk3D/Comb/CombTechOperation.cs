@@ -34,16 +34,17 @@ namespace CAM.Disk3D
 
         public override void BuildProcessing(ICommandGenerator generator)
         {
-            generator.ZSafety += (int)TechProcess.Thickness.Value;
-            generator.ToolLocation.Point += Vector3d.ZAxis * TechProcess.Thickness.Value;
+            var disk3DTechProcess = (Disk3DTechProcess)TechProcess;
 
             var offsetSurface = CreateOffsetSurface();
 
-            var angle = ((Disk3DTechProcess)TechProcess).Angle;
-            var matrix = Matrix3d.Rotation(angle.ToRad(), Vector3d.ZAxis, Point3d.Origin);
-            if (angle != 0)
+            var matrix = Matrix3d.Rotation(disk3DTechProcess.Angle.ToRad(), Vector3d.ZAxis, Point3d.Origin);
+            if (disk3DTechProcess.Angle != 0)
                 offsetSurface.TransformBy(matrix);
             var bounds = offsetSurface.GeometricExtents;
+            generator.ZSafety = bounds.MinPoint.Z + TechProcess.Thickness.Value + TechProcess.ZSafety;
+            generator.ToolLocation.Point += Vector3d.ZAxis * generator.ZSafety;
+
 
             //var ray = new Ray { UnitDir = Vector3d.XAxis };
             //var y = StartPass;
@@ -154,7 +155,7 @@ namespace CAM.Disk3D
             //}
 
             var PassList = new List<List<Point3d>>();
-            for (var y = bounds.MinPoint.Y + StartPass; y < bounds.MaxPoint.Y; y += StepPass)
+            for (var y = bounds.MinPoint.Y + StartPass; y < bounds.MaxPoint.Y - (disk3DTechProcess.IsExactlyEnd ? TechProcess.Tool.Thickness : 0); y += StepPass)
             {
                 var points = new Point3dCollection();
                 for (var x = bounds.MinPoint.X; x <= bounds.MaxPoint.X; x += StepLong)
@@ -190,7 +191,7 @@ namespace CAM.Disk3D
             matrix = matrix.Inverse();
             PassList.ForEach(p =>
             {
-                var tp = angle != 0 ? p.ConvertAll(x => x.TransformBy(matrix)) : p;
+                var tp = disk3DTechProcess.Angle != 0 ? p.ConvertAll(x => x.TransformBy(matrix)) : p;
                 var loc = generator.ToolLocation;
                 if (loc.IsDefined && loc.Point.DistanceTo(tp.First()) > loc.Point.DistanceTo(tp.Last()))
                     tp.Reverse();
@@ -283,7 +284,7 @@ namespace CAM.Disk3D
         {
             if (TechProcess.MachineType == MachineType.ScemaLogic)
                 points = points.ConvertAll(p => new Point3d(p.X, p.Y + TechProcess.Tool.Thickness.Value, p.Z));
-            var z = TechProcess.Thickness.Value;
+            var z = generator.ZSafety - TechProcess.ZSafety;
             bool isComplete;
             do
             {

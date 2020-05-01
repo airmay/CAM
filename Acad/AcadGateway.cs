@@ -50,6 +50,15 @@ namespace CAM
                 App.LockAndExecute(() => ids.QForEach(action));
         }
 
+        public static string GetSize(List<AcadObject> processingArea)
+        {
+            if (processingArea == null)
+                return "";
+            var bounds = processingArea.Select(p => p.ObjectId).GetExtents();
+            var vector = bounds.MaxPoint - bounds.MinPoint;
+            return $"{vector.X.Round()} x {vector.Y.Round()} x {vector.Z.Round()}";
+        }
+
         public static void ForEach<T>(this IEnumerable<ObjectId> ids, Action<T> action) where T : DBObject
         {
             if (ids.Any())

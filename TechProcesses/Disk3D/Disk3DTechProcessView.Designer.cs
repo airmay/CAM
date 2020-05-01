@@ -48,6 +48,12 @@
             this.lbMachine = new System.Windows.Forms.Label();
             this.tbAngle = new System.Windows.Forms.TextBox();
             this.label2 = new System.Windows.Forms.Label();
+            this.checkBox2 = new System.Windows.Forms.CheckBox();
+            this.checkBox1 = new System.Windows.Forms.CheckBox();
+            this.tbZSafety = new System.Windows.Forms.TextBox();
+            this.label5 = new System.Windows.Forms.Label();
+            this.label3 = new System.Windows.Forms.Label();
+            this.lbSize = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.disk3DTechProcessBindingSource)).BeginInit();
             this.SuspendLayout();
             // 
@@ -224,7 +230,7 @@
             this.tbAngle.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.tbAngle.DataBindings.Add(new System.Windows.Forms.Binding("Text", this.disk3DTechProcessBindingSource, "Angle", true));
-            this.tbAngle.Location = new System.Drawing.Point(102, 199);
+            this.tbAngle.Location = new System.Drawing.Point(102, 214);
             this.tbAngle.Name = "tbAngle";
             this.tbAngle.Size = new System.Drawing.Size(152, 20);
             this.tbAngle.TabIndex = 93;
@@ -232,16 +238,80 @@
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(3, 202);
+            this.label2.Location = new System.Drawing.Point(3, 217);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(32, 13);
             this.label2.TabIndex = 94;
             this.label2.Text = "Угол";
             // 
+            // checkBox2
+            // 
+            this.checkBox2.AutoSize = true;
+            this.checkBox2.DataBindings.Add(new System.Windows.Forms.Binding("Checked", this.disk3DTechProcessBindingSource, "IsExactlyEnd", true));
+            this.checkBox2.Location = new System.Drawing.Point(102, 246);
+            this.checkBox2.Name = "checkBox2";
+            this.checkBox2.Size = new System.Drawing.Size(88, 17);
+            this.checkBox2.TabIndex = 96;
+            this.checkBox2.Text = "Конец точно";
+            this.checkBox2.UseVisualStyleBackColor = true;
+            // 
+            // checkBox1
+            // 
+            this.checkBox1.AutoSize = true;
+            this.checkBox1.DataBindings.Add(new System.Windows.Forms.Binding("Checked", this.disk3DTechProcessBindingSource, "IsExactlyBegin", true));
+            this.checkBox1.Location = new System.Drawing.Point(6, 246);
+            this.checkBox1.Name = "checkBox1";
+            this.checkBox1.Size = new System.Drawing.Size(94, 17);
+            this.checkBox1.TabIndex = 95;
+            this.checkBox1.Text = "Начало точно";
+            this.checkBox1.UseVisualStyleBackColor = true;
+            // 
+            // tbZSafety
+            // 
+            this.tbZSafety.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.tbZSafety.DataBindings.Add(new System.Windows.Forms.Binding("Text", this.disk3DTechProcessBindingSource, "ZSafety", true));
+            this.tbZSafety.Location = new System.Drawing.Point(102, 275);
+            this.tbZSafety.Name = "tbZSafety";
+            this.tbZSafety.Size = new System.Drawing.Size(152, 20);
+            this.tbZSafety.TabIndex = 97;
+            // 
+            // label5
+            // 
+            this.label5.AutoSize = true;
+            this.label5.Location = new System.Drawing.Point(3, 278);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(88, 13);
+            this.label5.TabIndex = 98;
+            this.label5.Text = "Z безопасности";
+            // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(3, 188);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(54, 13);
+            this.label3.TabIndex = 99;
+            this.label3.Text = "Размеры";
+            // 
+            // lbSize
+            // 
+            this.lbSize.AutoSize = true;
+            this.lbSize.Location = new System.Drawing.Point(99, 188);
+            this.lbSize.Name = "lbSize";
+            this.lbSize.Size = new System.Drawing.Size(0, 13);
+            this.lbSize.TabIndex = 100;
+            // 
             // Disk3DTechProcessView
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.Controls.Add(this.lbSize);
+            this.Controls.Add(this.label3);
+            this.Controls.Add(this.tbZSafety);
+            this.Controls.Add(this.label5);
+            this.Controls.Add(this.checkBox2);
+            this.Controls.Add(this.checkBox1);
             this.Controls.Add(this.tbAngle);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.tbPenetrationFeed);
@@ -289,5 +359,11 @@
         private System.Windows.Forms.BindingSource disk3DTechProcessBindingSource;
         private System.Windows.Forms.TextBox tbAngle;
         private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.CheckBox checkBox2;
+        private System.Windows.Forms.CheckBox checkBox1;
+        private System.Windows.Forms.TextBox tbZSafety;
+        private System.Windows.Forms.Label label5;
+        private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.Label lbSize;
     }
 }

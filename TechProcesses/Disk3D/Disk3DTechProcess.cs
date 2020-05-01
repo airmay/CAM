@@ -8,6 +8,10 @@ namespace CAM.Disk3D
     {
         public double Angle { get; set; }
 
+        public bool IsExactlyBegin { get; set; }
+
+        public bool IsExactlyEnd { get; set; }
+
         public Disk3DTechProcess(string caption) : base(caption)
         {
         }
