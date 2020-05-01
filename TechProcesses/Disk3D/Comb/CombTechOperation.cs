@@ -282,7 +282,7 @@ namespace CAM.Disk3D
 
         private void BuildPass(ICommandGenerator generator, List<Point3d> points)
         {
-            if (TechProcess.MachineType == MachineType.ScemaLogic)
+            if (TechProcess.MachineType == MachineType.ScemaLogic) //Settongs.IsFrontPlaneZero
                 points = points.ConvertAll(p => new Point3d(p.X, p.Y + TechProcess.Tool.Thickness.Value, p.Z));
             var z = generator.ZSafety - TechProcess.ZSafety;
             bool isComplete;

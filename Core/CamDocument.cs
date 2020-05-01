@@ -65,7 +65,7 @@ namespace CAM
         {
             if (processCommand.ToolpathObjectId.HasValue)
                 Acad.SelectObjectIds(processCommand.ToolpathObjectId.Value);
-            Acad.RegenToolObject(techProcess.Tool, processCommand.HasTool, processCommand.ToolLocation, techProcess.MachineType == MachineType.Donatoni);
+            Acad.RegenToolObject(techProcess.Tool, processCommand.HasTool, processCommand.ToolLocation, techProcess.MachineType == MachineType.Donatoni);  //Settongs.IsFrontPlaneZero
         }
 
         public void DeleteExtraObjects(ITechProcess techProcess)

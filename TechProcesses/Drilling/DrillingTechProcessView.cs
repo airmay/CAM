@@ -18,7 +18,6 @@ namespace CAM.TechProcesses.Drilling
             drillingTechProcessBindingSource.DataSource = _techProcess = data;
             tbOrigin.Text = $"{{{_techProcess.OriginX}, {_techProcess.OriginY}}}";
             tbObjects.Text = _techProcess.ProcessingArea?.GetDesc();
-            _techProcess.MachineType = MachineType.Krea;
         }
 
         private void bOrigin_Click(object sender, EventArgs e)
