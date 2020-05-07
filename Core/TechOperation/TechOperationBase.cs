@@ -50,6 +50,8 @@ namespace CAM
 
         public abstract void BuildProcessing(ICommandGenerator generator);
 
+        public virtual void PrepareBuild(ICommandGenerator generator) { }
+
         public void SetToolpathVisible(bool visible) => ToolpathObjectIds?.ForEach<Curve>(p => p.Visible = visible);
 
         public virtual void Setup(ITechProcess techProcess) => _techProcess = techProcess;

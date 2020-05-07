@@ -33,6 +33,13 @@ namespace CAM.TechProcesses.Disk3D
         {
         }
 
+        public override void PrepareBuild(ICommandGenerator generator)
+        {
+            var bounds = TechProcess.ProcessingArea.Select(p => p.ObjectId).GetExtents();
+            generator.ZSafety = bounds.MaxPoint.Z + TechProcess.ZSafety;
+            generator.ToolLocation.Point += Vector3d.ZAxis * generator.ZSafety;
+        }
+
         public override void BuildProcessing(ICommandGenerator generator)
         {
             var disk3DTechProcess = (Disk3DTechProcess)TechProcess;
@@ -45,9 +52,6 @@ namespace CAM.TechProcesses.Disk3D
             var bounds = offsetSurface.GeometricExtents;
             var minPoint = bounds.MinPoint;
             var maxPoint = bounds.MaxPoint;
-
-            generator.ZSafety = maxPoint.Z + TechProcess.ZSafety;
-            generator.ToolLocation.Point += Vector3d.ZAxis * generator.ZSafety;
 
             var PassList = new List<List<Point3d>>();
             var startY = minPoint.Y - (disk3DTechProcess.IsExactlyBegin ? 0 : (TechProcess.Tool.Thickness.Value - StepPass));

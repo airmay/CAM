@@ -78,7 +78,11 @@ namespace CAM
                 _camDocument.SelectProcessCommand(CurrentTechProcess, CurrentProcessCommand);
         }
 
-        public void SelectProcessCommand(Autodesk.AutoCAD.DatabaseServices.ObjectId id) => processCommandBindingSource.Position = _processCommandsIdx[id] - _startIdx;
+        public void SelectProcessCommand(Autodesk.AutoCAD.DatabaseServices.ObjectId id)
+        {
+            if (_processCommandsIdx.ContainsKey(id))
+                processCommandBindingSource.Position = _processCommandsIdx[id] - _startIdx;
+        }
 
         public void RefreshViews()
         {
@@ -94,7 +98,7 @@ namespace CAM
                     }
             var tid = CurrentProcessCommand?.ToolpathObjectId;
             processCommandBindingSource.DataSource = commands;
-            if (commands != null && treeView.SelectedNode.Parent == null && tid != null)
+            if (commands != null && treeView.SelectedNode.Parent == null && tid != null && _processCommandsIdx.ContainsKey(tid.Value))
                 processCommandBindingSource.Position = _processCommandsIdx[tid.Value];
         }
         #endregion
@@ -125,6 +129,7 @@ namespace CAM
                         new List<ToolStripItem> { new ToolStripMenuItem("Все операции", null, new EventHandler(bCreateTechOperation_Click)), new ToolStripSeparator() }
                         .Concat(_techOperationItems[CurrentTechProcess.GetType()]).ToArray());                
                 RefreshToolButtonsState();
+                CreateProcessCommandsIdx();
             }
             RefreshViews();
             if (treeView.SelectedNode.Tag is ITechProcess)
@@ -264,10 +269,7 @@ namespace CAM
             else
                 _camDocument.PartialProcessing(CurrentTechProcess, CurrentProcessCommand);
 
-            _processCommandsIdx = CurrentTechProcess.ProcessCommands
-                    .Select((p, ind) => new { p.ToolpathObjectId, ind })
-                    .Where(p => p.ToolpathObjectId != null)
-                    .ToDictionary(p => p.ToolpathObjectId.Value, p => p.ind);
+            CreateProcessCommandsIdx();
 
             if (node.Nodes.Count == 0)
             {
@@ -275,13 +277,19 @@ namespace CAM
                 node.Expand();
             }
 
-            UpdateCaptions();            
+            UpdateCaptions();
             RefreshToolButtonsState();
 
             ClearCommandsView();
             RefreshViews();
             tabControl.SelectedTab = tabPageCommands;
         }
+
+        private void CreateProcessCommandsIdx() => 
+            _processCommandsIdx = CurrentTechProcess.ProcessCommands?
+                    .Select((p, ind) => new { p.ToolpathObjectId, ind })
+                    .Where(p => p.ToolpathObjectId != null)
+                    .ToDictionary(p => p.ToolpathObjectId.Value, p => p.ind);
 
         private void UpdateCaptions()
         {

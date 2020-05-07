@@ -99,6 +99,7 @@ namespace CAM
                 {
                     generator.StartTechOperation();
 
+                    p.PrepareBuild(generator);
                     p.BuildProcessing(generator);
 
                     if (!generator.IsUpperTool)
@@ -115,6 +116,10 @@ namespace CAM
 
         public virtual void SkipProcessing(ProcessCommand processCommand)
         {
+            var techOperation = TechOperations.FirstOrDefault(p => p.ProcessCommands?.Contains(processCommand) == true);
+            if (techOperation == null)
+                return;
+
             List<ProcessCommand> techOperationCommands;
             List<ProcessCommand> techProcessCommands;
             using (var generator = CommandGeneratorFactory.Create(MachineType.Value))
@@ -124,22 +129,15 @@ namespace CAM
                 generator.SetTool(
                     MachineType.Value != CAM.MachineType.Donatoni ? Tool.Number : processCommand.HasTool ? 1 : 2, 
                     Frequency);
+                techOperation.PrepareBuild(generator);
                 var loc = ProcessCommands[ProcessCommands.IndexOf(processCommand) - 1].ToolLocation;
                 generator.Move(loc.Point.X, loc.Point.Y, angleC: loc.AngleC, angleA: loc.AngleA);
                 generator.GCommand(CommandNames.Penetration, 1, point: loc.Point, feed: PenetrationFeed);
                 techOperationCommands = generator.FinishTechOperation();
                 techProcessCommands = generator.FinishTechProcess();
             }
-            foreach (var techOperation in TechOperations)
-            {
-                if (techOperation.ProcessCommands?.Last().Number >= processCommand.Number)
-                {
-                    techOperation.ProcessCommands = techOperationCommands.Concat(techOperation.ProcessCommands.SkipWhile(p => p.Number < processCommand.Number)).ToList();
-                    break;
-                }
-                else
-                    techOperation.ProcessCommands = null;
-            }
+            TechOperations.TakeWhile(p => p != techOperation).ToList().ForEach(p => p.ProcessCommands = null);
+            techOperation.ProcessCommands = techOperationCommands.Concat(techOperation.ProcessCommands.SkipWhile(p => p.Number < processCommand.Number)).ToList();
             ProcessCommands = techProcessCommands.TakeWhile(p => !techOperationCommands.Contains(p)).Concat(techOperationCommands)
                 .Concat(ProcessCommands.SkipWhile(p => p.Number < processCommand.Number)).ToList();
             UpdateCaptions();

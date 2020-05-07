@@ -18,6 +18,8 @@ namespace CAM
 
         void BuildProcessing(ICommandGenerator generator);
 
+        void PrepareBuild(ICommandGenerator generator);
+
         void SetToolpathVisible(bool visible);
 
         void Setup(ITechProcess techProcess);

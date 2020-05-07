@@ -83,6 +83,7 @@ namespace CAM
                 var stopwatch = Stopwatch.StartNew();
                 Acad.DeleteObjects(techProcess.ToolpathObjectIds);
                 Acad.DeleteExtraObjects();
+                Acad.Editor.UpdateScreen();
 
                 techProcess.BuildProcessing();
 
