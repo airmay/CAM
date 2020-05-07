@@ -91,6 +91,7 @@
     <Compile Include="Acad\AcadGateway.cs" />
     <Compile Include="Acad\AcadObjectNames.cs" />
     <Compile Include="Core\CamDocument.cs" />
+    <Compile Include="Core\UI\Progressor.cs" />
     <Compile Include="Program\BuilderUtils.cs" />
     <Compile Include="Program\CommandGenerator\CommandGeneratorBase.cs" />
     <Compile Include="Program\CommandGenerator\CommandGeneratorFactory.cs" />

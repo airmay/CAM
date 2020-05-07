@@ -1,11 +1,14 @@
 ﻿using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
+using Autodesk.AutoCAD.Runtime;
+using CAM.Core;
 using CAM.Disk3D;
 using Dreambuild.AutoCAD;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using DbSurface = Autodesk.AutoCAD.DatabaseServices.Surface;
+using Exception = Autodesk.AutoCAD.Runtime.Exception;
 
 namespace CAM.TechProcesses.Disk3D
 {
@@ -56,8 +59,11 @@ namespace CAM.TechProcesses.Disk3D
             var PassList = new List<List<Point3d>>();
             var startY = minPoint.Y - (disk3DTechProcess.IsExactlyBegin ? 0 : (TechProcess.Tool.Thickness.Value - StepPass));
             var endY = maxPoint.Y - (disk3DTechProcess.IsExactlyEnd ? TechProcess.Tool.Thickness : 0);
+
+            var progressor = new Progressor("Диск 3D", (int)((endY - startY) / StepPass));
             for (var y = startY; y < endY; y += StepPass)
             {
+                progressor.Progress();
                 var points = new Point3dCollection();
                 for (var x = minPoint.X; x <= maxPoint.X; x += StepLong)
                 {
@@ -88,6 +94,7 @@ namespace CAM.TechProcesses.Disk3D
                     PassList.Add(CalcOffsetPoints(points, bounds));
             }
             offsetSurface.Dispose();
+            progressor.Stop();
 
             matrix = matrix.Inverse();
             PassList.ForEach(p =>
@@ -134,7 +141,7 @@ namespace CAM.TechProcesses.Disk3D
                     });
                     break;
                 default:
-                    throw new Exception($"Полученный тип кривой не может быть обработан {offsetCurves[0].GetType()}");
+                    throw new Exception(ErrorStatus.NotImplementedYet, $"Полученный тип кривой не может быть обработан {offsetCurves[0].GetType()}");
             }
 
             var lastPoint = offsetPoints.Last();
@@ -164,7 +171,7 @@ namespace CAM.TechProcesses.Disk3D
                         ((PlaneSurface)surface).CreateFromRegion(region);
                         break;
                     default:
-                        throw new Exception($"Объект типа {dBObject.GetType()} не может быть обработан (1)");
+                        throw new Exception(ErrorStatus.NotImplementedYet, $"Объект типа {dBObject.GetType()} не может быть обработан (1)");
                 }
                 if (unionSurface == null)
                     unionSurface = surface;
