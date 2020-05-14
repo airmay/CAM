@@ -152,6 +152,13 @@
     <Compile Include="Program\IHasProcessCommands.cs" />
     <Compile Include="Core\TechProcess\ITechProcess.cs" />
     <Compile Include="Core\Settings\MachineSettings.cs" />
+    <Compile Include="TechProcesses\Polishing\PolishingTechProcess.cs" />
+    <Compile Include="TechProcesses\Polishing\PolishingTechProcessView.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="TechProcesses\Polishing\PolishingTechProcessView.Designer.cs">
+      <DependentUpon>PolishingTechProcessView.cs</DependentUpon>
+    </Compile>
     <Compile Include="TechProcesses\Sawing\Border.cs" />
     <Compile Include="TechProcesses\Sawing\SawingMode.cs" />
     <Compile Include="TechProcesses\Sawing\SawingModesView.cs">
@@ -296,6 +303,9 @@
     <EmbeddedResource Include="TechProcesses\Drilling\DrillingTechProcessView.resx">
       <DependentUpon>DrillingTechProcessView.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="TechProcesses\Polishing\PolishingTechProcessView.resx">
+      <DependentUpon>PolishingTechProcessView.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="TechProcesses\Sawing\SawingModesView.resx">
       <DependentUpon>SawingModesView.cs</DependentUpon>
     </EmbeddedResource>
@@ -341,6 +351,7 @@
     <None Include="Properties\DataSources\CAM.TechOperation.Tactile.TactileParams.datasource" />
     <None Include="Properties\DataSources\CAM.TechProcesses.Disk3D.LongCleaningTechOperation.datasource" />
     <None Include="Properties\DataSources\CAM.TechProcesses.Drilling.DrillingTechProcess.datasource" />
+    <None Include="Properties\DataSources\CAM.TechProcesses.Polishing.PolishingTechProcess.datasource" />
     <None Include="Resources\arrow-090_.png" />
   </ItemGroup>
   <ItemGroup>
