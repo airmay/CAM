@@ -51,7 +51,7 @@
             this.bBuildProcessing = new System.Windows.Forms.ToolStripSplitButton();
             this.bPartialProcessing = new System.Windows.Forms.ToolStripMenuItem();
             this.bDeleteExtraObjects = new System.Windows.Forms.ToolStripButton();
-            this.bDeleteProcessing = new System.Windows.Forms.ToolStripButton();
+            this.bPlay = new System.Windows.Forms.ToolStripButton();
             this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
             this.bSendProgramm = new System.Windows.Forms.ToolStripButton();
             this.bClose = new System.Windows.Forms.ToolStripButton();
@@ -218,7 +218,7 @@
             this.toolStripSeparator1,
             this.bBuildProcessing,
             this.bDeleteExtraObjects,
-            this.bDeleteProcessing,
+            this.bPlay,
             this.toolStripSeparator2,
             this.bSendProgramm,
             this.bClose});
@@ -309,15 +309,16 @@
             this.bDeleteExtraObjects.Text = "Удалить доп. объекты";
             this.bDeleteExtraObjects.Click += new System.EventHandler(this.bDeleteExtraObjects_Click);
             // 
-            // bDeleteProcessing
+            // bPlay
             // 
-            this.bDeleteProcessing.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.bDeleteProcessing.Image = global::CAM.Properties.Resources.border_color;
-            this.bDeleteProcessing.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.bDeleteProcessing.Name = "bDeleteProcessing";
-            this.bDeleteProcessing.Size = new System.Drawing.Size(23, 22);
-            this.bDeleteProcessing.Text = "Скрыть/показать обработку";
-            this.bDeleteProcessing.Click += new System.EventHandler(this.bDeleteProcessing_Click);
+            this.bPlay.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.bPlay.Image = global::CAM.Properties.Resources.gear__arrow;
+            this.bPlay.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.bPlay.Name = "bPlay";
+            this.bPlay.Size = new System.Drawing.Size(23, 22);
+            this.bPlay.Text = "Проиграть обработку";
+            this.bPlay.ToolTipText = "Проигрывавание обработки";
+            this.bPlay.Click += new System.EventHandler(this.bPlay_Click);
             // 
             // toolStripSeparator2
             // 
@@ -407,7 +408,7 @@
         private System.Windows.Forms.ToolStripButton bSendProgramm;
         private System.Windows.Forms.ToolStripButton bClose;
         private System.Windows.Forms.ToolStripDropDownButton bCreateTechProcess;
-        private System.Windows.Forms.ToolStripButton bDeleteProcessing;
+        private System.Windows.Forms.ToolStripButton bPlay;
         private System.Windows.Forms.ToolStripDropDownButton bCreateTechOperation;
         private System.Windows.Forms.DataGridViewTextBoxColumn numberDataGridViewTextBoxColumn;
         private System.Windows.Forms.DataGridViewTextBoxColumn nameDataGridViewTextBoxColumn;

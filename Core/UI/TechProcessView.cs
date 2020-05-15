@@ -20,7 +20,7 @@ namespace CAM
             imageList.Images.AddRange(new Image[] { Properties.Resources.drive, Properties.Resources.drive_download });
             RefreshToolButtonsState();
 
-            bDeleteProcessing.Visible = false;
+            //bDeleteProcessing.Visible = false;
 #if DEBUG
             bClose.Visible = true;
 #endif
@@ -185,7 +185,7 @@ namespace CAM
         {
             bRemove.Enabled = bMoveUpTechOperation.Enabled = bMoveDownTechOperation.Enabled = bBuildProcessing.Enabled = treeView.SelectedNode != null;
             bCreateTechOperation.Enabled = treeView.SelectedNode != null && bCreateTechOperation.DropDownItems.Count > 0;
-            bDeleteExtraObjects.Enabled = bSendProgramm.Enabled = bPartialProcessing.Enabled = CurrentTechProcess?.ProcessCommands != null;
+            bDeleteExtraObjects.Enabled = bSendProgramm.Enabled = bPartialProcessing.Enabled = bPlay.Enabled = CurrentTechProcess?.ProcessCommands != null;
         }
 
         private void createTechProcessItem_Click(object sender, EventArgs e)
@@ -304,9 +304,12 @@ namespace CAM
             Acad.Editor.UpdateScreen();
         }
 
-        private void bDeleteProcessing_Click(object sender, EventArgs e)
+        private void bPlay_Click(object sender, EventArgs e)
         {
-            //_camDocument.DeleteExtraObjects(CurrentTechProcess);
+            toolStrip1.Enabled = false;
+            var command = _camDocument.Play(CurrentTechProcess, processCommandBindingSource.Position);
+            processCommandBindingSource.Position = CurrentTechProcess.ProcessCommands.IndexOf(command);
+            toolStrip1.Enabled = true;
         }
 
         private void bSend_Click(object sender, EventArgs e)

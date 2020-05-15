@@ -14,10 +14,10 @@ namespace CAM.Core
         int _current;
         Stopwatch _stopwatch;
 
-        public Progressor(string name, int max)
+        public Progressor(string caption, int max)
         {
             _progressMeter = new ProgressMeter();
-            _progressMeter.Start($"Расчет обработки по техпроцессу \"{name}\" [Esc - остановить]");
+            _progressMeter.Start($"{caption} [Esc - остановить]");
             _progressMeter.SetLimit(max);
 
             _stopwatch = new Stopwatch();
@@ -29,7 +29,7 @@ namespace CAM.Core
             Application.AddMessageFilter(_filter);
         }
 
-        public void Progress()
+        public bool Progress(bool throwException = true)
         {
             _progressMeter.MeterProgress();
             _current++;
@@ -40,14 +40,17 @@ namespace CAM.Core
             {
                 _stopwatch.Stop();
                 var time = TimeSpan.FromSeconds((_stopwatch.ElapsedMilliseconds * _max / _current - _stopwatch.ElapsedMilliseconds) / 1000);
-                if (MessageBox.Show($"До завершения расчета осталось {time}.\nОстановить выполнение расчета?", "Запрос", MessageBoxButtons.YesNo) == DialogResult.Yes)
+                if (MessageBox.Show($"До завершения осталось {time}. Остановить выполнение?", "Запрос", MessageBoxButtons.YesNo) == DialogResult.Yes)
                 {
-                    Stop();                    
-                    throw new Autodesk.AutoCAD.Runtime.Exception(ErrorStatus.UserBreak);
+                    Stop();   
+                    if (throwException)
+                        throw new Autodesk.AutoCAD.Runtime.Exception(ErrorStatus.UserBreak);
+                    return false;
                 }
                 _filter.bCanceled = false;
                 _stopwatch.Start();
             }
+            return true;
         }
 
         public void Stop()

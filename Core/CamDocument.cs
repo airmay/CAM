@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CAM.Core;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -73,6 +74,24 @@ namespace CAM
             techProcess.SetToolpathVisible(false);
             Acad.DeleteExtraObjects();
             //Acad.HideExtraObjects(techProcess.ToolpathCurves);
+        }
+
+        public ProcessCommand Play(ITechProcess techProcess, int commandIndex)
+        {
+            var commands = techProcess.ProcessCommands.Skip(commandIndex).ToList();
+            var progressor = new Progressor("Проигрывание обработки", commands.Count);
+            foreach (var command in commands)
+            {
+                Acad.RegenToolObject(techProcess.Tool, command.HasTool, command.ToolLocation, techProcess.MachineType == MachineType.Donatoni);
+                if (!progressor.Progress(false))
+                {
+                    SelectProcessCommand(techProcess, command);
+                    return command;
+                }
+                System.Threading.Thread.Sleep(30);
+            }
+            progressor.Stop();
+            return commands.Last();
         }
 
         public void BuildProcessing(ITechProcess techProcess)

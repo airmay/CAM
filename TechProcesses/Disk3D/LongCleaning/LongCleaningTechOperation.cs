@@ -60,7 +60,7 @@ namespace CAM.TechProcesses.Disk3D
             var startY = minPoint.Y - (disk3DTechProcess.IsExactlyBegin ? 0 : (TechProcess.Tool.Thickness.Value - StepPass));
             var endY = maxPoint.Y - (disk3DTechProcess.IsExactlyEnd ? TechProcess.Tool.Thickness : 0);
 
-            var progressor = new Progressor("Диск 3D", (int)((endY - startY) / StepPass));
+            var progressor = new Progressor("Расчет обработки по техпроцессу Диск 3D", (int)((endY - startY) / StepPass));
             for (var y = startY; y < endY; y += StepPass)
             {
                 progressor.Progress();
