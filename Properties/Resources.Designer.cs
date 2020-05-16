@@ -233,6 +233,26 @@ namespace CAM.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap icons8_cinema_16 {
+            get {
+                object obj = ResourceManager.GetObject("icons8_cinema_16", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap icons8_play {
+            get {
+                object obj = ResourceManager.GetObject("icons8_play", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap layer_resize {
             get {
                 object obj = ResourceManager.GetObject("layer_resize", resourceCulture);

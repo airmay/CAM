@@ -13,6 +13,8 @@ namespace CAM.TechProcesses.Polishing
     {
         public int Feed { get; set; }
 
+        public int ZEntry { get; set; }
+
         public double Angle1 { get; set; }
 
         public double Angle2 { get; set; }
@@ -27,6 +29,12 @@ namespace CAM.TechProcesses.Polishing
 
         public PolishingTechProcess(string caption) : base(caption)
         {
+        }
+        public override bool Validate()
+        {
+            if (Angle2 >= 90)
+                Acad.Alert("Угол2 должен быть меньше 90");
+            return Angle2 < 90;
         }
 
         protected override void BuildProcessing(ICommandGenerator generator)
@@ -59,10 +67,13 @@ namespace CAM.TechProcesses.Polishing
 
             void Cutting(Point3d point1, Point3d point2, Vector3d dir, Vector3d pv)
             {
+                var z = 0;
                 if (generator.IsUpperTool)
+                {
                     generator.Move(point1.X, point1.Y);
-                generator.GCommand(CommandNames.Cutting, 1, point: point1);
-
+                    generator.GCommand(CommandNames.Cutting, 1, x: point1.X, y: point1.Y, z: ZEntry, feed: Feed / 5);
+                    z = ZEntry;
+                }
                 var point0 = point1;
                 var line = new Line();
                 var length = point1.DistanceTo(point2);
@@ -89,7 +100,11 @@ namespace CAM.TechProcesses.Polishing
                     if (line.Intersect(curves).Any())
                         isInner = !isInner;
                     if (isInner)
-                        generator.GCommand(CommandNames.Cutting, 1, point: point, feed: Feed);
+                    {
+                        if (z > 0)
+                            z--;
+                        generator.GCommand(CommandNames.Cutting, 1, x: point.X, y: point.Y, z: z, feed: Feed);
+                    }
                     point0 = point;
                 }
                 line.Dispose();

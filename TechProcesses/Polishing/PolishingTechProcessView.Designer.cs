@@ -56,13 +56,15 @@
             this.label7 = new System.Windows.Forms.Label();
             this.textBox2 = new System.Windows.Forms.TextBox();
             this.label9 = new System.Windows.Forms.Label();
+            this.textBox3 = new System.Windows.Forms.TextBox();
+            this.label11 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.polishingTechProcessBindingSource)).BeginInit();
             this.SuspendLayout();
             // 
             // bOrigin
             // 
             this.bOrigin.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.bOrigin.Location = new System.Drawing.Point(234, 115);
+            this.bOrigin.Location = new System.Drawing.Point(234, 138);
             this.bOrigin.Name = "bOrigin";
             this.bOrigin.Size = new System.Drawing.Size(21, 21);
             this.bOrigin.TabIndex = 101;
@@ -75,7 +77,7 @@
             // 
             this.tbOrigin.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.tbOrigin.Location = new System.Drawing.Point(102, 115);
+            this.tbOrigin.Location = new System.Drawing.Point(102, 138);
             this.tbOrigin.Name = "tbOrigin";
             this.tbOrigin.ReadOnly = true;
             this.tbOrigin.Size = new System.Drawing.Size(130, 20);
@@ -84,7 +86,7 @@
             // label8
             // 
             this.label8.AutoSize = true;
-            this.label8.Location = new System.Drawing.Point(3, 119);
+            this.label8.Location = new System.Drawing.Point(3, 142);
             this.label8.Name = "label8";
             this.label8.Size = new System.Drawing.Size(100, 13);
             this.label8.TabIndex = 100;
@@ -135,7 +137,7 @@
             // bObjects
             // 
             this.bObjects.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.bObjects.Location = new System.Drawing.Point(233, 138);
+            this.bObjects.Location = new System.Drawing.Point(233, 161);
             this.bObjects.Name = "bObjects";
             this.bObjects.Size = new System.Drawing.Size(21, 21);
             this.bObjects.TabIndex = 92;
@@ -148,7 +150,7 @@
             // 
             this.tbObjects.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.tbObjects.Location = new System.Drawing.Point(102, 139);
+            this.tbObjects.Location = new System.Drawing.Point(102, 162);
             this.tbObjects.Name = "tbObjects";
             this.tbObjects.ReadOnly = true;
             this.tbObjects.Size = new System.Drawing.Size(130, 20);
@@ -157,7 +159,7 @@
             // label10
             // 
             this.label10.AutoSize = true;
-            this.label10.Location = new System.Drawing.Point(2, 142);
+            this.label10.Location = new System.Drawing.Point(2, 165);
             this.label10.Name = "label10";
             this.label10.Size = new System.Drawing.Size(42, 13);
             this.label10.TabIndex = 91;
@@ -208,7 +210,7 @@
             this.tbAngle.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.tbAngle.DataBindings.Add(new System.Windows.Forms.Binding("Text", this.polishingTechProcessBindingSource, "Angle1", true));
-            this.tbAngle.Location = new System.Drawing.Point(102, 175);
+            this.tbAngle.Location = new System.Drawing.Point(102, 198);
             this.tbAngle.Name = "tbAngle";
             this.tbAngle.Size = new System.Drawing.Size(152, 20);
             this.tbAngle.TabIndex = 70;
@@ -216,7 +218,7 @@
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(3, 178);
+            this.label1.Location = new System.Drawing.Point(3, 201);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(38, 13);
             this.label1.TabIndex = 105;
@@ -227,7 +229,7 @@
             this.tbStep1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.tbStep1.DataBindings.Add(new System.Windows.Forms.Binding("Text", this.polishingTechProcessBindingSource, "Angle2", true));
-            this.tbStep1.Location = new System.Drawing.Point(102, 198);
+            this.tbStep1.Location = new System.Drawing.Point(102, 221);
             this.tbStep1.Name = "tbStep1";
             this.tbStep1.Size = new System.Drawing.Size(152, 20);
             this.tbStep1.TabIndex = 80;
@@ -235,7 +237,7 @@
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(3, 201);
+            this.label2.Location = new System.Drawing.Point(3, 224);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(38, 13);
             this.label2.TabIndex = 107;
@@ -246,7 +248,7 @@
             this.tbAmplitude.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.tbAmplitude.DataBindings.Add(new System.Windows.Forms.Binding("Text", this.polishingTechProcessBindingSource, "AmplitudeMin", true));
-            this.tbAmplitude.Location = new System.Drawing.Point(102, 234);
+            this.tbAmplitude.Location = new System.Drawing.Point(102, 257);
             this.tbAmplitude.Name = "tbAmplitude";
             this.tbAmplitude.Size = new System.Drawing.Size(152, 20);
             this.tbAmplitude.TabIndex = 90;
@@ -254,7 +256,7 @@
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(3, 237);
+            this.label3.Location = new System.Drawing.Point(3, 260);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(88, 13);
             this.label3.TabIndex = 109;
@@ -265,7 +267,7 @@
             this.tbStep2.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.tbStep2.DataBindings.Add(new System.Windows.Forms.Binding("Text", this.polishingTechProcessBindingSource, "AmplitudeMax", true));
-            this.tbStep2.Location = new System.Drawing.Point(102, 257);
+            this.tbStep2.Location = new System.Drawing.Point(102, 280);
             this.tbStep2.Name = "tbStep2";
             this.tbStep2.Size = new System.Drawing.Size(152, 20);
             this.tbStep2.TabIndex = 100;
@@ -273,7 +275,7 @@
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(3, 260);
+            this.label4.Location = new System.Drawing.Point(3, 283);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(94, 13);
             this.label4.TabIndex = 111;
@@ -284,7 +286,7 @@
             this.textBox1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.textBox1.DataBindings.Add(new System.Windows.Forms.Binding("Text", this.polishingTechProcessBindingSource, "StepMax", true));
-            this.textBox1.Location = new System.Drawing.Point(102, 317);
+            this.textBox1.Location = new System.Drawing.Point(102, 340);
             this.textBox1.Name = "textBox1";
             this.textBox1.Size = new System.Drawing.Size(152, 20);
             this.textBox1.TabIndex = 113;
@@ -292,7 +294,7 @@
             // label7
             // 
             this.label7.AutoSize = true;
-            this.label7.Location = new System.Drawing.Point(3, 320);
+            this.label7.Location = new System.Drawing.Point(3, 343);
             this.label7.Name = "label7";
             this.label7.Size = new System.Drawing.Size(59, 13);
             this.label7.TabIndex = 115;
@@ -303,7 +305,7 @@
             this.textBox2.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.textBox2.DataBindings.Add(new System.Windows.Forms.Binding("Text", this.polishingTechProcessBindingSource, "StepMin", true));
-            this.textBox2.Location = new System.Drawing.Point(102, 294);
+            this.textBox2.Location = new System.Drawing.Point(102, 317);
             this.textBox2.Name = "textBox2";
             this.textBox2.Size = new System.Drawing.Size(152, 20);
             this.textBox2.TabIndex = 112;
@@ -311,16 +313,37 @@
             // label9
             // 
             this.label9.AutoSize = true;
-            this.label9.Location = new System.Drawing.Point(3, 297);
+            this.label9.Location = new System.Drawing.Point(3, 320);
             this.label9.Name = "label9";
             this.label9.Size = new System.Drawing.Size(53, 13);
             this.label9.TabIndex = 114;
             this.label9.Text = "Шаг мин.";
             // 
+            // textBox3
+            // 
+            this.textBox3.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.textBox3.DataBindings.Add(new System.Windows.Forms.Binding("Text", this.polishingTechProcessBindingSource, "ZEntry", true));
+            this.textBox3.Location = new System.Drawing.Point(102, 104);
+            this.textBox3.Name = "textBox3";
+            this.textBox3.Size = new System.Drawing.Size(152, 20);
+            this.textBox3.TabIndex = 45;
+            // 
+            // label11
+            // 
+            this.label11.AutoSize = true;
+            this.label11.Location = new System.Drawing.Point(3, 107);
+            this.label11.Name = "label11";
+            this.label11.Size = new System.Drawing.Size(46, 13);
+            this.label11.TabIndex = 117;
+            this.label11.Text = "Z входа";
+            // 
             // PolishingTechProcessView
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.Controls.Add(this.textBox3);
+            this.Controls.Add(this.label11);
             this.Controls.Add(this.textBox1);
             this.Controls.Add(this.label7);
             this.Controls.Add(this.textBox2);
@@ -384,5 +407,7 @@
         private System.Windows.Forms.Label label7;
         private System.Windows.Forms.TextBox textBox2;
         private System.Windows.Forms.Label label9;
+        private System.Windows.Forms.TextBox textBox3;
+        private System.Windows.Forms.Label label11;
     }
 }

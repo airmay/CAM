@@ -19,8 +19,6 @@ namespace CAM
 
             imageList.Images.AddRange(new Image[] { Properties.Resources.drive, Properties.Resources.drive_download });
             RefreshToolButtonsState();
-
-            //bDeleteProcessing.Visible = false;
 #if DEBUG
             bClose.Visible = true;
 #endif
@@ -40,7 +38,7 @@ namespace CAM
             treeView.Nodes.Clear();
             _camDocument?.TechProcessList.ForEach(p => CreateTechProcessNode(p));
             treeView.SelectedNode = treeView.Nodes.Count > 0 ? treeView.Nodes[0] : null;
-            toolStrip1.Enabled = _camDocument != null;
+            toolStrip.Enabled = _camDocument != null;
             RefreshToolButtonsState();
         }
 
@@ -264,10 +262,12 @@ namespace CAM
             treeView.SelectedNode = node;
             SelectNextControl(ActiveControl, true, true, true, true);
 
+            toolStrip.Enabled = false;
             if (sender == bBuildProcessing)
                 _camDocument.BuildProcessing(CurrentTechProcess);
             else
                 _camDocument.PartialProcessing(CurrentTechProcess, CurrentProcessCommand);
+            toolStrip.Enabled = true;
 
             CreateProcessCommandsIdx();
 
@@ -306,10 +306,10 @@ namespace CAM
 
         private void bPlay_Click(object sender, EventArgs e)
         {
-            toolStrip1.Enabled = false;
+            toolStrip.Enabled = false;
             var command = _camDocument.Play(CurrentTechProcess, processCommandBindingSource.Position);
             processCommandBindingSource.Position = CurrentTechProcess.ProcessCommands.IndexOf(command);
-            toolStrip1.Enabled = true;
+            toolStrip.Enabled = true;
         }
 
         private void bSend_Click(object sender, EventArgs e)
