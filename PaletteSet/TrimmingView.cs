@@ -40,7 +40,18 @@ namespace CAM
 
         private void CreatePline(ObjectId[] ids)
         {
-            var curves = App.LockAndExecute(() => ids.QOpenForRead<Curve>());
+            var curves = App.LockAndExecute(() => ids.QOpenForRead<Curve>())
+                .SelectMany(p =>
+                {
+                    if (p is Polyline)
+                    {
+                        var results = new DBObjectCollection();
+                        p.Explode(results);
+                        return results.Cast<Curve>();
+                    }
+                    return new List<Curve>{ p };
+                })
+                .ToArray();
             var curve = curves[0];
             var item = new Item
             {

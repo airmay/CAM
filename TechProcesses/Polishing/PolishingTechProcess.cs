@@ -50,6 +50,7 @@ namespace CAM.TechProcesses.Polishing
             var random = new Random();
             var mainDir = Vector3d.XAxis.RotateBy(Angle1.ToRad(), Vector3d.ZAxis);
             var side = 1;
+            var sign = -1;
             var basePoint = bounds.MinPoint + (bounds.GetCenter() - bounds.MinPoint).GetNormal() * 100;
             using (var ray = new Ray())
                 while (true)
@@ -61,7 +62,7 @@ namespace CAM.TechProcesses.Polishing
                         break;
 
                     basePoint = points.First() + ray.UnitDir.Negate();
-                    Cutting(ray.BasePoint, basePoint, ray.UnitDir, ray.UnitDir.GetPerpendicularVector() * side);
+                    Cutting(ray.BasePoint, basePoint, ray.UnitDir, ray.UnitDir.GetPerpendicularVector() * side * sign);
                     side *= -1;
                 }
 
@@ -77,16 +78,16 @@ namespace CAM.TechProcesses.Polishing
                 var point0 = point1;
                 var line = new Line();
                 var length = point1.DistanceTo(point2);
-                var l = 0;
-                double a = 0;
-                var count = 10;
+                var l = 0D;
+                var a = 0D;
+                var count = 10D;
                 var stepA = Math.PI / count;
-                var stepL = 0;
+                var stepL = 0D;
                 var amp = 0;
                 var isInner = true;
 
                 while (l < length)
-                {
+                {                    
                     if (Math.Abs(Math.Sin(a)) < Consts.Epsilon)
                     {
                         stepL = random.Next(StepMin, StepMax) / count;
@@ -108,6 +109,8 @@ namespace CAM.TechProcesses.Polishing
                     point0 = point;
                 }
                 line.Dispose();
+                if (Math.Sin(a - stepA) > 0)
+                    sign = -sign;
             }
 
                 //var ray = new Ray

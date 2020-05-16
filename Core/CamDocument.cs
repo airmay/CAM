@@ -91,7 +91,7 @@ namespace CAM
                 System.Threading.Thread.Sleep(30);
             }
             progressor.Stop();
-            return commands.Last();
+            return commands.First();
         }
 
         public void BuildProcessing(ITechProcess techProcess)
