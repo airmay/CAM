@@ -10,26 +10,30 @@ namespace CAM.Core
     {
         private ProgressMeter _progressMeter;
         private MyMessageFilter _filter;
-        int _max;
-        int _current;
-        Stopwatch _stopwatch;
+        private int _max;
+        private int _current;
+        private Stopwatch _stopwatch;
 
-        public Progressor(string caption, int max)
+        public Progressor(string caption)
         {
             _progressMeter = new ProgressMeter();
             _progressMeter.Start($"{caption} [Esc - остановить]");
-            _progressMeter.SetLimit(max);
 
             _stopwatch = new Stopwatch();
-            _stopwatch.Start();
-            _max = max;
-            _current = 0;
+            _stopwatch.Start();            
 
             _filter = new MyMessageFilter();
             Application.AddMessageFilter(_filter);
         }
 
-        public bool Progress(bool throwException = true)
+        public void SetLimit(int max)
+        {
+            _progressMeter.SetLimit(max);
+            _max = max;
+            _current = 0;
+        }
+
+        public bool Report(bool throwException = true)
         {
             _progressMeter.MeterProgress();
             _current++;
@@ -39,8 +43,10 @@ namespace CAM.Core
             if (_filter.bCanceled == true)
             {
                 _stopwatch.Stop();
-                var time = TimeSpan.FromSeconds((_stopwatch.ElapsedMilliseconds * _max / _current - _stopwatch.ElapsedMilliseconds) / 1000);
-                if (MessageBox.Show($"До завершения осталось {time}. Остановить выполнение?", "Запрос", MessageBoxButtons.YesNo) == DialogResult.Yes)
+                var rest = _max != 0
+                    ? $"До завершения осталось {TimeSpan.FromSeconds((_stopwatch.ElapsedMilliseconds * _max / _current - _stopwatch.ElapsedMilliseconds) / 1000)}. "
+                    : String.Empty;
+                if (MessageBox.Show($"{rest}Остановить выполнение?", "Запрос", MessageBoxButtons.YesNo) == DialogResult.Yes)
                 {
                     Stop();   
                     if (throwException)

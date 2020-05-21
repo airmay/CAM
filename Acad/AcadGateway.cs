@@ -5,6 +5,7 @@ using Autodesk.AutoCAD.EditorInput;
 using Autodesk.AutoCAD.Geometry;
 using Autodesk.AutoCAD.GraphicsInterface;
 using Autodesk.AutoCAD.Windows;
+using CAM.Core;
 using Dreambuild.AutoCAD;
 using System;
 using System.Collections.Generic;
@@ -267,6 +268,20 @@ namespace CAM
                     ids.QForEach(entity => entity.Erase());
             });
         }
+        #endregion
+
+        #region Progressor
+
+        public static Progressor _progressor;
+
+        public static void CreateProgressor(string caption) => _progressor = new Progressor(caption);
+
+        public static void SetLimitProgressor(int max) => _progressor.SetLimit(max);
+
+        public static bool ReportProgressor(bool throwException = true) => _progressor.Report(throwException);
+
+        public static void CloseProgressor() => _progressor.Stop();
+
         #endregion
 
         /// <summary>

@@ -79,18 +79,19 @@ namespace CAM
         public ProcessCommand Play(ITechProcess techProcess, int commandIndex)
         {
             var commands = techProcess.ProcessCommands.Skip(commandIndex).ToList();
-            var progressor = new Progressor("Проигрывание обработки", commands.Count);
+            Acad.CreateProgressor("Проигрывание обработки");
+            Acad.SetLimitProgressor(commands.Count);
             foreach (var command in commands)
             {
                 Acad.RegenToolObject(techProcess.Tool, command.HasTool, command.ToolLocation, techProcess.MachineType == MachineType.Donatoni);
-                if (!progressor.Progress(false))
+                if (!Acad.ReportProgressor(false))
                 {
                     SelectProcessCommand(techProcess, command);
                     return command;
                 }
                 System.Threading.Thread.Sleep(30);
             }
-            progressor.Stop();
+            Acad.CloseProgressor();
             return commands.First();
         }
 
@@ -100,6 +101,7 @@ namespace CAM
             {
                 Acad.Write($"Выполняется расчет обработки по техпроцессу {techProcess.Caption} ...");
                 var stopwatch = Stopwatch.StartNew();
+                Acad.CreateProgressor($"Расчет обработки по техпроцессу \"{techProcess.Caption}\"");
                 Acad.DeleteObjects(techProcess.ToolpathObjectIds);
                 Acad.DeleteExtraObjects();
                 Acad.Editor.UpdateScreen();
@@ -122,6 +124,7 @@ namespace CAM
                 techProcess.DeleteProcessCommands();
                 Acad.Alert("Ошибка при выполнении расчета", ex);
             }
+            Acad.CloseProgressor();
             Acad.Editor.UpdateScreen();
         }
 

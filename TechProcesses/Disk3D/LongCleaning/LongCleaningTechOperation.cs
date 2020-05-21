@@ -60,10 +60,10 @@ namespace CAM.TechProcesses.Disk3D
             var startY = minPoint.Y - (disk3DTechProcess.IsExactlyBegin ? 0 : (TechProcess.Tool.Thickness.Value - StepPass));
             var endY = maxPoint.Y - (disk3DTechProcess.IsExactlyEnd ? TechProcess.Tool.Thickness : 0);
 
-            var progressor = new Progressor("Расчет обработки по техпроцессу Диск 3D", (int)((endY - startY) / StepPass));
+            Acad.SetLimitProgressor((int)((endY - startY) / StepPass));
             for (var y = startY; y < endY; y += StepPass)
             {
-                progressor.Progress();
+                Acad.ReportProgressor();
                 var points = new Point3dCollection();
                 for (var x = minPoint.X; x <= maxPoint.X; x += StepLong)
                 {
@@ -94,17 +94,20 @@ namespace CAM.TechProcesses.Disk3D
                     PassList.Add(CalcOffsetPoints(points, bounds));
             }
             offsetSurface.Dispose();
-            progressor.Stop();
 
             matrix = matrix.Inverse();
             PassList.ForEach(p =>
             {
-                var tp = disk3DTechProcess.Angle != 0 ? p.ConvertAll(x => x.TransformBy(matrix)) : p;
+                var points = p;
+                if (TechProcess.MachineType == MachineType.ScemaLogic) //Settongs.IsFrontPlaneZero
+                    points = points.ConvertAll(x => new Point3d(x.X, x.Y + TechProcess.Tool.Thickness.Value, x.Z));
+                if (disk3DTechProcess.Angle != 0)
+                    points = points.ConvertAll(x => x.TransformBy(matrix));
                 var loc = generator.ToolLocation;
-                if (loc.IsDefined && loc.Point.DistanceTo(tp.First()) > loc.Point.DistanceTo(tp.Last()))
-                    tp.Reverse();
+                if (loc.IsDefined && loc.Point.DistanceTo(points.First()) > loc.Point.DistanceTo(points.Last()))
+                    points.Reverse();
 
-                BuildPass(generator, tp);
+                BuildPass(generator, points);
 
                 if (IsUplifting)
                     generator.Uplifting();
@@ -193,9 +196,6 @@ namespace CAM.TechProcesses.Disk3D
 
         private void BuildPass(ICommandGenerator generator, List<Point3d> points)
         {
-            if (TechProcess.MachineType == MachineType.ScemaLogic)  //Settongs.IsFrontPlaneZero
-                points = points.ConvertAll(p => new Point3d(p.X, p.Y + TechProcess.Tool.Thickness.Value, p.Z));
-
             var point0 = Algorithms.NullPoint3d;
             var point = Algorithms.NullPoint3d;
 
