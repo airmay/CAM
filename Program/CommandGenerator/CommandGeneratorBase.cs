@@ -87,7 +87,7 @@ namespace CAM
         public void SetTool(int toolNo, int frequency, double angleA = 0, bool hasTool = true)
         {
             StopEngine();
-            ToolLocation.Set(new Point3d(double.NaN, double.NaN, UpperZ), 0, 0);
+            ToolLocation.Set(new Point3d(double.NaN, double.NaN, ZSafety + UpperZ), 0, 0);
             SetToolCommands(toolNo, angleA);
 
             _frequency = frequency;

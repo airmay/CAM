@@ -77,13 +77,6 @@ namespace CAM
 
         public virtual void BuildProcessing()
         {
-            if (!TechOperations.Any())
-                CreateTechOperations();
-
-            if (!Validate() || TechOperations.Any(p => p.Enabled && p.CanProcess && !p.Validate()))
-                return;
-            DeleteProcessCommands();
-
             using (var generator = CommandGeneratorFactory.Create(MachineType.Value))
             {
                 generator.StartTechProcess(this.GetType().Name, OriginX, OriginY, ZSafety);

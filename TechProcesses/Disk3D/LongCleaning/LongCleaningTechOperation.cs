@@ -7,6 +7,7 @@ using Dreambuild.AutoCAD;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using DbSurface = Autodesk.AutoCAD.DatabaseServices.Surface;
 using Exception = Autodesk.AutoCAD.Runtime.Exception;
 
@@ -32,8 +33,13 @@ namespace CAM.TechProcesses.Disk3D
 
         public bool IsUplifting { get; set; }
 
+        public double StepZ { get; set; }
+
         public LongCleaningTechOperation(ITechProcess techProcess, string caption) : base(techProcess, caption)
         {
+            StepPass = 1;
+            StepLong = 1;
+            StepZ = 1;
         }
 
         public override void PrepareBuild(ICommandGenerator generator)
@@ -44,6 +50,218 @@ namespace CAM.TechProcesses.Disk3D
         }
 
         public override void BuildProcessing(ICommandGenerator generator)
+        {
+            //var progressMeter = new ProgressMeter();
+            //progressMeter.Start($"test");
+            //progressMeter.SetLimit(100);
+            //for (int i = 0; i < 100; i++)
+            //{
+            //    progressMeter.MeterProgress();
+            //    Thread.Sleep(100);
+            //}
+            ////progressMeter.Start($"test111");
+            //progressMeter.SetLimit(100);
+            //for (int i = 0; i < 100; i++)
+            //{
+            //    progressMeter.MeterProgress();
+            //    Thread.Sleep(100);
+            //}
+            //progressMeter.Stop();
+            //return;
+
+            //Draw.Pline(new Point3d(0, 1000, 0), new Point3d(1000, 1000, 0), new Point3d(1000, 1200, 0), new Point3d(2000, 1200, 0));
+            //var points1 = new Point3dCollection(new Point3d[] { new Point3d(0, 1000, 0), new Point3d(1000, 1000, 0), new Point3d(1000, 1200, 0), new Point3d(2000, 1200, 0) });
+            //var pline = new PolylineCurve3d(points1);
+
+            //    var distance = TechProcess.Tool.Diameter / 2;
+            //    var offsetCurves = pline.GetTrimmedOffset(100, Vector3d.ZAxis, OffsetCurveExtensionType.Fillet);
+
+            //var cInt = new CurveCurveIntersector3d(offsetCurves[0], new Line3d(new Point3d(0, 0, 0), new Point3d(0, 3000, 0)), Vector3d.ZAxis);
+            //var dbp = new List<DBPoint>();
+            //for (int i = 0; i < 2000; i++)
+            //{
+            //    cInt.Set(offsetCurves[0], new Line3d(new Point3d(i, 0, 0), new Point3d(i, 3000, 0)), Vector3d.ZAxis);
+
+            //    Point3d pnt3d = cInt.GetIntersectionPoint(0);
+
+            //    dbp.Add(new DBPoint(pnt3d - Vector3d.YAxis * 100));
+
+            //}
+            //cInt.Dispose();
+            //dbp.AddToCurrentSpace();
+
+
+            var disk3DTechProcess = (Disk3DTechProcess)TechProcess;
+
+            var offsetSurface = CreateOffsetSurface();
+
+            var matrix = Matrix3d.Rotation(disk3DTechProcess.Angle.ToRad(), Vector3d.ZAxis, Point3d.Origin);
+            if (disk3DTechProcess.Angle != 0)
+                offsetSurface.TransformBy(matrix);
+
+            var minPoint = offsetSurface.GeometricExtents.MinPoint;
+            var maxPoint = offsetSurface.GeometricExtents.MaxPoint; // - Vector3d.XAxis * 1000;
+
+            var polylines = GetSurfacePolylines(offsetSurface, minPoint, maxPoint);
+
+            offsetSurface.Dispose();
+
+            var pointsArray = GetPointsArray(polylines, minPoint, maxPoint);
+
+            var passList = CalcCuttingPass(pointsArray);
+
+            matrix = matrix.Inverse();
+            passList.ForEach(p =>
+            {
+                var points = p;
+                if (TechProcess.MachineType == MachineType.Krea) //Settongs.IsFrontPlaneZero
+                    points = points.ConvertAll(x => new Point3d(x.X, x.Y - TechProcess.Tool.Thickness.Value, x.Z));
+                if (disk3DTechProcess.Angle != 0)
+                    points = points.ConvertAll(x => x.TransformBy(matrix));
+                var loc = generator.ToolLocation;
+                if (loc.IsDefined && loc.Point.DistanceTo(points.First()) > loc.Point.DistanceTo(points.Last()))
+                    points.Reverse();
+
+                BuildPass(generator, points);
+
+                if (IsUplifting)
+                    generator.Uplifting();
+            });
+        }
+
+        private List<List<Point3d>> CalcCuttingPass(Point3d[,] pointsArray)
+        {
+            var passList = new List<List<Point3d>>();
+
+            var w = (int)(TechProcess.Tool.Thickness / StepPass);
+            var w08 = (int)(0.8 * TechProcess.Tool.Thickness / StepPass);
+            int k08 = 0;
+            var zArrayLast = new double[pointsArray.GetLength(1)];
+            var zArray = new double[pointsArray.GetLength(1)];
+
+            Acad.SetLimitProgressor(pointsArray.GetLength(0));
+
+            for (int j = 0; j < pointsArray.GetLength(1); j++)
+            {
+                zArrayLast[j] = pointsArray[0, j].Z;
+            }
+            for (int i = 1; i < pointsArray.GetLength(0); i++)
+            {
+                Acad.ReportProgressor();
+                var isCutting = false;
+                k08++;
+
+                for (int j = 0; j < pointsArray.GetLength(1); j++)
+                {
+                    var z = double.MinValue;
+                    for (int k = 0; k <= w && i - k >= 0; k++)
+                    {
+                        if (i - k < pointsArray.GetLength(0) && pointsArray[i - k, j].Z > z)
+                            z = pointsArray[i - k, j].Z;
+                    }
+                    zArray[j] = z;
+                    if (zArrayLast[j] > double.MinValue && z > double.MinValue && Math.Abs(z - zArrayLast[j]) > StepZ)
+                        isCutting = true;
+                }
+                if (isCutting || k08 == w08)
+                {
+                    k08 = 0;
+                    var pass = new List<Point3d>();
+                    for (int j = 0; j < pointsArray.GetLength(1); j++)
+                    {
+                        if (zArray[j] > double.MinValue)
+                            pass.Add(new Point3d(pointsArray[i, j].X, pointsArray[i, j].Y, zArray[j]));
+                        zArrayLast[j] = zArray[j];
+                        zArray[j] = double.MinValue;
+                    }
+                    passList.Add(pass);
+                }
+            }
+            
+            return passList;
+        }
+
+        private Point3d[,] GetPointsArray(List<PolylineCurve3d> polylines, Point3d minPoint, Point3d maxPoint)
+        {
+            var distance = TechProcess.Tool.Diameter / 2;
+            var stepX = StepLong;
+            var countX = (int)((maxPoint.X - minPoint.X) / stepX) + 1;
+            var pointsArray = new Point3d[polylines.Count, countX];
+            var cInt = new CurveCurveIntersector3d();
+            Acad.SetLimitProgressor(polylines.Count);
+            var lr = Acad.GetProcessLayerId();
+            for (int i = 0; i < polylines.Count; i++)
+            {
+                Acad.ReportProgressor();
+
+                var polyline = polylines[i];
+                var y = polyline.StartPoint.Y;
+                for (int j = 0; j < countX; j++)
+                {
+                    var x = minPoint.X + j * stepX;
+                    var offsetCurve = polyline.GetTrimmedOffset(distance, -Vector3d.YAxis, OffsetCurveExtensionType.Fillet)[0];
+                    var line = new Line3d(new Point3d(x, y, minPoint.Z), new Point3d(x, y, maxPoint.Z));
+                    cInt.Set(offsetCurve, line, Vector3d.ZAxis);
+
+                    pointsArray[i, j] = cInt.NumberOfIntersectionPoints == 1 ? cInt.GetIntersectionPoint(0) - Vector3d.ZAxis * distance : new Point3d(x, y, double.MinValue);
+
+                    //var pt = new DBPoint(pointsArray[i, j]);
+                    //pt.LayerId = lr;
+                    //pt.AddToCurrentSpace();
+                }
+                polyline.Dispose();
+            }
+            return pointsArray;
+        }
+
+        private List<PolylineCurve3d> GetSurfacePolylines(DbSurface offsetSurface, Point3d minPoint, Point3d maxPoint)
+        {
+            var startY = minPoint.Y;
+            var endY = maxPoint.Y;
+            var stepY = StepPass;
+            var countY = (int)((endY - startY) / stepY);
+
+            var startX = minPoint.X;
+            var endX = (int)maxPoint.X;
+            var stepX = 10;
+            var countX = (int)((endX - startX) / stepX);
+
+            var polylines = new List<PolylineCurve3d>();
+            var collection = new Point3dCollection();
+
+            Acad.SetLimitProgressor(countY);
+
+            for (var i = 0; i < countY; i++)
+            {
+                Acad.ReportProgressor();
+
+                for (var j = 0; j < countX; j++)
+                {
+                    var y = startY + i * stepY;
+                    var x = startX + j * stepX;
+                    offsetSurface.RayTest(new Point3d(x, y, minPoint.Z), Vector3d.ZAxis, 0.0001, out SubentityId[] col, out DoubleCollection par);
+                    if (par.Count > 0)
+                    {
+                        var z = par[par.Count - 1];
+                        //if (x > 500)
+                        //    z += 100;
+
+                        var point = new Point3d(x, y, minPoint.Z + z);
+                        var ind = collection.Count - 1;
+                        if (ind > 0 && collection[ind - 1].GetVectorTo(collection[ind]).IsCodirectionalTo(collection[ind].GetVectorTo(point)))
+                            collection[ind] = point;
+                        else
+                            collection.Add(point);
+                    }   
+                }
+                polylines.Add(new PolylineCurve3d(collection));
+                collection.Clear();
+            }
+            return polylines;
+        }
+        //------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+        public void BuildProcessing1(ICommandGenerator generator)
         {
             var disk3DTechProcess = (Disk3DTechProcess)TechProcess;
 

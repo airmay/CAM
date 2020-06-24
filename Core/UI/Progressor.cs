@@ -28,6 +28,7 @@ namespace CAM.Core
 
         public void SetLimit(int max)
         {
+            _progressMeter.Start();
             _progressMeter.SetLimit(max);
             _max = max;
             _current = 0;

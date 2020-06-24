@@ -92,7 +92,7 @@ namespace CAM.Tactile
             if (ProcessingAngle >= 90)
                 passDir = passDir.Negate();
             double offset = BandStart - BandSpacing - BandWidth;
-            var size = (contourPoints[ProcessingAngle == 0 ? 3 : ProcessingAngle == 90 ? 1 : 2] - contourPoints[0]).Length;
+            var size = (contourPoints[ProcessingAngle == 0 ? 1 : ProcessingAngle == 90 ? 3 : 2] - contourPoints[0]).Length;
 
             if (IsEdgeProcessing)
             {

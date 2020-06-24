@@ -36,12 +36,14 @@ namespace CAM
 
         public void DeleteTechProcess(ITechProcess techProcess)
         {
+            DeleteProcessing(techProcess);
             techProcess.Teardown();
             TechProcessList.Remove(techProcess);
         }
 
         public void DeleteTechOperation(ITechOperation techOperation)
         {
+            DeleteProcessing(techOperation.TechProcess);
             techOperation.Teardown();
             techOperation.TechProcess.TechOperations.Remove(techOperation);
         }
@@ -76,6 +78,13 @@ namespace CAM
             //Acad.HideExtraObjects(techProcess.ToolpathCurves);
         }
 
+        private void DeleteProcessing(ITechProcess techProcess)
+        {
+            Acad.DeleteObjects(techProcess.ToolpathObjectIds);
+            Acad.DeleteExtraObjects();
+            techProcess.DeleteProcessCommands();
+        }
+
         public ProcessCommand Play(ITechProcess techProcess, int commandIndex)
         {
             var commands = techProcess.ProcessCommands.Skip(commandIndex).ToList();
@@ -97,13 +106,18 @@ namespace CAM
 
         public void BuildProcessing(ITechProcess techProcess)
         {
+            if (!techProcess.TechOperations.Any())
+                techProcess.CreateTechOperations();
+
+            if (!techProcess.Validate() || techProcess.TechOperations.Any(p => p.Enabled && p.CanProcess && !p.Validate()))
+                return;
+
             try
             {
                 Acad.Write($"Выполняется расчет обработки по техпроцессу {techProcess.Caption} ...");
                 var stopwatch = Stopwatch.StartNew();
                 Acad.CreateProgressor($"Расчет обработки по техпроцессу \"{techProcess.Caption}\"");
-                Acad.DeleteObjects(techProcess.ToolpathObjectIds);
-                Acad.DeleteExtraObjects();
+                DeleteProcessing(techProcess);
                 Acad.Editor.UpdateScreen();
 
                 techProcess.BuildProcessing();

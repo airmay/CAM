@@ -56,7 +56,7 @@ namespace CAM
 
         public virtual void Setup(ITechProcess techProcess) => _techProcess = techProcess;
 
-        public virtual void Teardown() => Acad.DeleteObjects(ToolpathObjectIds);
+        public virtual void Teardown() { }
 
         public IEnumerable<ObjectId> ToolpathObjectIds => ProcessCommands?.Where(p => p.ToolpathObjectId != null).Select(p => p.ToolpathObjectId.Value);
 

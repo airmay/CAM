@@ -42,6 +42,8 @@
             this.label4 = new System.Windows.Forms.Label();
             this.tbZSafety = new System.Windows.Forms.TextBox();
             this.label5 = new System.Windows.Forms.Label();
+            this.tbDepth = new System.Windows.Forms.TextBox();
+            this.label6 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.conesTechOperationBindingSource)).BeginInit();
             this.SuspendLayout();
             // 
@@ -165,10 +167,31 @@
             this.label5.TabIndex = 60;
             this.label5.Text = "Z безопасности";
             // 
+            // tbDepth
+            // 
+            this.tbDepth.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.tbDepth.DataBindings.Add(new System.Windows.Forms.Binding("Text", this.conesTechOperationBindingSource, "Depth", true));
+            this.tbDepth.Location = new System.Drawing.Point(102, 161);
+            this.tbDepth.Name = "tbDepth";
+            this.tbDepth.Size = new System.Drawing.Size(152, 20);
+            this.tbDepth.TabIndex = 63;
+            // 
+            // label6
+            // 
+            this.label6.AutoSize = true;
+            this.label6.Location = new System.Drawing.Point(3, 164);
+            this.label6.Name = "label6";
+            this.label6.Size = new System.Drawing.Size(48, 13);
+            this.label6.TabIndex = 64;
+            this.label6.Text = "Глубина";
+            // 
             // ConesTechOperationView
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.Controls.Add(this.tbDepth);
+            this.Controls.Add(this.label6);
             this.Controls.Add(this.tbZEntry);
             this.Controls.Add(this.label4);
             this.Controls.Add(this.tbZSafety);
@@ -204,5 +227,7 @@
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.TextBox tbZSafety;
         private System.Windows.Forms.Label label5;
+        private System.Windows.Forms.TextBox tbDepth;
+        private System.Windows.Forms.Label label6;
     }
 }

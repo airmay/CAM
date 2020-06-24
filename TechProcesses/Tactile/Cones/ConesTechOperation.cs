@@ -20,7 +20,9 @@ namespace CAM.Tactile
         public int ZSafety { get; set; }
 
         public int ZEntry { get; set; }
-        
+
+        public double Depth { get; set; }
+
         public ConesTechOperation(TactileTechProcess techProcess, string name) : base(techProcess, name)
         {
             FeedMax = 200;
@@ -28,6 +30,7 @@ namespace CAM.Tactile
             Frequency = 5000;
             ZSafety = 5;
             ZEntry = 1;
+            Depth = ((TactileTechProcess)TechProcess).TactileTechProcessParams.Depth;
         }
 
         public override bool CanProcess => TechProcess.MachineType == MachineType.Donatoni || TechProcess.MachineType == MachineType.Krea;
@@ -80,11 +83,15 @@ namespace CAM.Tactile
             {
                 generator.Move(x, y);
                 generator.Move(z: ZEntry);
-                var zMin = -tactileParams.Depth;
-                double z = 0;
+                var zMin = -Depth;
+                double z = 0.2;
                 int counter = 0;
-                while (z >= zMin)
+                while (z > zMin)
                 {
+                    z -= 0.2;
+                    if (z < zMin)
+                        z = zMin;
+
                     var feed = (int)((FeedMax - FeedMin) / zMin * (z * z / zMin - 2 * z) + FeedMax);
                     generator.Cutting(x, y, z, feed);
                     if (z <= -2)
@@ -98,7 +105,6 @@ namespace CAM.Tactile
                             generator.Cutting(x, y, z, feed);
                         }
                     }
-                    z -= 0.2;
                 }
                 Pause();
                 generator.Uplifting();
