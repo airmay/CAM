@@ -124,6 +124,13 @@
     <Compile Include="TechProcesses\Disk3D\Comb\CombTechOperationView.Designer.cs">
       <DependentUpon>CombTechOperationView.cs</DependentUpon>
     </Compile>
+    <Compile Include="TechProcesses\Disk3D\CrossCleaning\CrossCleaningTechOperation.cs" />
+    <Compile Include="TechProcesses\Disk3D\CrossCleaning\CrossCleaningTechOperationView.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="TechProcesses\Disk3D\CrossCleaning\CrossCleaningTechOperationView.Designer.cs">
+      <DependentUpon>CrossCleaningTechOperationView.cs</DependentUpon>
+    </Compile>
     <Compile Include="TechProcesses\Disk3D\Disk3DTechProcess.cs" />
     <Compile Include="TechProcesses\Disk3D\Disk3DTechProcessView.cs">
       <SubType>UserControl</SubType>
@@ -291,6 +298,9 @@
     <EmbeddedResource Include="TechProcesses\Disk3D\Comb\CombTechOperationView.resx">
       <DependentUpon>CombTechOperationView.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="TechProcesses\Disk3D\CrossCleaning\CrossCleaningTechOperationView.resx">
+      <DependentUpon>CrossCleaningTechOperationView.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="TechProcesses\Disk3D\Disk3DTechProcessView.resx">
       <DependentUpon>Disk3DTechProcessView.cs</DependentUpon>
     </EmbeddedResource>
@@ -349,6 +359,7 @@
     <None Include="Properties\DataSources\CAM.Tactile.TactileTechProcessParams.datasource" />
     <None Include="Properties\DataSources\CAM.TechOperation.Tactile.TactileDefaultParams.datasource" />
     <None Include="Properties\DataSources\CAM.TechOperation.Tactile.TactileParams.datasource" />
+    <None Include="Properties\DataSources\CAM.TechProcesses.Disk3D.CrossCleaningTechOperation.datasource" />
     <None Include="Properties\DataSources\CAM.TechProcesses.Disk3D.LongCleaningTechOperation.datasource" />
     <None Include="Properties\DataSources\CAM.TechProcesses.Drilling.DrillingTechProcess.datasource" />
     <None Include="Properties\DataSources\CAM.TechProcesses.Polishing.PolishingTechProcess.datasource" />
@@ -431,9 +442,7 @@
   <ItemGroup>
     <None Include="Resources\paper-clip.png" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="TechProcesses\Disk3D\CrossCleaning\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
