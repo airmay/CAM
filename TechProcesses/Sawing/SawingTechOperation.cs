@@ -54,7 +54,7 @@ namespace CAM.Sawing
             const int CornerIndentIncrease = 5;
             var techProcess = (SawingTechProcess)TechProcess;
             var curve = ProcessingArea.GetCurve();
-            var thickness = techProcess.Thickness.Value;
+            var thickness = techProcess.Thickness.Value + 2; // запил на 2мм ниже нижнего края 
             var toolDiameter = techProcess.Tool.Diameter;
             var engineSide = Side.None;
             double offsetArc = 0;

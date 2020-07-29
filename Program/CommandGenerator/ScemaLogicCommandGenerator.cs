@@ -49,7 +49,7 @@ namespace CAM.Commands
         {
             var text = $"{(point.X - _originX).Round(4)};{(point.Y - _originY).Round(4)};";
             if (gCode == 0)
-                return angleC.HasValue ? $"0;XYC;{text}{angleC.Value.Round(4)};;" : $"0;XYZ;{text}{point.Z.Round(4)};;";
+                return angleC.HasValue ? $"0;;XYC;0;{text}{angleC.Value.Round(4)};;" : $"0;;XYZ;0;{text}{point.Z.Round(4)};;";
 
             if (center!= null)
                 text += $"{(center.Value.X - _originX).Round(4)};{(center.Value.Y - _originY).Round(4)};";
