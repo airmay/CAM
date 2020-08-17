@@ -36,7 +36,8 @@ namespace CAM
         {
             Command("M7", "Охлаждение");
             Command("M8", "Охлаждение");
-            Command($"M3 S{_frequency}", "Шпиндель");
+            Command($"S{_frequency}", "Шпиндель");
+            Command($"M3", "Шпиндель");
         }
 
         protected override void StopEngineCommands()

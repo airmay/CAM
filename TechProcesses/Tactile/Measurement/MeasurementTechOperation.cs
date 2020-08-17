@@ -14,6 +14,14 @@ namespace CAM.Tactile
 
         public List<double> PointsY { get; set; } = new List<double>();
 
+        public enum CalcMethodType
+        {
+            Average,
+            Minimum
+        };
+
+        public CalcMethodType CalcMethod { get; set; } = CalcMethodType.Average;
+
         [NonSerialized]
         public ObjectId[] PointObjectIds;
 
@@ -23,16 +31,42 @@ namespace CAM.Tactile
 
         public override void BuildProcessing(ICommandGenerator generator)
         {
-            for (int i = 0; i < PointsX.Count; i++)
+            if (CalcMethod == CalcMethodType.Average)
             {
-                generator.GCommand(CommandNames.Fast, 0, x: PointsX[i], y: PointsY[i], z: 80);
-                generator.Command($"G0 Z80");
-                generator.Command("M131");
-                generator.Command($"DBL THICK{i} = %TastL.ZLastra - %TastL.ZBanco", "Измерение");
-                generator.Command($"G0 Z(THICK{i}/1000 + 100)");
+                for (int i = 0; i < PointsX.Count; i++)
+                {
+                    generator.GCommand(CommandNames.Fast, 0, x: PointsX[i] + 230, y: PointsY[i] - 100 - TechProcess.Tool.Thickness.GetValueOrDefault());
+                    generator.ToolLocation.Point -= new Vector3d(0, 0, 1);
+                    generator.GCommand("", 0, z: TechProcess.Thickness.GetValueOrDefault() + TechProcess.ZSafety);
+
+                    generator.Command("M131");
+                    generator.Command($"DBL THICK{i} = %TastL.ZLastra - %TastL.ZBanco", "Измерение");
+                    generator.Command($"G0 Z(THICK{i}/1000 + 100)");
+                }
+                var s = String.Join(" + ", Enumerable.Range(0, PointsX.Count).Select(p => $"THICK{p}"));
+                generator.Command($"DBL THICK = ({s})/{PointsX.Count}/1000");
             }
-            var s = String.Join(" + ", Enumerable.Range(0, PointsX.Count).Select(p => $"THICK{p}"));
-            generator.Command($"DBL THICK = ({s})/{PointsX.Count}/1000");
+            else
+            {
+                for (int i = 0; i < PointsX.Count; i++)
+                {
+                    generator.GCommand(CommandNames.Fast, 0, x: PointsX[i] + 230, y: PointsY[i] - 100 - TechProcess.Tool.Thickness.GetValueOrDefault());
+                    generator.ToolLocation.Point -= new Vector3d(0, 0, 1);
+                    generator.GCommand("", 0, z: TechProcess.Thickness.GetValueOrDefault() + TechProcess.ZSafety);
+
+                    generator.Command("M131");
+                    generator.Command($"DBL THICK{i} = %TastL.ZLastra - %TastL.ZBanco", "Измерение");
+                    generator.Command($"G0 Z(THICK{i}/1000 + 100)");
+
+                    if (i != 0)
+                    {
+                        generator.Command($"IF (THICK{i} < THICK0) THEN");
+                        generator.Command($" THICK0 = THICK{i}");
+                        generator.Command("ENDIF");
+                    }
+                }
+                generator.Command("DBL THICK = THICK0/1000");
+            }
             generator.WithThick = true;
         }
 
@@ -63,4 +97,5 @@ namespace CAM.Tactile
             base.Teardown();
         }
     }
+
 }

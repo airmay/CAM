@@ -17,6 +17,7 @@ namespace CAM.Tactile
         {
             _techOperation = data;
             tbPointsCount.Text = _techOperation.PointsX.Count.ToString();
+            tactileTechProcessBindingSource.DataSource = data.TechProcess;
         }
 
         private void bSelectPoints_Click(object sender, System.EventArgs e)
@@ -34,6 +35,14 @@ namespace CAM.Tactile
         private void tbPointsCount_Enter(object sender, System.EventArgs e)
         {
             Acad.SelectObjectIds(_techOperation.PointObjectIds);
+        }
+
+        private void rbCalcMethodChanged(object sender, System.EventArgs e)
+        {
+            if (rbAverage.Checked)
+                _techOperation.CalcMethod = MeasurementTechOperation.CalcMethodType.Average;
+            else
+                _techOperation.CalcMethod = MeasurementTechOperation.CalcMethodType.Minimum;
         }
     }
 }

@@ -234,7 +234,7 @@
             // 
             this.tbMaxCrestWidth.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.tbMaxCrestWidth.DataBindings.Add(new System.Windows.Forms.Binding("Text", this.bandsTechOperationBindingSource, "Depth", true));
+            this.tbMaxCrestWidth.DataBindings.Add(new System.Windows.Forms.Binding("Text", this.bandsTechOperationBindingSource, "MaxCrestWidth", true));
             this.tbMaxCrestWidth.Location = new System.Drawing.Point(102, 190);
             this.tbMaxCrestWidth.Name = "tbMaxCrestWidth";
             this.tbMaxCrestWidth.Size = new System.Drawing.Size(152, 20);

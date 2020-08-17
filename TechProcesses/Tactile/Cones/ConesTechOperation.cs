@@ -114,5 +114,10 @@ namespace CAM.Tactile
 
             contour.Dispose();
         }
+
+        public override void PrepareBuild(ICommandGenerator generator)
+        {
+            generator.WithThick = TechProcess.TechOperations.OfType<MeasurementTechOperation>().Any(p => p.Enabled);
+        }
     }
 }

@@ -28,9 +28,18 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             this.bSelectPoints = new System.Windows.Forms.Button();
             this.tbPointsCount = new System.Windows.Forms.TextBox();
             this.label1 = new System.Windows.Forms.Label();
+            this.textBox1 = new System.Windows.Forms.TextBox();
+            this.tactileTechProcessBindingSource = new System.Windows.Forms.BindingSource(this.components);
+            this.label2 = new System.Windows.Forms.Label();
+            this.rbAverage = new System.Windows.Forms.RadioButton();
+            this.rbMinimum = new System.Windows.Forms.RadioButton();
+            this.gbCalcMethodType = new System.Windows.Forms.GroupBox();
+            ((System.ComponentModel.ISupportInitialize)(this.tactileTechProcessBindingSource)).BeginInit();
+            this.gbCalcMethodType.SuspendLayout();
             this.SuspendLayout();
             // 
             // bSelectPoints
@@ -65,15 +74,81 @@
             this.label1.TabIndex = 44;
             this.label1.Text = "Точки";
             // 
+            // textBox1
+            // 
+            this.textBox1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.textBox1.DataBindings.Add(new System.Windows.Forms.Binding("Text", this.tactileTechProcessBindingSource, "Thickness", true));
+            this.textBox1.Location = new System.Drawing.Point(102, 27);
+            this.textBox1.Name = "textBox1";
+            this.textBox1.Size = new System.Drawing.Size(128, 20);
+            this.textBox1.TabIndex = 46;
+            // 
+            // tactileTechProcessBindingSource
+            // 
+            this.tactileTechProcessBindingSource.DataSource = typeof(CAM.Tactile.TactileTechProcess);
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(1, 31);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(53, 13);
+            this.label2.TabIndex = 47;
+            this.label2.Text = "Толщина";
+            // 
+            // rbAverage
+            // 
+            this.rbAverage.AutoSize = true;
+            this.rbAverage.Checked = true;
+            this.rbAverage.Location = new System.Drawing.Point(18, 19);
+            this.rbAverage.Name = "rbAverage";
+            this.rbAverage.Size = new System.Drawing.Size(68, 17);
+            this.rbAverage.TabIndex = 48;
+            this.rbAverage.TabStop = true;
+            this.rbAverage.Text = "Среднее";
+            this.rbAverage.UseVisualStyleBackColor = true;
+            this.rbAverage.CheckedChanged += new System.EventHandler(this.rbCalcMethodChanged);
+            // 
+            // rbMinimum
+            // 
+            this.rbMinimum.AutoSize = true;
+            this.rbMinimum.Location = new System.Drawing.Point(18, 42);
+            this.rbMinimum.Name = "rbMinimum";
+            this.rbMinimum.Size = new System.Drawing.Size(91, 17);
+            this.rbMinimum.TabIndex = 49;
+            this.rbMinimum.Text = "Наименьшее";
+            this.rbMinimum.UseVisualStyleBackColor = true;
+            this.rbMinimum.CheckedChanged += new System.EventHandler(this.rbCalcMethodChanged);
+            // 
+            // gbCalcMethodType
+            // 
+            this.gbCalcMethodType.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.gbCalcMethodType.Controls.Add(this.rbMinimum);
+            this.gbCalcMethodType.Controls.Add(this.rbAverage);
+            this.gbCalcMethodType.Location = new System.Drawing.Point(4, 53);
+            this.gbCalcMethodType.Name = "gbCalcMethodType";
+            this.gbCalcMethodType.Size = new System.Drawing.Size(226, 68);
+            this.gbCalcMethodType.TabIndex = 50;
+            this.gbCalcMethodType.TabStop = false;
+            this.gbCalcMethodType.Text = "Метод расчета";
+            // 
             // MeasurementTechOperationView
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.Controls.Add(this.gbCalcMethodType);
+            this.Controls.Add(this.textBox1);
+            this.Controls.Add(this.label2);
             this.Controls.Add(this.bSelectPoints);
             this.Controls.Add(this.tbPointsCount);
             this.Controls.Add(this.label1);
             this.Name = "MeasurementTechOperationView";
             this.Size = new System.Drawing.Size(255, 366);
+            ((System.ComponentModel.ISupportInitialize)(this.tactileTechProcessBindingSource)).EndInit();
+            this.gbCalcMethodType.ResumeLayout(false);
+            this.gbCalcMethodType.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -84,5 +159,11 @@
         private System.Windows.Forms.Button bSelectPoints;
         private System.Windows.Forms.TextBox tbPointsCount;
         private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.TextBox textBox1;
+        private System.Windows.Forms.BindingSource tactileTechProcessBindingSource;
+        private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.RadioButton rbAverage;
+        private System.Windows.Forms.RadioButton rbMinimum;
+        private System.Windows.Forms.GroupBox gbCalcMethodType;
     }
 }

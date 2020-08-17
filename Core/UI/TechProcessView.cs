@@ -259,7 +259,7 @@ namespace CAM
         private void bBuildProcessing_ButtonClick(object sender, EventArgs e)
         {
             var node = treeView.SelectedNode.Parent ?? treeView.SelectedNode;
-            treeView.SelectedNode = node;
+            //treeView.SelectedNode = node;
             SelectNextControl(ActiveControl, true, true, true, true);
 
             toolStrip.Enabled = false;
