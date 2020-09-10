@@ -37,6 +37,7 @@ namespace CAM
         public bool IsUpperTool => !ToolLocation.IsDefined || ToolLocation.Point.Z >= ZSafety;
         public bool WithThick { get; set; }
         public Location ToolLocation { get; set; } = new Location();
+        public string ThickCommand { get; set; }
 
         public void StartTechProcess(string caption, double originX, double originY, double zSafety)
         {
@@ -168,7 +169,7 @@ namespace CAM
                     if (polyline.GetSegmentType(i - 1) == SegmentType.Arc)
                     {
                         var arcSeg = polyline.GetArcSegment2dAt(i - 1);
-                        GCommand(CommandNames.Cutting, arcSeg.IsClockWise ? 3 : 2, point: point, angleC: angleC, curve: polyline, feed: cuttingFeed, center: arcSeg.Center);
+                        GCommand(CommandNames.Cutting, arcSeg.IsClockWise ? 2 : 3, point: point, angleC: angleC, curve: polyline, feed: cuttingFeed, center: arcSeg.Center);
                     }
                     else
                         GCommand(CommandNames.Cutting, 1, point: point, angleC: angleC, curve: polyline, feed: cuttingFeed);
@@ -179,7 +180,7 @@ namespace CAM
                 var arc = curve as Arc;
                 if (arc != null)
                     angleC += arc.TotalAngle.ToDeg() * (point == curve.StartPoint ? -1 : 1);
-                var gCode = curve is Line ? 1 : point == curve.StartPoint ? 3 : 2;
+                var gCode = curve is Line ? 1 : point == curve.StartPoint ? 2 : 3;
                 GCommand(CommandNames.Cutting, gCode, point: curve.NextPoint(point), angleC: angleC, curve: curve, feed: cuttingFeed, center: arc?.Center.ToPoint2d());
             }
         }
@@ -202,6 +203,15 @@ namespace CAM
 
             if (point == null)
                 point = new Point3d(x ?? ToolLocation.Point.X, y ?? ToolLocation.Point.Y, z ?? ToolLocation.Point.Z);
+
+            if (ThickCommand != null && (point.Value.X != ToolLocation.Point.X || point.Value.Y != ToolLocation.Point.Y))
+                _commands.Add(
+                    new ProcessCommand
+                    {
+                        Text = string.Format(ThickCommand, point.Value.X.Round(), point.Value.Y.Round()),
+                        HasTool = _hasTool,
+                        ToolLocation = ToolLocation.Clone()
+                    });
 
             command.Text = GCommandText(gCode, paramsString, point.Value, curve, angleC, angleA, feed, center);
             

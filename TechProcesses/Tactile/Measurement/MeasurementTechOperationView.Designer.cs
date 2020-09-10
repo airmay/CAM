@@ -38,6 +38,7 @@
             this.rbAverage = new System.Windows.Forms.RadioButton();
             this.rbMinimum = new System.Windows.Forms.RadioButton();
             this.gbCalcMethodType = new System.Windows.Forms.GroupBox();
+            this.rbСorners = new System.Windows.Forms.RadioButton();
             ((System.ComponentModel.ISupportInitialize)(this.tactileTechProcessBindingSource)).BeginInit();
             this.gbCalcMethodType.SuspendLayout();
             this.SuspendLayout();
@@ -125,14 +126,26 @@
             // 
             this.gbCalcMethodType.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.gbCalcMethodType.Controls.Add(this.rbСorners);
             this.gbCalcMethodType.Controls.Add(this.rbMinimum);
             this.gbCalcMethodType.Controls.Add(this.rbAverage);
             this.gbCalcMethodType.Location = new System.Drawing.Point(4, 53);
             this.gbCalcMethodType.Name = "gbCalcMethodType";
-            this.gbCalcMethodType.Size = new System.Drawing.Size(226, 68);
+            this.gbCalcMethodType.Size = new System.Drawing.Size(226, 93);
             this.gbCalcMethodType.TabIndex = 50;
             this.gbCalcMethodType.TabStop = false;
             this.gbCalcMethodType.Text = "Метод расчета";
+            // 
+            // rbСorners
+            // 
+            this.rbСorners.AutoSize = true;
+            this.rbСorners.Location = new System.Drawing.Point(18, 65);
+            this.rbСorners.Name = "rbСorners";
+            this.rbСorners.Size = new System.Drawing.Size(81, 17);
+            this.rbСorners.TabIndex = 50;
+            this.rbСorners.Text = "По 4 углам";
+            this.rbСorners.UseVisualStyleBackColor = true;
+            this.rbСorners.CheckedChanged += new System.EventHandler(this.rbCalcMethodChanged);
             // 
             // MeasurementTechOperationView
             // 
@@ -165,5 +178,6 @@
         private System.Windows.Forms.RadioButton rbAverage;
         private System.Windows.Forms.RadioButton rbMinimum;
         private System.Windows.Forms.GroupBox gbCalcMethodType;
+        private System.Windows.Forms.RadioButton rbСorners;
     }
 }

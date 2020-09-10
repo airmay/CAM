@@ -64,17 +64,19 @@ namespace CAM
         {
             return $"G{gCode}{Format("X", point.X, ToolLocation.Point.X, _originX)}{Format("Y", point.Y, ToolLocation.Point.Y, _originY)}" +
                 $"{FormatIJ("I", center?.X, _originX)}{FormatIJ("J", center?.Y, _originY)}" +
-                $"{Format("Z", point.Z, ToolLocation.Point.Z, withThick: WithThick)}{Format("C", angleC, ToolLocation.AngleC)}{Format("A", angleA, ToolLocation.AngleA)}" +
+                $"{FormatZ()}{Format("C", angleC, ToolLocation.AngleC)}{Format("A", angleA, ToolLocation.AngleA)}" +
                 $"{Format("F", feed, _feed)}";
 
-            string Format(string label, double? value, double oldValue, double origin = 0, bool withThick = false) =>
+            string Format(string label, double? value, double oldValue, double origin = 0) =>
                  (paramsString == null || paramsString.Contains(label)) && (value.GetValueOrDefault(oldValue) != oldValue) // || (_GCode == 0 ^ gCode == 0))
-                        ? $" {label}{FormatValue((value.GetValueOrDefault(oldValue) - origin).Round(4), withThick)}"
+                        ? $" {label}{(value.GetValueOrDefault(oldValue) - origin).Round(4)}"
                         : null;
 
             string FormatIJ(string label, double? value, double origin) => value.HasValue ? $" {label}{(value.Value - origin).Round(4)}" : null;
 
-            string FormatValue(double value, bool withThick) => withThick ? $"({value} + THICK)" : value.ToString();
+            string FormatZ() => (paramsString == null || paramsString.Contains("Z")) && ((ThickCommand != null && gCode == 1) || point.Z != ToolLocation.Point.Z)
+                ? (WithThick ? $" Z({point.Z} + THICK)" : $" Z{point.Z}")
+                : null;
         }
     }
 }

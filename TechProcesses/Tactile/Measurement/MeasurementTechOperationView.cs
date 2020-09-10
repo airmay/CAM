@@ -41,8 +41,10 @@ namespace CAM.Tactile
         {
             if (rbAverage.Checked)
                 _techOperation.CalcMethod = MeasurementTechOperation.CalcMethodType.Average;
-            else
+            else if(rbMinimum.Checked)
                 _techOperation.CalcMethod = MeasurementTechOperation.CalcMethodType.Minimum;
+            else
+                _techOperation.CalcMethod = MeasurementTechOperation.CalcMethodType.Сorners;
         }
     }
 }

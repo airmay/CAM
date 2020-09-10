@@ -23,7 +23,7 @@ namespace CAM
             do
             {
                 depth += mode.DepthStep;
-                if (nextMode != null && depth >= nextMode.Depth)
+                if (nextMode != null && depth >= mode.Depth)
                 {
                     mode = nextMode;
                     nextMode = enumerator.MoveNext() ? enumerator.Current : null;

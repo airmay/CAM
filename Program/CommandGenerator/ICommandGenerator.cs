@@ -41,6 +41,7 @@ namespace CAM
         double ZSafety { get; set; }
 
         Location ToolLocation { get; set; }
+        string ThickCommand { get; set; }
 
         void Pause(double duration);
     }
