@@ -142,18 +142,18 @@ namespace CAM
         /// <summary>
         /// Рез между точками
         /// </summary>
-        public void Cutting(Point3d startPoint, Point3d endPoint, int cuttingFeed, int transitionFeed) => Cutting(NoDraw.Line(startPoint, endPoint), cuttingFeed, transitionFeed);
+        public void Cutting(Point3d startPoint, Point3d endPoint, int cuttingFeed, int transitionFeed, double angleA = 0) => Cutting(NoDraw.Line(startPoint, endPoint), cuttingFeed, transitionFeed, angleA: angleA);
 
         /// <summary>
         /// Рез по кривой
         /// </summary>
-        public void Cutting(Curve curve, int cuttingFeed, int transitionFeed, Side engineSide = Side.None)
+        public void Cutting(Curve curve, int cuttingFeed, int transitionFeed, Side engineSide = Side.None, double angleA = 0)
         {
             var point = curve.GetClosestPoint(ToolLocation.Point);
             var angleC = ToolLocation.AngleC;
             if (!(curve is Line))
                 angleC = BuilderUtils.CalcToolAngle(curve, point, engineSide);
-            GCommand(point.Z != ToolLocation.Point.Z ? CommandNames.Penetration : CommandNames.Transition, 1, point: point, angleC: angleC, feed: transitionFeed);
+            GCommand(point.Z != ToolLocation.Point.Z ? CommandNames.Penetration : CommandNames.Transition, 1, point: point, angleC: angleC, angleA: angleA, feed: transitionFeed);
 
             if (curve is Polyline polyline)
             {

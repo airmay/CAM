@@ -182,7 +182,8 @@ namespace CAM
                 }
                 _highlightedObjects = objectIds;
             });
-            Editor.Regen();// UpdateScreen();
+            //Editor.Regen();
+            Editor.UpdateScreen();
         }
 
         public static void SubscribeObjects(IEnumerable<ObjectId> objectIds, Action handler)

@@ -189,6 +189,13 @@
     <Compile Include="TechProcesses\Sawing\SawingTechProcessView.Designer.cs">
       <DependentUpon>SawingTechProcessView.cs</DependentUpon>
     </Compile>
+    <Compile Include="TechProcesses\SectionProfile\SectionProfileTechProcess.cs" />
+    <Compile Include="TechProcesses\SectionProfile\SectionProfileTechProcessView.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="TechProcesses\SectionProfile\SectionProfileTechProcessView.Designer.cs">
+      <DependentUpon>SectionProfileTechProcessView.cs</DependentUpon>
+    </Compile>
     <Compile Include="TechProcesses\Tactile\Bands\BandsTechOperation.cs" />
     <Compile Include="TechProcesses\Tactile\Bands\BandsTechOperationView.cs">
       <SubType>UserControl</SubType>
@@ -325,6 +332,9 @@
     <EmbeddedResource Include="TechProcesses\Sawing\SawingTechProcessView.resx">
       <DependentUpon>SawingTechProcessView.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="TechProcesses\SectionProfile\SectionProfileTechProcessView.resx">
+      <DependentUpon>SectionProfileTechProcessView.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="TechProcesses\Tactile\Bands\BandsTechOperationView.resx">
       <DependentUpon>BandsTechOperationView.cs</DependentUpon>
     </EmbeddedResource>
@@ -363,6 +373,7 @@
     <None Include="Properties\DataSources\CAM.TechProcesses.Disk3D.LongCleaningTechOperation.datasource" />
     <None Include="Properties\DataSources\CAM.TechProcesses.Drilling.DrillingTechProcess.datasource" />
     <None Include="Properties\DataSources\CAM.TechProcesses.Polishing.PolishingTechProcess.datasource" />
+    <None Include="Properties\DataSources\CAM.TechProcesses.SectionProfile.SectionProfileTechProcess.datasource" />
     <None Include="Resources\arrow-090_.png" />
   </ItemGroup>
   <ItemGroup>

@@ -7,5 +7,6 @@
         public const string Disk3D = "Диск 3D";
         public const string Drilling = "Сверление";
         public const string Polishing = "Полировка";
+        public const string SectionProfile = "Профиль по сечению";
     }
 }

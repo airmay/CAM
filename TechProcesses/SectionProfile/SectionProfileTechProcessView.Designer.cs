@@ -1,0 +1,395 @@
+﻿namespace CAM.TechProcesses.SectionProfile
+{
+    partial class SectionProfileTechProcessView
+    {
+        /// <summary> 
+        /// Required designer variable.
+        /// </summary>
+        private System.ComponentModel.IContainer components = null;
+
+        /// <summary> 
+        /// Clean up any resources being used.
+        /// </summary>
+        /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing && (components != null))
+            {
+                components.Dispose();
+            }
+            base.Dispose(disposing);
+        }
+
+        #region Component Designer generated code
+
+        /// <summary> 
+        /// Required method for Designer support - do not modify 
+        /// the contents of this method with the code editor.
+        /// </summary>
+        private void InitializeComponent()
+        {
+            this.components = new System.ComponentModel.Container();
+            this.tbZSafety = new System.Windows.Forms.TextBox();
+            this.label5 = new System.Windows.Forms.Label();
+            this.cbNormal = new System.Windows.Forms.CheckBox();
+            this.tbPenetrationFeed = new System.Windows.Forms.TextBox();
+            this.label9 = new System.Windows.Forms.Label();
+            this.cbMaterial = new System.Windows.Forms.ComboBox();
+            this.label1 = new System.Windows.Forms.Label();
+            this.tbFrequency = new System.Windows.Forms.TextBox();
+            this.lbFrequency = new System.Windows.Forms.Label();
+            this.bObjects = new System.Windows.Forms.Button();
+            this.tbObjects = new System.Windows.Forms.TextBox();
+            this.label8 = new System.Windows.Forms.Label();
+            this.tbTool = new System.Windows.Forms.TextBox();
+            this.bTool = new System.Windows.Forms.Button();
+            this.label6 = new System.Windows.Forms.Label();
+            this.tbStep = new System.Windows.Forms.TextBox();
+            this.label2 = new System.Windows.Forms.Label();
+            this.tbDeparture = new System.Windows.Forms.TextBox();
+            this.label7 = new System.Windows.Forms.Label();
+            this.textBox5 = new System.Windows.Forms.TextBox();
+            this.label3 = new System.Windows.Forms.Label();
+            this.tbCuttingFeed = new System.Windows.Forms.TextBox();
+            this.label4 = new System.Windows.Forms.Label();
+            this.bRail = new System.Windows.Forms.Button();
+            this.tbRail = new System.Windows.Forms.TextBox();
+            this.label10 = new System.Windows.Forms.Label();
+            this.sectionProfileTechProcessBindingSource = new System.Windows.Forms.BindingSource(this.components);
+            ((System.ComponentModel.ISupportInitialize)(this.sectionProfileTechProcessBindingSource)).BeginInit();
+            this.SuspendLayout();
+            // 
+            // tbZSafety
+            // 
+            this.tbZSafety.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.tbZSafety.DataBindings.Add(new System.Windows.Forms.Binding("Text", this.sectionProfileTechProcessBindingSource, "ZSafety", true));
+            this.tbZSafety.Location = new System.Drawing.Point(101, 274);
+            this.tbZSafety.Name = "tbZSafety";
+            this.tbZSafety.Size = new System.Drawing.Size(152, 20);
+            this.tbZSafety.TabIndex = 120;
+            // 
+            // label5
+            // 
+            this.label5.AutoSize = true;
+            this.label5.Location = new System.Drawing.Point(2, 277);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(88, 13);
+            this.label5.TabIndex = 113;
+            this.label5.Text = "Z безопасности";
+            // 
+            // cbNormal
+            // 
+            this.cbNormal.AutoSize = true;
+            this.cbNormal.DataBindings.Add(new System.Windows.Forms.Binding("Checked", this.sectionProfileTechProcessBindingSource, "IsNormal", true));
+            this.cbNormal.Location = new System.Drawing.Point(5, 181);
+            this.cbNormal.Name = "cbNormal";
+            this.cbNormal.Size = new System.Drawing.Size(87, 17);
+            this.cbNormal.TabIndex = 80;
+            this.cbNormal.Text = "По нормали";
+            this.cbNormal.UseVisualStyleBackColor = true;
+            // 
+            // tbPenetrationFeed
+            // 
+            this.tbPenetrationFeed.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.tbPenetrationFeed.DataBindings.Add(new System.Windows.Forms.Binding("Text", this.sectionProfileTechProcessBindingSource, "PenetrationFeed", true));
+            this.tbPenetrationFeed.Location = new System.Drawing.Point(101, 94);
+            this.tbPenetrationFeed.Name = "tbPenetrationFeed";
+            this.tbPenetrationFeed.Size = new System.Drawing.Size(152, 20);
+            this.tbPenetrationFeed.TabIndex = 50;
+            // 
+            // label9
+            // 
+            this.label9.AutoSize = true;
+            this.label9.Location = new System.Drawing.Point(2, 97);
+            this.label9.Name = "label9";
+            this.label9.Size = new System.Drawing.Size(70, 13);
+            this.label9.TabIndex = 110;
+            this.label9.Text = "Скор. малая";
+            // 
+            // cbMaterial
+            // 
+            this.cbMaterial.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.cbMaterial.DataBindings.Add(new System.Windows.Forms.Binding("SelectedValue", this.sectionProfileTechProcessBindingSource, "Material", true));
+            this.cbMaterial.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cbMaterial.FormattingEnabled = true;
+            this.cbMaterial.Location = new System.Drawing.Point(101, 2);
+            this.cbMaterial.Name = "cbMaterial";
+            this.cbMaterial.Size = new System.Drawing.Size(152, 21);
+            this.cbMaterial.TabIndex = 10;
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(2, 5);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(57, 13);
+            this.label1.TabIndex = 109;
+            this.label1.Text = "Материал";
+            // 
+            // tbFrequency
+            // 
+            this.tbFrequency.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.tbFrequency.DataBindings.Add(new System.Windows.Forms.Binding("Text", this.sectionProfileTechProcessBindingSource, "Frequency", true));
+            this.tbFrequency.Location = new System.Drawing.Point(101, 49);
+            this.tbFrequency.Name = "tbFrequency";
+            this.tbFrequency.Size = new System.Drawing.Size(152, 20);
+            this.tbFrequency.TabIndex = 30;
+            // 
+            // lbFrequency
+            // 
+            this.lbFrequency.AutoSize = true;
+            this.lbFrequency.Location = new System.Drawing.Point(2, 52);
+            this.lbFrequency.Name = "lbFrequency";
+            this.lbFrequency.Size = new System.Drawing.Size(58, 13);
+            this.lbFrequency.TabIndex = 108;
+            this.lbFrequency.Text = "Шпиндель";
+            // 
+            // bObjects
+            // 
+            this.bObjects.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.bObjects.Location = new System.Drawing.Point(233, 127);
+            this.bObjects.Name = "bObjects";
+            this.bObjects.Size = new System.Drawing.Size(21, 21);
+            this.bObjects.TabIndex = 107;
+            this.bObjects.TabStop = false;
+            this.bObjects.Text = "۞";
+            this.bObjects.UseVisualStyleBackColor = true;
+            this.bObjects.Click += new System.EventHandler(this.bObjects_Click);
+            // 
+            // tbObjects
+            // 
+            this.tbObjects.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.tbObjects.Location = new System.Drawing.Point(101, 127);
+            this.tbObjects.Name = "tbObjects";
+            this.tbObjects.ReadOnly = true;
+            this.tbObjects.Size = new System.Drawing.Size(130, 20);
+            this.tbObjects.TabIndex = 60;
+            this.tbObjects.Enter += new System.EventHandler(this.tbObjects_Enter);
+            // 
+            // label8
+            // 
+            this.label8.AutoSize = true;
+            this.label8.Location = new System.Drawing.Point(2, 131);
+            this.label8.Name = "label8";
+            this.label8.Size = new System.Drawing.Size(53, 13);
+            this.label8.TabIndex = 106;
+            this.label8.Text = "Профиль";
+            // 
+            // tbTool
+            // 
+            this.tbTool.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.tbTool.ForeColor = System.Drawing.SystemColors.WindowText;
+            this.tbTool.Location = new System.Drawing.Point(101, 26);
+            this.tbTool.Name = "tbTool";
+            this.tbTool.ReadOnly = true;
+            this.tbTool.Size = new System.Drawing.Size(130, 20);
+            this.tbTool.TabIndex = 20;
+            // 
+            // bTool
+            // 
+            this.bTool.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.bTool.Location = new System.Drawing.Point(233, 26);
+            this.bTool.Name = "bTool";
+            this.bTool.Size = new System.Drawing.Size(20, 20);
+            this.bTool.TabIndex = 105;
+            this.bTool.TabStop = false;
+            this.bTool.Text = "Ξ";
+            this.bTool.UseVisualStyleBackColor = true;
+            this.bTool.Click += new System.EventHandler(this.bTool_Click);
+            // 
+            // label6
+            // 
+            this.label6.AutoSize = true;
+            this.label6.Location = new System.Drawing.Point(2, 29);
+            this.label6.Name = "label6";
+            this.label6.Size = new System.Drawing.Size(68, 13);
+            this.label6.TabIndex = 104;
+            this.label6.Text = "Инструмент";
+            // 
+            // tbStep
+            // 
+            this.tbStep.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.tbStep.DataBindings.Add(new System.Windows.Forms.Binding("Text", this.sectionProfileTechProcessBindingSource, "Step", true));
+            this.tbStep.Location = new System.Drawing.Point(101, 205);
+            this.tbStep.Name = "tbStep";
+            this.tbStep.Size = new System.Drawing.Size(152, 20);
+            this.tbStep.TabIndex = 90;
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(3, 208);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(27, 13);
+            this.label2.TabIndex = 125;
+            this.label2.Text = "Шаг";
+            // 
+            // tbDeparture
+            // 
+            this.tbDeparture.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.tbDeparture.DataBindings.Add(new System.Windows.Forms.Binding("Text", this.sectionProfileTechProcessBindingSource, "Departure", true));
+            this.tbDeparture.Location = new System.Drawing.Point(101, 228);
+            this.tbDeparture.Name = "tbDeparture";
+            this.tbDeparture.Size = new System.Drawing.Size(152, 20);
+            this.tbDeparture.TabIndex = 100;
+            // 
+            // label7
+            // 
+            this.label7.AutoSize = true;
+            this.label7.Location = new System.Drawing.Point(3, 231);
+            this.label7.Name = "label7";
+            this.label7.Size = new System.Drawing.Size(40, 13);
+            this.label7.TabIndex = 124;
+            this.label7.Text = "Выезд";
+            // 
+            // textBox5
+            // 
+            this.textBox5.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.textBox5.DataBindings.Add(new System.Windows.Forms.Binding("Text", this.sectionProfileTechProcessBindingSource, "Delta", true));
+            this.textBox5.Location = new System.Drawing.Point(101, 251);
+            this.textBox5.Name = "textBox5";
+            this.textBox5.Size = new System.Drawing.Size(152, 20);
+            this.textBox5.TabIndex = 110;
+            // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(3, 254);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(50, 13);
+            this.label3.TabIndex = 123;
+            this.label3.Text = "Припуск";
+            // 
+            // tbCuttingFeed
+            // 
+            this.tbCuttingFeed.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.tbCuttingFeed.DataBindings.Add(new System.Windows.Forms.Binding("Text", this.sectionProfileTechProcessBindingSource, "CuttingFeed", true));
+            this.tbCuttingFeed.Location = new System.Drawing.Point(101, 71);
+            this.tbCuttingFeed.Name = "tbCuttingFeed";
+            this.tbCuttingFeed.Size = new System.Drawing.Size(152, 20);
+            this.tbCuttingFeed.TabIndex = 40;
+            // 
+            // label4
+            // 
+            this.label4.AutoSize = true;
+            this.label4.Location = new System.Drawing.Point(3, 74);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(44, 13);
+            this.label4.TabIndex = 122;
+            this.label4.Text = "Подача";
+            // 
+            // bRail
+            // 
+            this.bRail.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.bRail.Location = new System.Drawing.Point(233, 151);
+            this.bRail.Name = "bRail";
+            this.bRail.Size = new System.Drawing.Size(21, 21);
+            this.bRail.TabIndex = 128;
+            this.bRail.TabStop = false;
+            this.bRail.Text = "۞";
+            this.bRail.UseVisualStyleBackColor = true;
+            this.bRail.Click += new System.EventHandler(this.bRail_Click);
+            // 
+            // tbRail
+            // 
+            this.tbRail.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.tbRail.Location = new System.Drawing.Point(101, 151);
+            this.tbRail.Name = "tbRail";
+            this.tbRail.ReadOnly = true;
+            this.tbRail.Size = new System.Drawing.Size(130, 20);
+            this.tbRail.TabIndex = 70;
+            this.tbRail.Enter += new System.EventHandler(this.tbRail_Enter);
+            // 
+            // label10
+            // 
+            this.label10.AutoSize = true;
+            this.label10.Location = new System.Drawing.Point(2, 155);
+            this.label10.Name = "label10";
+            this.label10.Size = new System.Drawing.Size(86, 13);
+            this.label10.TabIndex = 127;
+            this.label10.Text = "Направляющая";
+            // 
+            // sectionProfileTechProcessBindingSource
+            // 
+            this.sectionProfileTechProcessBindingSource.DataSource = typeof(CAM.TechProcesses.SectionProfile.SectionProfileTechProcess);
+            // 
+            // SectionProfileTechProcessView
+            // 
+            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.Controls.Add(this.bRail);
+            this.Controls.Add(this.tbRail);
+            this.Controls.Add(this.label10);
+            this.Controls.Add(this.tbStep);
+            this.Controls.Add(this.label2);
+            this.Controls.Add(this.tbDeparture);
+            this.Controls.Add(this.label7);
+            this.Controls.Add(this.textBox5);
+            this.Controls.Add(this.label3);
+            this.Controls.Add(this.tbCuttingFeed);
+            this.Controls.Add(this.label4);
+            this.Controls.Add(this.tbZSafety);
+            this.Controls.Add(this.label5);
+            this.Controls.Add(this.cbNormal);
+            this.Controls.Add(this.tbPenetrationFeed);
+            this.Controls.Add(this.label9);
+            this.Controls.Add(this.cbMaterial);
+            this.Controls.Add(this.label1);
+            this.Controls.Add(this.tbFrequency);
+            this.Controls.Add(this.lbFrequency);
+            this.Controls.Add(this.bObjects);
+            this.Controls.Add(this.tbObjects);
+            this.Controls.Add(this.label8);
+            this.Controls.Add(this.tbTool);
+            this.Controls.Add(this.bTool);
+            this.Controls.Add(this.label6);
+            this.Name = "SectionProfileTechProcessView";
+            this.Size = new System.Drawing.Size(257, 540);
+            ((System.ComponentModel.ISupportInitialize)(this.sectionProfileTechProcessBindingSource)).EndInit();
+            this.ResumeLayout(false);
+            this.PerformLayout();
+
+        }
+
+        #endregion
+
+        private System.Windows.Forms.TextBox tbZSafety;
+        private System.Windows.Forms.Label label5;
+        private System.Windows.Forms.CheckBox cbNormal;
+        private System.Windows.Forms.TextBox tbPenetrationFeed;
+        private System.Windows.Forms.Label label9;
+        private System.Windows.Forms.ComboBox cbMaterial;
+        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.TextBox tbFrequency;
+        private System.Windows.Forms.Label lbFrequency;
+        private System.Windows.Forms.Button bObjects;
+        private System.Windows.Forms.TextBox tbObjects;
+        private System.Windows.Forms.Label label8;
+        private System.Windows.Forms.TextBox tbTool;
+        private System.Windows.Forms.Button bTool;
+        private System.Windows.Forms.Label label6;
+        private System.Windows.Forms.TextBox tbStep;
+        private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.TextBox tbDeparture;
+        private System.Windows.Forms.Label label7;
+        private System.Windows.Forms.TextBox textBox5;
+        private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.TextBox tbCuttingFeed;
+        private System.Windows.Forms.Label label4;
+        private System.Windows.Forms.Button bRail;
+        private System.Windows.Forms.TextBox tbRail;
+        private System.Windows.Forms.Label label10;
+        private System.Windows.Forms.BindingSource sectionProfileTechProcessBindingSource;
+    }
+}

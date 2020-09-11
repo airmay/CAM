@@ -23,9 +23,9 @@ namespace CAM
 
         void Cutting(double x, double y, double z, int feed);
 
-        void Cutting(Point3d startPoint, Point3d endPoint, int cuttingFeed, int transitionFeed);
+        void Cutting(Point3d startPoint, Point3d endPoint, int cuttingFeed, int transitionFeed, double angleA = 0);
 
-        void Cutting(Curve curve, int cuttingFeed, int transitionFeed, Side engineSide = Side.None);
+        void Cutting(Curve curve, int cuttingFeed, int transitionFeed, Side engineSide = Side.None, double angleA = 0);
 
         void Command(string text, string name = null, double duration = 0);
 
