@@ -75,7 +75,7 @@ namespace CAM
             string FormatIJ(string label, double? value, double origin) => value.HasValue ? $" {label}{(value.Value - origin).Round(4)}" : null;
 
             string FormatZ() => (paramsString == null || paramsString.Contains("Z")) && ((ThickCommand != null && gCode == 1) || point.Z != ToolLocation.Point.Z)
-                ? (WithThick ? $" Z({point.Z} + THICK)" : $" Z{point.Z}")
+                ? (WithThick ? $" Z({point.Z.Round(4)} + THICK)" : $" Z{point.Z.Round(4)}")
                 : null;
         }
     }

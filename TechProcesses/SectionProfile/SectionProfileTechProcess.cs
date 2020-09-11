@@ -23,36 +23,30 @@ namespace CAM.TechProcesses.SectionProfile
         protected override void BuildProcessing(ICommandGenerator generator)
         {
             var rail = Rail.GetCurve() as Line;
-            var startRail = rail.GetClosestPoint(Point3d.Origin);
-            var railVector = (rail.NextPoint(startRail) - startRail).GetNormal();
+            var startRail = rail.StartPoint;
+            var railVector = rail.Delta.GetNormal();
+            if (rail.Angle >= Math.PI)
+            {
+                startRail = rail.EndPoint;
+                railVector = railVector.Negate();
+            }
             var startPass = startRail - railVector * Departure;
             var passVector = railVector * (rail.Length + 2 * Departure);
             var railAngle = railVector.GetAngleTo(Vector3d.XAxis);
 
             var profile = ProcessingArea[0].GetCurve();
             var profileLength = profile.Length();
+            startPass = new Point3d(startPass.X, startPass.Y, profile.StartPoint.Y);
+            generator.ZSafety += profile.StartPoint.Y;
+
             double dist = 0;
             var engineSide = Side.None;
             double angleC;
             do
             {
                 var point = profile.GetPointAtDist(dist);
-                var dist2 = dist + Tool.Thickness.Value;
-                if (dist2 > profileLength)
-                    dist2 = profileLength;
-                var point2 = profile.GetPointAtDist(dist2);
-                var distAvg = (dist2 + dist) / 2;
-                var pointAvg = profile.GetPointAtDist(distAvg);
-
-                var profileVector = point - profile.StartPoint;
-                var startPoint1 = startPass + railVector.RotateBy(Math.PI / 2, -Vector3d.ZAxis).RotateBy(profileVector.GetAngleTo(Vector3d.XAxis), railVector) * profileVector.Length;
-
-                profileVector = point2 - profile.StartPoint;
-                var startPoint2 = startPass + railVector.RotateBy(Math.PI / 2, -Vector3d.ZAxis).RotateBy(profileVector.GetAngleTo(Vector3d.XAxis), railVector) * profileVector.Length;
-
-                var tangent = profile.GetTangent(pointAvg);
-                var angleA = Math.Abs(tangent.GetAngleTo(Vector2d.XAxis).ToDeg());
-
+                var tangent = profile.GetFirstDerivative(point);
+                var angleA = Math.Abs(tangent.GetAngleTo(Vector3d.XAxis).ToDeg());
                 var side = tangent.Y < 0 ? Side.Left : Side.Right;
                 if (engineSide != side)
                 {
@@ -60,10 +54,10 @@ namespace CAM.TechProcesses.SectionProfile
                     angleC = BuilderUtils.CalcToolAngle(railAngle, side);
                     if (!generator.IsUpperTool)
                         generator.Uplifting();
-                    var sp = engineSide == Side.Left ? startPoint2 : startPoint1;
+                    var sp = GetStartPoint(point, tangent);
                     generator.Move(sp.X, sp.Y, angleC: angleC, angleA: angleA);
                 }
-                var startPoint = engineSide == Side.Left ? startPoint2 : startPoint1;
+                var startPoint = GetStartPoint(point, tangent);
                 generator.Cutting(startPoint, startPoint + passVector, CuttingFeed, PenetrationFeed, angleA: angleA);
                 dist += Step;
             }
@@ -71,10 +65,13 @@ namespace CAM.TechProcesses.SectionProfile
 
             generator.Uplifting();
 
-            //Point3d GetStartPoint()
-            //{
-
-            //}
+            Point3d GetStartPoint(Point3d point, Vector3d tangent)
+            {
+                if (engineSide == Side.Left)
+                    point += tangent.GetNormal() * Tool.Thickness.Value;
+                var profileVector = point - profile.StartPoint;
+                return startPass + railVector.RotateBy(Math.PI / 2, -Vector3d.ZAxis).RotateBy(profileVector.GetAngleTo(Vector3d.XAxis), railVector) * profileVector.Length;
+            }
         }
     }
 }
