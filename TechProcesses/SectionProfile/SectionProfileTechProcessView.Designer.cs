@@ -56,6 +56,8 @@
             this.tbRail = new System.Windows.Forms.TextBox();
             this.label10 = new System.Windows.Forms.Label();
             this.sectionProfileTechProcessBindingSource = new System.Windows.Forms.BindingSource(this.components);
+            this.tbLength = new System.Windows.Forms.TextBox();
+            this.label11 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.sectionProfileTechProcessBindingSource)).BeginInit();
             this.SuspendLayout();
             // 
@@ -64,7 +66,7 @@
             this.tbZSafety.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.tbZSafety.DataBindings.Add(new System.Windows.Forms.Binding("Text", this.sectionProfileTechProcessBindingSource, "ZSafety", true));
-            this.tbZSafety.Location = new System.Drawing.Point(101, 274);
+            this.tbZSafety.Location = new System.Drawing.Point(101, 311);
             this.tbZSafety.Name = "tbZSafety";
             this.tbZSafety.Size = new System.Drawing.Size(152, 20);
             this.tbZSafety.TabIndex = 120;
@@ -72,7 +74,7 @@
             // label5
             // 
             this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(2, 277);
+            this.label5.Location = new System.Drawing.Point(2, 314);
             this.label5.Name = "label5";
             this.label5.Size = new System.Drawing.Size(88, 13);
             this.label5.TabIndex = 113;
@@ -82,7 +84,7 @@
             // 
             this.cbNormal.AutoSize = true;
             this.cbNormal.DataBindings.Add(new System.Windows.Forms.Binding("Checked", this.sectionProfileTechProcessBindingSource, "IsNormal", true));
-            this.cbNormal.Location = new System.Drawing.Point(5, 181);
+            this.cbNormal.Location = new System.Drawing.Point(5, 218);
             this.cbNormal.Name = "cbNormal";
             this.cbNormal.Size = new System.Drawing.Size(87, 17);
             this.cbNormal.TabIndex = 80;
@@ -217,7 +219,7 @@
             this.tbStep.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.tbStep.DataBindings.Add(new System.Windows.Forms.Binding("Text", this.sectionProfileTechProcessBindingSource, "Step", true));
-            this.tbStep.Location = new System.Drawing.Point(101, 205);
+            this.tbStep.Location = new System.Drawing.Point(101, 242);
             this.tbStep.Name = "tbStep";
             this.tbStep.Size = new System.Drawing.Size(152, 20);
             this.tbStep.TabIndex = 90;
@@ -225,7 +227,7 @@
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(3, 208);
+            this.label2.Location = new System.Drawing.Point(3, 245);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(27, 13);
             this.label2.TabIndex = 125;
@@ -236,7 +238,7 @@
             this.tbDeparture.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.tbDeparture.DataBindings.Add(new System.Windows.Forms.Binding("Text", this.sectionProfileTechProcessBindingSource, "Departure", true));
-            this.tbDeparture.Location = new System.Drawing.Point(101, 228);
+            this.tbDeparture.Location = new System.Drawing.Point(101, 265);
             this.tbDeparture.Name = "tbDeparture";
             this.tbDeparture.Size = new System.Drawing.Size(152, 20);
             this.tbDeparture.TabIndex = 100;
@@ -244,7 +246,7 @@
             // label7
             // 
             this.label7.AutoSize = true;
-            this.label7.Location = new System.Drawing.Point(3, 231);
+            this.label7.Location = new System.Drawing.Point(3, 268);
             this.label7.Name = "label7";
             this.label7.Size = new System.Drawing.Size(40, 13);
             this.label7.TabIndex = 124;
@@ -255,7 +257,7 @@
             this.textBox5.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.textBox5.DataBindings.Add(new System.Windows.Forms.Binding("Text", this.sectionProfileTechProcessBindingSource, "Delta", true));
-            this.textBox5.Location = new System.Drawing.Point(101, 251);
+            this.textBox5.Location = new System.Drawing.Point(101, 288);
             this.textBox5.Name = "textBox5";
             this.textBox5.Size = new System.Drawing.Size(152, 20);
             this.textBox5.TabIndex = 110;
@@ -263,7 +265,7 @@
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(3, 254);
+            this.label3.Location = new System.Drawing.Point(3, 291);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(50, 13);
             this.label3.TabIndex = 123;
@@ -291,7 +293,7 @@
             // bRail
             // 
             this.bRail.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.bRail.Location = new System.Drawing.Point(233, 151);
+            this.bRail.Location = new System.Drawing.Point(233, 164);
             this.bRail.Name = "bRail";
             this.bRail.Size = new System.Drawing.Size(21, 21);
             this.bRail.TabIndex = 128;
@@ -304,7 +306,7 @@
             // 
             this.tbRail.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.tbRail.Location = new System.Drawing.Point(101, 151);
+            this.tbRail.Location = new System.Drawing.Point(101, 164);
             this.tbRail.Name = "tbRail";
             this.tbRail.ReadOnly = true;
             this.tbRail.Size = new System.Drawing.Size(130, 20);
@@ -314,7 +316,7 @@
             // label10
             // 
             this.label10.AutoSize = true;
-            this.label10.Location = new System.Drawing.Point(2, 155);
+            this.label10.Location = new System.Drawing.Point(2, 168);
             this.label10.Name = "label10";
             this.label10.Size = new System.Drawing.Size(86, 13);
             this.label10.TabIndex = 127;
@@ -324,10 +326,31 @@
             // 
             this.sectionProfileTechProcessBindingSource.DataSource = typeof(CAM.TechProcesses.SectionProfile.SectionProfileTechProcess);
             // 
+            // tbLength
+            // 
+            this.tbLength.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.tbLength.DataBindings.Add(new System.Windows.Forms.Binding("Text", this.sectionProfileTechProcessBindingSource, "Length", true));
+            this.tbLength.Location = new System.Drawing.Point(101, 188);
+            this.tbLength.Name = "tbLength";
+            this.tbLength.Size = new System.Drawing.Size(152, 20);
+            this.tbLength.TabIndex = 75;
+            // 
+            // label11
+            // 
+            this.label11.AutoSize = true;
+            this.label11.Location = new System.Drawing.Point(2, 191);
+            this.label11.Name = "label11";
+            this.label11.Size = new System.Drawing.Size(88, 13);
+            this.label11.TabIndex = 130;
+            this.label11.Text = "Длина направл.";
+            // 
             // SectionProfileTechProcessView
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.Controls.Add(this.tbLength);
+            this.Controls.Add(this.label11);
             this.Controls.Add(this.bRail);
             this.Controls.Add(this.tbRail);
             this.Controls.Add(this.label10);
@@ -391,5 +414,7 @@
         private System.Windows.Forms.TextBox tbRail;
         private System.Windows.Forms.Label label10;
         private System.Windows.Forms.BindingSource sectionProfileTechProcessBindingSource;
+        private System.Windows.Forms.TextBox tbLength;
+        private System.Windows.Forms.Label label11;
     }
 }

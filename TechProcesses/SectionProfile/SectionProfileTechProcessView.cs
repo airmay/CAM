@@ -57,11 +57,17 @@ namespace CAM.TechProcesses.SectionProfile
             Interaction.SetActiveDocFocus();
             Acad.SelectObjectIds();
             var ids = Interaction.GetSelection("\nВыберите направляющую [Отрезок]", AcadObjectNames.Line);
-            if (ids.Length != 1)
-                return;
-            _techProcess.Rail = AcadObject.Create(ids[0]);
-            tbRail.Text = _techProcess.Rail.GetDesc();
-            Acad.SelectObjectIds(ids);
+            if (ids.Length == 1)
+            {
+                _techProcess.Rail = AcadObject.Create(ids[0]);
+                tbRail.Text = _techProcess.Rail.GetDesc();
+                Acad.SelectObjectIds(ids);
+            }
+            else
+            {
+                _techProcess.Rail = null;
+                tbRail.Text = "";
+            }
         }
 
         private void tbObjects_Enter(object sender, EventArgs e)

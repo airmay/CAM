@@ -9,6 +9,7 @@ namespace CAM.TechProcesses.SectionProfile
     public class SectionProfileTechProcess : TechProcessBase
     {
         public AcadObject Rail { get; set; }
+        public double? Length { get; set; }
         public int CuttingFeed { get; set; }
         public bool IsNormal { get; set; }
         public double Step { get; set; }
@@ -22,7 +23,7 @@ namespace CAM.TechProcesses.SectionProfile
 
         protected override void BuildProcessing(ICommandGenerator generator)
         {
-            var rail = Rail.GetCurve() as Line;
+            var rail = Rail != null ? Rail.GetCurve() as Line : new Line(Point3d.Origin, new Point3d(Length.Value, 0, 0));
             var startRail = rail.StartPoint;
             var railVector = rail.Delta.GetNormal();
             if (rail.Angle >= Math.PI)
@@ -33,10 +34,12 @@ namespace CAM.TechProcesses.SectionProfile
             var startPass = startRail - railVector * Departure;
             var passVector = railVector * (rail.Length + 2 * Departure);
             var railAngle = railVector.GetAngleTo(Vector3d.XAxis);
+            if (Rail == null)
+                rail.Dispose();
 
             var profile = ProcessingArea[0].GetCurve();
             var profileLength = profile.Length();
-            startPass = new Point3d(startPass.X, startPass.Y, profile.StartPoint.Y);
+            startPass = new Point3d(startPass.X, startPass.Y - profile.StartPoint.X, profile.StartPoint.Y);
             generator.ZSafety += profile.StartPoint.Y;
 
             double dist = 0;
