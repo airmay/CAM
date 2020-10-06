@@ -14,7 +14,7 @@ namespace CAM
             {
                 Style = PaletteSetStyles.NameEditable | PaletteSetStyles.ShowPropertiesMenu | PaletteSetStyles.ShowAutoHideButton | PaletteSetStyles.ShowCloseButton,
                 MinimumSize = new Size(300, 200),
-                KeepFocus = false,
+                KeepFocus = true,
                 Visible = true,
                 Dock = DockSides.Left
             };

@@ -15,7 +15,7 @@ namespace CAM
         protected double _originX, _originY;
         protected int _frequency;
 
-        private const int UpperZ = 80;
+        private const int UpperZ = 100;
         private List<ProcessCommand> _commands = new List<ProcessCommand>();
         private int _startRangeIndex;
         private bool _isEngineStarted = false;
@@ -95,6 +95,12 @@ namespace CAM
             _hasTool = hasTool;
         }
 
+        public void SetZSafety(double zSafety, double zMax = 0)
+        {
+            ZSafety = zSafety + zMax;
+            ToolLocation.Set(new Point3d(double.NaN, double.NaN, ZSafety + UpperZ), 0, 0);
+        }
+
         protected abstract void SetToolCommands(int toolNo, double angleA);
 
         private void StopEngine()
@@ -144,16 +150,43 @@ namespace CAM
         /// </summary>
         public void Cutting(Point3d startPoint, Point3d endPoint, int cuttingFeed, int transitionFeed, double angleA = 0) => Cutting(NoDraw.Line(startPoint, endPoint), cuttingFeed, transitionFeed, angleA: angleA);
 
+        public void Cutting(Point3d startPoint, Vector3d delta, int cuttingFeed, int smallFeed) => Cutting(startPoint, startPoint + delta, cuttingFeed, smallFeed);
+
+        public void Cutting(Point3d startPoint, Vector3d delta, double[] zArray, int cuttingFeed, int smallFeed, Side engineSide = Side.None, double? angleC = null, double angleA = 0)
+        {
+            using (var line = NoDraw.Line(startPoint, startPoint + delta))
+                Cutting(line, zArray, cuttingFeed, smallFeed, engineSide, angleC, angleA);
+        }
+
+        public void Cutting(Curve curve, double[] zArray, int cuttingFeed, int smallFeed, Side engineSide = Side.None, double? angleC = null, double angleA = 0)
+        {
+            foreach (var z in zArray)
+            {
+                var matrix = Matrix3d.Displacement(Vector3d.ZAxis * z);
+                var zCurve = (Curve)curve.GetTransformedCopy(matrix);
+                Cutting(zCurve, cuttingFeed, smallFeed, engineSide, angleC, angleA);
+            }
+        }
+
         /// <summary>
         /// Рез по кривой
         /// </summary>
-        public void Cutting(Curve curve, int cuttingFeed, int transitionFeed, Side engineSide = Side.None, double angleA = 0)
+        public void Cutting(Curve curve, int cuttingFeed, int smallFeed, Side engineSide = Side.None, double? angleC = null, double angleA = 0)
         {
             var point = curve.GetClosestPoint(ToolLocation.Point);
-            var angleC = ToolLocation.AngleC;
-            if (!(curve is Line))
+
+            if (IsUpperTool && angleA == 0)
+            {
+                var upperPoint = new Point3d(point.X, point.Y, ZSafety);
+                if (!ToolLocation.Point.IsEqualTo(upperPoint))
+                {
+                    Move(upperPoint.X, upperPoint.Y, angleC: angleC ?? BuilderUtils.CalcToolAngle(curve, point, engineSide));
+                }
+            }
+            else if (!(curve is Line))
                 angleC = BuilderUtils.CalcToolAngle(curve, point, engineSide);
-            GCommand(point.Z != ToolLocation.Point.Z ? CommandNames.Penetration : CommandNames.Transition, 1, point: point, angleC: angleC, angleA: angleA, feed: transitionFeed);
+
+            GCommand(point.Z != ToolLocation.Point.Z ? CommandNames.Penetration : CommandNames.Transition, 1, point: point, angleC: angleC, angleA: angleA, feed: smallFeed);
 
             if (curve is Polyline polyline)
             {

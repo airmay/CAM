@@ -17,6 +17,8 @@ namespace CAM
 
         void SetTool(int toolNo, int frequency, double angleA = 0, bool hasTool = true);
 
+        void SetZSafety(double zSafety, double zMax = 0);
+
         void Uplifting(double? z = null);
 
         void Move(double? x = null, double? y = null, double? z = null, double? angleC = null, double angleA = 0);
@@ -25,7 +27,13 @@ namespace CAM
 
         void Cutting(Point3d startPoint, Point3d endPoint, int cuttingFeed, int transitionFeed, double angleA = 0);
 
-        void Cutting(Curve curve, int cuttingFeed, int transitionFeed, Side engineSide = Side.None, double angleA = 0);
+        void Cutting(Point3d startPoint, Vector3d delta, int cuttingFeed, int transitionFeed);
+
+        void Cutting(Curve curve, int cuttingFeed, int transitionFeed, Side engineSide = Side.None, double? angleC = null, double angleA = 0);
+
+        void Cutting(Point3d startPoint, Vector3d delta, double[] zArray, int cuttingFeed, int smallFeed, Side engineSide = Side.None, double? angleC = null, double angleA = 0);
+
+        void Cutting(Curve curve, double[] zArray, int cuttingFeed, int smallFeed, Side engineSide = Side.None, double? angleC = null, double angleA = 0);
 
         void Command(string text, string name = null, double duration = 0);
 

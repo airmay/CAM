@@ -13,6 +13,7 @@ namespace CAM.TechProcesses.SectionProfile
         public SectionProfileTechProcessView()
         {
             InitializeComponent();
+            cbMachine.BindEnum(MachineType.Donatoni, MachineType.ScemaLogic);
             cbMaterial.BindEnum<Material>();
         }
 

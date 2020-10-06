@@ -129,11 +129,11 @@ namespace CAM
                 RefreshToolButtonsState();
                 CreateProcessCommandsIdx();
             }
-            RefreshViews();
             if (treeView.SelectedNode.Tag is ITechProcess)
                 _camDocument.SelectTechProcess((ITechProcess)treeView.SelectedNode.Tag);
             else
                 _camDocument.SelectTechOperation((ITechOperation)treeView.SelectedNode.Tag);
+            RefreshViews();
         }
 
         private void treeView_NodeMouseDoubleClick(object sender, TreeNodeMouseClickEventArgs e)

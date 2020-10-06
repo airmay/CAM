@@ -18,11 +18,12 @@ namespace CAM.TechProcesses.SectionProfile
 
         public SectionProfileTechProcess(string caption) : base(caption)
         {
-            MachineType = CAM.MachineType.Donatoni;
         }
 
         protected override void BuildProcessing(ICommandGenerator generator)
         {
+            return;
+
             var rail = Rail != null ? Rail.GetCurve() as Line : new Line(Point3d.Origin, new Point3d(Length.Value, 0, 0));
             var startRail = rail.StartPoint;
             var railVector = rail.Delta.GetNormal();
@@ -48,7 +49,13 @@ namespace CAM.TechProcesses.SectionProfile
             do
             {
                 var point = profile.GetPointAtDist(dist);
-                var tangent = profile.GetFirstDerivative(point);
+
+                var distAvg = dist + Tool.Thickness.Value / 2;
+                if (distAvg > profileLength)
+                    distAvg = profileLength;
+                var pointAvg = profile.GetPointAtDist(distAvg);
+
+                var tangent = profile.GetFirstDerivative(pointAvg);
                 var angleA = Math.Abs(tangent.GetAngleTo(Vector3d.XAxis).ToDeg());
                 var side = tangent.Y < 0 ? Side.Left : Side.Right;
                 if (engineSide != side)
