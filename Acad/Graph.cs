@@ -85,6 +85,25 @@ namespace CAM
             return result;
         }
 
+        public static IEnumerable<Point3d> GetPolylineFitPoints(this Polyline poly, double distDelta)
+        {
+            for (int i = 0; i < poly.EndParam - Consts.Epsilon; i++)
+            {
+                if (poly.GetBulgeAt(i) == 0)
+                {
+                    yield return poly.GetPointAtParameter(i);
+                }
+                else
+                {
+                    for (var dist = poly.GetDistAtParam(i); dist < poly.GetDistAtParam(i + 1); dist += distDelta)
+                    {
+                        yield return poly.GetPointAtDistX(dist);
+                    }
+                }
+            }
+            yield return poly.GetPointAtParameter(poly.EndParam);
+        }
+
         public static void CreateHatch(List<Curve> contour, int sign)
         {
             try

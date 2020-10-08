@@ -196,6 +196,20 @@
     <Compile Include="TechProcesses\SectionProfile\Comb\CombTechOperationView.Designer.cs">
       <DependentUpon>CombTechOperationView.cs</DependentUpon>
     </Compile>
+    <Compile Include="TechProcesses\SectionProfile\CrossCleaning\CrossCleaningTechOperation.cs" />
+    <Compile Include="TechProcesses\SectionProfile\CrossCleaning\CrossCleaningTechOperationView.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="TechProcesses\SectionProfile\CrossCleaning\CrossCleaningTechOperationView.Designer.cs">
+      <DependentUpon>CrossCleaningTechOperationView.cs</DependentUpon>
+    </Compile>
+    <Compile Include="TechProcesses\SectionProfile\LongCleaning\LongCleaningTechOperation.cs" />
+    <Compile Include="TechProcesses\SectionProfile\LongCleaning\LongCleaningTechOperationView.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="TechProcesses\SectionProfile\LongCleaning\LongCleaningTechOperationView.Designer.cs">
+      <DependentUpon>LongCleaningTechOperationView.cs</DependentUpon>
+    </Compile>
     <Compile Include="TechProcesses\SectionProfile\SectionProfileTechProcess.cs" />
     <Compile Include="TechProcesses\SectionProfile\SectionProfileTechProcessView.cs">
       <SubType>UserControl</SubType>
@@ -342,6 +356,12 @@
     <EmbeddedResource Include="TechProcesses\SectionProfile\Comb\CombTechOperationView.resx">
       <DependentUpon>CombTechOperationView.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="TechProcesses\SectionProfile\CrossCleaning\CrossCleaningTechOperationView.resx">
+      <DependentUpon>CrossCleaningTechOperationView.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="TechProcesses\SectionProfile\LongCleaning\LongCleaningTechOperationView.resx">
+      <DependentUpon>LongCleaningTechOperationView.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="TechProcesses\SectionProfile\SectionProfileTechProcessView.resx">
       <DependentUpon>SectionProfileTechProcessView.cs</DependentUpon>
     </EmbeddedResource>
@@ -384,6 +404,8 @@
     <None Include="Properties\DataSources\CAM.TechProcesses.Drilling.DrillingTechProcess.datasource" />
     <None Include="Properties\DataSources\CAM.TechProcesses.Polishing.PolishingTechProcess.datasource" />
     <None Include="Properties\DataSources\CAM.TechProcesses.SectionProfile.CombTechOperation.datasource" />
+    <None Include="Properties\DataSources\CAM.TechProcesses.SectionProfile.CrossCleaningTechOperation.datasource" />
+    <None Include="Properties\DataSources\CAM.TechProcesses.SectionProfile.LongCleaningTechOperation.datasource" />
     <None Include="Properties\DataSources\CAM.TechProcesses.SectionProfile.SectionProfileTechProcess.datasource" />
     <None Include="Resources\arrow-090_.png" />
   </ItemGroup>

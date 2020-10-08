@@ -45,13 +45,15 @@ namespace CAM.TechProcesses.SectionProfile
 
             var profile = sectionProfile.ProcessingArea[0].GetCurve();
             var profileX = profile.GetStartEndPoints().OrderBy(p => p.X).Select(p => p.X).ToArray();
+            if (Delta != 0)
+                profile = (Curve)profile.GetOffsetCurves(Delta * (profileX[0] == profile.StartPoint.X ? -1 : 1))[0];
+
+            Acad.SetLimitProgressor((int)((profileX[1] - profileX[0]) / StepPass));
 
             using (var curve = profile.ToCompositeCurve2d())
             using (var ray = new Ray2d())
             using (var intersector = new CurveCurveIntersector2d())
             {
-                Acad.SetLimitProgressor((int)((profile.EndPoint.X - profile.StartPoint.X) / StepPass));
-
                 for (var x = profileX[1] - StartPass; x > profileX[0] + toolThickness; x -= StepPass)
                 {
                     Acad.ReportProgressor();
@@ -73,7 +75,7 @@ namespace CAM.TechProcesses.SectionProfile
                     var penetrationCalc = (ZMax - y) / passCount;
                     var zArray = Enumerable.Range(1, passCount).Select(p => ZMax - p * penetrationCalc).ToArray();
 
-                    generator.Cutting(startPass + crossVector * (profileX[1] - x - shift), passVector, zArray, CuttingFeed, sectionProfile.PenetrationFeed);
+                    generator.Cutting(startPass + crossVector * (profileX[1] - x + shift), passVector, zArray, CuttingFeed, sectionProfile.PenetrationFeed);
                     generator.Uplifting();
                 }
             }
