@@ -1,5 +1,6 @@
 ﻿using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
+using CAM.Core.UI;
 using System;
 
 namespace CAM.TechProcesses.SectionProfile
@@ -18,6 +19,22 @@ namespace CAM.TechProcesses.SectionProfile
 
         public SectionProfileTechProcess(string caption) : base(caption)
         {
+        }
+
+        public void ConfigureParamsView(ParamsView view)
+        {
+            view.AddMachine(CAM.MachineType.Donatoni, CAM.MachineType.ScemaLogic)
+                .AddMaterial()
+                .AddTool()
+                .AddParam(nameof(Frequency))
+                .AddParam(nameof(CuttingFeed))
+                .AddParam(nameof(PenetrationFeed))
+                .AddIndent()
+                .AddAcadObject(nameof(ProcessingArea), "Профиль")
+                .AddAcadObject(nameof(Rail), "Направляющая")
+                .AddParam(nameof(Length), "Длина направляющей")
+                .AddIndent()
+                .AddParam(nameof(ZSafety));
         }
 
         protected override void BuildProcessing(ICommandGenerator generator)

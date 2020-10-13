@@ -1,8 +1,10 @@
 ﻿using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
+using CAM.Core.UI;
 using Dreambuild.AutoCAD;
 using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Linq;
 
 namespace CAM.TechProcesses.SectionProfile
@@ -11,7 +13,6 @@ namespace CAM.TechProcesses.SectionProfile
     [TechOperation(3, TechProcessNames.SectionProfile, "Поперечная чистка")]
     public class CrossCleaningTechOperation : TechOperationBase
     {
-
         public double StepX { get; set; }
 
         public double StepY { get; set; }
@@ -26,6 +27,16 @@ namespace CAM.TechProcesses.SectionProfile
         {
         }
 
+        public void ConfigureParamsView(ParamsView view)
+        {
+            view.AddParam(nameof(StepX))
+                .AddParam(nameof(StepY))
+                .AddIndent()
+                .AddParam(nameof(Departure))
+                .AddParam(nameof(CuttingFeed))
+                .AddParam(nameof(Delta));
+        }
+
         public override void BuildProcessing(ICommandGenerator generator)
         {
             var sectionProfile = (SectionProfileTechProcess)TechProcess;
@@ -34,7 +45,7 @@ namespace CAM.TechProcesses.SectionProfile
             var rail = sectionProfile.Rail != null ? sectionProfile.Rail.GetCurve() as Line : new Line(Point3d.Origin, new Point3d(sectionProfile.Length.Value, 0, 0));
             var railVector = rail.Delta.GetNormal();
             var passVector = rail.Delta;
-            var crossVector = railVector.RotateBy(Math.PI / 2, Vector3d.ZAxis);
+            var crossVector = railVector.RotateBy(-Math.PI / 2, Vector3d.ZAxis);
             var startPass = rail.StartPoint;
             var shift = TechProcess.MachineType == MachineType.Donatoni ^ BuilderUtils.CalcEngineSide(rail.Angle) == Side.Left ? toolThickness : 0;
             if (rail.IsNewObject)

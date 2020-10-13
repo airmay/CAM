@@ -4,7 +4,7 @@ using System.Linq;
 using System.Reflection;
 using System.Windows.Forms;
 
-namespace CAM
+namespace CAM.Core.UI
 {
     public static class ViewsContainer
     {
@@ -19,11 +19,18 @@ namespace CAM
         public static void BindData(dynamic data, Control owner)
         {
             var dataType = data.GetType();
-            if (!_viewTypes.ContainsKey(dataType))
-                throw new Exception($"Не найдено представление для типа {dataType}");
             if (!_views.TryGetValue(dataType, out dynamic view))
             {
-                view = Activator.CreateInstance(_viewTypes[dataType]);
+                if (!_viewTypes.ContainsKey(dataType))
+                {
+                    var type = (Type)data.GetType();
+                    view = new ParamsView(type);
+                    data.ConfigureParamsView(view);
+                }
+                else
+                {
+                    view = Activator.CreateInstance(_viewTypes[dataType]);
+                }
                 view.Dock = DockStyle.Fill;
                 owner.Controls.Add(view);
                 _views.Add(dataType, view);

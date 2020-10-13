@@ -1,5 +1,6 @@
 ﻿using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
+using CAM.Core.UI;
 using Dreambuild.AutoCAD;
 using System;
 using System.Collections.Generic;
@@ -20,6 +21,36 @@ namespace CAM.Sawing
         {
             SawingTechProcessParams = @params.Clone();
             PenetrationFeed = SawingTechProcessParams.PenetrationFeed;
+        }
+
+        public void ConfigureParamsView(ParamsView view)
+        {
+            var sawingModesView = new SawingModesView();
+
+            view.AddMachine(CAM.MachineType.Donatoni, CAM.MachineType.ScemaLogic)
+                .AddMaterial()
+                .AddParam(nameof(Thickness))
+                .AddIndent()
+                .AddTool()
+                .AddParam(nameof(Frequency))
+                .AddParam(nameof(PenetrationFeed))
+                .AddIndent()
+                .AddAcadObject(message: "Выберите объекты распиловки",
+                    allowedTypes: $"{AcadObjectNames.Line},{AcadObjectNames.Arc},{AcadObjectNames.Lwpolyline}",
+                    afterSelect: ids =>
+                    {
+                        Acad.DeleteExtraObjects();
+                        CreateExtraObjects(ids);
+                    }
+                )
+                .AddIndent()
+                .AddComboBox("Режимы", new[] { "Отрезок", "Кривая" }, SetSawingModes)
+                .AddControl(sawingModesView);
+
+            void SetSawingModes(int index) => 
+                sawingModesView.sawingModesBindingSource.DataSource = index == 0 
+                    ? SawingTechProcessParams.SawingLineModes 
+                    : SawingTechProcessParams.SawingCurveModes;
         }
 
         public override void Setup()

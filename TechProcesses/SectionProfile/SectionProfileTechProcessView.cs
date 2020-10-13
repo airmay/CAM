@@ -6,7 +6,7 @@ using Dreambuild.AutoCAD;
 
 namespace CAM.TechProcesses.SectionProfile
 {
-    public partial class SectionProfileTechProcessView : UserControl, IDataView<SectionProfileTechProcess>
+    public partial class SectionProfileTechProcessView : UserControl //, IDataView<SectionProfileTechProcess>
     {
         private SectionProfileTechProcess _techProcess;
 

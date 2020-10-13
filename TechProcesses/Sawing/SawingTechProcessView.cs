@@ -4,7 +4,7 @@ using System.Windows.Forms;
 
 namespace CAM.Sawing
 {
-    public partial class SawingTechProcessView : UserControl, IDataView<SawingTechProcess>
+    public partial class SawingTechProcessView : UserControl//, IDataView<SawingTechProcess>
     {
         public SawingTechProcess _techProcess;
 

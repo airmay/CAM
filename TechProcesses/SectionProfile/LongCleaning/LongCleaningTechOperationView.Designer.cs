@@ -30,6 +30,7 @@
         {
             this.components = new System.ComponentModel.Container();
             this.tbDeparture = new System.Windows.Forms.TextBox();
+            this.longCleaningTechOperationBindingSource = new System.Windows.Forms.BindingSource(this.components);
             this.label7 = new System.Windows.Forms.Label();
             this.textBox5 = new System.Windows.Forms.TextBox();
             this.label6 = new System.Windows.Forms.Label();
@@ -41,11 +42,13 @@
             this.label4 = new System.Windows.Forms.Label();
             this.checkBox2 = new System.Windows.Forms.CheckBox();
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
-            this.label2 = new System.Windows.Forms.Label();
+            this.bObjects = new System.Windows.Forms.Button();
+            this.tbProfile = new System.Windows.Forms.TextBox();
+            this.label8 = new System.Windows.Forms.Label();
             this.textBox2 = new System.Windows.Forms.TextBox();
-            this.longCleaningTechOperationBindingSource = new System.Windows.Forms.BindingSource(this.components);
-            this.tableLayoutPanel1.SuspendLayout();
+            this.label2 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.longCleaningTechOperationBindingSource)).BeginInit();
+            this.tableLayoutPanel1.SuspendLayout();
             this.SuspendLayout();
             // 
             // tbDeparture
@@ -54,8 +57,12 @@
             this.tbDeparture.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tbDeparture.Location = new System.Drawing.Point(103, 103);
             this.tbDeparture.Name = "tbDeparture";
-            this.tbDeparture.Size = new System.Drawing.Size(135, 20);
+            this.tbDeparture.Size = new System.Drawing.Size(107, 20);
             this.tbDeparture.TabIndex = 103;
+            // 
+            // longCleaningTechOperationBindingSource
+            // 
+            this.longCleaningTechOperationBindingSource.DataSource = typeof(CAM.TechProcesses.SectionProfile.LongCleaningTechOperation);
             // 
             // label7
             // 
@@ -74,7 +81,7 @@
             this.textBox5.Dock = System.Windows.Forms.DockStyle.Fill;
             this.textBox5.Location = new System.Drawing.Point(103, 153);
             this.textBox5.Name = "textBox5";
-            this.textBox5.Size = new System.Drawing.Size(135, 20);
+            this.textBox5.Size = new System.Drawing.Size(107, 20);
             this.textBox5.TabIndex = 106;
             // 
             // label6
@@ -94,7 +101,7 @@
             this.textBox4.Dock = System.Windows.Forms.DockStyle.Fill;
             this.textBox4.Location = new System.Drawing.Point(103, 128);
             this.textBox4.Name = "textBox4";
-            this.textBox4.Size = new System.Drawing.Size(135, 20);
+            this.textBox4.Size = new System.Drawing.Size(107, 20);
             this.textBox4.TabIndex = 105;
             // 
             // label5
@@ -114,7 +121,7 @@
             this.textBox1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.textBox1.Location = new System.Drawing.Point(103, 28);
             this.textBox1.Name = "textBox1";
-            this.textBox1.Size = new System.Drawing.Size(135, 20);
+            this.textBox1.Size = new System.Drawing.Size(107, 20);
             this.textBox1.TabIndex = 10;
             // 
             // label1
@@ -134,7 +141,7 @@
             this.tbStepPass.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tbStepPass.Location = new System.Drawing.Point(103, 53);
             this.tbStepPass.Name = "tbStepPass";
-            this.tbStepPass.Size = new System.Drawing.Size(135, 20);
+            this.tbStepPass.Size = new System.Drawing.Size(107, 20);
             this.tbStepPass.TabIndex = 20;
             // 
             // label4
@@ -165,9 +172,13 @@
             this.tableLayoutPanel1.AutoScroll = true;
             this.tableLayoutPanel1.AutoScrollMinSize = new System.Drawing.Size(120, 0);
             this.tableLayoutPanel1.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this.tableLayoutPanel1.ColumnCount = 2;
+            this.tableLayoutPanel1.ColumnCount = 3;
             this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 100F));
             this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 28F));
+            this.tableLayoutPanel1.Controls.Add(this.bObjects, 2, 8);
+            this.tableLayoutPanel1.Controls.Add(this.tbProfile, 1, 8);
+            this.tableLayoutPanel1.Controls.Add(this.label8, 0, 8);
             this.tableLayoutPanel1.Controls.Add(this.textBox2, 1, 0);
             this.tableLayoutPanel1.Controls.Add(this.label1, 0, 1);
             this.tableLayoutPanel1.Controls.Add(this.textBox1, 1, 1);
@@ -184,7 +195,7 @@
             this.tableLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tableLayoutPanel1.Location = new System.Drawing.Point(0, 0);
             this.tableLayoutPanel1.Name = "tableLayoutPanel1";
-            this.tableLayoutPanel1.RowCount = 9;
+            this.tableLayoutPanel1.RowCount = 11;
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 25F));
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 25F));
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 25F));
@@ -193,9 +204,53 @@
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 25F));
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 25F));
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 25F));
-            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 25F));
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 25F));
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.tableLayoutPanel1.Size = new System.Drawing.Size(241, 540);
             this.tableLayoutPanel1.TabIndex = 120;
+            // 
+            // bObjects
+            // 
+            this.bObjects.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.bObjects.Location = new System.Drawing.Point(216, 203);
+            this.bObjects.Name = "bObjects";
+            this.bObjects.Size = new System.Drawing.Size(22, 19);
+            this.bObjects.TabIndex = 119;
+            this.bObjects.TabStop = false;
+            this.bObjects.Text = "۞";
+            this.bObjects.UseVisualStyleBackColor = true;
+            this.bObjects.Click += new System.EventHandler(this.bObjects_Click);
+            // 
+            // tbProfile
+            // 
+            this.tbProfile.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.tbProfile.Location = new System.Drawing.Point(103, 203);
+            this.tbProfile.Name = "tbProfile";
+            this.tbProfile.ReadOnly = true;
+            this.tbProfile.Size = new System.Drawing.Size(107, 20);
+            this.tbProfile.TabIndex = 118;
+            // 
+            // label8
+            // 
+            this.label8.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left)));
+            this.label8.Location = new System.Drawing.Point(3, 200);
+            this.label8.Name = "label8";
+            this.label8.Size = new System.Drawing.Size(53, 25);
+            this.label8.TabIndex = 117;
+            this.label8.Text = "Профиль";
+            this.label8.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            // 
+            // textBox2
+            // 
+            this.textBox2.DataBindings.Add(new System.Windows.Forms.Binding("Text", this.longCleaningTechOperationBindingSource, "StepYmin", true));
+            this.textBox2.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.textBox2.Location = new System.Drawing.Point(103, 3);
+            this.textBox2.Name = "textBox2";
+            this.textBox2.Size = new System.Drawing.Size(107, 20);
+            this.textBox2.TabIndex = 5;
             // 
             // label2
             // 
@@ -208,19 +263,6 @@
             this.label2.Text = "Шаг Y мин.";
             this.label2.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
-            // textBox2
-            // 
-            this.textBox2.DataBindings.Add(new System.Windows.Forms.Binding("Text", this.longCleaningTechOperationBindingSource, "StepYmin", true));
-            this.textBox2.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.textBox2.Location = new System.Drawing.Point(103, 3);
-            this.textBox2.Name = "textBox2";
-            this.textBox2.Size = new System.Drawing.Size(135, 20);
-            this.textBox2.TabIndex = 5;
-            // 
-            // longCleaningTechOperationBindingSource
-            // 
-            this.longCleaningTechOperationBindingSource.DataSource = typeof(CAM.TechProcesses.SectionProfile.LongCleaningTechOperation);
-            // 
             // LongCleaningTechOperationView
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -228,9 +270,9 @@
             this.Controls.Add(this.tableLayoutPanel1);
             this.Name = "LongCleaningTechOperationView";
             this.Size = new System.Drawing.Size(241, 540);
+            ((System.ComponentModel.ISupportInitialize)(this.longCleaningTechOperationBindingSource)).EndInit();
             this.tableLayoutPanel1.ResumeLayout(false);
             this.tableLayoutPanel1.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.longCleaningTechOperationBindingSource)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -251,5 +293,8 @@
         private System.Windows.Forms.BindingSource longCleaningTechOperationBindingSource;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.TextBox textBox2;
+        private System.Windows.Forms.Label label8;
+        private System.Windows.Forms.Button bObjects;
+        private System.Windows.Forms.TextBox tbProfile;
     }
 }

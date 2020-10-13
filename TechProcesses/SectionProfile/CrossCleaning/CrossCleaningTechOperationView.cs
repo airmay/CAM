@@ -2,7 +2,7 @@
 
 namespace CAM.TechProcesses.SectionProfile
 {
-    public partial class CrossCleaningTechOperationView : UserControl, IDataView<CrossCleaningTechOperation>
+    public partial class CrossCleaningTechOperationView : UserControl//, IDataView<CrossCleaningTechOperation>
     {
         public CrossCleaningTechOperationView()
         {

@@ -1,6 +1,6 @@
 ﻿using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
-using Dreambuild.AutoCAD;
+using CAM.Core.UI;
 using System;
 using System.Linq;
 
@@ -24,8 +24,27 @@ namespace CAM.TechProcesses.SectionProfile
 
         public double ZMax { get; set; }
 
+        public bool IsUplifting { get; set; }
+
+        public AcadObject Profile { get; set; }
+
         public CombTechOperation(ITechProcess techProcess, string caption) : base(techProcess, caption)
         {
+        }
+
+        public void ConfigureParamsView(ParamsView view)
+        {
+            view.AddParam(nameof(StepPass))
+                .AddParam(nameof(StartPass))
+                .AddParam(nameof(Departure))
+                .AddIndent()
+                .AddParam(nameof(Penetration))
+                .AddParam(nameof(CuttingFeed))
+                .AddIndent()
+                .AddParam(nameof(ZMax))
+                .AddParam(nameof(Delta))
+                .AddParam(nameof(IsUplifting))
+                .AddAcadObject(nameof(Profile));
         }
 
         public override void BuildProcessing(ICommandGenerator generator)
@@ -37,13 +56,13 @@ namespace CAM.TechProcesses.SectionProfile
             var rail = sectionProfile.Rail != null ? sectionProfile.Rail.GetCurve() as Line : new Line(Point3d.Origin, new Point3d(sectionProfile.Length.Value, 0, 0));
             var railVector = rail.Delta.GetNormal();
             var passVector = railVector * (rail.Length + 2 * Departure);
-            var crossVector = railVector.RotateBy(Math.PI / 2, Vector3d.ZAxis);
+            var crossVector = railVector.RotateBy(-Math.PI / 2, Vector3d.ZAxis);
             var startPass = rail.StartPoint - railVector * Departure;
             var shift = TechProcess.MachineType == MachineType.Donatoni ^ BuilderUtils.CalcEngineSide(rail.Angle) == Side.Left ? toolThickness : 0;
             if (rail.IsNewObject)
                 rail.Dispose();
 
-            var profile = sectionProfile.ProcessingArea[0].GetCurve();
+            var profile = (Profile ?? sectionProfile.ProcessingArea[0]).GetCurve();
             var profileX = profile.GetStartEndPoints().OrderBy(p => p.X).Select(p => p.X).ToArray();
             if (Delta != 0)
                 profile = (Curve)profile.GetOffsetCurves(Delta * (profileX[0] == profile.StartPoint.X ? -1 : 1))[0];
@@ -63,8 +82,8 @@ namespace CAM.TechProcesses.SectionProfile
                     {
                         ray.Set(new Point2d(x - i * toolThickness / 2, ZMax), -Vector2d.YAxis);
                         intersector.Set(curve, ray);
-                        if (intersector.NumberOfIntersectionPoints != 1) throw new Exception("Некорректный профиль");
-                        y = Math.Max(y, intersector.GetIntersectionPoint(0).Y);
+                        if (intersector.NumberOfIntersectionPoints == 1)
+                            y = Math.Max(y, intersector.GetIntersectionPoint(0).Y);
 
                         //Draw.Circle(new CircularArc2d(new Point2d(x - i * toolThickness / 2, intersector.GetIntersectionPoint(0).Y), 1));
                     }
@@ -75,8 +94,10 @@ namespace CAM.TechProcesses.SectionProfile
                     var penetrationCalc = (ZMax - y) / passCount;
                     var zArray = Enumerable.Range(1, passCount).Select(p => ZMax - p * penetrationCalc).ToArray();
 
-                    generator.Cutting(startPass + crossVector * (profileX[1] - x + shift), passVector, zArray, CuttingFeed, sectionProfile.PenetrationFeed);
-                    generator.Uplifting();
+                    generator.Cutting(startPass + crossVector * (x - shift), passVector, zArray, CuttingFeed, sectionProfile.PenetrationFeed);
+
+                    if (IsUplifting)
+                        generator.Uplifting();
                 }
             }
         }

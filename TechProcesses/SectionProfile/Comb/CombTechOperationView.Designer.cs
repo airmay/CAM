@@ -30,7 +30,6 @@
         {
             this.components = new System.ComponentModel.Container();
             this.tbStepPass = new System.Windows.Forms.TextBox();
-            this.bindingSource = new System.Windows.Forms.BindingSource(this.components);
             this.label4 = new System.Windows.Forms.Label();
             this.textBox2 = new System.Windows.Forms.TextBox();
             this.label2 = new System.Windows.Forms.Label();
@@ -44,6 +43,11 @@
             this.label7 = new System.Windows.Forms.Label();
             this.textBox1 = new System.Windows.Forms.TextBox();
             this.label1 = new System.Windows.Forms.Label();
+            this.checkBox2 = new System.Windows.Forms.CheckBox();
+            this.bProfile = new System.Windows.Forms.Button();
+            this.tbProfile = new System.Windows.Forms.TextBox();
+            this.label8 = new System.Windows.Forms.Label();
+            this.bindingSource = new System.Windows.Forms.BindingSource(this.components);
             ((System.ComponentModel.ISupportInitialize)(this.bindingSource)).BeginInit();
             this.SuspendLayout();
             // 
@@ -56,10 +60,6 @@
             this.tbStepPass.Name = "tbStepPass";
             this.tbStepPass.Size = new System.Drawing.Size(152, 20);
             this.tbStepPass.TabIndex = 10;
-            // 
-            // bindingSource
-            // 
-            this.bindingSource.DataSource = typeof(CAM.TechProcesses.SectionProfile.CombTechOperation);
             // 
             // label4
             // 
@@ -184,10 +184,61 @@
             this.label1.TabIndex = 101;
             this.label1.Text = "Припуск";
             // 
+            // checkBox2
+            // 
+            this.checkBox2.Anchor = System.Windows.Forms.AnchorStyles.Left;
+            this.checkBox2.AutoSize = true;
+            this.checkBox2.DataBindings.Add(new System.Windows.Forms.Binding("Checked", this.bindingSource, "IsUplifting", true));
+            this.checkBox2.Location = new System.Drawing.Point(6, 194);
+            this.checkBox2.Name = "checkBox2";
+            this.checkBox2.Size = new System.Drawing.Size(67, 17);
+            this.checkBox2.TabIndex = 116;
+            this.checkBox2.Text = "Подъем";
+            this.checkBox2.UseVisualStyleBackColor = true;
+            // 
+            // bProfile
+            // 
+            this.bProfile.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.bProfile.Location = new System.Drawing.Point(234, 226);
+            this.bProfile.Name = "bProfile";
+            this.bProfile.Size = new System.Drawing.Size(21, 21);
+            this.bProfile.TabIndex = 119;
+            this.bProfile.TabStop = false;
+            this.bProfile.Text = "۞";
+            this.bProfile.UseVisualStyleBackColor = true;
+            this.bProfile.Click += new System.EventHandler(this.bObjects_Click);
+            // 
+            // tbProfile
+            // 
+            this.tbProfile.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.tbProfile.Location = new System.Drawing.Point(102, 226);
+            this.tbProfile.Name = "tbProfile";
+            this.tbProfile.ReadOnly = true;
+            this.tbProfile.Size = new System.Drawing.Size(130, 20);
+            this.tbProfile.TabIndex = 117;
+            // 
+            // label8
+            // 
+            this.label8.AutoSize = true;
+            this.label8.Location = new System.Drawing.Point(3, 230);
+            this.label8.Name = "label8";
+            this.label8.Size = new System.Drawing.Size(53, 13);
+            this.label8.TabIndex = 118;
+            this.label8.Text = "Профиль";
+            // 
+            // bindingSource
+            // 
+            this.bindingSource.DataSource = typeof(CAM.TechProcesses.SectionProfile.CombTechOperation);
+            // 
             // CombTechOperationView
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.Controls.Add(this.bProfile);
+            this.Controls.Add(this.tbProfile);
+            this.Controls.Add(this.label8);
+            this.Controls.Add(this.checkBox2);
             this.Controls.Add(this.textBox1);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.tbDeparture);
@@ -227,5 +278,9 @@
         private System.Windows.Forms.Label label7;
         private System.Windows.Forms.TextBox textBox1;
         private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.CheckBox checkBox2;
+        private System.Windows.Forms.Button bProfile;
+        private System.Windows.Forms.TextBox tbProfile;
+        private System.Windows.Forms.Label label8;
     }
 }

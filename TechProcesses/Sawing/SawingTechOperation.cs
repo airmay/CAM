@@ -1,5 +1,6 @@
 ﻿using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
+using CAM.Core.UI;
 using Dreambuild.AutoCAD;
 using System;
 using System.Collections.Generic;
@@ -28,6 +29,31 @@ namespace CAM.Sawing
         public SawingTechOperation(ITechProcess techProcess, Border border) : base(techProcess, $"Распиловка{border.ObjectId.GetDesc()}")
         {
             SetFromBorder(border);
+        }
+
+        public void ConfigureParamsView(ParamsView view)
+        {
+            var sawingModesView = new SawingModesView();
+            sawingModesView.sawingModesBindingSource.DataSource = SawingModes;
+
+            view.AddParam(nameof(IsExactlyBegin), "Начало точно")
+                .AddParam(nameof(IsExactlyEnd), "Конец точно")
+                .AddParam(nameof(AngleA))
+                .AddIndent()
+                .AddAcadObject(message: "Выберите объект",
+                    allowedTypes: $"{AcadObjectNames.Line},{AcadObjectNames.Arc},{AcadObjectNames.Lwpolyline}",
+                    afterSelect: ids =>
+                    {
+                        Acad.DeleteExtraObjects();
+                        ProcessingArea = null;
+                        var border = ((SawingTechProcess)TechProcess).CreateExtraObjects(ids[0])[0];
+                        SetFromBorder(border);
+                        view.ResetControls();
+                        sawingModesView.sawingModesBindingSource.DataSource = SawingModes;
+                    }
+                )
+                .AddIndent()
+                .AddControl(sawingModesView);
         }
 
         public void SetIsExactly(Corner corner, bool value)
