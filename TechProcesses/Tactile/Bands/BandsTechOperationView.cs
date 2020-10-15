@@ -10,7 +10,7 @@ using System.Windows.Forms;
 
 namespace CAM.Tactile
 {
-    public partial class BandsTechOperationView : UserControl, IDataView<BandsTechOperation>
+    public partial class BandsTechOperationView : UserControl//, IDataView<BandsTechOperation>
     {
         private BandsTechOperation _techOperation;
 

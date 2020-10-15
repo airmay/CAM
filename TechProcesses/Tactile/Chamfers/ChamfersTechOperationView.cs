@@ -2,7 +2,7 @@
 
 namespace CAM.Tactile
 {
-    public partial class ChamfersTechOperationView : UserControl, IDataView<ChamfersTechOperation>
+    public partial class ChamfersTechOperationView : UserControl//, IDataView<ChamfersTechOperation>
     {
         public ChamfersTechOperationView()
         {

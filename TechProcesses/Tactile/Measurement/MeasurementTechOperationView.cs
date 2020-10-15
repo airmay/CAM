@@ -4,7 +4,7 @@ using System.Windows.Forms;
 
 namespace CAM.Tactile
 {
-    public partial class MeasurementTechOperationView : UserControl, IDataView<MeasurementTechOperation>
+    public partial class MeasurementTechOperationView : UserControl//, IDataView<MeasurementTechOperation>
     {
         private MeasurementTechOperation _techOperation;
 

@@ -53,7 +53,7 @@ namespace CAM.Sawing
                     }
                 )
                 .AddIndent()
-                .AddControl(sawingModesView);
+                .AddControl(sawingModesView, 6);
         }
 
         public void SetIsExactly(Corner corner, bool value)

@@ -4,7 +4,7 @@ using System.Windows.Forms;
 
 namespace CAM.Tactile
 {
-    public partial class TactileTechProcessView : UserControl, IDataView<TactileTechProcess>
+    public partial class TactileTechProcessView : UserControl//, IDataView<TactileTechProcess>
     {
         private TactileTechProcess _techProcess;
 
@@ -18,7 +18,6 @@ namespace CAM.Tactile
         public void BindData(TactileTechProcess data)
         {
             tactileTechProcessBindingSource.DataSource = _techProcess = data;
-            tactileTechProcessParamsBindingSource.DataSource = _techProcess.TactileTechProcessParams;
             tbTool.Text = _techProcess.Tool?.ToString();
             tbOrigin.Text = $"{{{_techProcess.OriginX}, {_techProcess.OriginY}}}";
             tbContour.Text = _techProcess.ProcessingArea?.GetDesc();

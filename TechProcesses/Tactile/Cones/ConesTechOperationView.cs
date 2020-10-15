@@ -2,7 +2,7 @@
 
 namespace CAM.Tactile
 {
-    public partial class ConesTechOperationView : UserControl, IDataView<ConesTechOperation>
+    public partial class ConesTechOperationView : UserControl//, IDataView<ConesTechOperation>
     {
         public ConesTechOperationView()
         {

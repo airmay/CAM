@@ -14,6 +14,7 @@ namespace CAM.Core.UI
             ["Frequency"] = "Шпиндель",
             ["CuttingFeed"] = "Подача",
             ["PenetrationFeed"] = "Скор.малая",
+            ["TransitionFeed"] = "Переход",
 
             ["ProcessingArea"] = "Объекты",
             ["Rail"] = "Направляющая",
@@ -26,6 +27,7 @@ namespace CAM.Core.UI
             ["StartPass"] = "Первый проход",
 
             ["Thickness"] = "Толщина",
+            ["Depth"] = "Глубина",
             ["Penetration"] = "Заглубление",
             ["Departure"] = "Выезд",
             ["IsUplifting"] = "Подъем",
@@ -34,11 +36,11 @@ namespace CAM.Core.UI
             ["ZSafety"] = "Z безопасности",
             ["AngleA"] = "Угол вертикальный",
         };
-
+        private const int RowHeight = 24;
         private Action _refreshAction;
         private readonly Type _type;
 
-        private object ParamsObject => bindingSource.DataSource;
+        public object ParamsObject => BindingSource.DataSource;
 
         private string GetDisplayName(string paramName) => _displayNames.TryGetValue(paramName, out var value) ? value : paramName;
 
@@ -46,7 +48,7 @@ namespace CAM.Core.UI
         {
             InitializeComponent();
             _type = type;
-            bindingSource.DataSource = type;
+            BindingSource.DataSource = type;
 
             tablePanel.Height = 0;
             tablePanel.RowStyles.RemoveAt(0);
@@ -54,21 +56,21 @@ namespace CAM.Core.UI
 
         public void BindData(object obj)
         {
-            bindingSource.DataSource = obj;
+            BindingSource.DataSource = obj;
             _refreshAction?.Invoke();
         }
 
-        public void ResetControls() => bindingSource.ResetBindings(false);
+        public void ResetControls() => BindingSource.ResetBindings(false);
 
-        private void AddRow(int height)
+        private void AddRow(int height = 1)
         {
-            tablePanel.RowStyles.Add(new RowStyle(SizeType.Absolute, height));
-            tablePanel.Height += height;
+            tablePanel.RowStyles.Add(new RowStyle(SizeType.Absolute, RowHeight * height));
+            tablePanel.Height += RowHeight * height;
         }
 
         public ParamsView AddIndent()
         {
-            AddRow(10);
+            AddRow();
             return this;
         }
 
@@ -85,9 +87,9 @@ namespace CAM.Core.UI
             tablePanel.Controls.Add(label, 0, tablePanel.RowStyles.Count - 1);
         }
 
-        public ParamsView AddParam(string paramName, string displayName = null)
+        public ParamsView AddParam(string paramName, string displayName = null, bool readOnly = false)
         {
-            AddRow(26);
+            AddRow();
             AddLabel(displayName ?? GetDisplayName(paramName));
 
             Control control;
@@ -96,13 +98,17 @@ namespace CAM.Core.UI
             if (propType.UnderlyingSystemType == typeof(bool))
             {
                 control = new CheckBox();
-                control.DataBindings.Add(new Binding("Checked", bindingSource, paramName, true));
+                control.DataBindings.Add(new Binding("Checked", BindingSource, paramName, true));
             }
             else
             {
-                control = new TextBox();
-                control.DataBindings.Add(new Binding("Text", bindingSource, paramName, true));
-                control.Dock = DockStyle.Fill;
+                control = new TextBox
+                {
+                    ReadOnly = readOnly,
+                    BackColor = readOnly ? SystemColors.Control : SystemColors.Window,
+                    Dock = DockStyle.Fill
+                };
+                control.DataBindings.Add(new Binding("Text", BindingSource, paramName, true));
             }
             tablePanel.Controls.Add(control, 1, tablePanel.RowStyles.Count - 1);
 
@@ -112,14 +118,14 @@ namespace CAM.Core.UI
 
         #region AddEnumParam
 
-        private ParamsView AddEnumParam<T>(string paramName, string displayName = null, params T[] values) where T : struct
+        public ParamsView AddEnumParam<T>(string paramName, string displayName = null, params T[] values) where T : struct
         {
-            AddRow(26);
+            AddRow();
             AddLabel(displayName ?? GetDisplayName(paramName));
 
             var comboBox = new ComboBox();
             comboBox.BindEnum(values);
-            comboBox.DataBindings.Add(new Binding("SelectedValue", bindingSource, paramName, true));
+            comboBox.DataBindings.Add(new Binding("SelectedValue", BindingSource, paramName, true));
             comboBox.DropDownStyle = ComboBoxStyle.DropDownList;
             comboBox.FormattingEnabled = true;
             comboBox.Dock = DockStyle.Fill;
@@ -136,15 +142,22 @@ namespace CAM.Core.UI
 
         #region AddSelectorParam
 
-        private UserControl AddSelector(string displayName, string buttonText)
+        public ParamsView AddSelector(string displayName, string buttonText, Action<TextBox, Button, BindingSource> configure)
         {
-            AddRow(26);
+            var selector = CreateSelector(displayName, buttonText);
+            configure?.Invoke((TextBox)selector.Controls[0] , (Button)selector.Controls[1], BindingSource);
+            return this;
+        }
+
+        private UserControl CreateSelector(string displayName, string buttonText)
+        {
+            AddRow();
             AddLabel(displayName);
 
             var userControl = new UserControl
             {
-                Margin = new Padding(3, 3, 3, 2),
-                Size = new Size(124, 26)
+                Margin = new Padding(3, 3, 3, 0),
+                Size = new Size(124, RowHeight)
             };
 
             var textBox = new TextBox
@@ -165,7 +178,7 @@ namespace CAM.Core.UI
                 TabStop = false,
                 Text = buttonText
             };
-            userControl.Controls.Add(button);
+            userControl.Controls.Add(button);            
 
             userControl.Dock = DockStyle.Fill;
             tablePanel.Controls.Add(userControl, 1, tablePanel.RowStyles.Count - 1);
@@ -180,7 +193,7 @@ namespace CAM.Core.UI
             var materialProp = _type.GetProperty("Material");
             var frequencyProp = _type.GetProperty("Frequency");
 
-            var selector = AddSelector("Инструмент", "Ξ");
+            var selector = CreateSelector("Инструмент", "Ξ");
 
             var textBox = selector.Controls[0];
             _refreshAction += () => textBox.Text = toolProp.GetValue(ParamsObject)?.ToString();
@@ -198,7 +211,7 @@ namespace CAM.Core.UI
                     textBox.Text = tool.ToString();
                     frequencyProp.SetValue(ParamsObject, ToolService.CalcFrequency(tool, machine.Value, material.Value));
 
-                    bindingSource.ResetBindings(false);
+                    BindingSource.ResetBindings(false);
                 }
             };
             return this;
@@ -208,7 +221,7 @@ namespace CAM.Core.UI
         {
             var prop = _type.GetProperty(paramName);
 
-            var selector = AddSelector(displayName ?? GetDisplayName(paramName), "۞");
+            var selector = CreateSelector(displayName ?? GetDisplayName(paramName), "۞");
 
             var textBox = selector.Controls[0];
             _refreshAction += prop.PropertyType == typeof(AcadObject) 
@@ -253,7 +266,7 @@ namespace CAM.Core.UI
             var originY = _type.GetProperty("OriginY");
             var originObject = _type.GetProperty("OriginObject");
 
-            var selector = AddSelector("Начало координат", "۞");
+            var selector = CreateSelector("Начало координат", "۞");
 
             var textBox = selector.Controls[0];
             _refreshAction += RefreshText;
@@ -280,9 +293,9 @@ namespace CAM.Core.UI
         }
         #endregion
 
-        public ParamsView AddControl(Control control)
+        public ParamsView AddControl(Control control, int height = 1)
         {
-            AddRow(130);
+            AddRow(height);
             tablePanel.Controls.Add(control, 0, tablePanel.RowStyles.Count - 1);
             tablePanel.SetColumnSpan(control, 2);
             control.Dock = DockStyle.Fill;
@@ -292,7 +305,7 @@ namespace CAM.Core.UI
 
         public ParamsView AddComboBox(string displayName, string[] items, Action<int> SelectedIndexChanged)
         {
-            AddRow(26);
+            AddRow();
             AddLabel(displayName);
 
             var comboBox = new ComboBox

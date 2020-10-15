@@ -1,8 +1,12 @@
 ﻿using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
+using CAM.Core.UI;
+using Dreambuild.AutoCAD;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
+using System.Windows.Forms;
 
 namespace CAM.Tactile
 {
@@ -14,10 +18,17 @@ namespace CAM.Tactile
 
         public List<double> PointsY { get; set; } = new List<double>();
 
+        public double? Thickness { get; set; }
+
         public enum CalcMethodType
         {
+            [Description("Среднее")]
             Average,
+
+            [Description("Наименьшее")]
             Minimum,
+
+            [Description("По 4 углам")]
             Сorners
         };
 
@@ -28,6 +39,36 @@ namespace CAM.Tactile
 
         public MeasurementTechOperation(ITechProcess techProcess, string caption) : base(techProcess, caption)
         {
+            Thickness = techProcess.Thickness;
+        }
+
+        public void ConfigureParamsView(ParamsView view)
+        {
+            var selector = view.AddSelector("Точки", "۞", ConfigurePointsSelector)
+                .AddParam(nameof(Thickness))
+                .AddEnumParam<CalcMethodType>(nameof(CalcMethod), "Метод расчета");
+        }
+
+        private void ConfigurePointsSelector(TextBox textBox, Button button, BindingSource bindingSource)
+        {
+            Func<MeasurementTechOperation> getObject = () => (MeasurementTechOperation)bindingSource.DataSource;
+
+            textBox.Enter += (s, e) => Acad.SelectObjectIds(getObject().PointObjectIds);
+
+            button.Click += (s, e) =>
+            {
+                var current = getObject();
+                current.Clear();
+                Interaction.SetActiveDocFocus();
+                Point3d point;
+                while (!(point = Interaction.GetPoint("\nВыберите точку измерения")).IsNull())
+                {
+                    current.CreatePoint(point);
+                    textBox.Text = current.PointsX.Count.ToString();
+                }
+            };
+
+            bindingSource.DataSourceChanged += (s, e) => textBox.Text = getObject().PointsX.Count.ToString();
         }
 
         public override void BuildProcessing(ICommandGenerator generator)

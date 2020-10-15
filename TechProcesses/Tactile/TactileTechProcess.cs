@@ -1,5 +1,6 @@
 ﻿using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
+using CAM.Core.UI;
 using Dreambuild.AutoCAD;
 using System;
 using System.Collections.Generic;
@@ -12,8 +13,6 @@ namespace CAM.Tactile
     public class TactileTechProcess: TechProcessBase
     {
         public List<AcadObject> Objects { get; set; }
-
-        public TactileTechProcessParams TactileTechProcessParams { get; }
 
         public double? BandWidth { get; set; }
 
@@ -29,11 +28,42 @@ namespace CAM.Tactile
 
         public string Type { get; set; }
 
-        public TactileTechProcess(string caption, TactileTechProcessParams @params) : base(caption)
+        public double Depth { get; set; }
+
+        public double Departure { get; set; }
+
+        public int TransitionFeed { get; set; }
+
+        public TactileTechProcess(string caption) : base(caption)
         {
-            TactileTechProcessParams = @params.Clone();
             Material = CAM.Material.Granite;
-            PenetrationFeed = TactileTechProcessParams.PenetrationFeed;
+        }
+
+        public void ConfigureParamsView(ParamsView view)
+        {
+            view.AddMachine()
+                .AddTool()
+                .AddParam(nameof(Frequency))
+                .AddIndent()
+                .AddParam(nameof(Depth))
+                .AddParam(nameof(Departure))
+                .AddParam(nameof(TransitionFeed))
+                .AddParam(nameof(PenetrationFeed))
+                .AddOrigin()
+                .AddIndent()
+                .AddAcadObject(nameof(ProcessingArea), "Контур плитки", "Выберите объекты контура плитки", AcadObjectNames.Line)
+                .AddAcadObject(nameof(Objects), "2 элемента плитки", "Выберите 2 элемента плитки",
+                    afterSelect: ids =>
+                    {
+                        CalcType(ids);
+                        view.ResetControls();
+                    })
+                .AddIndent()
+                .AddParam(nameof(Type), "Тип плитки", true)
+                .AddParam(nameof(BandWidth), "Ширина полосы")
+                .AddParam(nameof(BandSpacing), "Расст.м/у полосами")
+                .AddParam(nameof(BandStart1), "Начало полосы 1")
+                .AddParam(nameof(BandStart2), "Начало полосы 2");
         }
 
         public Polyline GetContour()

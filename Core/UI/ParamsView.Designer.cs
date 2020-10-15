@@ -30,8 +30,8 @@
         {
             this.components = new System.ComponentModel.Container();
             this.tablePanel = new System.Windows.Forms.TableLayoutPanel();
-            this.bindingSource = new System.Windows.Forms.BindingSource(this.components);
-            ((System.ComponentModel.ISupportInitialize)(this.bindingSource)).BeginInit();
+            this.BindingSource = new System.Windows.Forms.BindingSource(this.components);
+            ((System.ComponentModel.ISupportInitialize)(this.BindingSource)).BeginInit();
             this.SuspendLayout();
             // 
             // tablePanel
@@ -55,7 +55,7 @@
             this.Controls.Add(this.tablePanel);
             this.Name = "ParamsView";
             this.Size = new System.Drawing.Size(252, 408);
-            ((System.ComponentModel.ISupportInitialize)(this.bindingSource)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.BindingSource)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -63,6 +63,6 @@
         #endregion
 
         private System.Windows.Forms.TableLayoutPanel tablePanel;
-        private System.Windows.Forms.BindingSource bindingSource;
+        public System.Windows.Forms.BindingSource BindingSource;
     }
 }

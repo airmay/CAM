@@ -1,4 +1,5 @@
 ﻿using Autodesk.AutoCAD.DatabaseServices;
+using CAM.Core.UI;
 using Dreambuild.AutoCAD;
 using System;
 using System.Linq;
@@ -30,7 +31,18 @@ namespace CAM.Tactile
             Frequency = 5000;
             ZSafety = 5;
             ZEntry = 1;
-            Depth = ((TactileTechProcess)TechProcess).TactileTechProcessParams.Depth;
+            Depth = ((TactileTechProcess)TechProcess).Depth;
+        }
+
+        public void ConfigureParamsView(ParamsView view)
+        {
+            view.AddParam(nameof(Frequency))
+                .AddParam(nameof(FeedMax), "Подача макс")
+                .AddParam(nameof(FeedMin), "Подача мин")
+                .AddIndent()
+                .AddParam(nameof(ZSafety))
+                .AddParam(nameof(ZEntry), "Z входа")
+                .AddParam(nameof(Depth));
         }
 
         public override bool CanProcess => TechProcess.MachineType == MachineType.Donatoni || TechProcess.MachineType == MachineType.Krea;
@@ -38,7 +50,6 @@ namespace CAM.Tactile
         public override void BuildProcessing(ICommandGenerator generator)
         {
             var tactileTechProcess = (TactileTechProcess)TechProcess;
-            var tactileParams = ((TactileTechProcess)TechProcess).TactileTechProcessParams;
             var isDiag = tactileTechProcess.ProcessingAngle1 != 0;
 
             var contour = tactileTechProcess.GetContour();

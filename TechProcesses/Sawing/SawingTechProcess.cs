@@ -45,7 +45,7 @@ namespace CAM.Sawing
                 )
                 .AddIndent()
                 .AddComboBox("Режимы", new[] { "Отрезок", "Кривая" }, SetSawingModes)
-                .AddControl(sawingModesView);
+                .AddControl(sawingModesView, 6);
 
             void SetSawingModes(int index) => 
                 sawingModesView.sawingModesBindingSource.DataSource = index == 0 

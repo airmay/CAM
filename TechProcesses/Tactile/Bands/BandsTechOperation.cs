@@ -1,5 +1,7 @@
 ﻿using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
+using CAM.Core.UI;
+using CAM.TechProcesses.Tactile;
 using Dreambuild.AutoCAD;
 using System;
 using System.Collections.Generic;
@@ -27,7 +29,7 @@ namespace CAM.Tactile
 
         public double MaxCrestWidth { get; set; }
 
-        public List<Pass> PassList { get; set; }
+        public List<Pass> PassList { get; set; } = new List<Pass>();
 
         public bool IsEdgeProcessing { get; set; }
         
@@ -39,11 +41,25 @@ namespace CAM.Tactile
             BandSpacing = techProcess.BandSpacing.Value;
             BandStart = bandStart ?? techProcess.BandStart1.Value;
             ProcessingAngle = processingAngle ?? techProcess.ProcessingAngle1.Value;
-            Depth = techProcess.TactileTechProcessParams.Depth;
-            CuttingFeed = techProcess.TactileTechProcessParams.CuttingFeed;
-            FeedFinishing = techProcess.TactileTechProcessParams.FinishingFeed;
+            Depth = techProcess.Depth;
             MaxCrestWidth = (TechProcess.Tool?.Thickness).GetValueOrDefault();
             IsEdgeProcessing = true;
+        }
+
+        public void ConfigureParamsView(ParamsView view)
+        {
+            view.AddParam(nameof(ProcessingAngle), "Угол полосы")
+                .AddParam(nameof(CuttingFeed), "Подача гребенка")
+                .AddParam(nameof(FeedFinishing), "Подача чистовая")
+                .AddIndent()
+                .AddParam(nameof(BandWidth), "Ширина полосы")
+                .AddParam(nameof(BandSpacing), "Расст.м/у полосами")
+                .AddParam(nameof(BandStart), "Начало полосы")
+                .AddParam(nameof(Depth), "Глубина")
+                .AddIndent()
+                .AddParam(nameof(MaxCrestWidth), "Макс.шир.гребня")
+                .AddParam(nameof(IsEdgeProcessing), "Обработка краев")
+                .AddControl(new PassListControl(view.BindingSource), 10);
         }
 
         public void CalcPassList()
@@ -62,7 +78,8 @@ namespace CAM.Tactile
             periodWidth = periodAll / count;
             var x = (toolThickness - (periodWidth - toolThickness)) / 2;
             var shift = TechProcess.MachineType == MachineType.ScemaLogic ^ ProcessingAngle == 45? toolThickness : 0;
-            PassList = new List<Pass> { new Pass(shift, CuttingType.Roughing) };
+            PassList.Clear();
+            PassList.Add(new Pass(shift, CuttingType.Roughing));
             for (int i = 1; i <= count; i++)
             {
                 PassList.Add(new Pass(i * periodWidth + shift, CuttingType.Roughing));
@@ -134,12 +151,12 @@ namespace CAM.Tactile
                 ray.IntersectWith(contour, Intersect.ExtendThis, new Plane(), points, IntPtr.Zero, IntPtr.Zero);
                 if (points.Count == 2)
                 {
-                    var vector = (points[1] - points[0]).GetNormal() * tactileTechProcess.TactileTechProcessParams.Departure;
+                    var vector = (points[1] - points[0]).GetNormal() * tactileTechProcess.Departure;
                     var startPoint = points[0] + passDir * s - vector - Vector3d.ZAxis * Depth;
                     var endPoint = points[1] + passDir * s + vector - Vector3d.ZAxis * Depth;
                     if (generator.IsUpperTool)
                         generator.Move(startPoint.X, startPoint.Y, angleC: BuilderUtils.CalcToolAngle(ProcessingAngle.ToRad()));
-                    generator.Cutting(startPoint, endPoint, feed, tactileTechProcess.TactileTechProcessParams.TransitionFeed);
+                    generator.Cutting(startPoint, endPoint, feed, tactileTechProcess.TransitionFeed);
                 }
             }
         }

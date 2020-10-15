@@ -1,5 +1,6 @@
 ﻿using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
+using CAM.Core.UI;
 using Dreambuild.AutoCAD;
 using System;
 using System.Linq;
@@ -22,7 +23,12 @@ namespace CAM.Tactile
         {
             BandStart = bandStart ?? techProcess.BandStart1.Value;
             ProcessingAngle = processingAngle ?? techProcess.ProcessingAngle1.Value;
-            CuttingFeed = techProcess.TactileTechProcessParams.CuttingFeed;
+        }
+
+        public void ConfigureParamsView(ParamsView view)
+        {
+            view.AddParam(nameof(ProcessingAngle), "Угол полосы")
+                .AddParam(nameof(CuttingFeed));
         }
 
         public override bool CanProcess => TechProcess.MachineType == MachineType.Donatoni;
@@ -45,7 +51,6 @@ namespace CAM.Tactile
                 passDir = passDir.Negate();
             ray.BasePoint += passDir * (tactileTechProcess.BandStart1.Value - tactileTechProcess.BandSpacing.Value);
             var step = tactileTechProcess.BandWidth.Value + tactileTechProcess.BandSpacing.Value;
-            var tactileParams = tactileTechProcess.TactileTechProcessParams;
             var engineSide = ProcessingAngle < 90 ? Side.Right : Side.Left;
             while (true)
             {
@@ -53,12 +58,12 @@ namespace CAM.Tactile
                 ray.IntersectWith(contour, Intersect.ExtendThis, new Plane(), points, IntPtr.Zero, IntPtr.Zero);
                 if (points.Count == 2 && !points[0].IsEqualTo(points[1]))
                 {
-                    var vector = (points[1] - points[0]).GetNormal() * tactileParams.Departure;
-                    var startPoint = points[0] - vector - Vector3d.ZAxis * tactileParams.Depth;
-                    var endPoint = points[1] + vector - Vector3d.ZAxis * tactileParams.Depth;
+                    var vector = (points[1] - points[0]).GetNormal() * tactileTechProcess.Departure;
+                    var startPoint = points[0] - vector - Vector3d.ZAxis * tactileTechProcess.Depth;
+                    var endPoint = points[1] + vector - Vector3d.ZAxis * tactileTechProcess.Depth;
                     if (generator.IsUpperTool)
                         generator.Move(startPoint.X, startPoint.Y, angleC: BuilderUtils.CalcToolAngle(ProcessingAngle.ToRad(), engineSide), angleA: AngleA);
-                    generator.Cutting(startPoint, endPoint, CuttingFeed, tactileParams.TransitionFeed);
+                    generator.Cutting(startPoint, endPoint, CuttingFeed, tactileTechProcess.TransitionFeed);
                 }
                 else if (step > 0)
                 {

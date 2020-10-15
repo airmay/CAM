@@ -195,7 +195,6 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.gvPassList.AutoGenerateColumns = false;
             this.gvPassList.BackgroundColor = System.Drawing.SystemColors.Window;
-            this.gvPassList.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.gvPassList.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.DisableResizing;
             this.gvPassList.ColumnHeadersVisible = false;
             this.gvPassList.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
@@ -216,12 +215,14 @@
             // 
             // cuttingTypeDataGridViewTextBoxColumn
             // 
+            this.cuttingTypeDataGridViewTextBoxColumn.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
             this.cuttingTypeDataGridViewTextBoxColumn.DataPropertyName = "CuttingType";
             this.cuttingTypeDataGridViewTextBoxColumn.DisplayStyleForCurrentCellOnly = true;
             this.cuttingTypeDataGridViewTextBoxColumn.HeaderText = "CuttingType";
             this.cuttingTypeDataGridViewTextBoxColumn.Items.AddRange(new object[] {
             "Гребенка",
             "Чистка"});
+            this.cuttingTypeDataGridViewTextBoxColumn.MinimumWidth = 50;
             this.cuttingTypeDataGridViewTextBoxColumn.Name = "cuttingTypeDataGridViewTextBoxColumn";
             this.cuttingTypeDataGridViewTextBoxColumn.Resizable = System.Windows.Forms.DataGridViewTriState.True;
             // 
@@ -362,8 +363,8 @@
         private System.Windows.Forms.Label label7;
         private System.Windows.Forms.Button bUp;
         private System.Windows.Forms.Button bDown;
+        private System.Windows.Forms.CheckBox checkBox1;
         private System.Windows.Forms.DataGridViewTextBoxColumn posDataGridViewTextBoxColumn1;
         private System.Windows.Forms.DataGridViewComboBoxColumn cuttingTypeDataGridViewTextBoxColumn;
-        private System.Windows.Forms.CheckBox checkBox1;
     }
 }

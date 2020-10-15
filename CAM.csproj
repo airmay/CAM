@@ -254,6 +254,12 @@
     <Compile Include="TechProcesses\Tactile\Measurement\MeasurementTechOperationView.Designer.cs">
       <DependentUpon>MeasurementTechOperationView.cs</DependentUpon>
     </Compile>
+    <Compile Include="TechProcesses\Tactile\Bands\PassListControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="TechProcesses\Tactile\Bands\PassListControl.Designer.cs">
+      <DependentUpon>PassListControl.cs</DependentUpon>
+    </Compile>
     <Compile Include="TechProcesses\Tactile\TactileTechProcess.cs" />
     <Compile Include="TechProcesses\Tactile\TactileTechProcessParams.cs" />
     <Compile Include="TechProcesses\Tactile\TactileTechProcessView.cs">
@@ -385,6 +391,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="TechProcesses\Tactile\Measurement\MeasurementTechOperationView.resx">
       <DependentUpon>MeasurementTechOperationView.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="TechProcesses\Tactile\Bands\PassListControl.resx">
+      <DependentUpon>PassListControl.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="TechProcesses\Tactile\TactileTechProcessView.resx">
       <DependentUpon>TactileTechProcessView.cs</DependentUpon>
