@@ -4,7 +4,7 @@ using System.Windows.Forms;
 
 namespace CAM.Disk3D
 {
-    public partial class Disk3DTechProcessView : UserControl, IDataView<Disk3DTechProcess>
+    public partial class Disk3DTechProcessView : UserControl//, IDataView<Disk3DTechProcess>
     {
         public Disk3DTechProcess _techProcess;
 

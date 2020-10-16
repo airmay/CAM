@@ -34,7 +34,7 @@ namespace CAM.Tactile
             Depth = ((TactileTechProcess)TechProcess).Depth;
         }
 
-        public void ConfigureParamsView(ParamsView view)
+        public static void ConfigureParamsView(ParamsView view)
         {
             view.AddParam(nameof(Frequency))
                 .AddParam(nameof(FeedMax), "Подача макс")

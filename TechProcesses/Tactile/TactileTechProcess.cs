@@ -39,7 +39,7 @@ namespace CAM.Tactile
             Material = CAM.Material.Granite;
         }
 
-        public void ConfigureParamsView(ParamsView view)
+        public static void ConfigureParamsView(ParamsView view)
         {
             view.AddMachine()
                 .AddTool()
@@ -55,7 +55,7 @@ namespace CAM.Tactile
                 .AddAcadObject(nameof(Objects), "2 элемента плитки", "Выберите 2 элемента плитки",
                     afterSelect: ids =>
                     {
-                        CalcType(ids);
+                        view.GetParams<TactileTechProcess>().CalcType(ids);
                         view.ResetControls();
                     })
                 .AddIndent()

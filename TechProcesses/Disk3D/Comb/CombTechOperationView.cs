@@ -2,7 +2,7 @@
 
 namespace CAM.Disk3D
 {
-    public partial class CombTechOperationView : UserControl, IDataView<CombTechOperation>
+    public partial class CombTechOperationView : UserControl//, IDataView<CombTechOperation>
     {
         public CombTechOperationView()
         {

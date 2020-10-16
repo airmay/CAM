@@ -31,10 +31,10 @@ namespace CAM.Sawing
             SetFromBorder(border);
         }
 
-        public void ConfigureParamsView(ParamsView view)
+        public static void ConfigureParamsView(ParamsView view)
         {
             var sawingModesView = new SawingModesView();
-            sawingModesView.sawingModesBindingSource.DataSource = SawingModes;
+            view.BindingSource.DataSourceChanged += (s, e) => sawingModesView.sawingModesBindingSource.DataSource = view.GetParams<SawingTechOperation>().SawingModes;
 
             view.AddParam(nameof(IsExactlyBegin), "Начало точно")
                 .AddParam(nameof(IsExactlyEnd), "Конец точно")
@@ -44,15 +44,16 @@ namespace CAM.Sawing
                     allowedTypes: $"{AcadObjectNames.Line},{AcadObjectNames.Arc},{AcadObjectNames.Lwpolyline}",
                     afterSelect: ids =>
                     {
+                        var operation = view.GetParams<SawingTechOperation>();
                         Acad.DeleteExtraObjects();
-                        ProcessingArea = null;
-                        var border = ((SawingTechProcess)TechProcess).CreateExtraObjects(ids[0])[0];
-                        SetFromBorder(border);
+                        operation.ProcessingArea = null;
+                        var border = ((SawingTechProcess)operation.TechProcess).CreateExtraObjects(ids[0])[0];
+                        operation.SetFromBorder(border);
                         view.ResetControls();
-                        sawingModesView.sawingModesBindingSource.DataSource = SawingModes;
+                        sawingModesView.sawingModesBindingSource.DataSource = operation.SawingModes;
                     }
                 )
-                .AddIndent()
+                .AddText("Режимы")
                 .AddControl(sawingModesView, 6);
         }
 

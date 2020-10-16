@@ -46,7 +46,7 @@ namespace CAM.Tactile
             IsEdgeProcessing = true;
         }
 
-        public void ConfigureParamsView(ParamsView view)
+        public static void ConfigureParamsView(ParamsView view)
         {
             view.AddParam(nameof(ProcessingAngle), "Угол полосы")
                 .AddParam(nameof(CuttingFeed), "Подача гребенка")

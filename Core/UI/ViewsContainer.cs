@@ -25,7 +25,8 @@ namespace CAM.Core.UI
                 {
                     var type = (Type)data.GetType();
                     view = new ParamsView(type);
-                    data.ConfigureParamsView(view);
+                    type.GetMethod("ConfigureParamsView").Invoke(null, new[] { view });
+                    //data.ConfigureParamsView(view);
                 }
                 else
                 {

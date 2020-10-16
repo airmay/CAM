@@ -3,7 +3,7 @@ using System.Windows.Forms;
 
 namespace CAM.TechProcesses.Polishing
 {
-    public partial class PolishingTechProcessView : UserControl, IDataView<PolishingTechProcess>
+    public partial class PolishingTechProcessView : UserControl//, IDataView<PolishingTechProcess>
     {
         private PolishingTechProcess _techProcess;
 

@@ -30,10 +30,10 @@
         {
             this.components = new System.ComponentModel.Container();
             this.gvSawingModes = new System.Windows.Forms.DataGridView();
+            this.sawingModesBindingSource = new System.Windows.Forms.BindingSource(this.components);
             this.depthDataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.depthStepDataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.feedDataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.sawingModesBindingSource = new System.Windows.Forms.BindingSource(this.components);
             ((System.ComponentModel.ISupportInitialize)(this.gvSawingModes)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.sawingModesBindingSource)).BeginInit();
             this.SuspendLayout();
@@ -43,7 +43,6 @@
             this.gvSawingModes.AutoGenerateColumns = false;
             this.gvSawingModes.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.ColumnHeader;
             this.gvSawingModes.BackgroundColor = System.Drawing.SystemColors.Window;
-            this.gvSawingModes.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.gvSawingModes.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.DisableResizing;
             this.gvSawingModes.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.depthDataGridViewTextBoxColumn,
@@ -57,6 +56,10 @@
             this.gvSawingModes.Size = new System.Drawing.Size(264, 282);
             this.gvSawingModes.TabIndex = 1;
             this.gvSawingModes.DataError += new System.Windows.Forms.DataGridViewDataErrorEventHandler(this.gvSawingModes_DataError);
+            // 
+            // sawingModesBindingSource
+            // 
+            this.sawingModesBindingSource.DataSource = typeof(CAM.Sawing.SawingMode);
             // 
             // depthDataGridViewTextBoxColumn
             // 
@@ -75,14 +78,10 @@
             // 
             // feedDataGridViewTextBoxColumn
             // 
+            this.feedDataGridViewTextBoxColumn.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
             this.feedDataGridViewTextBoxColumn.DataPropertyName = "Feed";
             this.feedDataGridViewTextBoxColumn.HeaderText = "Подача";
             this.feedDataGridViewTextBoxColumn.Name = "feedDataGridViewTextBoxColumn";
-            this.feedDataGridViewTextBoxColumn.Width = 69;
-            // 
-            // sawingModesBindingSource
-            // 
-            this.sawingModesBindingSource.DataSource = typeof(SawingMode);
             // 
             // SawingModesView
             // 
@@ -100,9 +99,9 @@
         #endregion
 
         private System.Windows.Forms.DataGridView gvSawingModes;
+        public System.Windows.Forms.BindingSource sawingModesBindingSource;
         private System.Windows.Forms.DataGridViewTextBoxColumn depthDataGridViewTextBoxColumn;
         private System.Windows.Forms.DataGridViewTextBoxColumn depthStepDataGridViewTextBoxColumn;
         private System.Windows.Forms.DataGridViewTextBoxColumn feedDataGridViewTextBoxColumn;
-        public System.Windows.Forms.BindingSource sawingModesBindingSource;
     }
 }

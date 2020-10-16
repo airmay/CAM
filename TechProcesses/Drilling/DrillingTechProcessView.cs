@@ -4,7 +4,7 @@ using Dreambuild.AutoCAD;
 
 namespace CAM.TechProcesses.Drilling
 {
-    public partial class DrillingTechProcessView :  UserControl, IDataView<DrillingTechProcess>
+    public partial class DrillingTechProcessView :  UserControl//, IDataView<DrillingTechProcess>
     {
         private DrillingTechProcess _techProcess;
 

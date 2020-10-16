@@ -10,7 +10,7 @@ using System.Windows.Forms;
 
 namespace CAM.TechProcesses.Disk3D.CrossCleaning
 {
-    public partial class CrossCleaningTechOperationView : UserControl, IDataView<CrossCleaningTechOperation>
+    public partial class CrossCleaningTechOperationView : UserControl//, IDataView<CrossCleaningTechOperation>
     {
         public CrossCleaningTechOperationView()
         {

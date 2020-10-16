@@ -42,33 +42,31 @@ namespace CAM.Tactile
             Thickness = techProcess.Thickness;
         }
 
-        public void ConfigureParamsView(ParamsView view)
+        public static void ConfigureParamsView(ParamsView view)
         {
             var selector = view.AddSelector("Точки", "۞", ConfigurePointsSelector)
                 .AddParam(nameof(Thickness))
                 .AddEnumParam<CalcMethodType>(nameof(CalcMethod), "Метод расчета");
         }
 
-        private void ConfigurePointsSelector(TextBox textBox, Button button, BindingSource bindingSource)
+        private static void ConfigurePointsSelector(TextBox textBox, Button button, BindingSource bindingSource)
         {
-            Func<MeasurementTechOperation> getObject = () => (MeasurementTechOperation)bindingSource.DataSource;
-
-            textBox.Enter += (s, e) => Acad.SelectObjectIds(getObject().PointObjectIds);
+            textBox.Enter += (s, e) => Acad.SelectObjectIds(bindingSource.GetSource<MeasurementTechOperation>().PointObjectIds);
 
             button.Click += (s, e) =>
             {
-                var current = getObject();
-                current.Clear();
+                var operation = bindingSource.GetSource<MeasurementTechOperation>();
+                operation.Clear();
                 Interaction.SetActiveDocFocus();
                 Point3d point;
                 while (!(point = Interaction.GetPoint("\nВыберите точку измерения")).IsNull())
                 {
-                    current.CreatePoint(point);
-                    textBox.Text = current.PointsX.Count.ToString();
+                    operation.CreatePoint(point);
+                    textBox.Text = operation.PointsX.Count.ToString();
                 }
             };
 
-            bindingSource.DataSourceChanged += (s, e) => textBox.Text = getObject().PointsX.Count.ToString();
+            bindingSource.DataSourceChanged += (s, e) => textBox.Text = bindingSource.GetSource<MeasurementTechOperation>().PointsX.Count.ToString();
         }
 
         public override void BuildProcessing(ICommandGenerator generator)

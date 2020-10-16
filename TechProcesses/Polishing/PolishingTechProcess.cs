@@ -1,8 +1,8 @@
 ﻿using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
+using CAM.Core.UI;
 using Dreambuild.AutoCAD;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 
 namespace CAM.TechProcesses.Polishing
@@ -30,6 +30,29 @@ namespace CAM.TechProcesses.Polishing
         public PolishingTechProcess(string caption) : base(caption)
         {
         }
+
+        public static void ConfigureParamsView(ParamsView view)
+        {
+            view.AddMachine(CAM.MachineType.Donatoni, CAM.MachineType.Krea)
+                .AddParam(nameof(Frequency))
+                .AddIndent()
+                .AddParam(nameof(Feed))
+                .AddParam(nameof(ZSafety))
+                .AddParam(nameof(ZEntry))
+                .AddIndent()
+                .AddOrigin()
+                .AddAcadObject(nameof(ProcessingArea), "Контур", "Выберите объекты контура")
+                .AddIndent()
+                .AddParam(nameof(Angle1), "Угол 1")
+                .AddParam(nameof(Angle2), "Угол 2")
+                .AddIndent()
+                .AddParam(nameof(AmplitudeMin), "Амплитуда мин.")
+                .AddParam(nameof(AmplitudeMax), "Амплитуда макс.")
+                .AddIndent()
+                .AddParam(nameof(StepMin), "Шаг мин.")
+                .AddParam(nameof(StepMax), "Шаг макс.");
+        }
+
         public override bool Validate()
         {
             if (Angle2 >= 90)

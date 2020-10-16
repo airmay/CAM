@@ -21,7 +21,7 @@ namespace CAM.TechProcesses.SectionProfile
         {
         }
 
-        public void ConfigureParamsView(ParamsView view)
+        public static void ConfigureParamsView(ParamsView view)
         {
             view.AddMachine(CAM.MachineType.Donatoni, CAM.MachineType.ScemaLogic)
                 .AddMaterial()

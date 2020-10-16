@@ -39,5 +39,7 @@ namespace CAM
                 Acad.Alert($"Не заполнено поле {field}");
             return value != null;
         }
+
+        public static T GetSource<T>(this BindingSource bindingSource) => (T)bindingSource.DataSource;
     }
 }

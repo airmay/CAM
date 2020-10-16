@@ -10,7 +10,7 @@ using System.Windows.Forms;
 
 namespace CAM.TechProcesses.Disk3D
 {
-    public partial class LongCleaningTechOperationView : UserControl, IDataView<LongCleaningTechOperation>
+    public partial class LongCleaningTechOperationView : UserControl//, IDataView<LongCleaningTechOperation>
     {
         public LongCleaningTechOperationView()
         {

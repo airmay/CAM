@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using DbSurface = Autodesk.AutoCAD.DatabaseServices.Surface;
 using Autodesk.AutoCAD.Geometry;
+using CAM.Core.UI;
 
 namespace CAM.Disk3D
 {
@@ -30,6 +31,21 @@ namespace CAM.Disk3D
 
         public CombTechOperation(ITechProcess techProcess, string caption) : base(techProcess, caption)
         {
+        }
+
+        public static void ConfigureParamsView(ParamsView view)
+        {
+            view.AddParam(nameof(StepPass))
+                .AddParam(nameof(StartPass))
+                .AddIndent()
+                .AddParam(nameof(StepLong))
+                .AddParam(nameof(Departure))
+                .AddIndent()
+                .AddParam(nameof(Penetration))
+                .AddParam(nameof(CuttingFeed))
+                .AddIndent()
+                .AddParam(nameof(Delta))
+                .AddParam(nameof(IsDepartureOnBorderSection), "Выезд по границе сечения");
         }
 
         public override void BuildProcessing(ICommandGenerator generator)

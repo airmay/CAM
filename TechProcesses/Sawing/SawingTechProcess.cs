@@ -23,7 +23,7 @@ namespace CAM.Sawing
             PenetrationFeed = SawingTechProcessParams.PenetrationFeed;
         }
 
-        public void ConfigureParamsView(ParamsView view)
+        public static void ConfigureParamsView(ParamsView view)
         {
             var sawingModesView = new SawingModesView();
 
@@ -40,7 +40,7 @@ namespace CAM.Sawing
                     afterSelect: ids =>
                     {
                         Acad.DeleteExtraObjects();
-                        CreateExtraObjects(ids);
+                        view.GetParams<SawingTechProcess>().CreateExtraObjects(ids);
                     }
                 )
                 .AddIndent()
@@ -49,8 +49,8 @@ namespace CAM.Sawing
 
             void SetSawingModes(int index) => 
                 sawingModesView.sawingModesBindingSource.DataSource = index == 0 
-                    ? SawingTechProcessParams.SawingLineModes 
-                    : SawingTechProcessParams.SawingCurveModes;
+                    ? view.GetParams<SawingTechProcess>().SawingTechProcessParams.SawingLineModes 
+                    : view.GetParams<SawingTechProcess>().SawingTechProcessParams.SawingCurveModes;
         }
 
         public override void Setup()

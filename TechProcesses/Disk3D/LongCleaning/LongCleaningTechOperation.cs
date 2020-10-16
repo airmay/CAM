@@ -2,6 +2,7 @@
 using Autodesk.AutoCAD.Geometry;
 using Autodesk.AutoCAD.Runtime;
 using CAM.Core;
+using CAM.Core.UI;
 using CAM.Disk3D;
 using Dreambuild.AutoCAD;
 using System;
@@ -47,6 +48,20 @@ namespace CAM.TechProcesses.Disk3D
             StepX2 = 1;
             StepY = 1;
             StepZ = 1;
+        }
+
+        public static void ConfigureParamsView(ParamsView view)
+        {
+            view.AddParam(nameof(StepX1), "Шаг X1")
+                .AddParam(nameof(StepX2), "Шаг X2")
+                .AddParam(nameof(StepY), "Шаг Y")
+                .AddParam(nameof(StepZ), "Шаг Z")
+                .AddIndent()
+                .AddParam(nameof(Departure))
+                .AddParam(nameof(IsDepartureOnBorderSection), "Выезд по границе сечения")
+                .AddParam(nameof(CuttingFeed))
+                .AddParam(nameof(Delta))
+                .AddParam(nameof(IsUplifting));
         }
 
         public override void PrepareBuild(ICommandGenerator generator)

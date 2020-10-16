@@ -12,6 +12,7 @@ namespace CAM.Core.UI
         private Dictionary<string, string> _displayNames = new Dictionary<string, string>
         {
             ["Frequency"] = "Шпиндель",
+            ["Feed"] = "Подача",
             ["CuttingFeed"] = "Подача",
             ["PenetrationFeed"] = "Скор.малая",
             ["TransitionFeed"] = "Переход",
@@ -24,6 +25,7 @@ namespace CAM.Core.UI
             ["StepX"] = "Шаг по X",
             ["StepY"] = "Шаг по Y",
             ["StepPass"] = "Шаг межстрочный",
+            ["StepLong"] = "Шаг продольный",
             ["StartPass"] = "Первый проход",
 
             ["Thickness"] = "Толщина",
@@ -34,13 +36,15 @@ namespace CAM.Core.UI
             ["Delta"] = "Припуск",
             ["ZMax"] = "Z максимум",
             ["ZSafety"] = "Z безопасности",
+            ["ZEntry"] = "Z входа",
             ["AngleA"] = "Угол вертикальный",
         };
         private const int RowHeight = 24;
-        private Action _refreshAction;
         private readonly Type _type;
 
         public object ParamsObject => BindingSource.DataSource;
+
+        public T GetParams<T>() => BindingSource.GetSource<T>();
 
         private string GetDisplayName(string paramName) => _displayNames.TryGetValue(paramName, out var value) ? value : paramName;
 
@@ -57,7 +61,6 @@ namespace CAM.Core.UI
         public void BindData(object obj)
         {
             BindingSource.DataSource = obj;
-            _refreshAction?.Invoke();
         }
 
         public void ResetControls() => BindingSource.ResetBindings(false);
@@ -111,6 +114,22 @@ namespace CAM.Core.UI
                 control.DataBindings.Add(new Binding("Text", BindingSource, paramName, true));
             }
             tablePanel.Controls.Add(control, 1, tablePanel.RowStyles.Count - 1);
+
+            return this;
+        }
+
+        public ParamsView AddText(string displayName, Action<Label> labelProvider = null)
+        {
+            AddRow();
+            AddLabel(displayName);
+
+            var label = new Label
+            {
+                Dock = DockStyle.Fill,
+                TextAlign = ContentAlignment.MiddleLeft
+            };
+            tablePanel.Controls.Add(label, 1, tablePanel.RowStyles.Count - 1);
+            labelProvider?.Invoke(label);
 
             return this;
         }
@@ -196,7 +215,7 @@ namespace CAM.Core.UI
             var selector = CreateSelector("Инструмент", "Ξ");
 
             var textBox = selector.Controls[0];
-            _refreshAction += () => textBox.Text = toolProp.GetValue(ParamsObject)?.ToString();
+            BindingSource.DataSourceChanged += (s, e) => textBox.Text = toolProp.GetValue(ParamsObject)?.ToString();
 
             var button = selector.Controls[1];
             button.Click += (s, e) =>
@@ -224,9 +243,9 @@ namespace CAM.Core.UI
             var selector = CreateSelector(displayName ?? GetDisplayName(paramName), "۞");
 
             var textBox = selector.Controls[0];
-            _refreshAction += prop.PropertyType == typeof(AcadObject) 
-                ? new Action(() => textBox.Text = ((AcadObject)prop.GetValue(ParamsObject))?.GetDesc())
-                : new Action(() => textBox.Text = ((List<AcadObject>)prop.GetValue(ParamsObject))?.GetDesc());
+            BindingSource.DataSourceChanged += prop.PropertyType == typeof(AcadObject) 
+                ? new EventHandler((s, e) => textBox.Text = ((AcadObject)prop.GetValue(ParamsObject))?.GetDesc())
+                : new EventHandler((s, e) => textBox.Text = ((List<AcadObject>)prop.GetValue(ParamsObject))?.GetDesc());
             textBox.Enter += prop.PropertyType == typeof(AcadObject)
                 ? new EventHandler((s, e) => { if (prop.GetValue(ParamsObject) is AcadObject acadObj) Acad.SelectAcadObjects(new List<AcadObject> { acadObj }); })
                 : new EventHandler((s, e) => { if (prop.GetValue(ParamsObject) is List<AcadObject> acadObjList) Acad.SelectAcadObjects(acadObjList); });
@@ -269,7 +288,7 @@ namespace CAM.Core.UI
             var selector = CreateSelector("Начало координат", "۞");
 
             var textBox = selector.Controls[0];
-            _refreshAction += RefreshText;
+            BindingSource.DataSourceChanged += (s, e) => RefreshText();
             textBox.Enter += (s, e) => Acad.SelectObjectIds((ObjectId[])originObject.GetValue(ParamsObject));
 
             var button = selector.Controls[1];
@@ -316,8 +335,12 @@ namespace CAM.Core.UI
             };
             comboBox.Items.AddRange(items);
             comboBox.SelectedIndexChanged += new EventHandler((s, e) => SelectedIndexChanged(comboBox.SelectedIndex));
-            comboBox.SelectedIndex = 0;
-            SelectedIndexChanged.Invoke(0);
+
+            BindingSource.DataSourceChanged += (s, e) =>
+            {
+                comboBox.SelectedIndex = 0;
+                SelectedIndexChanged.Invoke(0);
+            };
             tablePanel.Controls.Add(comboBox, 1, tablePanel.RowStyles.Count - 1);
 
             return this;

@@ -32,7 +32,7 @@ namespace CAM.TechProcesses.SectionProfile
         {
         }
 
-        public void ConfigureParamsView(ParamsView view)
+        public static void ConfigureParamsView(ParamsView view)
         {
             view.AddParam(nameof(StepPass))
                 .AddParam(nameof(StartPass))

@@ -1,4 +1,5 @@
 ﻿using Autodesk.AutoCAD.DatabaseServices;
+using CAM.Core.UI;
 using System;
 
 namespace CAM.TechProcesses.Drilling
@@ -20,10 +21,25 @@ namespace CAM.TechProcesses.Drilling
             MachineType = CAM.MachineType.Krea;
         }
 
+        public static void ConfigureParamsView(ParamsView view)
+        {
+            view.AddParam(nameof(Frequency))
+                .AddParam(nameof(Depth))
+                .AddIndent()
+                .AddOrigin()
+                .AddAcadObject(nameof(ProcessingArea), "Отверстия", "Выберите окружности", AcadObjectNames.Circle)
+                .AddIndent()
+                .AddParam(nameof(FeedMax), "Подача макс.")
+                .AddParam(nameof(FeedMin), "Подача мин.")
+                .AddIndent()
+                .AddParam(nameof(ZSafety))
+                .AddParam(nameof(ZEntry));
+        }
+
         protected override void BuildProcessing(ICommandGenerator generator)
         {
             generator.ZSafety = ZSafety;
-            generator.SetTool(1, Frequency);
+            generator.SetTool(1, Frequency, hasTool: false);
 
             ProcessingArea.ForEach(p =>
             {
