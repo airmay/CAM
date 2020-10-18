@@ -83,10 +83,12 @@ namespace CAM
                 processCommandBindingSource.Position = _processCommandsIdx[id] - _startIdx;
         }
 
+        private Dictionary<Type, ParamsView> _paramsViews = new Dictionary<Type, ParamsView>();
+
         public void RefreshViews()
         {
             var dataObject = treeView.SelectedNode.Tag;
-            ViewsContainer.BindData(dataObject, tabPageParams);
+            SetParamsView();
             var commands = ((IHasProcessCommands)dataObject).ProcessCommands;
             if (commands != null)
                 for (int i = 0; i < commands.Count; i++)
@@ -99,6 +101,20 @@ namespace CAM
             processCommandBindingSource.DataSource = commands;
             if (commands != null && treeView.SelectedNode.Parent == null && tid != null && _processCommandsIdx.ContainsKey(tid.Value))
                 processCommandBindingSource.Position = _processCommandsIdx[tid.Value];
+
+            void SetParamsView()
+            {
+                var type = dataObject.GetType();
+                if (!_paramsViews.TryGetValue(type, out var paramsView))
+                {
+                    paramsView = new ParamsView(type);
+                    paramsView.Dock = DockStyle.Fill;
+                    tabPageParams.Controls.Add(paramsView);
+                    _paramsViews[type] = paramsView;
+                }
+                paramsView.BindingSource.DataSource = dataObject;
+                paramsView.BringToFront();
+            }
         }
         #endregion
 

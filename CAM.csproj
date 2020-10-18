@@ -288,8 +288,6 @@
       <DependentUpon>ToolsForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Core\Enums\ToolType.cs" />
-    <Compile Include="Core\UI\IDataView.cs" />
-    <Compile Include="Core\UI\ViewsContainer.cs" />
     <Compile Include="Utils\Exceptions.cs" />
     <Compile Include="Acad\Graph.cs" />
     <Compile Include="Utils\Extensions.cs" />

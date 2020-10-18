@@ -56,11 +56,8 @@ namespace CAM.Core.UI
 
             tablePanel.Height = 0;
             tablePanel.RowStyles.RemoveAt(0);
-        }
 
-        public void BindData(object obj)
-        {
-            BindingSource.DataSource = obj;
+            type.GetMethod("ConfigureParamsView").Invoke(null, new[] { this });
         }
 
         public void ResetControls() => BindingSource.ResetBindings(false);
