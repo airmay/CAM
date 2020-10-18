@@ -7,7 +7,7 @@ using DbSurface = Autodesk.AutoCAD.DatabaseServices.Surface;
 using Autodesk.AutoCAD.Geometry;
 using CAM.Core.UI;
 
-namespace CAM.Disk3D
+namespace CAM.TechProcesses.Disk3D
 {
     [Serializable]
     [TechOperation(1, TechProcessNames.Disk3D, "Гребенка")]

@@ -2,7 +2,6 @@
 using Autodesk.AutoCAD.Geometry;
 using Autodesk.AutoCAD.Runtime;
 using CAM.Core.UI;
-using CAM.Disk3D;
 using Dreambuild.AutoCAD;
 using System;
 using System.Collections.Generic;

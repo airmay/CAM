@@ -123,42 +123,12 @@
     <Compile Include="Core\Enums\MachineType.cs" />
     <Compile Include="Core\Enums\Material.cs" />
     <Compile Include="Program\ProcessCommand.cs" />
-    <Compile Include="TechProcesses\Disk3D\Comb\CombTechOperation.cs" />
-    <Compile Include="TechProcesses\Disk3D\Comb\CombTechOperationView.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="TechProcesses\Disk3D\Comb\CombTechOperationView.Designer.cs">
-      <DependentUpon>CombTechOperationView.cs</DependentUpon>
-    </Compile>
-    <Compile Include="TechProcesses\Disk3D\CrossCleaning\CrossCleaningTechOperation.cs" />
-    <Compile Include="TechProcesses\Disk3D\CrossCleaning\CrossCleaningTechOperationView.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="TechProcesses\Disk3D\CrossCleaning\CrossCleaningTechOperationView.Designer.cs">
-      <DependentUpon>CrossCleaningTechOperationView.cs</DependentUpon>
-    </Compile>
+    <Compile Include="TechProcesses\Disk3D\CombTechOperation.cs" />
+    <Compile Include="TechProcesses\Disk3D\CrossCleaningTechOperation.cs" />
     <Compile Include="TechProcesses\Disk3D\Disk3DTechProcess.cs" />
-    <Compile Include="TechProcesses\Disk3D\Disk3DTechProcessView.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="TechProcesses\Disk3D\Disk3DTechProcessView.Designer.cs">
-      <DependentUpon>Disk3DTechProcessView.cs</DependentUpon>
-    </Compile>
     <Compile Include="Core\TechProcess\TechProcessBase.cs" />
-    <Compile Include="TechProcesses\Disk3D\LongCleaning\LongCleaningTechOperation.cs" />
-    <Compile Include="TechProcesses\Disk3D\LongCleaning\LongCleaningTechOperationView.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="TechProcesses\Disk3D\LongCleaning\LongCleaningTechOperationView.Designer.cs">
-      <DependentUpon>LongCleaningTechOperationView.cs</DependentUpon>
-    </Compile>
+    <Compile Include="TechProcesses\Disk3D\LongCleaningTechOperation.cs" />
     <Compile Include="TechProcesses\Drilling\DrillingTechProcess.cs" />
-    <Compile Include="TechProcesses\Drilling\DrillingTechProcessView.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="TechProcesses\Drilling\DrillingTechProcessView.Designer.cs">
-      <DependentUpon>DrillingTechProcessView.cs</DependentUpon>
-    </Compile>
     <Compile Include="Core\Tool\Location.cs" />
     <Compile Include="Core\TechOperation\TechOperationBase.cs" />
     <Compile Include="Core\Settings\CuttingMode.cs" />
@@ -166,12 +136,6 @@
     <Compile Include="Core\TechProcess\ITechProcess.cs" />
     <Compile Include="Core\Settings\MachineSettings.cs" />
     <Compile Include="TechProcesses\Polishing\PolishingTechProcess.cs" />
-    <Compile Include="TechProcesses\Polishing\PolishingTechProcessView.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="TechProcesses\Polishing\PolishingTechProcessView.Designer.cs">
-      <DependentUpon>PolishingTechProcessView.cs</DependentUpon>
-    </Compile>
     <Compile Include="TechProcesses\Sawing\Border.cs" />
     <Compile Include="TechProcesses\Sawing\SawingMode.cs" />
     <Compile Include="TechProcesses\Sawing\SawingModesView.cs">
@@ -181,79 +145,18 @@
       <DependentUpon>SawingModesView.cs</DependentUpon>
     </Compile>
     <Compile Include="TechProcesses\Sawing\SawingTechOperation.cs" />
-    <Compile Include="TechProcesses\Sawing\SawingTechOperationView.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="TechProcesses\Sawing\SawingTechOperationView.Designer.cs">
-      <DependentUpon>SawingTechOperationView.cs</DependentUpon>
-    </Compile>
     <Compile Include="TechProcesses\Sawing\SawingTechProcess.cs" />
     <Compile Include="TechProcesses\Sawing\SawingTechProcessParams.cs" />
-    <Compile Include="TechProcesses\Sawing\SawingTechProcessView.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="TechProcesses\Sawing\SawingTechProcessView.Designer.cs">
-      <DependentUpon>SawingTechProcessView.cs</DependentUpon>
-    </Compile>
-    <Compile Include="TechProcesses\SectionProfile\Comb\CombTechOperation.cs" />
-    <Compile Include="TechProcesses\SectionProfile\Comb\CombTechOperationView.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="TechProcesses\SectionProfile\Comb\CombTechOperationView.Designer.cs">
-      <DependentUpon>CombTechOperationView.cs</DependentUpon>
-    </Compile>
-    <Compile Include="TechProcesses\SectionProfile\CrossCleaning\CrossCleaningTechOperation.cs" />
-    <Compile Include="TechProcesses\SectionProfile\CrossCleaning\CrossCleaningTechOperationView.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="TechProcesses\SectionProfile\CrossCleaning\CrossCleaningTechOperationView.Designer.cs">
-      <DependentUpon>CrossCleaningTechOperationView.cs</DependentUpon>
-    </Compile>
-    <Compile Include="TechProcesses\SectionProfile\LongCleaning\LongCleaningTechOperation.cs" />
-    <Compile Include="TechProcesses\SectionProfile\LongCleaning\LongCleaningTechOperationView.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="TechProcesses\SectionProfile\LongCleaning\LongCleaningTechOperationView.Designer.cs">
-      <DependentUpon>LongCleaningTechOperationView.cs</DependentUpon>
-    </Compile>
+    <Compile Include="TechProcesses\SectionProfile\CombTechOperation.cs" />
+    <Compile Include="TechProcesses\SectionProfile\CrossCleaningTechOperation.cs" />
+    <Compile Include="TechProcesses\SectionProfile\LongCleaningTechOperation.cs" />
     <Compile Include="TechProcesses\SectionProfile\SectionProfileTechProcess.cs" />
-    <Compile Include="TechProcesses\SectionProfile\SectionProfileTechProcessView.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="TechProcesses\SectionProfile\SectionProfileTechProcessView.Designer.cs">
-      <DependentUpon>SectionProfileTechProcessView.cs</DependentUpon>
-    </Compile>
     <Compile Include="TechProcesses\Tactile\Bands\BandsTechOperation.cs" />
-    <Compile Include="TechProcesses\Tactile\Bands\BandsTechOperationView.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="TechProcesses\Tactile\Bands\BandsTechOperationView.Designer.cs">
-      <DependentUpon>BandsTechOperationView.cs</DependentUpon>
-    </Compile>
     <Compile Include="TechProcesses\Tactile\Bands\CuttingType.cs" />
     <Compile Include="TechProcesses\Tactile\Bands\Pass.cs" />
-    <Compile Include="TechProcesses\Tactile\Chamfers\ChamfersTechOperation.cs" />
-    <Compile Include="TechProcesses\Tactile\Chamfers\ChamfersTechOperationView.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="TechProcesses\Tactile\Chamfers\ChamfersTechOperationView.Designer.cs">
-      <DependentUpon>ChamfersTechOperationView.cs</DependentUpon>
-    </Compile>
-    <Compile Include="TechProcesses\Tactile\Cones\ConesTechOperation.cs" />
-    <Compile Include="TechProcesses\Tactile\Cones\ConesTechOperationView.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="TechProcesses\Tactile\Cones\ConesTechOperationView.Designer.cs">
-      <DependentUpon>ConesTechOperationView.cs</DependentUpon>
-    </Compile>
-    <Compile Include="TechProcesses\Tactile\ITechProcessFactory.cs" />
-    <Compile Include="TechProcesses\Tactile\Measurement\MeasurementTechOperation.cs" />
-    <Compile Include="TechProcesses\Tactile\Measurement\MeasurementTechOperationView.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="TechProcesses\Tactile\Measurement\MeasurementTechOperationView.Designer.cs">
-      <DependentUpon>MeasurementTechOperationView.cs</DependentUpon>
-    </Compile>
+    <Compile Include="TechProcesses\Tactile\ChamfersTechOperation.cs" />
+    <Compile Include="TechProcesses\Tactile\ConesTechOperation.cs" />
+    <Compile Include="TechProcesses\Tactile\MeasurementTechOperation.cs" />
     <Compile Include="TechProcesses\Tactile\Bands\PassListControl.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -262,12 +165,6 @@
     </Compile>
     <Compile Include="TechProcesses\Tactile\TactileTechProcess.cs" />
     <Compile Include="TechProcesses\Tactile\TactileTechProcessParams.cs" />
-    <Compile Include="TechProcesses\Tactile\TactileTechProcessView.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="TechProcesses\Tactile\TactileTechProcessView.Designer.cs">
-      <DependentUpon>TactileTechProcessView.cs</DependentUpon>
-    </Compile>
     <Compile Include="Core\TechOperation\TechOperationAttribute.cs" />
     <Compile Include="Core\TechProcess\TechProcessAttribute.cs" />
     <Compile Include="Core\TechProcess\TechProcessFactory.cs" />
@@ -314,12 +211,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
-    <None Include="Properties\DataSources\CAM.Disk3D.CombTechOperation.datasource" />
-    <None Include="Properties\DataSources\CAM.Disk3D.Disk3DTechProcess.datasource" />
-    <None Include="Properties\DataSources\CAM.Domain.BorderProcessingArea.datasource" />
-    <None Include="Properties\DataSources\CAM.Domain.ProcessCommand.datasource" />
-    <None Include="Properties\DataSources\CAM.Domain.SawingMode.datasource" />
-    <None Include="Properties\DataSources\CAM.Domain.SawingTechOperationParams.datasource" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Core\UI\ParamsView.resx">
@@ -336,65 +227,14 @@
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="TechProcesses\Disk3D\Comb\CombTechOperationView.resx">
-      <DependentUpon>CombTechOperationView.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="TechProcesses\Disk3D\CrossCleaning\CrossCleaningTechOperationView.resx">
-      <DependentUpon>CrossCleaningTechOperationView.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="TechProcesses\Disk3D\Disk3DTechProcessView.resx">
-      <DependentUpon>Disk3DTechProcessView.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="PaletteSet\PullingView.resx">
       <DependentUpon>PullingView.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="TechProcesses\Disk3D\LongCleaning\LongCleaningTechOperationView.resx">
-      <DependentUpon>LongCleaningTechOperationView.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="TechProcesses\Drilling\DrillingTechProcessView.resx">
-      <DependentUpon>DrillingTechProcessView.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="TechProcesses\Polishing\PolishingTechProcessView.resx">
-      <DependentUpon>PolishingTechProcessView.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="TechProcesses\Sawing\SawingModesView.resx">
       <DependentUpon>SawingModesView.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="TechProcesses\Sawing\SawingTechOperationView.resx">
-      <DependentUpon>SawingTechOperationView.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="TechProcesses\Sawing\SawingTechProcessView.resx">
-      <DependentUpon>SawingTechProcessView.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="TechProcesses\SectionProfile\Comb\CombTechOperationView.resx">
-      <DependentUpon>CombTechOperationView.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="TechProcesses\SectionProfile\CrossCleaning\CrossCleaningTechOperationView.resx">
-      <DependentUpon>CrossCleaningTechOperationView.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="TechProcesses\SectionProfile\LongCleaning\LongCleaningTechOperationView.resx">
-      <DependentUpon>LongCleaningTechOperationView.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="TechProcesses\SectionProfile\SectionProfileTechProcessView.resx">
-      <DependentUpon>SectionProfileTechProcessView.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="TechProcesses\Tactile\Bands\BandsTechOperationView.resx">
-      <DependentUpon>BandsTechOperationView.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="TechProcesses\Tactile\Chamfers\ChamfersTechOperationView.resx">
-      <DependentUpon>ChamfersTechOperationView.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="TechProcesses\Tactile\Cones\ConesTechOperationView.resx">
-      <DependentUpon>ConesTechOperationView.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="TechProcesses\Tactile\Measurement\MeasurementTechOperationView.resx">
-      <DependentUpon>MeasurementTechOperationView.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="TechProcesses\Tactile\Bands\PassListControl.resx">
       <DependentUpon>PassListControl.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="TechProcesses\Tactile\TactileTechProcessView.resx">
-      <DependentUpon>TactileTechProcessView.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Core\UI\TechProcessView.resx">
       <DependentUpon>TechProcessView.cs</DependentUpon>
@@ -404,25 +244,6 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Properties\DataSources\CAM.Domain.TechProcessParams.datasource" />
-    <None Include="Properties\DataSources\CAM.Sawing.SawingMode.datasource" />
-    <None Include="Properties\DataSources\CAM.Sawing.SawingTechOperation.datasource" />
-    <None Include="Properties\DataSources\CAM.Sawing.SawingTechProcess.datasource" />
-    <None Include="Properties\DataSources\CAM.Tactile.BandsTechOperation.datasource" />
-    <None Include="Properties\DataSources\CAM.Tactile.ChamfersTechOperation.datasource" />
-    <None Include="Properties\DataSources\CAM.Tactile.ConesTechOperation.datasource" />
-    <None Include="Properties\DataSources\CAM.Tactile.TactileTechProcess.datasource" />
-    <None Include="Properties\DataSources\CAM.Tactile.TactileTechProcessParams.datasource" />
-    <None Include="Properties\DataSources\CAM.TechOperation.Tactile.TactileDefaultParams.datasource" />
-    <None Include="Properties\DataSources\CAM.TechOperation.Tactile.TactileParams.datasource" />
-    <None Include="Properties\DataSources\CAM.TechProcesses.Disk3D.CrossCleaningTechOperation.datasource" />
-    <None Include="Properties\DataSources\CAM.TechProcesses.Disk3D.LongCleaningTechOperation.datasource" />
-    <None Include="Properties\DataSources\CAM.TechProcesses.Drilling.DrillingTechProcess.datasource" />
-    <None Include="Properties\DataSources\CAM.TechProcesses.Polishing.PolishingTechProcess.datasource" />
-    <None Include="Properties\DataSources\CAM.TechProcesses.SectionProfile.CombTechOperation.datasource" />
-    <None Include="Properties\DataSources\CAM.TechProcesses.SectionProfile.CrossCleaningTechOperation.datasource" />
-    <None Include="Properties\DataSources\CAM.TechProcesses.SectionProfile.LongCleaningTechOperation.datasource" />
-    <None Include="Properties\DataSources\CAM.TechProcesses.SectionProfile.SectionProfileTechProcess.datasource" />
     <None Include="Resources\arrow-090_.png" />
   </ItemGroup>
   <ItemGroup>

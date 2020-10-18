@@ -1,15 +1,11 @@
 ﻿using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
 using Autodesk.AutoCAD.Runtime;
-using CAM.Core;
 using CAM.Core.UI;
-using CAM.Disk3D;
 using Dreambuild.AutoCAD;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using DbSurface = Autodesk.AutoCAD.DatabaseServices.Surface;
 using Exception = Autodesk.AutoCAD.Runtime.Exception;

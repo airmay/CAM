@@ -1,9 +1,8 @@
-﻿using Autodesk.AutoCAD.DatabaseServices;
-using CAM.Core.UI;
+﻿using CAM.Core.UI;
 using System;
 using System.Windows.Forms;
 
-namespace CAM.Disk3D
+namespace CAM.TechProcesses.Disk3D
 {
     [Serializable]
     [TechProcess(3, TechProcessNames.Disk3D)]
