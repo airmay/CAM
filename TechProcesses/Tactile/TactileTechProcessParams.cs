@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace CAM.Tactile
+namespace CAM.TechProcesses.Tactile
 {
     /// <summary>
     /// Параметры техпроцесса "Тактилка"

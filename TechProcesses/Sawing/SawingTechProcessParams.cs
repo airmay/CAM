@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace CAM.Sawing
+namespace CAM.TechProcesses.Sawing
 {
     /// <summary>
     /// Параметры техпроцесса "Распиловка"

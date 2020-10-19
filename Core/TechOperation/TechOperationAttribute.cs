@@ -6,15 +6,15 @@ namespace CAM
     {
         public int Number { get; }
 
-        public string TechProcessCaption { get; }
+        public TechProcessType TechProcessType { get; }
 
         public string TechOperationCaption { get; }
 
-        public TechOperationAttribute(int number, string techProcessCaption, string techOperationCaption = null)
+        public TechOperationAttribute(TechProcessType techProcessType, string techOperationCaption, int number)
         {
+            this.TechProcessType = techProcessType;
+            this.TechOperationCaption = techOperationCaption ;
             this.Number = number;
-            this.TechProcessCaption = techProcessCaption;
-            this.TechOperationCaption = techOperationCaption ?? techProcessCaption;
         }
     }
 }

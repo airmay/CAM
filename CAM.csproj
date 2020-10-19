@@ -174,7 +174,6 @@
     <Compile Include="Core\Enums\Corner.cs" />
     <Compile Include="Core\Settings\Settings.cs" />
     <Compile Include="Core\TechOperation\ITechOperation.cs" />
-    <Compile Include="Core\TechProcess\TechProcessNames.cs" />
     <Compile Include="Core\Tool\Tool.cs" />
     <Compile Include="Core\Tool\ToolObject.cs" />
     <Compile Include="Core\Tool\ToolService.cs" />
@@ -185,6 +184,7 @@
       <DependentUpon>ToolsForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Core\Enums\ToolType.cs" />
+    <Compile Include="TechProcesses\TechProcessType.cs" />
     <Compile Include="Utils\Exceptions.cs" />
     <Compile Include="Acad\Graph.cs" />
     <Compile Include="Utils\Extensions.cs" />

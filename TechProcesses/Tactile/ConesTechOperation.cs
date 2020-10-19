@@ -1,13 +1,12 @@
 ﻿using Autodesk.AutoCAD.DatabaseServices;
-using CAM.Core.UI;
 using Dreambuild.AutoCAD;
 using System;
 using System.Linq;
 
-namespace CAM.Tactile
+namespace CAM.TechProcesses.Tactile
 {
     [Serializable]
-    [TechOperation(3, TechProcessNames.Tactile, "Конусы")]
+    [TechOperation(TechProcessType.Tactile, "Конусы", 3)]
     public class ConesTechOperation : TechOperationBase
     {
         public int CuttingFeed { get; set; }

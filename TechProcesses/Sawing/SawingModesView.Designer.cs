@@ -1,4 +1,4 @@
-﻿namespace CAM.Sawing
+﻿namespace CAM.TechProcesses.Sawing
 {
     partial class SawingModesView
     {
@@ -59,7 +59,7 @@
             // 
             // sawingModesBindingSource
             // 
-            this.sawingModesBindingSource.DataSource = typeof(CAM.Sawing.SawingMode);
+            this.sawingModesBindingSource.DataSource = typeof(CAM.TechProcesses.Sawing.SawingMode);
             // 
             // depthDataGridViewTextBoxColumn
             // 

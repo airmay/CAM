@@ -1,4 +1,4 @@
-﻿namespace CAM.Tactile
+﻿namespace CAM.TechProcesses.Tactile
 {
     public static class CuttingType
     {

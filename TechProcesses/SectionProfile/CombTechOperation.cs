@@ -1,13 +1,12 @@
 ﻿using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
-using CAM.Core.UI;
 using System;
 using System.Linq;
 
 namespace CAM.TechProcesses.SectionProfile
 {
     [Serializable]
-    [TechOperation(1, TechProcessNames.SectionProfile, "Гребенка")]
+    [TechOperation(TechProcessType.SectionProfile, "Гребенка", 1)]
     public class CombTechOperation : TechOperationBase
     {
         public double StepPass { get; set; }

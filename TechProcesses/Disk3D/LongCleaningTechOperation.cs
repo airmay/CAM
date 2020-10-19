@@ -1,7 +1,6 @@
 ﻿using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
 using Autodesk.AutoCAD.Runtime;
-using CAM.Core.UI;
 using Dreambuild.AutoCAD;
 using System;
 using System.Collections.Generic;
@@ -13,7 +12,7 @@ using Exception = Autodesk.AutoCAD.Runtime.Exception;
 namespace CAM.TechProcesses.Disk3D
 {
     [Serializable]
-    [TechOperation(2, TechProcessNames.Disk3D, "Продольная чистка")]
+    [TechOperation(TechProcessType.Disk3D, "Продольная чистка", 2)]
     public class LongCleaningTechOperation : TechOperationBase
     {
         private Disk3DTechProcess _disk3DTechProcess;

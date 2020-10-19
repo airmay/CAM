@@ -1,6 +1,6 @@
 ﻿using Autodesk.AutoCAD.DatabaseServices;
 
-namespace CAM.Sawing
+namespace CAM.TechProcesses.Sawing
 {
     public class Border
     {

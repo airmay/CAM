@@ -1,12 +1,11 @@
 ﻿using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
-using CAM.Core.UI;
 using System;
 
 namespace CAM.TechProcesses.SectionProfile
 {
     [Serializable]
-    [TechProcess(6, TechProcessNames.SectionProfile)]
+    [TechProcess(TechProcessType.SectionProfile)]
     public class SectionProfileTechProcess : TechProcessBase
     {
         public AcadObject Rail { get; set; }

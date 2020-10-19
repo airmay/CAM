@@ -4,13 +4,11 @@ namespace CAM
 {
     public class TechProcessAttribute : Attribute
     {
-        public int Number { get; }
-        public string Caption { get; }
+        public TechProcessType TechProcessType { get; }
 
-        public TechProcessAttribute(int number, string caption)
+        public TechProcessAttribute(TechProcessType type)
         {
-            this.Number = number;
-            this.Caption = caption;
+            this.TechProcessType = type;
         }
     }
 }

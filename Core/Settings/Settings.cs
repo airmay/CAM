@@ -85,7 +85,7 @@ namespace CAM
         public List<MachineSettings> MachineSettings { get; set; }
 
         #region TechProcessParams
-        public Sawing.SawingTechProcessParams SawingTechProcessParams { get; set; }
+        public CAM.TechProcesses.Sawing.SawingTechProcessParams SawingTechProcessParams { get; set; }
 
         //public Tactile.TactileTechProcessParams TactileTechProcessParams { get; set; }
         #endregion

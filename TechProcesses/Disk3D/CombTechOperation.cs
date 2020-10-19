@@ -5,12 +5,11 @@ using System.Collections.Generic;
 using System.Linq;
 using DbSurface = Autodesk.AutoCAD.DatabaseServices.Surface;
 using Autodesk.AutoCAD.Geometry;
-using CAM.Core.UI;
 
 namespace CAM.TechProcesses.Disk3D
 {
     [Serializable]
-    [TechOperation(1, TechProcessNames.Disk3D, "Гребенка")]
+    [TechOperation(TechProcessType.Disk3D, "Гребенка", 1)]
     public class CombTechOperation : TechOperationBase
     {
         public double StepPass { get; set; }

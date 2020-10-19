@@ -1,16 +1,14 @@
 ﻿using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
-using CAM.Core.UI;
 using Dreambuild.AutoCAD;
 using System;
 using System.Collections.Generic;
-using System.Collections.Specialized;
 using System.Linq;
 
 namespace CAM.TechProcesses.SectionProfile
 {
     [Serializable]
-    [TechOperation(3, TechProcessNames.SectionProfile, "Поперечная чистка")]
+    [TechOperation(TechProcessType.SectionProfile, "Поперечная чистка", 3)]
     public class CrossCleaningTechOperation : TechOperationBase
     {
         public double StepX { get; set; }

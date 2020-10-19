@@ -1,15 +1,14 @@
 ﻿using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
-using CAM.Core.UI;
 using Dreambuild.AutoCAD;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace CAM.Tactile
+namespace CAM.TechProcesses.Tactile
 {
     [Serializable]
-    [TechProcess(2, TechProcessNames.Tactile)]
+    [TechProcess(TechProcessType.Tactile)]
     public class TactileTechProcess: TechProcessBase
     {
         public List<AcadObject> Objects { get; set; }

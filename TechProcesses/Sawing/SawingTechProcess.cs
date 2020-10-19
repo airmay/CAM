@@ -1,15 +1,14 @@
 ﻿using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
-using CAM.Core.UI;
 using Dreambuild.AutoCAD;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace CAM.Sawing
+namespace CAM.TechProcesses.Sawing
 {
     [Serializable]
-    [TechProcess(1, TechProcessNames.Sawing)]
+    [TechProcess(TechProcessType.Sawing)]
     public class SawingTechProcess : TechProcessBase
     {
         public SawingTechProcessParams SawingTechProcessParams { get; }

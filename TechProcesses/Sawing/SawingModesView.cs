@@ -1,6 +1,6 @@
 ﻿using System.Windows.Forms;
 
-namespace CAM.Sawing
+namespace CAM.TechProcesses.Sawing
 {
     public partial class SawingModesView : UserControl
     {

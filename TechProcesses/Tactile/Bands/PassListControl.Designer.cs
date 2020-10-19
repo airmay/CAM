@@ -127,7 +127,7 @@
             // bindingSource
             // 
             this.bindingSource.DataMember = "PassList";
-            this.bindingSource.DataSource = typeof(CAM.Tactile.BandsTechOperation);
+            this.bindingSource.DataSource = typeof(CAM.TechProcesses.Tactile.BandsTechOperation);
             // 
             // PassListControl
             // 

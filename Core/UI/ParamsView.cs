@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using Dreambuild.AutoCAD;
 using Autodesk.AutoCAD.DatabaseServices;
 
-namespace CAM.Core.UI
+namespace CAM
 {
     public partial class ParamsView : UserControl
     {

@@ -1,11 +1,10 @@
 ﻿using Autodesk.AutoCAD.DatabaseServices;
-using CAM.Core.UI;
 using System;
 
 namespace CAM.TechProcesses.Drilling
 {
     [Serializable]
-    [TechProcess(4, TechProcessNames.Drilling)]
+    [TechProcess(TechProcessType.Drilling)]
     public class DrillingTechProcess : TechProcessBase
     {
         public double Depth { get; set; }

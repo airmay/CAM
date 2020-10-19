@@ -1,14 +1,12 @@
 ﻿using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
-using CAM.Core.UI;
-using Dreambuild.AutoCAD;
 using System;
 using System.Linq;
 
 namespace CAM.TechProcesses.SectionProfile
 {
     [Serializable]
-    [TechOperation(2, TechProcessNames.SectionProfile, "Продольная чистка")]
+    [TechOperation(TechProcessType.SectionProfile, "Продольная чистка", 2)]
     public class LongCleaningTechOperation : TechOperationBase
     {
 

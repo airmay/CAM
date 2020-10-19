@@ -1,16 +1,14 @@
 ﻿using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
-using CAM.Core.UI;
-using CAM.TechProcesses.Tactile;
 using Dreambuild.AutoCAD;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace CAM.Tactile
+namespace CAM.TechProcesses.Tactile
 {
     [Serializable]
-    [TechOperation(1, TechProcessNames.Tactile, "Полосы")]
+    [TechOperation(TechProcessType.Tactile, "Полосы", 1)]
     public class BandsTechOperation : TechOperationBase
     {
         public int ProcessingAngle { get; set; }

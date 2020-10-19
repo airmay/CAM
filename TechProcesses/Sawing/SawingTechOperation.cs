@@ -1,15 +1,14 @@
 ﻿using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
-using CAM.Core.UI;
 using Dreambuild.AutoCAD;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace CAM.Sawing
+namespace CAM.TechProcesses.Sawing
 {
     [Serializable]
-    [TechOperation(1, TechProcessNames.Sawing)]
+    [TechOperation(TechProcessType.Sawing, "Распиловка", 1)]
     public class SawingTechOperation : TechOperationBase
     {
         public bool IsExactlyBegin { get; set; }

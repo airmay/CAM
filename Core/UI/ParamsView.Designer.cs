@@ -1,4 +1,4 @@
-﻿namespace CAM.Core.UI
+﻿namespace CAM
 {
     partial class ParamsView
     {

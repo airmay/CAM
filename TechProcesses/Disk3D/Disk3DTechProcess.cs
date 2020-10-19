@@ -1,11 +1,10 @@
-﻿using CAM.Core.UI;
-using System;
+﻿using System;
 using System.Windows.Forms;
 
 namespace CAM.TechProcesses.Disk3D
 {
     [Serializable]
-    [TechProcess(3, TechProcessNames.Disk3D)]
+    [TechProcess(TechProcessType.Disk3D)]
     public class Disk3DTechProcess : TechProcessBase
     {
         public double Angle { get; set; }

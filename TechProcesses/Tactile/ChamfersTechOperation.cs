@@ -1,14 +1,13 @@
 ﻿using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
-using CAM.Core.UI;
 using Dreambuild.AutoCAD;
 using System;
 using System.Linq;
 
-namespace CAM.Tactile
+namespace CAM.TechProcesses.Tactile
 {
     [Serializable]
-    [TechOperation(2, TechProcessNames.Tactile, "Фаска")]
+    [TechOperation(TechProcessType.Tactile, "Фаска", 2)]
     public class ChamfersTechOperation : TechOperationBase
     {
         public double BandStart { get; set; }

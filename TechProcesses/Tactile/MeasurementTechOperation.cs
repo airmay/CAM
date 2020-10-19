@@ -1,6 +1,5 @@
 ﻿using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
-using CAM.Core.UI;
 using Dreambuild.AutoCAD;
 using System;
 using System.Collections.Generic;
@@ -8,10 +7,10 @@ using System.ComponentModel;
 using System.Linq;
 using System.Windows.Forms;
 
-namespace CAM.Tactile
+namespace CAM.TechProcesses.Tactile
 {
     [Serializable]
-    [TechOperation(4, TechProcessNames.Tactile, "Измерение")]
+    [TechOperation(TechProcessType.Tactile, "Измерение", 4)]
     public class MeasurementTechOperation : TechOperationBase
     {
         public List<double> PointsX { get; set; } = new List<double>();

@@ -1,6 +1,5 @@
 ﻿using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
-using CAM.Core.UI;
 using Dreambuild.AutoCAD;
 using System;
 using System.Linq;
@@ -8,7 +7,7 @@ using System.Linq;
 namespace CAM.TechProcesses.Polishing
 {
     [Serializable]
-    [TechProcess(5, TechProcessNames.Polishing)]
+    [TechProcess(TechProcessType.Polishing)]
     public class PolishingTechProcess : TechProcessBase
     {
         public int Feed { get; set; }
