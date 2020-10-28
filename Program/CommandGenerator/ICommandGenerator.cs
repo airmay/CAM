@@ -25,6 +25,8 @@ namespace CAM
 
         void Cutting(double x, double y, double z, int feed);
 
+        void Transition(double? x = null, double? y = null, double? z = null, int? feed = null);
+
         void Cutting(Point3d startPoint, Point3d endPoint, int cuttingFeed, int transitionFeed, double angleA = 0);
 
         void Cutting(Point3d startPoint, Vector3d delta, int cuttingFeed, int transitionFeed);

@@ -22,5 +22,8 @@ namespace CAM
         [Description("Полировка")]
         Polishing,
 
+        [Description("Тело вращения по профилю")]
+        RotationProfileBody,
+
     }
 }

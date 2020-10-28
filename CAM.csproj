@@ -136,6 +136,7 @@
     <Compile Include="Core\TechProcess\ITechProcess.cs" />
     <Compile Include="Core\Settings\MachineSettings.cs" />
     <Compile Include="TechProcesses\Polishing\PolishingTechProcess.cs" />
+    <Compile Include="TechProcesses\RotationProfileBody\RotationProfileBodyTechProcess.cs" />
     <Compile Include="TechProcesses\Sawing\Border.cs" />
     <Compile Include="TechProcesses\Sawing\SawingMode.cs" />
     <Compile Include="TechProcesses\Sawing\SawingModesView.cs">
