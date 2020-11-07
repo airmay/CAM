@@ -231,6 +231,8 @@ namespace CAM
 
         public virtual void Pause(double duration) { }
 
+        public virtual void Cycle() { }
+
         public void GCommand(string name, int gCode, string paramsString = null, Point3d? point = null, double? x = null, double? y = null, double? z = null,
             double? angleC = null, double? angleA = null, Curve curve = null, int? feed = null, Point2d? center = null)
         {

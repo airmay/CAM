@@ -54,5 +54,7 @@ namespace CAM
         string ThickCommand { get; set; }
 
         void Pause(double duration);
+
+        void Cycle();
     }
 }

@@ -185,12 +185,13 @@ namespace CAM.TechProcesses.Disk3D
                         if (y + s > bounds.MaxPoint.Y)
                             break;
                         offsetSurface.RayTest(new Point3d(x, y + s, bounds.MinPoint.Z), Vector3d.ZAxis, 0.0001, out SubentityId[] col, out DoubleCollection par);
-                        if (par.Count == 0)
-                        {
-                            z = 0;
-                            break;
-                        }
-                        z = par[par.Count - 1] > z ? par[par.Count - 1] : z;
+                        //if (par.Count == 0)
+                        //{
+                        //    z = 0;
+                        //    break;
+                        //}
+                        if (par.Count > 0)
+                            z = par[par.Count - 1] > z ? par[par.Count - 1] : z;
                     }
                     if (z > 0)
                     {
@@ -324,12 +325,19 @@ namespace CAM.TechProcesses.Disk3D
                         isComplete = false;
                     }
                     if (generator.IsUpperTool)
+                    {
                         generator.Move(p.X, p.Y, angleC: ((Disk3DTechProcess)TechProcess).Angle);
-
+                        generator.Cycle();
+                    }
                     if (point.IsNull())
                     {
                         if (generator.ToolLocation.Point != p)
                             generator.GCommand(CommandNames.Penetration, 1, point: p, feed: TechProcess.PenetrationFeed);
+                        else
+                        {
+                            generator.Move(p.X, p.Y);
+                            generator.Cycle();
+                        }
                     }
                     else if (point0 != point && point != p && !point0.GetVectorTo(point).IsCodirectionalTo(point.GetVectorTo(p)))
                     {

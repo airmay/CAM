@@ -58,5 +58,7 @@ namespace CAM.Commands
 
             return $"{gCode};;XYCZ;{feed ?? _feed};{text}";
         }
+
+        public override void Cycle() => Command("28;;XYCZ;;;;;;", CommandNames.Cycle);
     }
 }

@@ -19,7 +19,7 @@ namespace CAM.TechProcesses.Disk3D
 
         public double StepY { get; set; }
 
-        public double StartY { get; set; }
+        public double StepPass { get; set; }
 
         public double Delta { get; set; }
 
@@ -50,6 +50,7 @@ namespace CAM.TechProcesses.Disk3D
             view.AddParam(nameof(StepX1), "Шаг X1")
                 .AddParam(nameof(StepX2), "Шаг X2")
                 .AddParam(nameof(StepY), "Шаг Y")
+                .AddParam(nameof(StepPass))
                 .AddParam(nameof(StepZ), "Шаг Z")
                 .AddIndent()
                 .AddParam(nameof(Departure))
