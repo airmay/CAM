@@ -36,11 +36,7 @@ namespace CAM.TechProcesses.Sawing
                 .AddIndent()
                 .AddAcadObject(message: "Выберите объекты распиловки",
                     allowedTypes: $"{AcadObjectNames.Line},{AcadObjectNames.Arc},{AcadObjectNames.Lwpolyline}",
-                    afterSelect: ids =>
-                    {
-                        Acad.DeleteExtraObjects();
-                        view.GetParams<SawingTechProcess>().CreateExtraObjects(ids);
-                    }
+                    afterSelect: ids => view.GetParams<SawingTechProcess>().CreateExtraObjects(ids)
                 )
                 .AddIndent()
                 .AddComboBox("Режимы", new[] { "Отрезок", "Кривая" }, SetSawingModes)
@@ -60,6 +56,9 @@ namespace CAM.TechProcesses.Sawing
 
         public List<Border> CreateExtraObjects(params ObjectId[] ids)
         {
+            ExtraObjectsGroup?.DeleteGroup();
+            ExtraObjectsGroup = null;
+
             var techOperations = TechOperations.FindAll(p => p.ProcessingArea != null);
             techOperations.FindAll(p => ids.Contains(p.ProcessingArea.ObjectId)).ForEach(p => ((SawingTechOperation)p).OuterSide = Side.None);
             _borders = ids.Except(techOperations.Select(p => p.ProcessingArea.ObjectId)).Select(p => new Border(p)).ToList();
@@ -82,7 +81,10 @@ namespace CAM.TechProcesses.Sawing
                     borders.Remove(startBorder);
                 }
                 var sign = startBorder.OuterSide == Side.Left ? 1 : -1;
-                Graph.CreateHatch(contour, sign);
+
+                var hatchId = Graph.CreateHatch(contour, sign);
+                if (hatchId.HasValue)
+                    ExtraObjectsGroup = ExtraObjectsGroup.AppendToGroup(hatchId.Value);
             }
             return _borders;
 

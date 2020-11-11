@@ -87,7 +87,7 @@ namespace CAM
         {
             if (e.GlobalCommandName == "CLOSE" || e.GlobalCommandName == "QUIT" || e.GlobalCommandName == "QSAVE" || e.GlobalCommandName == "SAVEAS")
             {
-                _documents[sender as Document].TechProcessList.ForEach(p => p.DeleteProcessCommands());
+                _documents[sender as Document].TechProcessList.ForEach(p => _documents[sender as Document].DeleteProcessing(p));
                 TechProcessLoader.SaveTechProsess(_documents[sender as Document]);
                 _camPaletteSet.ClearCommands();
                 Acad.DeleteAll();

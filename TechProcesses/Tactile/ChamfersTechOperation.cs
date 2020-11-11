@@ -34,7 +34,7 @@ namespace CAM.TechProcesses.Tactile
 
         public override bool Validate() => ToolService.Validate(TechProcess.Tool, ToolType.Disk);
 
-        public override void BuildProcessing(ICommandGenerator generator)
+        public override void BuildProcessing(CommandGeneratorBase generator)
         {
             const int AngleA = 45;
             var tactileTechProcess = (TactileTechProcess)TechProcess;

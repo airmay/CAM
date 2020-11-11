@@ -19,5 +19,8 @@ namespace CAM
         public double Duration { get; set; }
 
         public string GetProgrammLine(string formatString) => string.Format(formatString, Number) + Text;
+
+        public object Owner { get; set; }
+
     }
 }

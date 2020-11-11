@@ -21,6 +21,8 @@ namespace CAM
         /// </summary>
         [NonSerialized]
         private ITechProcess _techProcess;
+        [NonSerialized]
+        private ObjectId? _toolpathObjectIds;
 
         public ITechProcess TechProcess => _techProcess;
 
@@ -29,18 +31,6 @@ namespace CAM
         /// </summary>
         public AcadObject ProcessingArea { get; set; }
 
-        /// <summary>
-        /// Команды
-        /// </summary>
-        [NonSerialized]
-        private List<ProcessCommand> _processCommands;
-
-        public List<ProcessCommand> ProcessCommands
-        {
-            get => _processCommands;
-            set => _processCommands = value;
-        }
-
         public TechOperationBase(ITechProcess techProcess, string caption)
         {
             techProcess.TechOperations.Add(this);
@@ -48,22 +38,22 @@ namespace CAM
             Setup(techProcess);
         }
 
-        public abstract void BuildProcessing(ICommandGenerator generator);
+        public abstract void BuildProcessing(CommandGeneratorBase generator);
 
-        public virtual void PrepareBuild(ICommandGenerator generator) { }
-
-        public void SetToolpathVisible(bool visible) => ToolpathObjectIds?.ForEach<Curve>(p => p.Visible = visible);
+        public virtual void PrepareBuild(CommandGeneratorBase generator) { }
 
         public virtual void Setup(ITechProcess techProcess) => _techProcess = techProcess;
 
         public virtual void Teardown() { }
 
-        public IEnumerable<ObjectId> ToolpathObjectIds => ProcessCommands?.Where(p => p.ToolpathObjectId != null).Select(p => p.ToolpathObjectId.Value);
+        public ObjectId? ToolpathObjectsGroup { get => _toolpathObjectIds; set => _toolpathObjectIds = value; }
 
         public virtual bool CanProcess => true;
 
         public bool Enabled { get; set; } = true;
 
         public virtual bool Validate() => true;
+
+        public int ProcessCommandIndex { get; set; }
     }
 }

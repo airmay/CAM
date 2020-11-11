@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Autodesk.AutoCAD.DatabaseServices;
+using Dreambuild.AutoCAD;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
@@ -17,7 +19,7 @@ namespace CAM
         {
             InitializeComponent();
 
-            imageList.Images.AddRange(new Image[] { Properties.Resources.drive, Properties.Resources.drive_download });
+            imageList.Images.AddRange(new System.Drawing.Image[] { Properties.Resources.drive, Properties.Resources.drive_download });
             RefreshToolButtonsState();
 #if DEBUG
             bClose.Visible = true;
@@ -25,8 +27,6 @@ namespace CAM
         }
 
         private Dictionary<Type, ToolStripMenuItem[]> _techOperationItems;
-        private Dictionary<Autodesk.AutoCAD.DatabaseServices.ObjectId, int> _processCommandsIdx;
-        private int _startIdx;
 
         public void SetCamDocument(CamDocument camDocument)
         {
@@ -73,13 +73,20 @@ namespace CAM
         private void processCommandBindingSource_CurrentChanged(object sender, EventArgs e)
         {
             if (CurrentProcessCommand != null)
-                _camDocument.SelectProcessCommand(CurrentTechProcess, CurrentProcessCommand);
+            {
+                if (CurrentProcessCommand.ToolpathObjectId.HasValue)
+                {
+                    App.LockAndExecute(() => CurrentProcessCommand.ToolpathObjectId.Value.QOpenForWrite<Curve>(p => p.Visible = true));
+                    Acad.SelectObjectIds(CurrentProcessCommand.ToolpathObjectId.Value);
+                }
+                Acad.RegenToolObject(CurrentTechProcess.Tool, CurrentProcessCommand.HasTool, CurrentProcessCommand.ToolLocation, CurrentTechProcess.MachineType == MachineType.Donatoni);  //Settongs.IsFrontPlaneZero
+            }
         }
 
         public void SelectProcessCommand(Autodesk.AutoCAD.DatabaseServices.ObjectId id)
         {
-            if (_processCommandsIdx.ContainsKey(id))
-                processCommandBindingSource.Position = _processCommandsIdx[id] - _startIdx;
+            if (CurrentTechProcess.ToolpathObjectIds.TryGetValue(id, out var index))
+                processCommandBindingSource.Position = index;
         }
 
         private Dictionary<Type, ParamsView> _paramsViews = new Dictionary<Type, ParamsView>();
@@ -87,33 +94,17 @@ namespace CAM
         public void RefreshViews()
         {
             var dataObject = treeView.SelectedNode.Tag;
-            SetParamsView();
-            var commands = ((IHasProcessCommands)dataObject).ProcessCommands;
-            if (commands != null)
-                for (int i = 0; i < commands.Count; i++)
-                    if (commands[i].ToolpathObjectId != null)
-                    {
-                        _startIdx = _processCommandsIdx[commands[i].ToolpathObjectId.Value] - i;
-                        break;
-                    }
-            var tid = CurrentProcessCommand?.ToolpathObjectId;
-            processCommandBindingSource.DataSource = commands;
-            if (commands != null && treeView.SelectedNode.Parent == null && tid != null && _processCommandsIdx.ContainsKey(tid.Value))
-                processCommandBindingSource.Position = _processCommandsIdx[tid.Value];
-
-            void SetParamsView()
+            var type = dataObject.GetType();
+            if (!_paramsViews.TryGetValue(type, out var paramsView))
             {
-                var type = dataObject.GetType();
-                if (!_paramsViews.TryGetValue(type, out var paramsView))
-                {
-                    paramsView = new ParamsView(type);
-                    paramsView.Dock = DockStyle.Fill;
-                    tabPageParams.Controls.Add(paramsView);
-                    _paramsViews[type] = paramsView;
-                }
-                paramsView.BindingSource.DataSource = dataObject;
-                paramsView.BringToFront();
+                paramsView = new ParamsView(type);
+                paramsView.Dock = DockStyle.Fill;
+                tabPageParams.Controls.Add(paramsView);
+                _paramsViews[type] = paramsView;
             }
+            paramsView.BindingSource.DataSource = dataObject;
+            paramsView.Show();
+            paramsView.BringToFront();
         }
         #endregion
 
@@ -121,7 +112,7 @@ namespace CAM
         private TreeNode CreateTechProcessNode(ITechProcess techProcess)
         {
             var children = techProcess.TechOperations.ConvertAll(CreateTechOperationNode).ToArray();
-            var techProcessNode = new TreeNode(techProcess.Caption + "   ", 0, 0, children) { Tag = techProcess, Checked = true, NodeFont = new Font(treeView.Font, FontStyle.Bold) };
+            var techProcessNode = new TreeNode(techProcess.Caption + "   ", 0, 0, children) { Tag = techProcess, Checked = true, NodeFont = new System.Drawing.Font(treeView.Font, FontStyle.Bold) };
             treeView.Nodes.Add(techProcessNode);
             techProcessNode.ExpandAll();
             RefreshToolButtonsState();
@@ -131,6 +122,8 @@ namespace CAM
 
         private static TreeNode CreateTechOperationNode(ITechOperation techOperation) =>
             new TreeNode(techOperation.Caption, 1, 1) { Tag = techOperation, Checked = techOperation.Enabled, ForeColor = techOperation.Enabled ? Color.Black : Color.Gray };
+
+        public bool IsToolpathVisible => !bDeleteExtraObjects.Checked;
 
         private void treeView_AfterSelect(object sender, TreeViewEventArgs e)
         {
@@ -143,12 +136,37 @@ namespace CAM
                         new List<ToolStripItem> { new ToolStripMenuItem("Все операции", null, new EventHandler(bCreateTechOperation_Click)), new ToolStripSeparator() }
                         .Concat(_techOperationItems[CurrentTechProcess.GetType()]).ToArray());                
                 RefreshToolButtonsState();
-                CreateProcessCommandsIdx();
             }
-            if (treeView.SelectedNode.Tag is ITechProcess)
-                _camDocument.SelectTechProcess((ITechProcess)treeView.SelectedNode.Tag);
+            if (IsToolpathVisible)
+            {
+                //_camDocument.SelectTechOperation((ITechOperation)treeView.SelectedNode.Tag);
+                //if (techOperation.ProcessingArea != null)
+                //    Acad.SelectObjectIds(techOperation.ProcessingArea.ObjectId);
+                if (treeView.SelectedNode.Tag is ITechOperation oper)
+                {
+                    CurrentTechProcess.ToolpathObjectsGroup?.SetVisibility(false);
+                    oper.ToolpathObjectsGroup?.SetVisibility(true);
+                }
+                else
+                {
+                    //_camDocument.SelectTechProcess((ITechProcess)treeView.SelectedNode.Tag);
+                    CurrentTechProcess.ToolpathObjectsGroup?.SetVisibility(true);
+                }
+                Acad.Editor.UpdateScreen();
+            }
+
+            if (treeView.SelectedNode.Tag is ITechOperation techOperation)
+            {
+                if (techOperation.ProcessingArea != null)
+                    Acad.SelectObjectIds(techOperation.ProcessingArea.ObjectId);
+
+                processCommandBindingSource.Position = techOperation.ProcessCommandIndex;
+            }
             else
-                _camDocument.SelectTechOperation((ITechOperation)treeView.SelectedNode.Tag);
+                processCommandBindingSource.Position = 0;
+
+            processCommandBindingSource.DataSource = CurrentTechProcess.ProcessCommands;
+
             RefreshViews();
         }
 
@@ -285,8 +303,6 @@ namespace CAM
                 _camDocument.PartialProcessing(CurrentTechProcess, CurrentProcessCommand);
             toolStrip.Enabled = true;
 
-            CreateProcessCommandsIdx();
-
             if (node.Nodes.Count == 0)
             {
                 node.Nodes.AddRange(CurrentTechProcess.TechOperations.ConvertAll(CreateTechOperationNode).ToArray());
@@ -296,16 +312,18 @@ namespace CAM
             UpdateCaptions();
             RefreshToolButtonsState();
 
-            ClearCommandsView();
+            processCommandBindingSource.Position = 0;
+            processCommandBindingSource.DataSource = CurrentTechProcess.ProcessCommands;
+
             RefreshViews();
             tabControl.SelectedTab = tabPageCommands;
-        }
 
-        private void CreateProcessCommandsIdx() => 
-            _processCommandsIdx = CurrentTechProcess.ProcessCommands?
-                    .Select((p, ind) => new { p.ToolpathObjectId, ind })
-                    .Where(p => p.ToolpathObjectId != null)
-                    .ToDictionary(p => p.ToolpathObjectId.Value, p => p.ind);
+            if (IsToolpathVisible)
+            {
+                CurrentTechProcess.ToolpathObjectsGroup?.SetVisibility(true);
+                Acad.Editor.UpdateScreen();
+            }
+        }
 
         private void UpdateCaptions()
         {
@@ -316,7 +334,8 @@ namespace CAM
 
         private void bDeleteExtraObjects_Click(object sender, EventArgs e)
         {
-            _camDocument.DeleteExtraObjects(CurrentTechProcess);
+            CurrentTechProcess.ToolpathObjectsGroup?.SetVisibility(IsToolpathVisible);
+            CurrentTechProcess.ExtraObjectsGroup?.SetVisibility(IsToolpathVisible);
             Acad.Editor.UpdateScreen();
         }
 
@@ -331,7 +350,7 @@ namespace CAM
         private void bSend_Click(object sender, EventArgs e)
         {
             dataGridViewCommand.EndEdit();
-            _camDocument.SendProgram(((IHasProcessCommands)treeView.SelectedNode.Tag).ProcessCommands, CurrentTechProcess);
+            _camDocument.SendProgram(CurrentTechProcess);
         }
 
         private void bClose_Click(object sender, EventArgs e)

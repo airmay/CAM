@@ -55,14 +55,14 @@ namespace CAM.TechProcesses.Disk3D
                 .AddParam(nameof(IsUplifting));
         }
 
-        public override void PrepareBuild(ICommandGenerator generator)
+        public override void PrepareBuild(CommandGeneratorBase generator)
         {
             var bounds = TechProcess.ProcessingArea.Select(p => p.ObjectId).GetExtents();
             generator.ZSafety = bounds.MaxPoint.Z + TechProcess.ZSafety;
             generator.ToolLocation.Point += Vector3d.ZAxis * generator.ZSafety;
         }
 
-        public override void BuildProcessing(ICommandGenerator generator)
+        public override void BuildProcessing(CommandGeneratorBase generator)
         {
             _disk3DTechProcess = (Disk3DTechProcess)TechProcess;
 
@@ -256,7 +256,7 @@ namespace CAM.TechProcesses.Disk3D
             return passList;
         }
 
-        private void BuildPass(ICommandGenerator generator, List<Point3d> points)
+        private void BuildPass(CommandGeneratorBase generator, List<Point3d> points)
         {
             var point0 = Algorithms.NullPoint3d;
             var point = Algorithms.NullPoint3d;

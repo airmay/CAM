@@ -77,13 +77,46 @@ namespace CAM
             return ids.Any() ? ids.QOpenForRead<Curve>() : Array.Empty<Curve>();
         }
 
+        public static void SetVisibility(this ObjectId groupId, bool value)
+        {
+            App.LockAndExecute(() => groupId.QOpenForWrite<Group>(p => p.SetVisibility(value)));
+        }
+
+        public static void Delete(this IEnumerable<ObjectId?> ids) => DeleteObjects(ids.NotNull());
+
         public static void DeleteObjects(IEnumerable<ObjectId> ids)
         {
-            if (ids != null && ids.Any())
+            if (ids?.Any() == true)
             {
-                _highlightedObjects = _highlightedObjects.Except(ids).ToArray();
+                ClearHighlighted();
                 App.LockAndExecute(() => ids.QForEach(p => p.Erase()));
             }
+        }
+
+        public static void DeleteGroup(this ObjectId groupId)
+        {
+            ClearHighlighted();
+            App.LockAndExecute(() => groupId.EraseGroup());
+        }
+
+        public static ObjectId CreateGroup(this IEnumerable<ObjectId?> entityIds)
+        {
+            return App.LockAndExecute(() => entityIds.NotNull().Distinct().Group(selectable: false));
+        }
+
+        public static ObjectId AppendToGroup(this ObjectId? groupId, params ObjectId[] entityIds)
+        {
+            return App.LockAndExecute(() =>
+            {
+                if (!groupId.HasValue)
+                {
+                    var id = entityIds.Group(selectable: false);
+                    id.QOpenForWrite<Group>(p => p.SetLayer(entityIds[0].QOpenForRead<Entity>().LayerId));
+                    return id;
+                }
+                Modify.AppendToGroup(groupId.Value, entityIds);
+                return groupId.Value;
+            });
         }
 
         public static Curve[] GetSelectedCurves() => OpenForRead(Interaction.GetPickSet());
@@ -245,21 +278,6 @@ namespace CAM
             }
         }
 
-        public static void DeleteExtraObjects()
-        {
-            DeleteByLayer(HatchLayerName);
-            DeleteByLayer(GashLayerName);
-            DeleteToolObject();
-        }
-
-        //public static void HideExtraObjects(IEnumerable<Curve> curves)
-        //{
-        //    curves.ForEach(p => p.Visible = !p.Visible);
-        //    DeleteToolObject();
-        //    Editor.UpdateScreen();
-        //    //Interaction.SetActiveDocFocus();
-        //}
-
         public static void DeleteByLayer(string layerName)
         {
             App.LockAndExecute(() => 
@@ -288,7 +306,7 @@ namespace CAM
         /// <summary>
         /// Запил
         /// </summary>
-        public static void CreateGash(Curve curve, Point3d point, Side side, double depth, double diam, double thickness, Point3d? pointС = null)
+        public static ObjectId CreateGash(Curve curve, Point3d point, Side side, double depth, double diam, double thickness, Point3d? pointС = null)
         {
             var gashLength = Math.Sqrt(depth * (diam - depth));
             var normal = curve.GetFirstDerivative(point).GetNormal();
@@ -299,6 +317,7 @@ namespace CAM
             var gash = NoDraw.Pline(point, point2, point2 + offsetVector, point + offsetVector);
             gash.LayerId = GetGashLayerId();
             App.LockAndExecute(() => gash.AddToCurrentSpace());
+            return gash.ObjectId;
         }
 
         static public string SaveFileDialog(string defaultName, string extension, string dialogName)

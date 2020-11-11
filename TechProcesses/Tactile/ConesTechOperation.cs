@@ -46,7 +46,7 @@ namespace CAM.TechProcesses.Tactile
 
         public override bool CanProcess => TechProcess.MachineType == MachineType.Donatoni || TechProcess.MachineType == MachineType.Krea;
 
-        public override void BuildProcessing(ICommandGenerator generator)
+        public override void BuildProcessing(CommandGeneratorBase generator)
         {
             var tactileTechProcess = (TactileTechProcess)TechProcess;
             var isDiag = tactileTechProcess.ProcessingAngle1 != 0;
@@ -125,7 +125,7 @@ namespace CAM.TechProcesses.Tactile
             contour.Dispose();
         }
 
-        public override void PrepareBuild(ICommandGenerator generator)
+        public override void PrepareBuild(CommandGeneratorBase generator)
         {
             generator.WithThick = TechProcess.TechOperations.OfType<MeasurementTechOperation>().Any(p => p.Enabled);
         }

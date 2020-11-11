@@ -6,7 +6,7 @@ namespace CAM
     /// <summary>
     /// Интрефейс технологической операции
     /// </summary>
-    public interface ITechOperation : IHasProcessCommands
+    public interface ITechOperation
     {
         ITechProcess TechProcess { get; }
 
@@ -14,13 +14,11 @@ namespace CAM
 
         AcadObject ProcessingArea { get; set; }
 
-        IEnumerable<ObjectId> ToolpathObjectIds { get; }
+        ObjectId? ToolpathObjectsGroup { get; set; }
 
-        void BuildProcessing(ICommandGenerator generator);
+        void BuildProcessing(CommandGeneratorBase generator);
 
-        void PrepareBuild(ICommandGenerator generator);
-
-        void SetToolpathVisible(bool visible);
+        void PrepareBuild(CommandGeneratorBase generator);
 
         void Setup(ITechProcess techProcess);
 
@@ -31,5 +29,7 @@ namespace CAM
         bool CanProcess { get; }
 
         bool Validate();
+
+        int ProcessCommandIndex { get; set; }
     }
 }

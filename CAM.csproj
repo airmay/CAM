@@ -103,7 +103,6 @@
     <Compile Include="Program\CommandGenerator\CommandGeneratorFactory.cs" />
     <Compile Include="Program\CommandGenerator\KreaCommandGenerator.cs" />
     <Compile Include="Program\CommandGenerator\DonatoniCommandGenerator.cs" />
-    <Compile Include="Program\CommandGenerator\ICommandGenerator.cs" />
     <Compile Include="Program\CommandGenerator\MachineTypeAttribute.cs" />
     <Compile Include="Program\CommandGenerator\ScemaLogicCommandGenerator.cs" />
     <Compile Include="Core\ExtensionApplication.cs" />
@@ -132,7 +131,6 @@
     <Compile Include="Core\Tool\Location.cs" />
     <Compile Include="Core\TechOperation\TechOperationBase.cs" />
     <Compile Include="Core\Settings\CuttingMode.cs" />
-    <Compile Include="Program\IHasProcessCommands.cs" />
     <Compile Include="Core\TechProcess\ITechProcess.cs" />
     <Compile Include="Core\Settings\MachineSettings.cs" />
     <Compile Include="TechProcesses\Polishing\PolishingTechProcess.cs" />

@@ -36,7 +36,7 @@ namespace CAM.TechProcesses.SectionProfile
                 .AddParam(nameof(ZSafety));
         }
 
-        protected override void BuildProcessing(ICommandGenerator generator)
+        protected override void BuildProcessing(CommandGeneratorBase generator)
         {
             return;
 

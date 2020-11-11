@@ -1,5 +1,4 @@
-﻿using CAM.Core;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -47,23 +46,7 @@ namespace CAM
             techOperation.Teardown();
             techOperation.TechProcess.TechOperations.Remove(techOperation);
         }
-
-        public void SelectTechProcess(ITechProcess techProcess)
-        {
-            techProcess.SetToolpathVisible(true);
-            Acad.Editor.UpdateScreen();
-        }
-
-        public void SelectTechOperation(ITechOperation techOperation)
-        {
-            if (techOperation.ProcessingArea != null)
-                Acad.SelectObjectIds(techOperation.ProcessingArea.ObjectId);
-            techOperation.TechProcess.TechOperations.ForEach(p => p.SetToolpathVisible(p == techOperation));
-            if (techOperation.ProcessCommands == null)
-                Acad.DeleteToolObject();
-            Acad.Editor.UpdateScreen();
-        }
-
+        
         public void SelectProcessCommand(ITechProcess techProcess, ProcessCommand processCommand)
         {
             if (processCommand.ToolpathObjectId.HasValue)
@@ -71,18 +54,19 @@ namespace CAM
             Acad.RegenToolObject(techProcess.Tool, processCommand.HasTool, processCommand.ToolLocation, techProcess.MachineType == MachineType.Donatoni);  //Settongs.IsFrontPlaneZero
         }
 
-        public void DeleteExtraObjects(ITechProcess techProcess)
+        public void DeleteProcessing(ITechProcess techProcess)
         {
-            techProcess.SetToolpathVisible(false);
-            Acad.DeleteExtraObjects();
-            //Acad.HideExtraObjects(techProcess.ToolpathCurves);
-        }
+            techProcess.ToolpathObjectsGroup?.DeleteGroup();
+            techProcess.ToolpathObjectsGroup = null;
 
-        private void DeleteProcessing(ITechProcess techProcess)
-        {
-            Acad.DeleteObjects(techProcess.ToolpathObjectIds);
-            Acad.DeleteExtraObjects();
-            techProcess.DeleteProcessCommands();
+            techProcess.TechOperations.Select(p => p.ToolpathObjectsGroup).Delete();
+            techProcess.TechOperations.ForEach(p => p.ToolpathObjectsGroup = null);
+
+            techProcess.ExtraObjectsGroup?.DeleteGroup();
+            techProcess.ExtraObjectsGroup = null;
+
+            techProcess.ToolpathObjectIds = null;
+            techProcess.ProcessCommands = null;
         }
 
         public ProcessCommand Play(ITechProcess techProcess, int commandIndex)
@@ -127,7 +111,6 @@ namespace CAM
             }
             catch (Autodesk.AutoCAD.Runtime.Exception ex)
             {
-                techProcess.DeleteProcessCommands();
                 if (ex.ErrorStatus == Autodesk.AutoCAD.Runtime.ErrorStatus.UserBreak)
                     Acad.Write("Расчет прерван");
                 else
@@ -135,27 +118,25 @@ namespace CAM
             }
             catch (Exception ex)
             {
-                techProcess.DeleteProcessCommands();
                 Acad.Alert("Ошибка при выполнении расчета", ex);
             }
             Acad.CloseProgressor();
-            Acad.Editor.UpdateScreen();
         }
 
         public void PartialProcessing(ITechProcess techProcess, ProcessCommand processCommand)
         {
-            Acad.Write($"Выполняется формирование программы обработки по техпроцессу {techProcess.Caption} с команды номер {processCommand.Number}");
+            //Acad.Write($"Выполняется формирование программы обработки по техпроцессу {techProcess.Caption} с команды номер {processCommand.Number}");
 
-            var toolpathObjectIds = techProcess.ToolpathObjectIds.ToList();
-            techProcess.SkipProcessing(processCommand);
+            //var toolpathObjectIds = techProcess.ToolpathObjectIds.ToList();
+            //techProcess.SkipProcessing(processCommand);
 
-            Acad.DeleteObjects(toolpathObjectIds.Except(techProcess.ToolpathObjectIds));
-            Acad.Editor.UpdateScreen();
+            //Acad.DeleteObjects(toolpathObjectIds.Except(techProcess.ToolpathObjectIds));
+            //Acad.Editor.UpdateScreen();
         }
 
-        public void SendProgram(List<ProcessCommand> processCommands, ITechProcess techProcess)
+        public void SendProgram(ITechProcess techProcess)
         {
-            if (processCommands == null || !processCommands.Any())
+            if (techProcess.ProcessCommands == null)
             {
                 Acad.Alert("Программа не сформирована");
                 return;
@@ -164,7 +145,7 @@ namespace CAM
             if (fileName != null)
                 try
                 {
-                    var contents = processCommands?.Select(p => p.GetProgrammLine(_machineSettings[techProcess.MachineType.Value].ProgramLineNumberFormat)).ToArray();
+                    var contents = techProcess.ProcessCommands.Select(p => p.GetProgrammLine(_machineSettings[techProcess.MachineType.Value].ProgramLineNumberFormat)).ToArray();
                     File.WriteAllLines(fileName, contents);
                     Acad.Write($"Создан файл {fileName}");
                 }

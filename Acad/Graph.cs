@@ -104,7 +104,7 @@ namespace CAM
             yield return poly.GetPointAtParameter(poly.EndParam);
         }
 
-        public static void CreateHatch(List<Curve> contour, int sign)
+        public static ObjectId? CreateHatch(List<Curve> contour, int sign)
         {
             try
             {
@@ -181,11 +181,14 @@ namespace CAM
                     offsetPolyline?.Erase();
 
                     trans.Commit();
+
+                    return hatch.Id;
                 }
             }
             catch (Exception ex)
             {
                 Acad.Alert("Ошибка при построении штриховки", ex);
+                return null;
             }
         }
 

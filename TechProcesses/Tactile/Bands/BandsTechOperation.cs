@@ -89,7 +89,7 @@ namespace CAM.TechProcesses.Tactile
 
         public override bool Validate() => ToolService.Validate(TechProcess.Tool, ToolType.Disk);
 
-        public override void BuildProcessing(ICommandGenerator generator)
+        public override void BuildProcessing(CommandGeneratorBase generator)
         {
             if (PassList?.Any() != true)
                 CalcPassList();

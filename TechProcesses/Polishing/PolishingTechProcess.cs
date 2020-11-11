@@ -59,7 +59,7 @@ namespace CAM.TechProcesses.Polishing
             return Angle2 < 90;
         }
 
-        protected override void BuildProcessing(ICommandGenerator generator)
+        protected override void BuildProcessing(CommandGeneratorBase generator)
         {
             generator.ZSafety = ZSafety;
             if (MachineType.Value == CAM.MachineType.Donatoni)

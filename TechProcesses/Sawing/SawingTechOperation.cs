@@ -44,7 +44,6 @@ namespace CAM.TechProcesses.Sawing
                     afterSelect: ids =>
                     {
                         var operation = view.GetParams<SawingTechOperation>();
-                        Acad.DeleteExtraObjects();
                         operation.ProcessingArea = null;
                         var border = ((SawingTechProcess)operation.TechProcess).CreateExtraObjects(ids[0])[0];
                         operation.SetFromBorder(border);
@@ -75,7 +74,7 @@ namespace CAM.TechProcesses.Sawing
             IsExactlyEnd = border.IsExactlyEnd;
         }
 
-        public override void BuildProcessing(ICommandGenerator generator)
+        public override void BuildProcessing(CommandGeneratorBase generator)
         {
             const int CornerIndentIncrease = 5;
             var techProcess = (SawingTechProcess)TechProcess;
@@ -149,10 +148,13 @@ namespace CAM.TechProcesses.Sawing
             if (!IsExactlyBegin || !IsExactlyEnd)
             {
                 var gashCurve = curve.GetOffsetCurves(shift)[0] as Curve;
+                var gashList = new List<ObjectId>();
                 if (!IsExactlyBegin)
-                    Acad.CreateGash(gashCurve, gashCurve.StartPoint, OuterSide, thickness * depthCoeff, toolDiameter, toolThickness);
+                    gashList.Add(Acad.CreateGash(gashCurve, gashCurve.StartPoint, OuterSide, thickness * depthCoeff, toolDiameter, toolThickness));
                 if (!IsExactlyEnd)
-                    Acad.CreateGash(gashCurve, gashCurve.EndPoint, OuterSide, thickness * depthCoeff, toolDiameter, toolThickness);
+                    gashList.Add(Acad.CreateGash(gashCurve, gashCurve.EndPoint, OuterSide, thickness * depthCoeff, toolDiameter, toolThickness));
+                if (gashList.Count > 0)
+                    Modify.AppendToGroup(TechProcess.ExtraObjectsGroup.Value, gashList.ToArray());
                 gashCurve.Dispose();
             }
 

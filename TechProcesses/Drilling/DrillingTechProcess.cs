@@ -35,7 +35,7 @@ namespace CAM.TechProcesses.Drilling
                 .AddParam(nameof(ZEntry));
         }
 
-        protected override void BuildProcessing(ICommandGenerator generator)
+        protected override void BuildProcessing(CommandGeneratorBase generator)
         {
             generator.ZSafety = ZSafety;
             generator.SetTool(1, Frequency, hasTool: false);
@@ -47,7 +47,7 @@ namespace CAM.TechProcesses.Drilling
             });
         }
 
-        private void Cutting(ICommandGenerator generator, double x, double y)
+        private void Cutting(CommandGeneratorBase generator, double x, double y)
         {
             generator.Move(x, y);
             generator.Move(z: ZEntry);

@@ -43,7 +43,7 @@ namespace CAM.TechProcesses.SectionProfile
                 .AddAcadObject(nameof(Profile));
         }
 
-        public override void BuildProcessing(ICommandGenerator generator)
+        public override void BuildProcessing(CommandGeneratorBase generator)
         {
             var sectionProfile = (SectionProfileTechProcess)TechProcess;
             var toolThickness = TechProcess.Tool.Thickness.Value;

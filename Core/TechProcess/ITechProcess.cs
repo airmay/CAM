@@ -19,12 +19,10 @@ namespace CAM
         List<AcadObject> ProcessingArea { get; set; } 
         List<ITechOperation> TechOperations { get; }
         Tool Tool { get; set; }
-        
-        IEnumerable<ObjectId> ToolpathObjectIds { get; }
+
+        Dictionary<ObjectId, int> ToolpathObjectIds { get; set; }
 
         void BuildProcessing();
-
-        void DeleteProcessCommands();
 
         bool TechOperationMoveDown(ITechOperation techOperation);
         bool TechOperationMoveUp(ITechOperation techOperation);
@@ -39,7 +37,8 @@ namespace CAM
 
         void SkipProcessing(ProcessCommand processCommand);
 
-        void SetToolpathVisible(bool visible);
+        ObjectId? ToolpathObjectsGroup { get; set; }
 
+        ObjectId? ExtraObjectsGroup { get; set; }
     }
 }

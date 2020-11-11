@@ -68,7 +68,7 @@ namespace CAM.TechProcesses.Tactile
             bindingSource.DataSourceChanged += (s, e) => textBox.Text = bindingSource.GetSource<MeasurementTechOperation>().PointsX.Count.ToString();
         }
 
-        public override void BuildProcessing(ICommandGenerator generator)
+        public override void BuildProcessing(CommandGeneratorBase generator)
         {
             switch (CalcMethod)
             {

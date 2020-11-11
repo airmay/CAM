@@ -49,7 +49,7 @@ namespace CAM.TechProcesses.RotationProfileBody
                 .AddParam(nameof(ZSafety));
         }
 
-        protected override void BuildProcessing(ICommandGenerator generator)
+        protected override void BuildProcessing(CommandGeneratorBase generator)
         {
             var toolThickness = Tool.Thickness.Value;
             var profile = ProcessingArea[0].GetCurve();

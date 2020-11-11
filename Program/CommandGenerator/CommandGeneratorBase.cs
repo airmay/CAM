@@ -3,12 +3,16 @@ using Autodesk.AutoCAD.Colors;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
 using Dreambuild.AutoCAD;
+using System;
 using System.Collections.Generic;
 
 namespace CAM
 {
-    public abstract class CommandGeneratorBase : ICommandGenerator
+    public abstract class CommandGeneratorBase: IDisposable
     {
+        private ITechProcess _techProcess;
+        private ITechOperation _techOperation;
+
         protected bool _hasTool;
         protected int _GCode;
         protected int _feed;
@@ -16,8 +20,6 @@ namespace CAM
         protected int _frequency;
 
         private const int UpperZ = 100;
-        private List<ProcessCommand> _commands = new List<ProcessCommand>();
-        private int _startRangeIndex;
         private bool _isEngineStarted = false;
 
         private DocumentLock _documentLock;
@@ -34,22 +36,26 @@ namespace CAM
         };
 
         public double ZSafety { get; set; }
+
+        private List<ProcessCommand> _processCommands = new List<ProcessCommand>();
+
         public bool IsUpperTool => !ToolLocation.IsDefined || ToolLocation.Point.Z >= ZSafety;
         public bool WithThick { get; set; }
         public Location ToolLocation { get; set; } = new Location();
         public string ThickCommand { get; set; }
 
-        public void StartTechProcess(string caption, double originX, double originY, double zSafety)
+        public void StartTechProcess(ITechProcess techProcess)
         {
-            _originX = originX;
-            _originY = originY;
-            ZSafety = zSafety;
+            _techProcess = techProcess;
+            _originX = techProcess.OriginX;
+            _originY = techProcess.OriginY;
+            ZSafety = techProcess.ZSafety;
 
             _documentLock = Acad.ActiveDocument.LockDocument();
             _transaction = Acad.Database.TransactionManager.StartTransaction();
             _currentSpace = (BlockTableRecord)_transaction.GetObject(Acad.Database.CurrentSpaceId, OpenMode.ForWrite, false);
 
-            StartMachineCommands(caption);
+            StartMachineCommands(_techProcess.Caption);
         }
 
         /// <summary>
@@ -57,17 +63,23 @@ namespace CAM
         /// </summary>
         protected abstract void StartMachineCommands(string caption);
 
-        public List<ProcessCommand> FinishTechProcess()
+        public void FinishTechProcess()
         {
             StopEngine();
             StopMachineCommands();
 
             _transaction.Commit();
+            _techProcess.ProcessCommands = _processCommands;
+        }
 
-            int number = 0;
-            _commands.ForEach(p => p.Number = ++number);
+        public void AddCommand(ProcessCommand command)
+        {
+            command.Owner = _techOperation ?? (object)_techProcess;
+            command.Number = _processCommands.Count + 1;
+            _processCommands.Add(command);
 
-            return _commands;
+            if (_techOperation != null && _techOperation.ProcessCommandIndex == 0)
+                _techOperation.ProcessCommandIndex = _processCommands.Count - 1;
         }
 
         public void Dispose()
@@ -81,9 +93,7 @@ namespace CAM
         /// </summary>
         protected abstract void StopMachineCommands();
 
-        public void StartTechOperation() => _startRangeIndex = _commands.Count;
-
-        public List<ProcessCommand> FinishTechOperation() => _commands.GetRange(_startRangeIndex, _commands.Count - _startRangeIndex);
+        public void SetTechOperation(ITechOperation techOperation) => _techOperation = techOperation;
 
         public void SetTool(int toolNo, int frequency, double angleA = 0, bool hasTool = true)
         {
@@ -220,14 +230,17 @@ namespace CAM
             }
         }
 
-        public void Command(string text, string name = null, double duration = 0) => _commands.Add(new ProcessCommand
+        public void Command(string text, string name = null, double duration = 0)
         {
-            Name = name,
-            Text = text,
-            HasTool = _hasTool,
-            ToolLocation = ToolLocation.Clone(),
-            Duration = duration
-        });
+            AddCommand(new ProcessCommand
+            {
+                Name = name,
+                Text = text,
+                HasTool = _hasTool,
+                ToolLocation = ToolLocation.Clone(),
+                Duration = duration
+            });
+        }
 
         public virtual void Pause(double duration) { }
 
@@ -242,7 +255,7 @@ namespace CAM
                 point = new Point3d(x ?? ToolLocation.Point.X, y ?? ToolLocation.Point.Y, z ?? ToolLocation.Point.Z);
 
             if (ThickCommand != null && (point.Value.X != ToolLocation.Point.X || point.Value.Y != ToolLocation.Point.Y))
-                _commands.Add(
+                AddCommand(
                     new ProcessCommand
                     {
                         Text = string.Format(ThickCommand, point.Value.X.Round(), point.Value.Y.Round()),
@@ -263,6 +276,7 @@ namespace CAM
                     if (Colors.ContainsKey(name))
                         curve.Color = Colors[name];
                     curve.LayerId = _layerId;
+                    curve.Visible = false;
                     _currentSpace.AppendEntity(curve);
                     _transaction.AddNewlyCreatedDBObject(curve, true);
                     length = curve.Length();
@@ -280,7 +294,7 @@ namespace CAM
             command.HasTool = _hasTool;
             command.ToolLocation = ToolLocation.Clone();
 
-            _commands.Add(command);
+            AddCommand(command);
         }
 
         protected abstract string GCommandText(int gCode, string paramsString, Point3d point, Curve curve, double? angleC, double? angleA, int? feed, Point2d? center);

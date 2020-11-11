@@ -10,7 +10,7 @@ namespace CAM
     /// Технологический процесс обработки
     /// </summary>
     [Serializable]
-    public abstract class TechProcessBase : ITechProcess, IHasProcessCommands
+    public abstract class TechProcessBase : ITechProcess
     {
         public string Caption { get; set; }
 
@@ -40,6 +40,12 @@ namespace CAM
 
         [NonSerialized]
         public ObjectId[] _originObject;
+        [NonSerialized]
+        private Dictionary<ObjectId, int> _toolpathObjectIds;
+        [NonSerialized]
+        private ObjectId? _toolpathObjectsGroup;
+        [NonSerialized]
+        private ObjectId? _extraObjectsGroup;
 
         public ObjectId[] OriginObject
         {
@@ -61,15 +67,11 @@ namespace CAM
             TechOperations.ForEach(p => p.Setup(this));
         }
 
-        public IEnumerable<ObjectId> ToolpathObjectIds => ProcessCommands?.Where(p => p.ToolpathObjectId != null).Select(p => p.ToolpathObjectId.Value);
+        public Dictionary<ObjectId, int> ToolpathObjectIds { get => _toolpathObjectIds; set => _toolpathObjectIds = value; }
 
-        public void SetToolpathVisible(bool visible) => ToolpathObjectIds?.ForEach<Curve>(p => p.Visible = visible);
+        public ObjectId? ToolpathObjectsGroup { get => _toolpathObjectsGroup; set => _toolpathObjectsGroup = value; }
 
-        public void DeleteProcessCommands()
-        {
-            TechOperations.ForEach(p => p.ProcessCommands = null);
-            ProcessCommands = null;
-        }
+        public ObjectId? ExtraObjectsGroup { get => _extraObjectsGroup; set => _extraObjectsGroup = value; }
 
         public bool TechOperationMoveDown(ITechOperation techOperation) => TechOperations.SwapNext(techOperation);
 
@@ -79,7 +81,7 @@ namespace CAM
         {
             using (var generator = CommandGeneratorFactory.Create(MachineType.Value))
             {
-                generator.StartTechProcess(this.GetType().Name, OriginX, OriginY, ZSafety);
+                generator.StartTechProcess(this);
 
                 if (Tool != null)
                     generator.SetTool(
@@ -90,62 +92,69 @@ namespace CAM
 
                 TechOperations.FindAll(p => p.Enabled && p.CanProcess).ForEach(p =>
                 {
-                    generator.StartTechOperation();
+                    generator.SetTechOperation(p);
 
                     p.PrepareBuild(generator);
                     p.BuildProcessing(generator);
 
                     if (!generator.IsUpperTool)
                         generator.Uplifting();
-
-                    p.ProcessCommands = generator.FinishTechOperation();                    
                 });
-                ProcessCommands = generator.FinishTechProcess();
+                generator.FinishTechProcess();
             }
-            UpdateCaptions();
+            UpdateFromCommands();
         }
 
-        protected virtual void BuildProcessing(ICommandGenerator generator) { }
+        protected virtual void BuildProcessing(CommandGeneratorBase generator) { }
 
         public virtual void SkipProcessing(ProcessCommand processCommand)
         {
-            var techOperation = TechOperations.FirstOrDefault(p => p.ProcessCommands?.Contains(processCommand) == true);
-            if (techOperation == null)
-                return;
+            //var techOperation = TechOperations.FirstOrDefault(p => p.ProcessCommands?.Contains(processCommand) == true);
+            //if (techOperation == null)
+            //    return;
 
-            List<ProcessCommand> techOperationCommands;
-            List<ProcessCommand> techProcessCommands;
-            using (var generator = CommandGeneratorFactory.Create(MachineType.Value))
-            {
-                generator.StartTechProcess(Caption, OriginX, OriginY, ZSafety);
-                generator.StartTechOperation();
-                generator.SetTool(
-                    MachineType.Value != CAM.MachineType.Donatoni ? Tool.Number : processCommand.HasTool ? 1 : 2, 
-                    Frequency);
-                techOperation.PrepareBuild(generator);
-                var loc = ProcessCommands[ProcessCommands.IndexOf(processCommand) - 1].ToolLocation;
-                generator.Move(loc.Point.X, loc.Point.Y, angleC: loc.AngleC, angleA: loc.AngleA);
-                generator.GCommand(CommandNames.Penetration, 1, point: loc.Point, feed: PenetrationFeed);
-                techOperationCommands = generator.FinishTechOperation();
-                techProcessCommands = generator.FinishTechProcess();
-            }
-            TechOperations.TakeWhile(p => p != techOperation).ToList().ForEach(p => p.ProcessCommands = null);
-            techOperation.ProcessCommands = techOperationCommands.Concat(techOperation.ProcessCommands.SkipWhile(p => p.Number < processCommand.Number)).ToList();
-            ProcessCommands = techProcessCommands.TakeWhile(p => !techOperationCommands.Contains(p)).Concat(techOperationCommands)
-                .Concat(ProcessCommands.SkipWhile(p => p.Number < processCommand.Number)).ToList();
-            UpdateCaptions();
+            //List<ProcessCommand> techOperationCommands;
+            //List<ProcessCommand> techProcessCommands;
+            //using (var generator = CommandGeneratorFactory.Create(MachineType.Value))
+            //{
+            //    generator.StartTechProcess(Caption, OriginX, OriginY, ZSafety);
+            //    generator.StartTechOperation();
+            //    generator.SetTool(
+            //        MachineType.Value != CAM.MachineType.Donatoni ? Tool.Number : processCommand.HasTool ? 1 : 2, 
+            //        Frequency);
+            //    techOperation.PrepareBuild(generator);
+            //    var loc = ProcessCommands[ProcessCommands.IndexOf(processCommand) - 1].ToolLocation;
+            //    generator.Move(loc.Point.X, loc.Point.Y, angleC: loc.AngleC, angleA: loc.AngleA);
+            //    generator.GCommand(CommandNames.Penetration, 1, point: loc.Point, feed: PenetrationFeed);
+            //    techOperationCommands = generator.FinishTechOperation();
+            //    techProcessCommands = generator.FinishTechProcess();
+            //}
+            //TechOperations.TakeWhile(p => p != techOperation).ToList().ForEach(p => p.ProcessCommands = null);
+            //techOperation.ProcessCommands = techOperationCommands.Concat(techOperation.ProcessCommands.SkipWhile(p => p.Number < processCommand.Number)).ToList();
+            //ProcessCommands = techProcessCommands.TakeWhile(p => !techOperationCommands.Contains(p)).Concat(techOperationCommands)
+            //    .Concat(ProcessCommands.SkipWhile(p => p.Number < processCommand.Number)).ToList();
+            //UpdateCaptions();
         }
 
-        private void UpdateCaptions()
+        private void UpdateFromCommands()
         {
-            TechOperations.ForEach(p => p.Caption = GetCaption(p, p.Caption));
-            Caption = GetCaption(this, Caption);
+            ToolpathObjectIds = ProcessCommands.Select((command, index) => new { command, index })
+                .Where(p => p.command.ToolpathObjectId.HasValue)
+                .GroupBy(p => p.command.ToolpathObjectId.Value)
+                .ToDictionary(p => p.Key, p => p.Min(k => k.index));
+            ToolpathObjectsGroup = ProcessCommands.Select(p => p.ToolpathObjectId).CreateGroup();
+            Caption = GetCaption(Caption, ProcessCommands.Sum(p => p.Duration));
+            foreach (var group in ProcessCommands.GroupBy(p => p.Owner))
+                if (group.Key is ITechOperation techOperation)
+                {
+                    techOperation.ToolpathObjectsGroup = group.Select(p => p.ToolpathObjectId).CreateGroup();
+                    techOperation.Caption = GetCaption(techOperation.Caption, group.Sum(p => p.Duration));
+                }
 
-            string GetCaption(IHasProcessCommands obj, string text)
+            string GetCaption(string caption, double duration)
             {
-                var duration = obj.ProcessCommands?.Sum(p => p.Duration) ?? 0;
-                var ind = text.IndexOf('(');
-                return $"{(ind > 0 ? text.Substring(0, ind).Trim() : text)} ({new TimeSpan(0, 0, 0, (int)duration)})";
+                var ind = caption.IndexOf('(');
+                return $"{(ind > 0 ? caption.Substring(0, ind).Trim() : caption)} ({new TimeSpan(0, 0, 0, (int)duration)})";
             }
         }
 
@@ -158,5 +167,6 @@ namespace CAM
             Acad.DeleteObjects(OriginObject);
             TechOperations.ForEach(to => to.Teardown());
         }
+
     }
 }

@@ -47,7 +47,7 @@ namespace CAM.TechProcesses.Disk3D
                 .AddParam(nameof(IsDepartureOnBorderSection), "Выезд по границе сечения");
         }
 
-        public override void BuildProcessing(ICommandGenerator generator)
+        public override void BuildProcessing(CommandGeneratorBase generator)
         {
             var disk3DTechProcess = (Disk3DTechProcess)TechProcess;
 
@@ -305,7 +305,7 @@ namespace CAM.TechProcesses.Disk3D
             return offsetSurface;
         }
 
-        private void BuildPass(ICommandGenerator generator, List<Point3d> points)
+        private void BuildPass(CommandGeneratorBase generator, List<Point3d> points)
         {
             var z = generator.ZSafety - TechProcess.ZSafety;
             bool isComplete;

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
@@ -41,5 +42,10 @@ namespace CAM
         }
 
         public static T GetSource<T>(this BindingSource bindingSource) => (T)bindingSource.DataSource;
+
+        public static IEnumerable<T> NotNull<T>(this IEnumerable<T?> collection) where T: struct
+        {
+            return collection?.Where(p => p.HasValue).Select(p => p.Value);
+        }
     }
 }
