@@ -76,7 +76,7 @@ namespace CAM.TechProcesses.Disk3D
             var maxPoint = offsetSurface.GeometricExtents.MaxPoint;
 
             var collections = GetPointCollections(offsetSurface, minPoint, maxPoint);
-
+             
             offsetSurface.Dispose();
 
             var zArray = GetZArray(collections, (maxPoint - minPoint).X);
@@ -250,7 +250,8 @@ namespace CAM.TechProcesses.Disk3D
                         pass.Add(new Point3d(x, minPoint.Y + i * StepY, minPoint.Z + passZArray[i][j].Value));
                     }
                 }
-                passList.Add(pass);
+                if (pass.Any())
+                    passList.Add(pass);
             }
         
             return passList;

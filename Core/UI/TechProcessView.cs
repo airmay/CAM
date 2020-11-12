@@ -139,9 +139,6 @@ namespace CAM
             }
             if (IsToolpathVisible)
             {
-                //_camDocument.SelectTechOperation((ITechOperation)treeView.SelectedNode.Tag);
-                //if (techOperation.ProcessingArea != null)
-                //    Acad.SelectObjectIds(techOperation.ProcessingArea.ObjectId);
                 if (treeView.SelectedNode.Tag is ITechOperation oper)
                 {
                     CurrentTechProcess.ToolpathObjectsGroup?.SetVisibility(false);
@@ -149,7 +146,6 @@ namespace CAM
                 }
                 else
                 {
-                    //_camDocument.SelectTechProcess((ITechProcess)treeView.SelectedNode.Tag);
                     CurrentTechProcess.ToolpathObjectsGroup?.SetVisibility(true);
                 }
                 Acad.Editor.UpdateScreen();
@@ -160,7 +156,8 @@ namespace CAM
                 if (techOperation.ProcessingArea != null)
                     Acad.SelectObjectIds(techOperation.ProcessingArea.ObjectId);
 
-                processCommandBindingSource.Position = techOperation.ProcessCommandIndex;
+                if (techOperation.ProcessCommandIndex != null)
+                    processCommandBindingSource.Position = techOperation.ProcessCommandIndex.Value;
             }
             else
                 processCommandBindingSource.Position = 0;
@@ -342,8 +339,14 @@ namespace CAM
         private void bPlay_Click(object sender, EventArgs e)
         {
             toolStrip.Enabled = false;
-            var command = _camDocument.Play(CurrentTechProcess, processCommandBindingSource.Position);
-            processCommandBindingSource.Position = CurrentTechProcess.ProcessCommands.IndexOf(command);
+            Acad.CreateProgressor("Проигрывание обработки");
+            Acad.SetLimitProgressor(processCommandBindingSource.Count - processCommandBindingSource.Position);
+            while (processCommandBindingSource.Position < processCommandBindingSource.Count - 1 && Acad.ReportProgressor(false))
+            {
+                processCommandBindingSource.MoveNext();
+                System.Threading.Thread.Sleep((int)((ProcessCommand)processCommandBindingSource.Current).Duration * 10);
+            }
+            Acad.CloseProgressor();
             toolStrip.Enabled = true;
         }
 

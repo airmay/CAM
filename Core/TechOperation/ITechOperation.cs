@@ -30,6 +30,6 @@ namespace CAM
 
         bool Validate();
 
-        int ProcessCommandIndex { get; set; }
+        int? ProcessCommandIndex { get; set; }
     }
 }

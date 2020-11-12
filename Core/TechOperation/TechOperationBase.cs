@@ -54,6 +54,6 @@ namespace CAM
 
         public virtual bool Validate() => true;
 
-        public int ProcessCommandIndex { get; set; }
+        public int? ProcessCommandIndex { get; set; }
     }
 }

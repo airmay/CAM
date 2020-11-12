@@ -78,7 +78,7 @@ namespace CAM
             command.Number = _processCommands.Count + 1;
             _processCommands.Add(command);
 
-            if (_techOperation != null && _techOperation.ProcessCommandIndex == 0)
+            if (_techOperation != null && !_techOperation.ProcessCommandIndex.HasValue)
                 _techOperation.ProcessCommandIndex = _processCommands.Count - 1;
         }
 

@@ -60,34 +60,18 @@ namespace CAM
             techProcess.ToolpathObjectsGroup = null;
 
             techProcess.TechOperations.Select(p => p.ToolpathObjectsGroup).Delete();
-            techProcess.TechOperations.ForEach(p => p.ToolpathObjectsGroup = null);
-
+            techProcess.TechOperations.ForEach(p =>
+            {
+                p.ToolpathObjectsGroup = null;
+                p.ProcessCommandIndex = null;
+            });
             techProcess.ExtraObjectsGroup?.DeleteGroup();
             techProcess.ExtraObjectsGroup = null;
 
             techProcess.ToolpathObjectIds = null;
             techProcess.ProcessCommands = null;
         }
-
-        public ProcessCommand Play(ITechProcess techProcess, int commandIndex)
-        {
-            var commands = techProcess.ProcessCommands.Skip(commandIndex).ToList();
-            Acad.CreateProgressor("Проигрывание обработки");
-            Acad.SetLimitProgressor(commands.Count);
-            foreach (var command in commands)
-            {
-                Acad.RegenToolObject(techProcess.Tool, command.HasTool, command.ToolLocation, techProcess.MachineType == MachineType.Donatoni);
-                if (!Acad.ReportProgressor(false))
-                {
-                    SelectProcessCommand(techProcess, command);
-                    return command;
-                }
-                System.Threading.Thread.Sleep(30);
-            }
-            Acad.CloseProgressor();
-            return commands.First();
-        }
-
+       
         public void BuildProcessing(ITechProcess techProcess)
         {
             if (!techProcess.TechOperations.Any())
