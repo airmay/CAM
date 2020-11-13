@@ -82,6 +82,8 @@ namespace CAM
             App.LockAndExecute(() => groupId.QOpenForWrite<Group>(p => p.SetVisibility(value)));
         }
 
+        public static void Delete(this ObjectId id) => DeleteObjects(new[] { id });
+
         public static void Delete(this IEnumerable<ObjectId?> ids) => DeleteObjects(ids.NotNull());
 
         public static void DeleteObjects(IEnumerable<ObjectId> ids)

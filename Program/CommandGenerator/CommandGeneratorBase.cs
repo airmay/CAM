@@ -37,7 +37,7 @@ namespace CAM
 
         public double ZSafety { get; set; }
 
-        private List<ProcessCommand> _processCommands = new List<ProcessCommand>();
+        public List<ProcessCommand> ProcessCommands { get; } = new List<ProcessCommand>();
 
         public bool IsUpperTool => !ToolLocation.IsDefined || ToolLocation.Point.Z >= ZSafety;
         public bool WithThick { get; set; }
@@ -67,23 +67,21 @@ namespace CAM
         {
             StopEngine();
             StopMachineCommands();
-
-            _transaction.Commit();
-            _techProcess.ProcessCommands = _processCommands;
         }
 
         public void AddCommand(ProcessCommand command)
         {
             command.Owner = _techOperation ?? (object)_techProcess;
-            command.Number = _processCommands.Count + 1;
-            _processCommands.Add(command);
+            command.Number = ProcessCommands.Count + 1;
+            ProcessCommands.Add(command);
 
             if (_techOperation != null && !_techOperation.ProcessCommandIndex.HasValue)
-                _techOperation.ProcessCommandIndex = _processCommands.Count - 1;
+                _techOperation.ProcessCommandIndex = ProcessCommands.Count - 1;
         }
 
         public void Dispose()
         {
+            _transaction.Commit();
             _transaction.Dispose();
             _documentLock.Dispose();
         }

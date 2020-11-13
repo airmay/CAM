@@ -109,13 +109,11 @@ namespace CAM
 
         public void PartialProcessing(ITechProcess techProcess, ProcessCommand processCommand)
         {
-            //Acad.Write($"Выполняется формирование программы обработки по техпроцессу {techProcess.Caption} с команды номер {processCommand.Number}");
+            Acad.Write($"Выполняется формирование программы обработки по техпроцессу {techProcess.Caption} с команды номер {processCommand.Number}");
 
-            //var toolpathObjectIds = techProcess.ToolpathObjectIds.ToList();
-            //techProcess.SkipProcessing(processCommand);
+            techProcess.SkipProcessing(processCommand);
 
-            //Acad.DeleteObjects(toolpathObjectIds.Except(techProcess.ToolpathObjectIds));
-            //Acad.Editor.UpdateScreen();
+            Acad.Editor.UpdateScreen();
         }
 
         public void SendProgram(ITechProcess techProcess)

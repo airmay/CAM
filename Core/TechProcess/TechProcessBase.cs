@@ -101,6 +101,7 @@ namespace CAM
                         generator.Uplifting();
                 });
                 generator.FinishTechProcess();
+                ProcessCommands = generator.ProcessCommands;
             }
             UpdateFromCommands();
         }
@@ -109,31 +110,40 @@ namespace CAM
 
         public virtual void SkipProcessing(ProcessCommand processCommand)
         {
-            //var techOperation = TechOperations.FirstOrDefault(p => p.ProcessCommands?.Contains(processCommand) == true);
-            //if (techOperation == null)
-            //    return;
+            if (!(processCommand.Owner is ITechOperation techOperation))
+                return;
 
-            //List<ProcessCommand> techOperationCommands;
-            //List<ProcessCommand> techProcessCommands;
-            //using (var generator = CommandGeneratorFactory.Create(MachineType.Value))
-            //{
-            //    generator.StartTechProcess(Caption, OriginX, OriginY, ZSafety);
-            //    generator.StartTechOperation();
-            //    generator.SetTool(
-            //        MachineType.Value != CAM.MachineType.Donatoni ? Tool.Number : processCommand.HasTool ? 1 : 2, 
-            //        Frequency);
-            //    techOperation.PrepareBuild(generator);
-            //    var loc = ProcessCommands[ProcessCommands.IndexOf(processCommand) - 1].ToolLocation;
-            //    generator.Move(loc.Point.X, loc.Point.Y, angleC: loc.AngleC, angleA: loc.AngleA);
-            //    generator.GCommand(CommandNames.Penetration, 1, point: loc.Point, feed: PenetrationFeed);
-            //    techOperationCommands = generator.FinishTechOperation();
-            //    techProcessCommands = generator.FinishTechProcess();
-            //}
-            //TechOperations.TakeWhile(p => p != techOperation).ToList().ForEach(p => p.ProcessCommands = null);
-            //techOperation.ProcessCommands = techOperationCommands.Concat(techOperation.ProcessCommands.SkipWhile(p => p.Number < processCommand.Number)).ToList();
-            //ProcessCommands = techProcessCommands.TakeWhile(p => !techOperationCommands.Contains(p)).Concat(techOperationCommands)
-            //    .Concat(ProcessCommands.SkipWhile(p => p.Number < processCommand.Number)).ToList();
-            //UpdateCaptions();
+            var objIds = ProcessCommands.SkipWhile(p => p != processCommand).Select(p => p.ToolpathObjectId).Distinct();
+            ProcessCommands.Select(p => p.ToolpathObjectId).Except(objIds).Delete();
+
+            ToolpathObjectsGroup?.Delete();
+            ToolpathObjectsGroup = null;
+
+            TechOperations.Select(p => p.ToolpathObjectsGroup).Delete();
+            TechOperations.ForEach(p =>
+            {
+                p.ToolpathObjectsGroup = null;
+                p.ProcessCommandIndex = null;
+            });
+            ToolpathObjectIds = null;
+
+            using (var generator = CommandGeneratorFactory.Create(MachineType.Value))
+            {
+                generator.StartTechProcess(this);
+                generator.SetTool(
+                    MachineType.Value != CAM.MachineType.Donatoni ? Tool.Number : 1,
+                    Frequency);
+
+                generator.SetTechOperation(techOperation);
+                techOperation.PrepareBuild(generator);
+
+                var loc = ProcessCommands[ProcessCommands.IndexOf(processCommand) - 1].ToolLocation;
+                generator.Move(loc.Point.X, loc.Point.Y, angleC: loc.AngleC, angleA: loc.AngleA);
+                generator.GCommand(CommandNames.Penetration, 1, point: loc.Point, feed: PenetrationFeed);
+
+                ProcessCommands = generator.ProcessCommands.Concat(ProcessCommands.SkipWhile(p => p != processCommand)).ToList();
+            }
+            UpdateFromCommands();
         }
 
         private void UpdateFromCommands()
