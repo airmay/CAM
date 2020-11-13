@@ -8,7 +8,7 @@ namespace CAM.TechProcesses.Polishing
 {
     [Serializable]
     [TechProcess(TechProcessType.Polishing)]
-    public class PolishingTechProcess : TechProcessBase
+    public class PolishingTechProcess : TechProcess
     {
         public int Feed { get; set; }
 

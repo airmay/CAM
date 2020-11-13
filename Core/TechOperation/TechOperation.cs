@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using Autodesk.AutoCAD.DatabaseServices;
 
@@ -9,7 +8,7 @@ namespace CAM
     /// Базовая технологическая операция
     /// </summary>
     [Serializable]
-    public abstract class TechOperationBase : ITechOperation
+    public abstract class TechOperation
     {
         /// <summary>
         /// Наименование
@@ -20,18 +19,18 @@ namespace CAM
         /// Технологический процесс обработки
         /// </summary>
         [NonSerialized]
-        private ITechProcess _techProcess;
+        private TechProcess _techProcess;
         [NonSerialized]
         private ObjectId? _toolpathObjectIds;
 
-        public ITechProcess TechProcess => _techProcess;
+        public TechProcess TechProcess => _techProcess;
 
         /// <summary>
         /// Обрабатываемая область
         /// </summary>
         public AcadObject ProcessingArea { get; set; }
 
-        public TechOperationBase(ITechProcess techProcess, string caption)
+        public TechOperation(TechProcess techProcess, string caption)
         {
             techProcess.TechOperations.Add(this);
             Caption = $"{caption}{techProcess.TechOperations.Count()}";
@@ -42,7 +41,7 @@ namespace CAM
 
         public virtual void PrepareBuild(CommandGeneratorBase generator) { }
 
-        public virtual void Setup(ITechProcess techProcess) => _techProcess = techProcess;
+        public virtual void Setup(TechProcess techProcess) => _techProcess = techProcess;
 
         public virtual void Teardown() { }
 

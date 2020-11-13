@@ -5,7 +5,7 @@ namespace CAM.TechProcesses.Drilling
 {
     [Serializable]
     [TechProcess(TechProcessType.Drilling)]
-    public class DrillingTechProcess : TechProcessBase
+    public class DrillingTechProcess : TechProcess
     {
         public double Depth { get; set; }
 

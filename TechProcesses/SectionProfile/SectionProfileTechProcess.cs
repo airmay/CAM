@@ -6,7 +6,7 @@ namespace CAM.TechProcesses.SectionProfile
 {
     [Serializable]
     [TechProcess(TechProcessType.SectionProfile)]
-    public class SectionProfileTechProcess : TechProcessBase
+    public class SectionProfileTechProcess : TechProcess
     {
         public AcadObject Rail { get; set; }
         public double? Length { get; set; }

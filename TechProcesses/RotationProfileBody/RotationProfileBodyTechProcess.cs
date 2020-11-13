@@ -8,7 +8,7 @@ namespace CAM.TechProcesses.RotationProfileBody
 {
     [Serializable]
     [TechProcess(TechProcessType.RotationProfileBody)]
-    public class RotationProfileBodyTechProcess : TechProcessBase
+    public class RotationProfileBodyTechProcess : TechProcess
     {
         public int CuttingFeed { get; set; }
 

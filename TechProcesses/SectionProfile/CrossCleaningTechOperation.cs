@@ -9,7 +9,7 @@ namespace CAM.TechProcesses.SectionProfile
 {
     [Serializable]
     [TechOperation(TechProcessType.SectionProfile, "Поперечная чистка", 3)]
-    public class CrossCleaningTechOperation : TechOperationBase
+    public class CrossCleaningTechOperation : TechOperation
     {
         public double StepX { get; set; }
 
@@ -21,7 +21,7 @@ namespace CAM.TechProcesses.SectionProfile
 
         public double Delta { get; set; }
 
-        public CrossCleaningTechOperation(ITechProcess techProcess, string caption) : base(techProcess, caption)
+        public CrossCleaningTechOperation(TechProcess techProcess, string caption) : base(techProcess, caption)
         {
         }
 

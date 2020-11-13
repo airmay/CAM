@@ -9,7 +9,7 @@ namespace CAM
     public class CamDocument
     {
         public int Hash;
-        public List<ITechProcess> TechProcessList { get; set; } = new List<ITechProcess>();
+        public List<TechProcess> TechProcessList { get; set; } = new List<TechProcess>();
 
         private readonly Dictionary<MachineType, MachineSettings> _machineSettings;    
         private readonly TechProcessFactory _techProcessFactory;
@@ -20,41 +20,41 @@ namespace CAM
             _techProcessFactory = techProcessFactory;
         }
 
-        public ITechProcess CreateTechProcess(string techProcessName)
+        public TechProcess CreateTechProcess(string techProcessName)
         {
             var techProcess = _techProcessFactory.CreateTechProcess(techProcessName);
             TechProcessList.Add(techProcess);
             return techProcess;
         }
 
-        public List<ITechOperation> CreateTechOperation(ITechProcess techProcess, string techOperationName) => _techProcessFactory.CreateTechOperations(techProcess, techOperationName);
+        public List<TechOperation> CreateTechOperation(TechProcess techProcess, string techOperationName) => _techProcessFactory.CreateTechOperations(techProcess, techOperationName);
 
         public IEnumerable<string> GetTechProcessNames() => _techProcessFactory.GetTechProcessNames();
 
         public ILookup<Type, string> GetTechOperationNames() => _techProcessFactory.GetTechOperationNames();
 
-        public void DeleteTechProcess(ITechProcess techProcess)
+        public void DeleteTechProcess(TechProcess techProcess)
         {
             DeleteProcessing(techProcess);
             techProcess.Teardown();
             TechProcessList.Remove(techProcess);
         }
 
-        public void DeleteTechOperation(ITechOperation techOperation)
+        public void DeleteTechOperation(TechOperation techOperation)
         {
             DeleteProcessing(techOperation.TechProcess);
             techOperation.Teardown();
             techOperation.TechProcess.TechOperations.Remove(techOperation);
         }
         
-        public void SelectProcessCommand(ITechProcess techProcess, ProcessCommand processCommand)
+        public void SelectProcessCommand(TechProcess techProcess, ProcessCommand processCommand)
         {
             if (processCommand.ToolpathObjectId.HasValue)
                 Acad.SelectObjectIds(processCommand.ToolpathObjectId.Value);
             Acad.RegenToolObject(techProcess.Tool, processCommand.HasTool, processCommand.ToolLocation, techProcess.MachineType == MachineType.Donatoni);  //Settongs.IsFrontPlaneZero
         }
 
-        public void DeleteProcessing(ITechProcess techProcess)
+        public void DeleteProcessing(TechProcess techProcess)
         {
             techProcess.ToolpathObjectsGroup?.DeleteGroup();
             techProcess.ToolpathObjectsGroup = null;
@@ -72,7 +72,7 @@ namespace CAM
             techProcess.ProcessCommands = null;
         }
        
-        public void BuildProcessing(ITechProcess techProcess)
+        public void BuildProcessing(TechProcess techProcess)
         {
             if (!techProcess.TechOperations.Any())
                 techProcess.CreateTechOperations();
@@ -107,7 +107,7 @@ namespace CAM
             Acad.CloseProgressor();
         }
 
-        public void PartialProcessing(ITechProcess techProcess, ProcessCommand processCommand)
+        public void PartialProcessing(TechProcess techProcess, ProcessCommand processCommand)
         {
             Acad.Write($"Выполняется формирование программы обработки по техпроцессу {techProcess.Caption} с команды номер {processCommand.Number}");
 
@@ -116,7 +116,7 @@ namespace CAM
             Acad.Editor.UpdateScreen();
         }
 
-        public void SendProgram(ITechProcess techProcess)
+        public void SendProgram(TechProcess techProcess)
         {
             if (techProcess.ProcessCommands == null)
             {

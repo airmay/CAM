@@ -12,7 +12,7 @@ namespace CAM
     {
 	    private CamDocument _camDocument;
         private Type _currentTechProcessType;
-        private ITechProcess CurrentTechProcess => (treeView.SelectedNode?.Parent ?? treeView.SelectedNode)?.Tag as ITechProcess;
+        private TechProcess CurrentTechProcess => (treeView.SelectedNode?.Parent ?? treeView.SelectedNode)?.Tag as TechProcess;
         private ProcessCommand CurrentProcessCommand => processCommandBindingSource.Current as ProcessCommand;
 
         public TechProcessView()
@@ -109,7 +109,7 @@ namespace CAM
         #endregion
 
         #region Tree
-        private TreeNode CreateTechProcessNode(ITechProcess techProcess)
+        private TreeNode CreateTechProcessNode(TechProcess techProcess)
         {
             var children = techProcess.TechOperations.ConvertAll(CreateTechOperationNode).ToArray();
             var techProcessNode = new TreeNode(techProcess.Caption + "   ", 0, 0, children) { Tag = techProcess, Checked = true, NodeFont = new System.Drawing.Font(treeView.Font, FontStyle.Bold) };
@@ -120,7 +120,7 @@ namespace CAM
             return techProcessNode;
         }
 
-        private static TreeNode CreateTechOperationNode(ITechOperation techOperation) =>
+        private static TreeNode CreateTechOperationNode(TechOperation techOperation) =>
             new TreeNode(techOperation.Caption, 1, 1) { Tag = techOperation, Checked = techOperation.Enabled, ForeColor = techOperation.Enabled ? Color.Black : Color.Gray };
 
         public bool IsToolpathVisible => !bDeleteExtraObjects.Checked;
@@ -139,7 +139,7 @@ namespace CAM
             }
             if (IsToolpathVisible)
             {
-                if (treeView.SelectedNode.Tag is ITechOperation oper)
+                if (treeView.SelectedNode.Tag is TechOperation oper)
                 {
                     CurrentTechProcess.ToolpathObjectsGroup?.SetVisibility(false);
                     oper.ToolpathObjectsGroup?.SetVisibility(true);
@@ -151,7 +151,7 @@ namespace CAM
                 Acad.Editor.UpdateScreen();
             }
 
-            if (treeView.SelectedNode.Tag is ITechOperation techOperation)
+            if (treeView.SelectedNode.Tag is TechOperation techOperation)
             {
                 if (techOperation.ProcessingArea != null)
                     Acad.SelectObjectIds(techOperation.ProcessingArea.ObjectId);
@@ -184,10 +184,10 @@ namespace CAM
             e.Node.Text = e.Label;
             switch (e.Node.Tag)
             {
-                case ITechProcess techProcess:
+                case TechProcess techProcess:
                     techProcess.Caption = e.Label;
                     break;
-                case TechOperationBase techOperation:
+                case TechOperation techOperation:
                     techOperation.Caption = e.Label;
                     break;
             }
@@ -198,7 +198,7 @@ namespace CAM
         private void treeView_AfterCheck(object sender, TreeViewEventArgs e)
         {
             e.Node.ForeColor = e.Node.Checked ? Color.Black : Color.Gray;
-            ((ITechOperation)e.Node.Tag).Enabled = e.Node.Checked;
+            ((TechOperation)e.Node.Tag).Enabled = e.Node.Checked;
         }
 
         private void EndEdit()
@@ -238,15 +238,15 @@ namespace CAM
 	    {
 		    if (treeView.SelectedNode == null)
 			    return;
-		    if (MessageBox.Show($"Вы хотите удалить {(treeView.SelectedNode.Tag is ITechProcess ? "техпроцесс" : "операцию")} '{treeView.SelectedNode.Text}'?",
+		    if (MessageBox.Show($"Вы хотите удалить {(treeView.SelectedNode.Tag is TechProcess ? "техпроцесс" : "операцию")} '{treeView.SelectedNode.Text}'?",
 			        "Подтверждение", MessageBoxButtons.YesNo, MessageBoxIcon.Question, MessageBoxDefaultButton.Button2) == DialogResult.Yes)
 		    {
 			    switch (treeView.SelectedNode.Tag)
 			    {
-				    case ITechProcess techProcess:
+				    case TechProcess techProcess:
                         _camDocument.DeleteTechProcess(techProcess);
 					    break;
-				    case TechOperationBase techOperation:
+				    case TechOperation techOperation:
                         _camDocument.DeleteTechOperation(techOperation);
 					    break;
 			    }
@@ -269,7 +269,7 @@ namespace CAM
 
 	    private void bMoveUpTechOperation_Click(object sender, EventArgs e)
 	    {
-		    if (treeView.SelectedNode.Tag is TechOperationBase techOperation)
+		    if (treeView.SelectedNode.Tag is TechOperation techOperation)
 		    {
 			    EndEdit();
 			    if (techOperation.TechProcess.TechOperationMoveUp(techOperation))
@@ -279,7 +279,7 @@ namespace CAM
 
 	    private void bMoveDownTechOperation_Click(object sender, EventArgs e)
 	    {
-		    if (treeView.SelectedNode.Tag is TechOperationBase techOperation)
+		    if (treeView.SelectedNode.Tag is TechOperation techOperation)
 		    {
 			    EndEdit();
 			    if (techOperation.TechProcess.TechOperationMoveDown(techOperation))
@@ -325,8 +325,8 @@ namespace CAM
         private void UpdateCaptions()
         {
             var techProcessNode = treeView.SelectedNode.Parent ?? treeView.SelectedNode;
-            techProcessNode.Text = ((ITechProcess)techProcessNode.Tag).Caption;
-            techProcessNode.Nodes.Cast<TreeNode>().ToList().ForEach(p => p.Text = ((ITechOperation)p.Tag).Caption);
+            techProcessNode.Text = ((TechProcess)techProcessNode.Tag).Caption;
+            techProcessNode.Nodes.Cast<TreeNode>().ToList().ForEach(p => p.Text = ((TechOperation)p.Tag).Caption);
         }
 
         private void bDeleteExtraObjects_Click(object sender, EventArgs e)

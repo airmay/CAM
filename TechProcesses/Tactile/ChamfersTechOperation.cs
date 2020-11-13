@@ -8,7 +8,7 @@ namespace CAM.TechProcesses.Tactile
 {
     [Serializable]
     [TechOperation(TechProcessType.Tactile, "Фаска", 2)]
-    public class ChamfersTechOperation : TechOperationBase
+    public class ChamfersTechOperation : TechOperation
     {
         public double BandStart { get; set; }
 

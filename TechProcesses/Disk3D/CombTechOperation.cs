@@ -10,7 +10,7 @@ namespace CAM.TechProcesses.Disk3D
 {
     [Serializable]
     [TechOperation(TechProcessType.Disk3D, "Гребенка", 1)]
-    public class CombTechOperation : TechOperationBase
+    public class CombTechOperation : TechOperation
     {
         public double StepPass { get; set; }
 
@@ -28,7 +28,7 @@ namespace CAM.TechProcesses.Disk3D
 
         public bool IsDepartureOnBorderSection { get; set; }
 
-        public CombTechOperation(ITechProcess techProcess, string caption) : base(techProcess, caption)
+        public CombTechOperation(TechProcess techProcess, string caption) : base(techProcess, caption)
         {
         }
 

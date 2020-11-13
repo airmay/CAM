@@ -7,7 +7,7 @@ namespace CAM.TechProcesses.SectionProfile
 {
     [Serializable]
     [TechOperation(TechProcessType.SectionProfile, "Продольная чистка", 2)]
-    public class LongCleaningTechOperation : TechOperationBase
+    public class LongCleaningTechOperation : TechOperation
     {
 
         public double StepYmin { get; set; }
@@ -26,7 +26,7 @@ namespace CAM.TechProcesses.SectionProfile
 
         public AcadObject Profile { get; set; }
 
-        public LongCleaningTechOperation(ITechProcess techProcess, string caption) : base(techProcess, caption)
+        public LongCleaningTechOperation(TechProcess techProcess, string caption) : base(techProcess, caption)
         {
         }
 

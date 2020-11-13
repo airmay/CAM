@@ -11,7 +11,7 @@ namespace CAM.TechProcesses.Tactile
 {
     [Serializable]
     [TechOperation(TechProcessType.Tactile, "Измерение", 4)]
-    public class MeasurementTechOperation : TechOperationBase
+    public class MeasurementTechOperation : TechOperation
     {
         public List<double> PointsX { get; set; } = new List<double>();
 
@@ -36,7 +36,7 @@ namespace CAM.TechProcesses.Tactile
         [NonSerialized]
         public ObjectId[] PointObjectIds;
 
-        public MeasurementTechOperation(ITechProcess techProcess, string caption) : base(techProcess, caption)
+        public MeasurementTechOperation(TechProcess techProcess, string caption) : base(techProcess, caption)
         {
             Thickness = techProcess.Thickness;
         }
@@ -134,7 +134,7 @@ namespace CAM.TechProcesses.Tactile
             generator.WithThick = true;
         }
 
-        public override void Setup(ITechProcess techProcess)
+        public override void Setup(TechProcess techProcess)
         {
             base.Setup(techProcess);
             PointObjectIds = PointsX.SelectMany((p, i) => Acad.CreateMeasurementPoint(new Point3d(PointsX[i], PointsY[i], 0))).ToArray();

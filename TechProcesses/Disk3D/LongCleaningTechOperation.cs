@@ -13,7 +13,7 @@ namespace CAM.TechProcesses.Disk3D
 {
     [Serializable]
     [TechOperation(TechProcessType.Disk3D, "Продольная чистка", 2)]
-    public class LongCleaningTechOperation : TechOperationBase
+    public class LongCleaningTechOperation : TechOperation
     {
         private Disk3DTechProcess _disk3DTechProcess;
 
@@ -37,7 +37,7 @@ namespace CAM.TechProcesses.Disk3D
 
         public double StepZ { get; set; }
 
-        public LongCleaningTechOperation(ITechProcess techProcess, string caption) : base(techProcess, caption)
+        public LongCleaningTechOperation(TechProcess techProcess, string caption) : base(techProcess, caption)
         {
             StepX1 = 1;
             StepX2 = 1;

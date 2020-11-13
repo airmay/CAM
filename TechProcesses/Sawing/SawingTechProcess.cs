@@ -9,7 +9,7 @@ namespace CAM.TechProcesses.Sawing
 {
     [Serializable]
     [TechProcess(TechProcessType.Sawing)]
-    public class SawingTechProcess : TechProcessBase
+    public class SawingTechProcess : TechProcess
     {
         public SawingTechProcessParams SawingTechProcessParams { get; }
 
@@ -131,7 +131,7 @@ namespace CAM.TechProcesses.Sawing
             }
         }
 
-        public override List<ITechOperation> CreateTechOperations() => _borders?.ConvertAll(p => new SawingTechOperation(this, p) as ITechOperation);
+        public override List<TechOperation> CreateTechOperations() => _borders?.ConvertAll(p => new SawingTechOperation(this, p) as TechOperation);
 
         public override bool Validate() => ToolService.Validate(Tool, ToolType.Disk) && Thickness.CheckNotNull("Толщина");
 

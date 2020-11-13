@@ -13,7 +13,7 @@ namespace CAM.TechProcesses.Disk3D
 {
     [Serializable]
     [TechOperation(TechProcessType.Disk3D, "Поперечная чистка", 3)]
-    public class CrossCleaningTechOperation : TechOperationBase
+    public class CrossCleaningTechOperation : TechOperation
     {
         private Disk3DTechProcess _disk3DTechProcess;
 
@@ -35,7 +35,7 @@ namespace CAM.TechProcesses.Disk3D
 
         public bool IsUplifting { get; set; }
 
-        public CrossCleaningTechOperation(ITechProcess techProcess, string caption) : base(techProcess, caption)
+        public CrossCleaningTechOperation(TechProcess techProcess, string caption) : base(techProcess, caption)
         {
             StepX1 = 1;
             StepX2 = 1;

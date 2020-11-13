@@ -5,7 +5,7 @@ namespace CAM.TechProcesses.Disk3D
 {
     [Serializable]
     [TechProcess(TechProcessType.Disk3D)]
-    public class Disk3DTechProcess : TechProcessBase
+    public class Disk3DTechProcess : TechProcess
     {
         public double Angle { get; set; }
 

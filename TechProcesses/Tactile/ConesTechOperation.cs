@@ -7,7 +7,7 @@ namespace CAM.TechProcesses.Tactile
 {
     [Serializable]
     [TechOperation(TechProcessType.Tactile, "Конусы", 3)]
-    public class ConesTechOperation : TechOperationBase
+    public class ConesTechOperation : TechOperation
     {
         public int CuttingFeed { get; set; }
 

@@ -9,7 +9,7 @@ namespace CAM.TechProcesses.Sawing
 {
     [Serializable]
     [TechOperation(TechProcessType.Sawing, "Распиловка", 1)]
-    public class SawingTechOperation : TechOperationBase
+    public class SawingTechOperation : TechOperation
     {
         public bool IsExactlyBegin { get; set; }
 
@@ -21,11 +21,11 @@ namespace CAM.TechProcesses.Sawing
 
         public List<SawingMode> SawingModes { get; set; }
 
-        public SawingTechOperation(ITechProcess techProcess, string caption) : base(techProcess, caption)
+        public SawingTechOperation(TechProcess techProcess, string caption) : base(techProcess, caption)
         {
         }
 
-        public SawingTechOperation(ITechProcess techProcess, Border border) : base(techProcess, $"Распиловка{border.ObjectId.GetDesc()}")
+        public SawingTechOperation(TechProcess techProcess, Border border) : base(techProcess, $"Распиловка{border.ObjectId.GetDesc()}")
         {
             SetFromBorder(border);
         }

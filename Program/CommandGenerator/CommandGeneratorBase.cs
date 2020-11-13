@@ -10,8 +10,8 @@ namespace CAM
 {
     public abstract class CommandGeneratorBase: IDisposable
     {
-        private ITechProcess _techProcess;
-        private ITechOperation _techOperation;
+        private TechProcess _techProcess;
+        private TechOperation _techOperation;
 
         protected bool _hasTool;
         protected int _GCode;
@@ -44,7 +44,7 @@ namespace CAM
         public Location ToolLocation { get; set; } = new Location();
         public string ThickCommand { get; set; }
 
-        public void StartTechProcess(ITechProcess techProcess)
+        public void StartTechProcess(TechProcess techProcess)
         {
             _techProcess = techProcess;
             _originX = techProcess.OriginX;
@@ -91,7 +91,7 @@ namespace CAM
         /// </summary>
         protected abstract void StopMachineCommands();
 
-        public void SetTechOperation(ITechOperation techOperation) => _techOperation = techOperation;
+        public void SetTechOperation(TechOperation techOperation) => _techOperation = techOperation;
 
         public void SetTool(int toolNo, int frequency, double angleA = 0, bool hasTool = true)
         {

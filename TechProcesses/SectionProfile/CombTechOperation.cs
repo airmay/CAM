@@ -7,7 +7,7 @@ namespace CAM.TechProcesses.SectionProfile
 {
     [Serializable]
     [TechOperation(TechProcessType.SectionProfile, "Гребенка", 1)]
-    public class CombTechOperation : TechOperationBase
+    public class CombTechOperation : TechOperation
     {
         public double StepPass { get; set; }
 
@@ -27,7 +27,7 @@ namespace CAM.TechProcesses.SectionProfile
 
         public AcadObject Profile { get; set; }
 
-        public CombTechOperation(ITechProcess techProcess, string caption) : base(techProcess, caption)
+        public CombTechOperation(TechProcess techProcess, string caption) : base(techProcess, caption)
         {
         }
 
