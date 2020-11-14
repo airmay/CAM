@@ -88,16 +88,14 @@ namespace CAM
 
         public static void DeleteObjects(IEnumerable<ObjectId> ids)
         {
+            UnhighlightAll();
             if (ids?.Any() == true)
-            {
-                ClearHighlighted();
                 App.LockAndExecute(() => ids.QForEach(p => p.Erase()));
-            }
         }
 
         public static void DeleteGroup(this ObjectId groupId)
         {
-            ClearHighlighted();
+            UnhighlightAll();
             App.LockAndExecute(() => groupId.EraseGroup());
         }
 
@@ -195,6 +193,8 @@ namespace CAM
         private static ObjectId[] _highlightedObjects = Array.Empty<ObjectId>();
 
         public static void ClearHighlighted() => _highlightedObjects = Array.Empty<ObjectId>();
+
+        public static void UnhighlightAll() => SelectObjectIds();
 
         public static void SelectAcadObjects(List<AcadObject> objects) => SelectObjectIds(objects?.Select(p => p.ObjectId).ToArray());
 

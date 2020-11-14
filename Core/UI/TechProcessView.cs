@@ -91,7 +91,7 @@ namespace CAM
 
         private Dictionary<Type, ParamsView> _paramsViews = new Dictionary<Type, ParamsView>();
 
-        public void RefreshViews()
+        public void RefreshParamsView()
         {
             var dataObject = treeView.SelectedNode.Tag;
             var type = dataObject.GetType();
@@ -123,7 +123,7 @@ namespace CAM
         private static TreeNode CreateTechOperationNode(TechOperation techOperation) =>
             new TreeNode(techOperation.Caption, 1, 1) { Tag = techOperation, Checked = techOperation.Enabled, ForeColor = techOperation.Enabled ? Color.Black : Color.Gray };
 
-        public bool IsToolpathVisible => !bDeleteExtraObjects.Checked;
+        public bool IsToolpathVisible => !bVisibility.Checked;
 
         private void treeView_AfterSelect(object sender, TreeViewEventArgs e)
         {
@@ -164,7 +164,7 @@ namespace CAM
 
             processCommandBindingSource.DataSource = CurrentTechProcess.ProcessCommands;
 
-            RefreshViews();
+            RefreshParamsView();
         }
 
         private void treeView_NodeMouseDoubleClick(object sender, TreeNodeMouseClickEventArgs e)
@@ -214,12 +214,13 @@ namespace CAM
         {
             bRemove.Enabled = bMoveUpTechOperation.Enabled = bMoveDownTechOperation.Enabled = bBuildProcessing.Enabled = treeView.SelectedNode != null;
             bCreateTechOperation.Enabled = treeView.SelectedNode != null && bCreateTechOperation.DropDownItems.Count > 0;
-            bDeleteExtraObjects.Enabled = bSendProgramm.Enabled = bPartialProcessing.Enabled = bPlay.Enabled = CurrentTechProcess?.ProcessCommands != null;
+            bVisibility.Enabled = bSendProgramm.Enabled = bPartialProcessing.Enabled = bPlay.Enabled = CurrentTechProcess?.ProcessCommands != null;
         }
 
         private void createTechProcessItem_Click(object sender, EventArgs e)
         {
             treeView.SelectedNode = CreateTechProcessNode(_camDocument.CreateTechProcess(((ToolStripMenuItem)sender).Text));
+            tabControl.SelectedTab = tabPageParams;
         }
 
         private void bCreateTechOperation_Click(object sender, EventArgs e)
@@ -231,31 +232,11 @@ namespace CAM
                 var techProcessNode = treeView.SelectedNode.Parent ?? treeView.SelectedNode;
                 techProcessNode.Nodes.AddRange(techOperations.ConvertAll(CreateTechOperationNode).ToArray());
                 treeView.SelectedNode = techProcessNode.Nodes[techProcessNode.Nodes.Count - 1];
+                tabControl.SelectedTab = tabPageParams;
             }
         }
 
-	    private void bRemove_Click(object sender, EventArgs e)
-	    {
-		    if (treeView.SelectedNode == null)
-			    return;
-		    if (MessageBox.Show($"Вы хотите удалить {(treeView.SelectedNode.Tag is TechProcess ? "техпроцесс" : "операцию")} '{treeView.SelectedNode.Text}'?",
-			        "Подтверждение", MessageBoxButtons.YesNo, MessageBoxIcon.Question, MessageBoxDefaultButton.Button2) == DialogResult.Yes)
-		    {
-			    switch (treeView.SelectedNode.Tag)
-			    {
-				    case TechProcess techProcess:
-                        _camDocument.DeleteTechProcess(techProcess);
-					    break;
-				    case TechOperation techOperation:
-                        _camDocument.DeleteTechOperation(techOperation);
-					    break;
-			    }
-                Acad.SelectObjectIds();
-                ClearParamsViews();
-                treeView.SelectedNode.Remove();
-                RefreshToolButtonsState();
-            }
-        }
+        private void bRemove_Click(object sender, EventArgs e) => Delete();
 
 	    private void MoveSelectedNode(int shift)
 	    {
@@ -312,7 +293,7 @@ namespace CAM
             processCommandBindingSource.Position = 0;
             processCommandBindingSource.DataSource = CurrentTechProcess.ProcessCommands;
 
-            RefreshViews();
+            RefreshParamsView();
             tabControl.SelectedTab = tabPageCommands;
 
             if (IsToolpathVisible)
@@ -329,7 +310,7 @@ namespace CAM
             techProcessNode.Nodes.Cast<TreeNode>().ToList().ForEach(p => p.Text = ((TechOperation)p.Tag).Caption);
         }
 
-        private void bDeleteExtraObjects_Click(object sender, EventArgs e)
+        private void bVisibility_Click(object sender, EventArgs e)
         {
             CurrentTechProcess.ToolpathObjectsGroup?.SetVisibility(IsToolpathVisible);
             CurrentTechProcess.ExtraObjectsGroup?.SetVisibility(IsToolpathVisible);
@@ -367,5 +348,37 @@ namespace CAM
             Autodesk.AutoCAD.ApplicationServices.Core.Application.Quit();
         }
         #endregion
+
+        private void treeView_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Delete)
+                Delete();
+        }
+
+        private void Delete()
+        {
+            if (treeView.SelectedNode == null)
+                return;
+            if (MessageBox.Show($"Вы хотите удалить {(treeView.SelectedNode.Tag is TechProcess ? "техпроцесс" : "операцию")} '{treeView.SelectedNode.Text}'?",
+                    "Подтверждение", MessageBoxButtons.YesNo, MessageBoxIcon.Question, MessageBoxDefaultButton.Button1) == DialogResult.Yes)
+            {
+                switch (treeView.SelectedNode.Tag)
+                {
+                    case TechProcess techProcess:
+                        _camDocument.DeleteTechProcess(techProcess);
+                        _currentTechProcessType = null;
+                        break;
+                    case TechOperation techOperation:
+                        _camDocument.DeleteTechOperation(techOperation);
+                        break;
+                }
+                Acad.UnhighlightAll();
+                ClearParamsViews();
+                tabControl.SelectedTab = tabPageParams;
+                treeView.SelectedNode.Remove();
+                treeView.Focus();
+                RefreshToolButtonsState();
+            }
+        }
     }
 }

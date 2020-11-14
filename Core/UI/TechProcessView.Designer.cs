@@ -50,7 +50,7 @@
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.bBuildProcessing = new System.Windows.Forms.ToolStripSplitButton();
             this.bPartialProcessing = new System.Windows.Forms.ToolStripMenuItem();
-            this.bDeleteExtraObjects = new System.Windows.Forms.ToolStripButton();
+            this.bVisibility = new System.Windows.Forms.ToolStripButton();
             this.bPlay = new System.Windows.Forms.ToolStripButton();
             this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
             this.bSendProgramm = new System.Windows.Forms.ToolStripButton();
@@ -104,6 +104,7 @@
             this.treeView.AfterCheck += new System.Windows.Forms.TreeViewEventHandler(this.treeView_AfterCheck);
             this.treeView.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.treeView_AfterSelect);
             this.treeView.NodeMouseDoubleClick += new System.Windows.Forms.TreeNodeMouseClickEventHandler(this.treeView_NodeMouseDoubleClick);
+            this.treeView.KeyDown += new System.Windows.Forms.KeyEventHandler(this.treeView_KeyDown);
             // 
             // imageList
             // 
@@ -217,7 +218,7 @@
             this.bMoveDownTechOperation,
             this.toolStripSeparator1,
             this.bBuildProcessing,
-            this.bDeleteExtraObjects,
+            this.bVisibility,
             this.bPlay,
             this.toolStripSeparator2,
             this.bSendProgramm,
@@ -243,7 +244,7 @@
             this.bRemove.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.bRemove.Name = "bRemove";
             this.bRemove.Size = new System.Drawing.Size(23, 22);
-            this.bRemove.Text = "Удалить";
+            this.bRemove.Text = "Удалить&Delete";
             this.bRemove.Click += new System.EventHandler(this.bRemove_Click);
             // 
             // bCreateTechOperation
@@ -299,16 +300,16 @@
             this.bPartialProcessing.ToolTipText = "Формирование программы обработки с текущей команды";
             this.bPartialProcessing.Click += new System.EventHandler(this.bBuildProcessing_ButtonClick);
             // 
-            // bDeleteExtraObjects
+            // bVisibility
             // 
-            this.bDeleteExtraObjects.CheckOnClick = true;
-            this.bDeleteExtraObjects.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.bDeleteExtraObjects.Image = global::CAM.Properties.Resources.eraser;
-            this.bDeleteExtraObjects.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.bDeleteExtraObjects.Name = "bDeleteExtraObjects";
-            this.bDeleteExtraObjects.Size = new System.Drawing.Size(23, 22);
-            this.bDeleteExtraObjects.Text = "Удалить доп. объекты";
-            this.bDeleteExtraObjects.Click += new System.EventHandler(this.bDeleteExtraObjects_Click);
+            this.bVisibility.CheckOnClick = true;
+            this.bVisibility.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.bVisibility.Image = global::CAM.Properties.Resources.eraser;
+            this.bVisibility.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.bVisibility.Name = "bVisibility";
+            this.bVisibility.Size = new System.Drawing.Size(23, 22);
+            this.bVisibility.Text = "Удалить доп. объекты";
+            this.bVisibility.Click += new System.EventHandler(this.bVisibility_Click);
             // 
             // bPlay
             // 
@@ -414,7 +415,7 @@
         private System.Windows.Forms.DataGridViewTextBoxColumn numberDataGridViewTextBoxColumn;
         private System.Windows.Forms.DataGridViewTextBoxColumn nameDataGridViewTextBoxColumn;
         private System.Windows.Forms.DataGridViewTextBoxColumn textDataGridViewTextBoxColumn;
-        private System.Windows.Forms.ToolStripButton bDeleteExtraObjects;
+        private System.Windows.Forms.ToolStripButton bVisibility;
         private System.Windows.Forms.ToolStripSplitButton bBuildProcessing;
         private System.Windows.Forms.ToolStripMenuItem bPartialProcessing;
     }
