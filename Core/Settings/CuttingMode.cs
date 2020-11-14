@@ -5,7 +5,7 @@
         /// <summary>
         /// Глубина
         /// </summary>
-        public double Depth { get; set; }
+        public double? Depth { get; set; }
 
         /// <summary>
         /// Шаг по глубине

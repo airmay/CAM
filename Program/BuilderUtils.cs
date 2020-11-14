@@ -12,7 +12,7 @@ namespace CAM
         public static IEnumerable<KeyValuePair<double, int>> GetPassList(IEnumerable<CuttingMode> modes, double DepthAll, bool isZeroPass)
         {
             var passList = new List<KeyValuePair<double, int>>();
-            var enumerator = modes.OrderBy(p => p.Depth).GetEnumerator();
+            var enumerator = modes.OrderBy(p => p.Depth ?? double.MaxValue).GetEnumerator();
             if (!enumerator.MoveNext())
                 throw new InvalidOperationException("Не заданы режимы обработки");
             var mode = enumerator.Current;

@@ -59,17 +59,12 @@
     <PenetrationFeed>200</PenetrationFeed>
     <SawingLineModes>
       <SawingMode>
-        <Depth>0</Depth>
+        <Depth xsi:nil="true" />
         <DepthStep>10</DepthStep>
         <Feed>2000</Feed>
       </SawingMode>
     </SawingLineModes>
     <SawingCurveModes>
-      <SawingMode>
-        <Depth>0</Depth>
-        <DepthStep>3</DepthStep>
-        <Feed>4000</Feed>
-      </SawingMode>
       <SawingMode>
         <Depth>30</Depth>
         <DepthStep>2</DepthStep>
@@ -79,6 +74,11 @@
         <Depth>60</Depth>
         <DepthStep>2</DepthStep>
         <Feed>2000</Feed>
+      </SawingMode>
+      <SawingMode>
+        <Depth xsi:nil="true" />
+        <DepthStep>1</DepthStep>
+        <Feed>1000</Feed>
       </SawingMode>
     </SawingCurveModes>
   </SawingTechProcessParams>

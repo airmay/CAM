@@ -11,12 +11,12 @@ namespace CAM.TechProcesses.Sawing
         /// <summary>
         /// Глубина
         /// </summary>
-        public int Depth { get; set; }
+        public double? Depth { get; set; }
 
         /// <summary>
         /// Шаг по глубине
         /// </summary>
-        public int DepthStep { get; set; }
+        public double DepthStep { get; set; }
 
         /// <summary>
         /// Подача
