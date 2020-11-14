@@ -9,8 +9,8 @@ using Autodesk.AutoCAD.Geometry;
 namespace CAM.TechProcesses.Disk3D
 {
     [Serializable]
-    [TechOperation(TechProcessType.Disk3D, "Гребенка", 1)]
-    public class CombTechOperation : TechOperation
+    [MenuItem("Гребенка", 1)]
+    public class CombTechOperation : TechOperation<Disk3DTechProcess>
     {
         public double StepPass { get; set; }
 
@@ -27,10 +27,6 @@ namespace CAM.TechProcesses.Disk3D
         public double Departure { get; set; }
 
         public bool IsDepartureOnBorderSection { get; set; }
-
-        public CombTechOperation(TechProcess techProcess, string caption) : base(techProcess, caption)
-        {
-        }
 
         public static void ConfigureParamsView(ParamsView view)
         {

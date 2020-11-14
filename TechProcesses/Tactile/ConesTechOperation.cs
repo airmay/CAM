@@ -6,8 +6,8 @@ using System.Linq;
 namespace CAM.TechProcesses.Tactile
 {
     [Serializable]
-    [TechOperation(TechProcessType.Tactile, "Конусы", 3)]
-    public class ConesTechOperation : TechOperation
+    [MenuItem("Конусы", 3)]
+    public class ConesTechOperation : TechOperation<TactileTechProcess>
     {
         public int CuttingFeed { get; set; }
 
@@ -23,7 +23,7 @@ namespace CAM.TechProcesses.Tactile
 
         public double Depth { get; set; }
 
-        public ConesTechOperation(TactileTechProcess techProcess, string name) : base(techProcess, name)
+        public ConesTechOperation(TactileTechProcess techProcess, string name)
         {
             FeedMax = 200;
             FeedMin = 80;

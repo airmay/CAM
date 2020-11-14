@@ -8,7 +8,7 @@ using System.Linq;
 namespace CAM.TechProcesses.Sawing
 {
     [Serializable]
-    [TechProcess(TechProcessType.Sawing)]
+    [MenuItem("Распиловка", 1)]
     public class SawingTechProcess : TechProcess
     {
         public SawingTechProcessParams SawingTechProcessParams { get; }
@@ -16,7 +16,7 @@ namespace CAM.TechProcesses.Sawing
         [NonSerialized]
         private List<Border> _borders;
 
-        public SawingTechProcess(string caption, SawingTechProcessParams @params) : base(caption)
+        public SawingTechProcess(SawingTechProcessParams @params)
         {
             SawingTechProcessParams = @params.Clone();
             PenetrationFeed = SawingTechProcessParams.PenetrationFeed;

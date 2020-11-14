@@ -7,7 +7,7 @@ using System.Linq;
 namespace CAM.TechProcesses.Polishing
 {
     [Serializable]
-    [TechProcess(TechProcessType.Polishing)]
+    [MenuItem("Полировка", 6)]
     public class PolishingTechProcess : TechProcess
     {
         public int Feed { get; set; }
@@ -25,10 +25,6 @@ namespace CAM.TechProcesses.Polishing
         public int AmplitudeMin { get; set; }
 
         public int AmplitudeMax { get; set; }
-
-        public PolishingTechProcess(string caption) : base(caption)
-        {
-        }
 
         public static void ConfigureParamsView(ParamsView view)
         {

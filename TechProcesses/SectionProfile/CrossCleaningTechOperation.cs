@@ -8,8 +8,8 @@ using System.Linq;
 namespace CAM.TechProcesses.SectionProfile
 {
     [Serializable]
-    [TechOperation(TechProcessType.SectionProfile, "Поперечная чистка", 3)]
-    public class CrossCleaningTechOperation : TechOperation
+    [MenuItem("Поперечная чистка", 3)]
+    public class CrossCleaningTechOperation : TechOperation<SectionProfileTechProcess>
     {
         public double StepX { get; set; }
 
@@ -20,10 +20,6 @@ namespace CAM.TechProcesses.SectionProfile
         public int CuttingFeed { get; set; }
 
         public double Delta { get; set; }
-
-        public CrossCleaningTechOperation(TechProcess techProcess, string caption) : base(techProcess, caption)
-        {
-        }
 
         public static void ConfigureParamsView(ParamsView view)
         {

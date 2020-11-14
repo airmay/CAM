@@ -7,7 +7,7 @@ using System.Linq;
 namespace CAM.TechProcesses.RotationProfileBody
 {
     [Serializable]
-    [TechProcess(TechProcessType.RotationProfileBody)]
+    [MenuItem("Тело вращения по профилю", 7)]
     public class RotationProfileBodyTechProcess : TechProcess
     {
         public int CuttingFeed { get; set; }
@@ -24,7 +24,7 @@ namespace CAM.TechProcesses.RotationProfileBody
 
         public double Delta { get; set; }
 
-        public RotationProfileBodyTechProcess(string caption) : base(caption)
+        public RotationProfileBodyTechProcess()
         {
             MachineType = CAM.MachineType.Donatoni;
             Material = CAM.Material.Marble;

@@ -26,7 +26,7 @@ namespace CAM
 
         public int PenetrationFeed { get; set; }
 
-        public double ZSafety { get; set; }
+        public double ZSafety { get; set; } = 20;
 
         public List<AcadObject> ProcessingArea { get; set; }
 
@@ -39,43 +39,21 @@ namespace CAM
         public double OriginY { get; set; }
 
         [NonSerialized]
-        public ObjectId[] _originObject;
+        public ObjectId[] OriginObject;
         [NonSerialized]
-        private Dictionary<ObjectId, int> _toolpathObjectIds;
+        public Dictionary<ObjectId, int> ToolpathObjectIds;
         [NonSerialized]
-        private ObjectId? _toolpathObjectsGroup;
+        public ObjectId? ToolpathObjectsGroup;
         [NonSerialized]
-        private ObjectId? _extraObjectsGroup;
-
-        public ObjectId[] OriginObject
-        {
-            get => _originObject;
-            set => _originObject = value;
-        }
-
-        public TechProcess(string caption)
-        {
-            Caption = caption;
-            ZSafety = 20;
-        }
-
+        public ObjectId? ExtraObjectsGroup;
+       
         public virtual void Setup()
         {
             if (OriginX != 0 || OriginY != 0)
                 OriginObject = Acad.CreateOriginObject(new Point3d(OriginX, OriginY, 0));
 
-            TechOperations.ForEach(p => p.Setup(this));
+            TechOperations.ForEach(p => p.TechProcessBase = this);
         }
-
-        public Dictionary<ObjectId, int> ToolpathObjectIds { get => _toolpathObjectIds; set => _toolpathObjectIds = value; }
-
-        public ObjectId? ToolpathObjectsGroup { get => _toolpathObjectsGroup; set => _toolpathObjectsGroup = value; }
-
-        public ObjectId? ExtraObjectsGroup { get => _extraObjectsGroup; set => _extraObjectsGroup = value; }
-
-        public bool TechOperationMoveDown(TechOperation techOperation) => TechOperations.SwapNext(techOperation);
-
-        public bool TechOperationMoveUp(TechOperation techOperation) => TechOperations.SwapPrev(techOperation);
 
         public virtual void BuildProcessing()
         {
@@ -166,6 +144,24 @@ namespace CAM
                 var ind = caption.IndexOf('(');
                 return $"{(ind > 0 ? caption.Substring(0, ind).Trim() : caption)} ({new TimeSpan(0, 0, 0, (int)duration)})";
             }
+        }
+
+        public void DeleteProcessing()
+        {
+            ToolpathObjectsGroup?.DeleteGroup();
+            ToolpathObjectsGroup = null;
+
+            TechOperations.Select(p => p.ToolpathObjectsGroup).Delete();
+            TechOperations.ForEach(p =>
+            {
+                p.ToolpathObjectsGroup = null;
+                p.ProcessCommandIndex = null;
+            });
+            ExtraObjectsGroup?.DeleteGroup();
+            ExtraObjectsGroup = null;
+
+            ToolpathObjectIds = null;
+            ProcessCommands = null;
         }
 
         public virtual List<TechOperation> CreateTechOperations() => new List<TechOperation>();

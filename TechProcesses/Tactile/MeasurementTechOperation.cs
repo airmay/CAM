@@ -10,8 +10,8 @@ using System.Windows.Forms;
 namespace CAM.TechProcesses.Tactile
 {
     [Serializable]
-    [TechOperation(TechProcessType.Tactile, "Измерение", 4)]
-    public class MeasurementTechOperation : TechOperation
+    [MenuItem("Измерение", 4)]
+    public class MeasurementTechOperation : TechOperation<TactileTechProcess>
     {
         public List<double> PointsX { get; set; } = new List<double>();
 
@@ -36,9 +36,10 @@ namespace CAM.TechProcesses.Tactile
         [NonSerialized]
         public ObjectId[] PointObjectIds;
 
-        public MeasurementTechOperation(TechProcess techProcess, string caption) : base(techProcess, caption)
+        protected override void Init()
         {
-            Thickness = techProcess.Thickness;
+            Thickness = TechProcess.Thickness;
+            PointObjectIds = PointsX.SelectMany((p, i) => Acad.CreateMeasurementPoint(new Point3d(PointsX[i], PointsY[i], 0))).ToArray();
         }
 
         public static void ConfigureParamsView(ParamsView view)
@@ -132,12 +133,6 @@ namespace CAM.TechProcesses.Tactile
                     break;
             }
             generator.WithThick = true;
-        }
-
-        public override void Setup(TechProcess techProcess)
-        {
-            base.Setup(techProcess);
-            PointObjectIds = PointsX.SelectMany((p, i) => Acad.CreateMeasurementPoint(new Point3d(PointsX[i], PointsY[i], 0))).ToArray();
         }
 
         public void Clear()

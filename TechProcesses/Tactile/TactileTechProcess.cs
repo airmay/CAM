@@ -8,7 +8,7 @@ using System.Linq;
 namespace CAM.TechProcesses.Tactile
 {
     [Serializable]
-    [TechProcess(TechProcessType.Tactile)]
+    [MenuItem("Тактилка", 2)]
     public class TactileTechProcess: TechProcess
     {
         public List<AcadObject> Objects { get; set; }
@@ -33,7 +33,7 @@ namespace CAM.TechProcesses.Tactile
 
         public int TransitionFeed { get; set; }
 
-        public TactileTechProcess(string caption) : base(caption)
+        public TactileTechProcess()
         {
             Material = CAM.Material.Granite;
         }

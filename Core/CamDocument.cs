@@ -35,41 +35,16 @@ namespace CAM
 
         public void DeleteTechProcess(TechProcess techProcess)
         {
-            DeleteProcessing(techProcess);
+            techProcess.DeleteProcessing();
             techProcess.Teardown();
             TechProcessList.Remove(techProcess);
         }
 
         public void DeleteTechOperation(TechOperation techOperation)
         {
-            DeleteProcessing(techOperation.TechProcess);
+            techOperation.TechProcessBase.DeleteProcessing();
             techOperation.Teardown();
-            techOperation.TechProcess.TechOperations.Remove(techOperation);
-        }
-        
-        public void SelectProcessCommand(TechProcess techProcess, ProcessCommand processCommand)
-        {
-            if (processCommand.ToolpathObjectId.HasValue)
-                Acad.SelectObjectIds(processCommand.ToolpathObjectId.Value);
-            Acad.RegenToolObject(techProcess.Tool, processCommand.HasTool, processCommand.ToolLocation, techProcess.MachineType == MachineType.Donatoni);  //Settongs.IsFrontPlaneZero
-        }
-
-        public void DeleteProcessing(TechProcess techProcess)
-        {
-            techProcess.ToolpathObjectsGroup?.DeleteGroup();
-            techProcess.ToolpathObjectsGroup = null;
-
-            techProcess.TechOperations.Select(p => p.ToolpathObjectsGroup).Delete();
-            techProcess.TechOperations.ForEach(p =>
-            {
-                p.ToolpathObjectsGroup = null;
-                p.ProcessCommandIndex = null;
-            });
-            techProcess.ExtraObjectsGroup?.DeleteGroup();
-            techProcess.ExtraObjectsGroup = null;
-
-            techProcess.ToolpathObjectIds = null;
-            techProcess.ProcessCommands = null;
+            techOperation.TechProcessBase.TechOperations.Remove(techOperation);
         }
        
         public void BuildProcessing(TechProcess techProcess)
@@ -85,7 +60,7 @@ namespace CAM
                 Acad.Write($"Выполняется расчет обработки по техпроцессу {techProcess.Caption} ...");
                 var stopwatch = Stopwatch.StartNew();
                 Acad.CreateProgressor($"Расчет обработки по техпроцессу \"{techProcess.Caption}\"");
-                DeleteProcessing(techProcess);
+                techProcess.DeleteProcessing();
                 Acad.Editor.UpdateScreen();
 
                 techProcess.BuildProcessing();
@@ -110,9 +85,7 @@ namespace CAM
         public void PartialProcessing(TechProcess techProcess, ProcessCommand processCommand)
         {
             Acad.Write($"Выполняется формирование программы обработки по техпроцессу {techProcess.Caption} с команды номер {processCommand.Number}");
-
             techProcess.SkipProcessing(processCommand);
-
             Acad.Editor.UpdateScreen();
         }
 

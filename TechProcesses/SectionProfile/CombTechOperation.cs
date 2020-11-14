@@ -6,8 +6,8 @@ using System.Linq;
 namespace CAM.TechProcesses.SectionProfile
 {
     [Serializable]
-    [TechOperation(TechProcessType.SectionProfile, "Гребенка", 1)]
-    public class CombTechOperation : TechOperation
+    [MenuItem("Гребенка", 1)]
+    public class CombTechOperation : TechOperation<SectionProfileTechProcess>
     {
         public double StepPass { get; set; }
 
@@ -26,10 +26,6 @@ namespace CAM.TechProcesses.SectionProfile
         public bool IsUplifting { get; set; }
 
         public AcadObject Profile { get; set; }
-
-        public CombTechOperation(TechProcess techProcess, string caption) : base(techProcess, caption)
-        {
-        }
 
         public static void ConfigureParamsView(ParamsView view)
         {

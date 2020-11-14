@@ -12,8 +12,8 @@ using Exception = Autodesk.AutoCAD.Runtime.Exception;
 namespace CAM.TechProcesses.Disk3D
 {
     [Serializable]
-    [TechOperation(TechProcessType.Disk3D, "Поперечная чистка", 3)]
-    public class CrossCleaningTechOperation : TechOperation
+    [MenuItem("Поперечная чистка", 3)]
+    public class CrossCleaningTechOperation : TechOperation<Disk3DTechProcess>
     {
         private Disk3DTechProcess _disk3DTechProcess;
 
@@ -35,7 +35,7 @@ namespace CAM.TechProcesses.Disk3D
 
         public bool IsUplifting { get; set; }
 
-        public CrossCleaningTechOperation(TechProcess techProcess, string caption) : base(techProcess, caption)
+        public CrossCleaningTechOperation()
         {
             StepX1 = 1;
             StepX2 = 1;

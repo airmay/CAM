@@ -4,7 +4,7 @@ using System.Windows.Forms;
 namespace CAM.TechProcesses.Disk3D
 {
     [Serializable]
-    [TechProcess(TechProcessType.Disk3D)]
+    [MenuItem("Диск 3D", 3)]
     public class Disk3DTechProcess : TechProcess
     {
         public double Angle { get; set; }
@@ -12,10 +12,6 @@ namespace CAM.TechProcesses.Disk3D
         public bool IsExactlyBegin { get; set; }
 
         public bool IsExactlyEnd { get; set; }
-
-        public Disk3DTechProcess(string caption) : base(caption)
-        {
-        }
 
         public static void ConfigureParamsView(ParamsView view)
         {

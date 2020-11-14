@@ -6,8 +6,8 @@ using System.Linq;
 namespace CAM.TechProcesses.SectionProfile
 {
     [Serializable]
-    [TechOperation(TechProcessType.SectionProfile, "Продольная чистка", 2)]
-    public class LongCleaningTechOperation : TechOperation
+    [MenuItem("Продольная чистка", 2)]
+    public class LongCleaningTechOperation : TechOperation<SectionProfileTechProcess>
     {
 
         public double StepYmin { get; set; }
@@ -25,10 +25,6 @@ namespace CAM.TechProcesses.SectionProfile
         public bool IsUplifting { get; set; }
 
         public AcadObject Profile { get; set; }
-
-        public LongCleaningTechOperation(TechProcess techProcess, string caption) : base(techProcess, caption)
-        {
-        }
 
         public static void ConfigureParamsView(ParamsView view)
         {

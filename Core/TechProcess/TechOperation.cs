@@ -8,44 +8,52 @@ namespace CAM
     /// Базовая технологическая операция
     /// </summary>
     [Serializable]
+    public abstract class TechOperation<T> : TechOperation where T: TechProcess
+    {
+        public T TechProcess => (T)TechProcessBase;
+    }
+
+    [Serializable]
     public abstract class TechOperation
     {
+        /// <summary>
+        /// Технологический процесс обработки
+        /// </summary>
+        [NonSerialized]
+        public TechProcess TechProcessBase;
+
+        [NonSerialized]
+        public ObjectId? ToolpathObjectsGroup;
+
+        [NonSerialized]
+        public int? ProcessCommandIndex;
+
         /// <summary>
         /// Наименование
         /// </summary>
         public string Caption { get; set; }
 
         /// <summary>
-        /// Технологический процесс обработки
-        /// </summary>
-        [NonSerialized]
-        private TechProcess _techProcess;
-        [NonSerialized]
-        private ObjectId? _toolpathObjectIds;
-
-        public TechProcess TechProcess => _techProcess;
-
-        /// <summary>
         /// Обрабатываемая область
         /// </summary>
         public AcadObject ProcessingArea { get; set; }
 
-        public TechOperation(TechProcess techProcess, string caption)
+        public virtual void Setup(TechProcess techProcess, string caption)
         {
-            techProcess.TechOperations.Add(this);
+            TechProcessBase = techProcess;
+            TechProcessBase.TechOperations.Add(this);
             Caption = $"{caption}{techProcess.TechOperations.Count()}";
-            Setup(techProcess);
+
+            Init();
         }
 
+        protected virtual void Init() { }
+        
         public abstract void BuildProcessing(CommandGeneratorBase generator);
 
         public virtual void PrepareBuild(CommandGeneratorBase generator) { }
 
-        public virtual void Setup(TechProcess techProcess) => _techProcess = techProcess;
-
         public virtual void Teardown() { }
-
-        public ObjectId? ToolpathObjectsGroup { get => _toolpathObjectIds; set => _toolpathObjectIds = value; }
 
         public virtual bool CanProcess => true;
 
@@ -53,6 +61,5 @@ namespace CAM
 
         public virtual bool Validate() => true;
 
-        public int? ProcessCommandIndex { get; set; }
     }
 }

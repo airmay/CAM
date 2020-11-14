@@ -7,8 +7,8 @@ using System.Linq;
 namespace CAM.TechProcesses.Tactile
 {
     [Serializable]
-    [TechOperation(TechProcessType.Tactile, "Фаска", 2)]
-    public class ChamfersTechOperation : TechOperation
+    [MenuItem("Фаска", 2)]
+    public class ChamfersTechOperation : TechOperation<TactileTechProcess>
     {
         public double BandStart { get; set; }
 
@@ -16,9 +16,7 @@ namespace CAM.TechProcesses.Tactile
 
         public int CuttingFeed { get; set; }
 
-        public ChamfersTechOperation(TactileTechProcess techProcess, string caption) : this(techProcess, caption, null, null) { }
-
-        public ChamfersTechOperation(TactileTechProcess techProcess, string caption, int? processingAngle, double? bandStart) : base(techProcess, caption)
+        public ChamfersTechOperation(TactileTechProcess techProcess, string caption, int? processingAngle, double? bandStart)
         {
             BandStart = bandStart ?? techProcess.BandStart1.Value;
             ProcessingAngle = processingAngle ?? techProcess.ProcessingAngle1.Value;

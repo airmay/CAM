@@ -4,7 +4,7 @@ using System;
 namespace CAM.TechProcesses.Drilling
 {
     [Serializable]
-    [TechProcess(TechProcessType.Drilling)]
+    [MenuItem("Сверление", 5)]
     public class DrillingTechProcess : TechProcess
     {
         public double Depth { get; set; }
@@ -15,7 +15,7 @@ namespace CAM.TechProcesses.Drilling
 
         public int ZEntry { get; set; }
 
-        public DrillingTechProcess(string caption) : base(caption)
+        public DrillingTechProcess()
         {
             MachineType = CAM.MachineType.Krea;
         }

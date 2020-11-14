@@ -272,7 +272,7 @@ namespace CAM
 		    if (treeView.SelectedNode.Tag is TechOperation techOperation)
 		    {
 			    EndEdit();
-			    if (techOperation.TechProcess.TechOperationMoveUp(techOperation))
+			    if (techOperation.TechProcessBase.TechOperations.SwapPrev(techOperation))
 				    MoveSelectedNode(-1);
 		    }
 	    }
@@ -282,7 +282,7 @@ namespace CAM
 		    if (treeView.SelectedNode.Tag is TechOperation techOperation)
 		    {
 			    EndEdit();
-			    if (techOperation.TechProcess.TechOperationMoveDown(techOperation))
+			    if (techOperation.TechProcessBase.TechOperations.SwapNext(techOperation))
 				    MoveSelectedNode(1);
 		    }
 	    }

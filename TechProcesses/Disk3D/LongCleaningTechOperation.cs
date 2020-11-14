@@ -12,8 +12,8 @@ using Exception = Autodesk.AutoCAD.Runtime.Exception;
 namespace CAM.TechProcesses.Disk3D
 {
     [Serializable]
-    [TechOperation(TechProcessType.Disk3D, "Продольная чистка", 2)]
-    public class LongCleaningTechOperation : TechOperation
+    [MenuItem("Продольная чистка", 2)]
+    public class LongCleaningTechOperation : TechOperation<Disk3DTechProcess>
     {
         private Disk3DTechProcess _disk3DTechProcess;
 
@@ -37,7 +37,7 @@ namespace CAM.TechProcesses.Disk3D
 
         public double StepZ { get; set; }
 
-        public LongCleaningTechOperation(TechProcess techProcess, string caption) : base(techProcess, caption)
+        public LongCleaningTechOperation()
         {
             StepX1 = 1;
             StepX2 = 1;

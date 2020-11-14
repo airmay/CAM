@@ -14,35 +14,40 @@ namespace CAM
         public TechProcessFactory(Settings settings)
         {
             _settings = settings;
-            var techProcessTypes = Assembly.GetExecutingAssembly().GetTypes()
+            _techProcessNames = Assembly.GetExecutingAssembly().GetTypes()
                             .Where(p => p.IsClass && !p.IsAbstract && typeof(TechProcess).IsAssignableFrom(p))
-                            .Select(p => new { Type = p, Attr = Attribute.GetCustomAttribute(p, typeof(TechProcessAttribute)) as TechProcessAttribute })
-                            .ToDictionary(p => p.Attr.TechProcessType, v => v.Type);
-            _techProcessNames = techProcessTypes.OrderBy(p => p.Key).ToDictionary(k => k.Key.GetDescription(), v => v.Value);
+                            .Select(p => new { Type = p, Attr = Attribute.GetCustomAttribute(p, typeof(MenuItemAttribute)) as MenuItemAttribute })
+                            .OrderBy(p => p.Attr.Position)
+                            .ToDictionary(p => p.Attr.Name, p => p.Type);
             _techOperationTypes = Assembly.GetExecutingAssembly().GetTypes()
-                            .Where(p => p.IsClass && !p.IsAbstract && typeof(TechOperation).IsAssignableFrom(p))
-                            .Select(p => new { Type = p, Attr = Attribute.GetCustomAttribute(p, typeof(TechOperationAttribute)) as TechOperationAttribute})
-                            .GroupBy(p => p.Attr.TechProcessType)
-                            .ToDictionary(p => techProcessTypes[p.Key], p => p.OrderBy(k => k.Attr.Number).ToDictionary(k => k.Attr.TechOperationCaption, v => v.Type));
+                .Where(p => p.BaseType.IsGenericType && p.BaseType.GetGenericTypeDefinition() == typeof(TechOperation<>))
+                .Select(p => new { tp = p.BaseType.GetGenericArguments()[0], to = p, attr = Attribute.GetCustomAttribute(p, typeof(MenuItemAttribute)) as MenuItemAttribute })
+                .GroupBy(p => p.tp)
+                .ToDictionary(p => p.Key, p => p.OrderBy(k => k.attr.Position).ToDictionary(k => k.attr.Name, v => v.to));
         }
 
         public TechProcess CreateTechProcess(string techProcessCaption)
         {
             var args = _techProcessNames[techProcessCaption].GetConstructors().Single().GetParameters()
-                .Select(par => par.ParameterType == typeof(string) 
-                    ? techProcessCaption
-                    : typeof(Settings).GetProperties().Single(prop => prop.PropertyType == par.ParameterType).GetValue(_settings))
+                .Select(par => typeof(Settings).GetProperties().Single(prop => prop.PropertyType == par.ParameterType).GetValue(_settings))
                 .ToArray();
-            
-            return Activator.CreateInstance(_techProcessNames[techProcessCaption], args) as TechProcess;
+
+            var techProcess = (TechProcess)Activator.CreateInstance(_techProcessNames[techProcessCaption], args);
+            techProcess.Caption = techProcessCaption;
+
+            return techProcess;
         }
 
-        public List<TechOperation> CreateTechOperations(TechProcess techProcess, string techOperationName = "Все операции") => 
-            !techProcess.Validate() 
-                ? new List<TechOperation>()
-                : techOperationName == "Все операции"
-                    ? techProcess.CreateTechOperations()
-                    : new List<TechOperation> { Activator.CreateInstance(_techOperationTypes[techProcess.GetType()][techOperationName], new object[] { techProcess, techOperationName }) as TechOperation };
+        public List<TechOperation> CreateTechOperations(TechProcess techProcess, string techOperationName = "Все операции")
+        {
+            if (!techProcess.Validate())
+                return new List<TechOperation>();
+            if (techOperationName == "Все операции")
+                return techProcess.CreateTechOperations();
+            var techOperation = (TechOperation)Activator.CreateInstance(_techOperationTypes[techProcess.GetType()][techOperationName]);
+            techOperation.Setup(techProcess, techOperationName);
+            return new List<TechOperation> { techOperation };
+        }
 
         public IEnumerable<string> GetTechProcessNames() => _techProcessNames.Keys;
 

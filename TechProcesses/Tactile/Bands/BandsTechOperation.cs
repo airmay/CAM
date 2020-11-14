@@ -8,8 +8,8 @@ using System.Linq;
 namespace CAM.TechProcesses.Tactile
 {
     [Serializable]
-    [TechOperation(TechProcessType.Tactile, "Полосы", 1)]
-    public class BandsTechOperation : TechOperation
+    [MenuItem("Полосы", 1)]
+    public class BandsTechOperation : TechOperation<TactileTechProcess>
     {
         public int ProcessingAngle { get; set; }
 
@@ -30,11 +30,13 @@ namespace CAM.TechProcesses.Tactile
         public List<Pass> PassList { get; set; } = new List<Pass>();
 
         public bool IsEdgeProcessing { get; set; }
-        
-        public BandsTechOperation(TactileTechProcess techProcess, string caption) : this(techProcess, caption, null, null) { }
 
-        public BandsTechOperation(TactileTechProcess techProcess, string caption, int? processingAngle, double? bandStart) : base(techProcess, caption)
+        //public BandsTechOperation() { }
+
+        public BandsTechOperation(TactileTechProcess techProcess, string caption, int? processingAngle, double? bandStart)
         {
+            Setup(techProcess, caption);
+
             BandWidth = techProcess.BandWidth.Value;
             BandSpacing = techProcess.BandSpacing.Value;
             BandStart = bandStart ?? techProcess.BandStart1.Value;

@@ -5,7 +5,7 @@ using System;
 namespace CAM.TechProcesses.SectionProfile
 {
     [Serializable]
-    [TechProcess(TechProcessType.SectionProfile)]
+    [MenuItem("Профиль по сечению", 4)]
     public class SectionProfileTechProcess : TechProcess
     {
         public AcadObject Rail { get; set; }
@@ -15,10 +15,6 @@ namespace CAM.TechProcesses.SectionProfile
         public double Step { get; set; }
         public double Departure { get; set; }
         public double Delta { get; set; }
-
-        public SectionProfileTechProcess(string caption) : base(caption)
-        {
-        }
 
         public static void ConfigureParamsView(ParamsView view)
         {

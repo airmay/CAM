@@ -8,8 +8,8 @@ using System.Linq;
 namespace CAM.TechProcesses.Sawing
 {
     [Serializable]
-    [TechOperation(TechProcessType.Sawing, "Распиловка", 1)]
-    public class SawingTechOperation : TechOperation
+    [MenuItem("Распиловка", 1)]
+    public class SawingTechOperation : TechOperation<SawingTechProcess>
     {
         public bool IsExactlyBegin { get; set; }
 
@@ -21,12 +21,11 @@ namespace CAM.TechProcesses.Sawing
 
         public List<SawingMode> SawingModes { get; set; }
 
-        public SawingTechOperation(TechProcess techProcess, string caption) : base(techProcess, caption)
-        {
-        }
+        public SawingTechOperation() { }
 
-        public SawingTechOperation(TechProcess techProcess, Border border) : base(techProcess, $"Распиловка{border.ObjectId.GetDesc()}")
+        public SawingTechOperation(TechProcess techProcess, Border border)
         {
+            Setup(techProcess, $"Распиловка{border.ObjectId.GetDesc()}");
             SetFromBorder(border);
         }
 

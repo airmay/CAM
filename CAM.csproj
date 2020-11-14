@@ -91,7 +91,8 @@
     <Compile Include="Acad\AcadGateway.cs" />
     <Compile Include="Acad\AcadObjectNames.cs" />
     <Compile Include="Core\CamDocument.cs" />
-    <Compile Include="Core\TechOperation\TechOperation.cs" />
+    <Compile Include="Core\UI\MenuItemAttribute.cs" />
+    <Compile Include="Core\TechProcess\TechOperation.cs" />
     <Compile Include="Core\TechProcess\TechProcess.cs" />
     <Compile Include="Core\UI\ParamsView.cs">
       <SubType>UserControl</SubType>
@@ -163,8 +164,6 @@
     </Compile>
     <Compile Include="TechProcesses\Tactile\TactileTechProcess.cs" />
     <Compile Include="TechProcesses\Tactile\TactileTechProcessParams.cs" />
-    <Compile Include="Core\TechOperation\TechOperationAttribute.cs" />
-    <Compile Include="Core\TechProcess\TechProcessAttribute.cs" />
     <Compile Include="Core\TechProcess\TechProcessFactory.cs" />
     <Compile Include="Core\TechProcess\TechProcessLoader.cs" />
     <Compile Include="PaletteSet\CamPaletteSet.cs" />
@@ -181,7 +180,6 @@
       <DependentUpon>ToolsForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Core\Enums\ToolType.cs" />
-    <Compile Include="TechProcesses\TechProcessType.cs" />
     <Compile Include="Utils\Exceptions.cs" />
     <Compile Include="Acad\Graph.cs" />
     <Compile Include="Utils\Extensions.cs" />
