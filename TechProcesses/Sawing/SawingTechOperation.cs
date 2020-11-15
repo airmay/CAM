@@ -19,6 +19,8 @@ namespace CAM.TechProcesses.Sawing
 
         public double AngleA { get; set; }
 
+        public double Departure { get; set; }
+
         public List<SawingMode> SawingModes { get; set; }
 
         public SawingTechOperation() { }
@@ -37,6 +39,7 @@ namespace CAM.TechProcesses.Sawing
             view.AddParam(nameof(IsExactlyBegin), "Начало точно")
                 .AddParam(nameof(IsExactlyEnd), "Конец точно")
                 .AddParam(nameof(AngleA))
+                .AddParam(nameof(Departure))
                 .AddIndent()
                 .AddAcadObject(message: "Выберите объект",
                     allowedTypes: $"{AcadObjectNames.Line},{AcadObjectNames.Arc},{AcadObjectNames.Lwpolyline}",
@@ -144,7 +147,7 @@ namespace CAM.TechProcesses.Sawing
             }
             generator.Uplifting(Vector3d.ZAxis.RotateBy(outerSideSign * angleA, toolpathCurve.EndPoint - toolpathCurve.StartPoint) * (thickness + generator.ZSafety) * depthCoeff);
 
-            if (!IsExactlyBegin || !IsExactlyEnd)
+            if ((!IsExactlyBegin || !IsExactlyEnd) && Departure == 0)
             {
                 var gashCurve = curve.GetOffsetCurves(shift)[0] as Curve;
                 var gashList = new List<ObjectId>();
@@ -247,6 +250,15 @@ namespace CAM.TechProcesses.Sawing
             {
                 toolpathCurve = curve.GetOffsetCurves(offset)[0] as Curve;
                 toolpathCurve.TransformBy(Matrix3d.Displacement(-Vector3d.ZAxis * depth));
+
+                if (Departure > 0 && toolpathCurve is Line line)
+                {
+                    if (!IsExactlyBegin)
+                        toolpathCurve.StartPoint = line.ExpandStart(Departure);
+                    if (!IsExactlyEnd)
+                        toolpathCurve.EndPoint = line.ExpandEnd(Departure);
+                }
+
                 if (!IsExactlyBegin && !IsExactlyEnd)
                     return;
                 var indent = CalcIndent(depth * depthCoeff);

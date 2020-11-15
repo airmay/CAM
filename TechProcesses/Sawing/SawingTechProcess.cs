@@ -33,6 +33,7 @@ namespace CAM.TechProcesses.Sawing
                 .AddTool()
                 .AddParam(nameof(Frequency))
                 .AddParam(nameof(PenetrationFeed))
+                .AddParam(nameof(ZSafety))
                 .AddIndent()
                 .AddAcadObject(message: "Выберите объекты распиловки",
                     allowedTypes: $"{AcadObjectNames.Line},{AcadObjectNames.Arc},{AcadObjectNames.Lwpolyline}",

@@ -67,6 +67,10 @@ namespace CAM
 
         public static double AngleDeg(this Line line) => Math.Round(line.Angle * 180 / Math.PI, 6);
 
+        public static Point3d ExpandStart(this Line line, double value) => line.StartPoint - line.Delta.GetNormal() * value;
+
+        public static Point3d ExpandEnd(this Line line, double value) => line.EndPoint + line.Delta.GetNormal() * value;
+
         public static bool IsTurnRight(Point3d px, Point3d py, Point3d pz)
         {
             double num = 0;
