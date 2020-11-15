@@ -6,6 +6,8 @@ namespace CAM
 {
     public partial class ToolsForm : Form
     {
+        public event EventHandler LoadTools;
+
         public ToolsForm()
         {
             InitializeComponent();
@@ -28,6 +30,11 @@ namespace CAM
             dataGridView.EndEdit();
             DialogResult = DialogResult.OK;
             Close();
+        }
+
+        private void bLoad_Click(object sender, EventArgs e)
+        {
+            LoadTools?.Invoke(this, EventArgs.Empty);
         }
     }
 }

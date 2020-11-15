@@ -1,5 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Globalization;
+using System.IO;
+using System.Linq;
 using System.Windows.Forms;
 
 namespace CAM
@@ -7,30 +9,32 @@ namespace CAM
     public static class ToolService
     {
         private static ToolsForm _toolsForm;
-        private static Dictionary<MachineType, MachineSettings> _machineSettings;
-        private static Dictionary<MachineType, List<Tool>> _tools = new Dictionary<MachineType, List<Tool>>();
-
-        public static void SetMachineSettings(Dictionary<MachineType, MachineSettings> machineSettings) => _machineSettings = machineSettings;
-
-        public static void AddMachineTools(MachineType machineType, List<Tool> tools) => _tools.Add(machineType, tools);
 
         public static Tool SelectTool(MachineType machineType)
         {
             if (_toolsForm == null)
+            {
                 _toolsForm = new ToolsForm();
+                _toolsForm.LoadTools += LoadTools;
+            }
             _toolsForm.Text = $"Инструмент {machineType}";
-            _toolsForm.ToolBindingSource.DataSource = _tools[machineType];
+            _toolsForm.bLoad.Enabled = machineType == MachineType.ScemaLogic;
+            _toolsForm.ToolBindingSource.DataSource = Settings.GetTools(machineType);
 
-            if (Autodesk.AutoCAD.ApplicationServices.Application.ShowModalDialog(_toolsForm) == DialogResult.OK)
-                return (Tool)_toolsForm.ToolBindingSource.Current;
-            return null;
+            var result = Autodesk.AutoCAD.ApplicationServices.Application.ShowModalDialog(_toolsForm);
+            Settings.Save();
+
+            return result == DialogResult.OK ? (Tool)_toolsForm.ToolBindingSource.Current : null;
         }
 
         public static int CalcFrequency(Tool tool, MachineType machineType, Material material)
         {
-            var speed = material == Material.Granite ? 35 : 50;
-            var frequency = (int)Math.Round(speed * 1000 / (tool.Diameter * Math.PI) * 60);
-            return Math.Min(frequency, _machineSettings[machineType].MaxFrequency);
+            // частота для диска 400мм - на граните 1900, на мраморе 2500
+            // частота для диска 600мм - на граните 1500, на мраморе 2000
+            var f400 = material == Material.Granite ? 1900 : 2500;
+            var df = material == Material.Granite ? 1900 - 1500 : 2500 - 2000;
+            var frequency = f400 - (tool.Diameter - 400) * df / 200;
+            return Math.Min((int)frequency, Settings.GetMachineSettings(machineType).MaxFrequency);
         }
 
         public static bool Validate(Tool tool, ToolType toolType)
@@ -56,5 +60,30 @@ namespace CAM
             return message == null;
         }
 
+        private static void LoadTools(object senser, EventArgs eventArgs)
+        {
+            string path = @"\\192.168.1.59\ssd\_CUST\Utensili.csv";
+            if (!File.Exists(path))
+            {
+                Acad.Alert($"Не найден файл инструментов по адресу {path}");
+                return;
+            }
+
+            var lines = File.ReadAllLines(path)
+                .Select(p => Array.ConvertAll(p.Split(';'), k => new { result = double.TryParse(k, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture, out var value), value }))
+                .Where(p => p.Length == 4 && p.All(k => k.result) && p[2].value == 0 && p[3].value == 1)
+                .Select((p, ind) => new Tool
+                {
+                    Number = ind + 1,
+                    Type = ToolType.Disk,
+                    Diameter = p[0].value,
+                    Thickness = p[1].value
+                });
+            var tools = Settings.GetTools(MachineType.ScemaLogic);
+            tools.Clear();
+            tools.AddRange(lines);
+            _toolsForm.ToolBindingSource.DataSource = tools;
+            _toolsForm.ToolBindingSource.ResetBindings(false);
+        }
     }
 }

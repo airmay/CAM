@@ -1,6 +1,5 @@
 ﻿using Autodesk.AutoCAD.ApplicationServices;
 using Autodesk.AutoCAD.DatabaseServices;
-using Autodesk.AutoCAD.EditorInput;
 using Autodesk.AutoCAD.Runtime;
 using System;
 using System.Collections.Generic;
@@ -13,8 +12,6 @@ namespace CAM
     public class ExtensionApplication : IExtensionApplication
     {
         private Dictionary<Document, CamDocument> _documents = new Dictionary<Document, CamDocument>();
-        private Settings _settings;
-        private Dictionary<MachineType, MachineSettings> _machineSettings;
         private TechProcessFactory _techProcessFactory;
         private CamPaletteSet _camPaletteSet;
 
@@ -22,16 +19,7 @@ namespace CAM
         {
             Acad.Write($"Инициализация плагина. Версия сборки от {File.GetLastWriteTime(Assembly.GetExecutingAssembly().Location)}");
 
-            _settings = Settings.Load();
-
-            _machineSettings = _settings.MachineSettings.ToDictionary(p => p.MachineType);
-            _techProcessFactory = new TechProcessFactory(_settings);
-
-            ToolService.SetMachineSettings(_machineSettings);
-            ToolService.AddMachineTools(MachineType.ScemaLogic, _settings.ToolsScemaLogic);
-            ToolService.AddMachineTools(MachineType.Donatoni, _settings.ToolsDonatoni);
-            ToolService.AddMachineTools(MachineType.Krea, _settings.ToolsKrea);
-
+            _techProcessFactory = new TechProcessFactory();
             _camPaletteSet = new CamPaletteSet();
 
             //var manager = new CamManager();
@@ -69,7 +57,7 @@ namespace CAM
                 document.CommandWillStart += Document_CommandWillStart;
                 document.BeginDocumentClose += Document_BeginDocumentClose;
                 document.ImpliedSelectionChanged += ImpliedSelectionChanged;
-                _documents[document] = new CamDocument(_machineSettings, _techProcessFactory);
+                _documents[document] = new CamDocument(_techProcessFactory);
                 TechProcessLoader.LoadTechProsess(_documents[document]);
             }
             Acad.ClearHighlighted();
@@ -107,7 +95,7 @@ namespace CAM
 
         public void Terminate()
         {
-            Settings.Save(_settings);
+            //Settings.Save(_settings);
         }
     }
 }

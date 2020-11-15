@@ -7,13 +7,11 @@ namespace CAM
 {
     public class TechProcessFactory
     {
-        private Settings _settings;
         private Dictionary<string, Type> _techProcessNames;
         private Dictionary<Type, Dictionary<string, Type>> _techOperationTypes;
 
-        public TechProcessFactory(Settings settings)
+        public TechProcessFactory()
         {
-            _settings = settings;
             _techProcessNames = Assembly.GetExecutingAssembly().GetTypes()
                             .Where(p => p.IsClass && !p.IsAbstract && typeof(TechProcess).IsAssignableFrom(p))
                             .Select(p => new { Type = p, Attr = Attribute.GetCustomAttribute(p, typeof(MenuItemAttribute)) as MenuItemAttribute })
@@ -29,7 +27,7 @@ namespace CAM
         public TechProcess CreateTechProcess(string techProcessCaption)
         {
             var args = _techProcessNames[techProcessCaption].GetConstructors().Single().GetParameters()
-                .Select(par => typeof(Settings).GetProperties().Single(prop => prop.PropertyType == par.ParameterType).GetValue(_settings))
+                .Select(par => typeof(Settings).GetProperties().Single(prop => prop.PropertyType == par.ParameterType).GetValue(Settings.Instance))
                 .ToArray();
 
             var techProcess = (TechProcess)Activator.CreateInstance(_techProcessNames[techProcessCaption], args);

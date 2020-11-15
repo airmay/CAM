@@ -11,12 +11,10 @@ namespace CAM
         public int Hash;
         public List<TechProcess> TechProcessList { get; set; } = new List<TechProcess>();
 
-        private readonly Dictionary<MachineType, MachineSettings> _machineSettings;    
         private readonly TechProcessFactory _techProcessFactory;
 
-        public CamDocument(Dictionary<MachineType, MachineSettings> machineSettings, TechProcessFactory techProcessFactory)
+        public CamDocument(TechProcessFactory techProcessFactory)
         {
-            _machineSettings = machineSettings;
             _techProcessFactory = techProcessFactory;
         }
 
@@ -96,11 +94,11 @@ namespace CAM
                 Acad.Alert("Программа не сформирована");
                 return;
             }
-            var fileName = Acad.SaveFileDialog(techProcess.Caption, _machineSettings[techProcess.MachineType.Value].ProgramFileExtension, techProcess.MachineType.ToString());
+            var fileName = Acad.SaveFileDialog(techProcess.Caption, Settings.GetMachineSettings(techProcess.MachineType.Value).ProgramFileExtension, techProcess.MachineType.ToString());
             if (fileName != null)
                 try
                 {
-                    var contents = techProcess.ProcessCommands.Select(p => p.GetProgrammLine(_machineSettings[techProcess.MachineType.Value].ProgramLineNumberFormat)).ToArray();
+                    var contents = techProcess.ProcessCommands.Select(p => p.GetProgrammLine(Settings.GetMachineSettings(techProcess.MachineType.Value).ProgramLineNumberFormat)).ToArray();
                     File.WriteAllLines(fileName, contents);
                     Acad.Write($"Создан файл {fileName}");
                 }
