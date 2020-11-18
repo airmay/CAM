@@ -76,7 +76,7 @@ namespace CAM
             {
                 if (CurrentProcessCommand.ToolpathObjectId.HasValue)
                 {
-                    App.LockAndExecute(() => CurrentProcessCommand.ToolpathObjectId.Value.QOpenForWrite<Curve>(p => p.Visible = true));
+                    Acad.Show(CurrentProcessCommand.ToolpathObjectId.Value);
                     Acad.SelectObjectIds(CurrentProcessCommand.ToolpathObjectId.Value);
                 }
                 Acad.RegenToolObject(CurrentTechProcess.Tool, CurrentProcessCommand.HasTool, CurrentProcessCommand.ToolLocation, CurrentTechProcess.MachineType == MachineType.Donatoni);  //Settongs.IsFrontPlaneZero
@@ -137,16 +137,18 @@ namespace CAM
                         .Concat(_techOperationItems[CurrentTechProcess.GetType()]).ToArray());                
                 RefreshToolButtonsState();
             }
+            RefreshParamsView();
+
             if (IsToolpathVisible)
             {
                 if (treeView.SelectedNode.Tag is TechOperation oper)
                 {
-                    CurrentTechProcess.ToolpathObjectsGroup?.SetVisibility(false);
-                    oper.ToolpathObjectsGroup?.SetVisibility(true);
+                    CurrentTechProcess.ToolpathObjectsGroup?.SetGroupVisibility(false);
+                    oper.ToolpathObjectsGroup?.SetGroupVisibility(true);
                 }
                 else
                 {
-                    CurrentTechProcess.ToolpathObjectsGroup?.SetVisibility(true);
+                    CurrentTechProcess.ToolpathObjectsGroup?.SetGroupVisibility(true);
                 }
                 Acad.Editor.UpdateScreen();
             }
@@ -163,8 +165,6 @@ namespace CAM
                 processCommandBindingSource.Position = 0;
 
             processCommandBindingSource.DataSource = CurrentTechProcess.ProcessCommands;
-
-            RefreshParamsView();
         }
 
         private void treeView_NodeMouseDoubleClick(object sender, TreeNodeMouseClickEventArgs e)
@@ -298,7 +298,7 @@ namespace CAM
 
             if (IsToolpathVisible)
             {
-                CurrentTechProcess.ToolpathObjectsGroup?.SetVisibility(true);
+                CurrentTechProcess.ToolpathObjectsGroup?.SetGroupVisibility(true);
                 Acad.Editor.UpdateScreen();
             }
         }
@@ -312,8 +312,8 @@ namespace CAM
 
         private void bVisibility_Click(object sender, EventArgs e)
         {
-            CurrentTechProcess.ToolpathObjectsGroup?.SetVisibility(IsToolpathVisible);
-            CurrentTechProcess.ExtraObjectsGroup?.SetVisibility(IsToolpathVisible);
+            CurrentTechProcess.ToolpathObjectsGroup?.SetGroupVisibility(IsToolpathVisible);
+            CurrentTechProcess.ExtraObjectsGroup?.SetGroupVisibility(IsToolpathVisible);
             Acad.Editor.UpdateScreen();
         }
 

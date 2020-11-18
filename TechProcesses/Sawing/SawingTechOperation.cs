@@ -79,15 +79,14 @@ namespace CAM.TechProcesses.Sawing
         public override void BuildProcessing(CommandGeneratorBase generator)
         {
             const int CornerIndentIncrease = 5;
-            var techProcess = (SawingTechProcess)TechProcess;
             var curve = ProcessingArea.GetCurve();
-            var thickness = techProcess.Thickness.Value + 2; // запил на 2мм ниже нижнего края 
-            var toolDiameter = techProcess.Tool.Diameter;
+            var thickness = TechProcess.Thickness.Value + 2; // запил на 2мм ниже нижнего края 
+            var toolDiameter = TechProcess.Tool.Diameter;
             var engineSide = Side.None;
             double offsetArc = 0;
             double angleA = 0;
 
-            if (techProcess.MachineType == MachineType.ScemaLogic)
+            if (TechProcess.MachineType == MachineType.ScemaLogic)
                 AngleA = 0;
 
             switch (curve)
@@ -108,8 +107,8 @@ namespace CAM.TechProcesses.Sawing
             var outerSideSign = OuterSide == Side.Left ^ curve is Line ? -1 : 1;
             var offsetCoeff = Math.Tan(angleA) * outerSideSign;
             var depthCoeff = 1 / Math.Cos(angleA);
-            var toolThickness = techProcess.Tool.Thickness.Value * depthCoeff;
-            var compensation = (offsetArc + (engineSide == OuterSide ^ techProcess.MachineType == MachineType.Donatoni ? toolThickness : 0)) * outerSideSign;
+            var toolThickness = TechProcess.Tool.Thickness.Value * depthCoeff;
+            var compensation = (offsetArc + (engineSide == OuterSide ^ TechProcess.MachineType == MachineType.Donatoni ? toolThickness : 0)) * outerSideSign;
             var shift = angleA > 0 ? -thickness * offsetCoeff : 0;
 
             var sumIndent = CalcIndent(thickness) * (Convert.ToInt32(IsExactlyBegin) + Convert.ToInt32(IsExactlyEnd));
@@ -120,7 +119,7 @@ namespace CAM.TechProcesses.Sawing
                 var point = Scheduling();
                 var angle = BuilderUtils.CalcToolAngle((curve.EndPoint - curve.StartPoint).ToVector2d().Angle, engineSide);
                 generator.Move(point.X, point.Y, angleC: angle);
-                generator.Cutting(point.X, point.Y, point.Z, techProcess.PenetrationFeed);
+                generator.Cutting(point.X, point.Y, point.Z, TechProcess.PenetrationFeed);
                 return;
             }
 
@@ -140,10 +139,10 @@ namespace CAM.TechProcesses.Sawing
                     var p0 = point + vector;
                     var angleC = BuilderUtils.CalcToolAngle(toolpathCurve, point, engineSide);
                     generator.Move(p0.X, p0.Y, angleC: angleC, angleA: Math.Abs(AngleA));
-                    if (techProcess.MachineType == MachineType.ScemaLogic)
+                    if (TechProcess.MachineType == MachineType.ScemaLogic)
                         generator.Command("28;;XYCZ;;;;;;", "Цикл");
                 }
-                generator.Cutting(toolpathCurve, item.Value, techProcess.PenetrationFeed, engineSide);
+                generator.Cutting(toolpathCurve, item.Value, TechProcess.PenetrationFeed, engineSide);
             }
             generator.Uplifting(Vector3d.ZAxis.RotateBy(outerSideSign * angleA, toolpathCurve.EndPoint - toolpathCurve.StartPoint) * (thickness + generator.ZSafety) * depthCoeff);
 
@@ -156,7 +155,7 @@ namespace CAM.TechProcesses.Sawing
                 if (!IsExactlyEnd)
                     gashList.Add(Acad.CreateGash(gashCurve, gashCurve.EndPoint, OuterSide, thickness * depthCoeff, toolDiameter, toolThickness));
                 if (gashList.Count > 0)
-                    Modify.AppendToGroup(TechProcess.ExtraObjectsGroup.Value, gashList.ToArray());
+                    Modify.AppendToGroup(base.TechProcess.ExtraObjectsGroup.Value, gashList.ToArray());
                 gashCurve.Dispose();
             }
 
@@ -174,14 +173,14 @@ namespace CAM.TechProcesses.Sawing
 
                 if (cornersOneSide < 0) //  дуга пересекает углы 90 или 270 градусов
                 {
-                    if (techProcess.MachineType == MachineType.ScemaLogic)
+                    if (TechProcess.MachineType == MachineType.ScemaLogic)
                         throw new InvalidOperationException("Обработка дуги невозможна - дуга пересекает угол 90 или 270 градусов.");
 
                     engineSide = startSide > 0 ? Side.Left : Side.Right;
                 }
                 if (OuterSide == Side.Left) // внутренний рез дуги
                 {
-                    if (techProcess.MachineType == MachineType.Donatoni && engineSide != Side.Left) // подворот диска при вн. резе дуги
+                    if (TechProcess.MachineType == MachineType.Donatoni && engineSide != Side.Left) // подворот диска при вн. резе дуги
                     {
                         engineSide = Side.Right;
                         //var comp = arc.Radius - Math.Sqrt(arc.Radius * arc.Radius - thickness * (toolDiameter - thickness));
@@ -226,7 +225,7 @@ namespace CAM.TechProcesses.Sawing
 
                     if (s != sign)
                     {
-                        if (techProcess.MachineType == MachineType.ScemaLogic)
+                        if (TechProcess.MachineType == MachineType.ScemaLogic)
                             throw new InvalidOperationException("Обработка полилинии невозможна - кривая пересекает углы 90 или 270 градусов.");
                         var side = sign > 0 ^ bulge < 0 ? Side.Left : Side.Right;
                         if (engineSide != Side.None)

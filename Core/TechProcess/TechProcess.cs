@@ -52,7 +52,13 @@ namespace CAM
             if (OriginX != 0 || OriginY != 0)
                 OriginObject = Acad.CreateOriginObject(new Point3d(OriginX, OriginY, 0));
 
-            TechOperations.ForEach(p => p.TechProcessBase = this);
+            AcadObject.LoadAcadProps(this);
+
+            TechOperations.ForEach(p =>
+            {
+                AcadObject.LoadAcadProps(p);
+                p.TechProcessBase = this;
+            });
         }
 
         public virtual void BuildProcessing()

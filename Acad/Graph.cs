@@ -1,5 +1,6 @@
 ﻿using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
+using Autodesk.AutoCAD.Internal.PropertyInspector;
 using Dreambuild.AutoCAD;
 using System;
 using System.Collections.Generic;
@@ -12,7 +13,12 @@ namespace CAM
     /// </summary>
     public static class Graph
     {
-        public static string GetDesc(this ObjectId id) => Autodesk.AutoCAD.Internal.PropertyInspector.ObjectPropertyManagerProperties.GetDisplayName(id);
+        public static string GetDesc(this ObjectId id)
+        {
+            if (id.IsErased)
+                Acad.RecoveryObject(id);
+            return ObjectPropertyManagerProperties.GetDisplayName(id);
+        }
 
         public static string GetDesc(this IEnumerable<ObjectId> ids) => string.Join(",",
             ids.GroupBy(p => p.GetDesc(), (k, c) => new { name = $"{k}({c.Count()})", count = c.Count() }).OrderByDescending(p => p.count).Select(p => p.name));

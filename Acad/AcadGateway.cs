@@ -77,7 +77,34 @@ namespace CAM
             return ids.Any() ? ids.QOpenForRead<Curve>() : Array.Empty<Curve>();
         }
 
-        public static void SetVisibility(this ObjectId groupId, bool value)
+        public static Curve OpenForRead(ObjectId id)
+        {
+            if (id.IsErased)
+                RecoveryObject(id);
+            return id.QOpenForRead<Curve>();
+        }
+
+        public static void Show(ObjectId id)
+        {
+            if (id.IsErased)
+                RecoveryObject(id);
+            App.LockAndExecute(() => id.QOpenForWrite<Curve>(p => p.Visible = true));
+        }
+
+        public static void RecoveryObject(ObjectId id)
+        {
+            App.LockAndExecute(() =>
+            {
+                using (var trans = id.Database.TransactionManager.StartTransaction())
+                {
+                    var ent = (Entity)trans.GetObject(id, OpenMode.ForWrite, true);
+                    ent.Erase(false);
+                    trans.Commit();
+                }
+            });
+        }
+
+        public static void SetGroupVisibility(this ObjectId groupId, bool value)
         {
             App.LockAndExecute(() => groupId.QOpenForWrite<Group>(p => p.SetVisibility(value)));
         }

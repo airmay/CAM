@@ -1,5 +1,4 @@
 ﻿using Autodesk.AutoCAD.DatabaseServices;
-using Dreambuild.AutoCAD;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,9 +23,43 @@ namespace CAM
 
         public static List<AcadObject> CreateList(IEnumerable<ObjectId> ids) => ids.Select(p => new AcadObject(p)).ToList();
 
-        public ObjectId ObjectId => (_objectId ?? (_objectId = Acad.Database.GetObjectId(false, new Handle(Handle), 0))).Value;
+        public static void LoadAcadProps(object @object)
+        {
+            bool err = false;
+            var properties = @object.GetType().GetProperties();
+            foreach (var prop in properties.Where(p => p.PropertyType == typeof(AcadObject)))
+            {
+                var acadObject = (AcadObject)prop.GetValue(@object);
+                if (!acadObject.TryLoadObject())
+                {
+                    prop.SetValue(@object, null);
+                    err = true;
+                }
+            }
+            foreach (var prop in properties.Where(p => p.PropertyType == typeof(List<AcadObject>)))
+            {
+                var acadObjects = (List<AcadObject>)prop.GetValue(@object);
+                if (!acadObjects.All(p => p.TryLoadObject()))
+                {
+                    prop.SetValue(@object, null);
+                    err = true;
+                }
+            }
+            if (err)
+                Acad.Alert("Используемые в техпроцессе объекты чертежа были удалены");
+        }
 
-        public Curve GetCurve() => ObjectId.QOpenForRead<Curve>();
+        private bool TryLoadObject()
+        {
+            var result = Acad.Database.TryGetObjectId(new Handle(Handle), out var id);
+            if (result)
+                _objectId = id;
+            return result;
+        }
+
+        public ObjectId ObjectId => _objectId.Value;
+
+        public Curve GetCurve() => Acad.OpenForRead(ObjectId);
 
         public string GetDesc() => ObjectId.GetDesc();
     }
