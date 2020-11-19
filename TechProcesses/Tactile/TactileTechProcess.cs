@@ -33,6 +33,8 @@ namespace CAM.TechProcesses.Tactile
 
         public int TransitionFeed { get; set; }
 
+        public double Delta { get; set; }
+
         public TactileTechProcess()
         {
             Material = CAM.Material.Granite;
@@ -50,6 +52,7 @@ namespace CAM.TechProcesses.Tactile
                 .AddParam(nameof(PenetrationFeed))
                 .AddOrigin()
                 .AddIndent()
+                .AddParam(nameof(Delta), "Припуск от конуса")
                 .AddAcadObject(nameof(ProcessingArea), "Контур плитки", "Выберите объекты контура плитки", AcadObjectNames.Line)
                 .AddAcadObject(nameof(Objects), "2 элемента плитки", "Выберите 2 элемента плитки",
                     afterSelect: ids =>
@@ -93,7 +96,6 @@ namespace CAM.TechProcesses.Tactile
             {
                 var radius = circles.Max(p => p.Radius);
                 circles = circles.Where(p => p.Radius == radius).ToArray();
-                const double Delta = 1;
                 radius += Delta;
                 var vector = circles[1].Center - circles[0].Center;
                 var center = (circles[1].Center.X < circles[0].Center.X ? circles[1] : circles[0]).Center;

@@ -16,8 +16,12 @@ namespace CAM.TechProcesses.Tactile
 
         public int CuttingFeed { get; set; }
 
+        public ChamfersTechOperation() { }
+
         public ChamfersTechOperation(TactileTechProcess techProcess, string caption, int? processingAngle, double? bandStart)
         {
+            Setup(techProcess, caption);
+
             BandStart = bandStart ?? techProcess.BandStart1.Value;
             ProcessingAngle = processingAngle ?? techProcess.ProcessingAngle1.Value;
         }

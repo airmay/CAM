@@ -23,14 +23,18 @@ namespace CAM.TechProcesses.Tactile
 
         public double Depth { get; set; }
 
-        public ConesTechOperation(TactileTechProcess techProcess, string name)
+        public ConesTechOperation() { }
+
+        public ConesTechOperation(TactileTechProcess techProcess, string caption)
         {
+            Setup(techProcess, caption);
+
             FeedMax = 200;
             FeedMin = 80;
             Frequency = 5000;
             ZSafety = 5;
             ZEntry = 1;
-            Depth = ((TactileTechProcess)TechProcess).Depth;
+            Depth = techProcess.Depth;
         }
 
         public static void ConfigureParamsView(ParamsView view)

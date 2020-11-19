@@ -30,7 +30,7 @@ namespace CAM
             foreach (var prop in properties.Where(p => p.PropertyType == typeof(AcadObject)))
             {
                 var acadObject = (AcadObject)prop.GetValue(@object);
-                if (!acadObject.TryLoadObject())
+                if (acadObject != null && !acadObject.LoadObject())
                 {
                     prop.SetValue(@object, null);
                     err = true;
@@ -39,7 +39,7 @@ namespace CAM
             foreach (var prop in properties.Where(p => p.PropertyType == typeof(List<AcadObject>)))
             {
                 var acadObjects = (List<AcadObject>)prop.GetValue(@object);
-                if (!acadObjects.All(p => p.TryLoadObject()))
+                if (acadObjects != null && !acadObjects.All(p => p.LoadObject()))
                 {
                     prop.SetValue(@object, null);
                     err = true;
@@ -49,7 +49,7 @@ namespace CAM
                 Acad.Alert("Используемые в техпроцессе объекты чертежа были удалены");
         }
 
-        private bool TryLoadObject()
+        private bool LoadObject()
         {
             var result = Acad.Database.TryGetObjectId(new Handle(Handle), out var id);
             if (result)

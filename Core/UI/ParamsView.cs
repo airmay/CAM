@@ -286,7 +286,7 @@ namespace CAM
 
             var textBox = selector.Controls[0];
             BindingSource.DataSourceChanged += (s, e) => RefreshText();
-            textBox.Enter += (s, e) => Acad.SelectObjectIds((ObjectId[])originObject.GetValue(ParamsObject));
+            textBox.Enter += (s, e) => Acad.SelectObjectIds((ObjectId[])originObject?.GetValue(ParamsObject));
 
             var button = selector.Controls[1];
             button.Click += (s, e) =>

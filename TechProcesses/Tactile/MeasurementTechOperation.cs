@@ -36,6 +36,8 @@ namespace CAM.TechProcesses.Tactile
         [NonSerialized]
         public ObjectId[] PointObjectIds;
 
+        public MeasurementTechOperation() { }
+
         protected override void Init()
         {
             Thickness = TechProcess.Thickness;

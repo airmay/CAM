@@ -31,7 +31,7 @@ namespace CAM.TechProcesses.Tactile
 
         public bool IsEdgeProcessing { get; set; }
 
-        //public BandsTechOperation() { }
+        public BandsTechOperation() { }
 
         public BandsTechOperation(TactileTechProcess techProcess, string caption, int? processingAngle, double? bandStart)
         {
