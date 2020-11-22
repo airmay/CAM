@@ -22,8 +22,14 @@ namespace CAM.TechProcesses.Tactile
         {
             Setup(techProcess, caption);
 
-            BandStart = bandStart ?? techProcess.BandStart1.Value;
-            ProcessingAngle = processingAngle ?? techProcess.ProcessingAngle1.Value;
+            BandStart = bandStart ?? BandStart;
+            ProcessingAngle = processingAngle ?? ProcessingAngle;
+        }
+
+        public override void Init()
+        {
+            BandStart = TechProcess.BandStart1.Value;
+            ProcessingAngle = TechProcess.ProcessingAngle1.Value;
         }
 
         public static void ConfigureParamsView(ParamsView view)

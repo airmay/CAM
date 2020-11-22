@@ -28,13 +28,16 @@ namespace CAM.TechProcesses.Tactile
         public ConesTechOperation(TactileTechProcess techProcess, string caption)
         {
             Setup(techProcess, caption);
+        }
 
+        public override void Init()
+        { 
             FeedMax = 200;
             FeedMin = 80;
             Frequency = 5000;
             ZSafety = 5;
             ZEntry = 1;
-            Depth = techProcess.Depth;
+            Depth = TechProcess.Depth;
         }
 
         public static void ConfigureParamsView(ParamsView view)

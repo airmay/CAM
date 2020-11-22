@@ -38,7 +38,7 @@ namespace CAM
         /// </summary>
         public AcadObject ProcessingArea { get; set; }
 
-        public virtual void Setup(TechProcess techProcess, string caption)
+        public void Setup(TechProcess techProcess, string caption)
         {
             TechProcessBase = techProcess;
             TechProcessBase.TechOperations.Add(this);
@@ -47,8 +47,10 @@ namespace CAM
             Init();
         }
 
-        protected virtual void Init() { }
-        
+        public virtual void Init() { }
+
+        public virtual void SerializeInit() { }
+
         public abstract void BuildProcessing(CommandGeneratorBase generator);
 
         public virtual void PrepareBuild(CommandGeneratorBase generator) { }

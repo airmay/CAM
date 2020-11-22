@@ -37,11 +37,17 @@ namespace CAM.TechProcesses.Tactile
         {
             Setup(techProcess, caption);
 
-            BandWidth = techProcess.BandWidth.Value;
-            BandSpacing = techProcess.BandSpacing.Value;
-            BandStart = bandStart ?? techProcess.BandStart1.Value;
-            ProcessingAngle = processingAngle ?? techProcess.ProcessingAngle1.Value;
-            Depth = techProcess.Depth;
+            BandStart = bandStart ?? BandStart;
+            ProcessingAngle = processingAngle ?? ProcessingAngle;
+        }
+
+        public override void Init()
+        {
+            BandWidth = TechProcess.BandWidth.Value;
+            BandSpacing = TechProcess.BandSpacing.Value;
+            BandStart = TechProcess.BandStart1.Value;
+            ProcessingAngle = TechProcess.ProcessingAngle1.Value;
+            Depth = TechProcess.Depth;
             MaxCrestWidth = (TechProcess.Tool?.Thickness).GetValueOrDefault();
             IsEdgeProcessing = true;
         }
@@ -116,9 +122,9 @@ namespace CAM.TechProcesses.Tactile
                 if (ProcessingAngle == 45 ^ TechProcess.MachineType == MachineType.Donatoni)
                     Cutting(0.8 * thickness, CuttingFeed, -thickness);
 
-                if (offset > 0)
+                if (offset > -0.5 * thickness)
                 {
-                    var count = (int)Math.Ceiling(offset / (0.8 * thickness));
+                    var count = offset > 0 ? (int)Math.Ceiling(offset / (0.8 * thickness)) : 1;
                     Algorithms.Range(-0.8 * thickness * count, -0.1, 0.8 * thickness).ForEach(p => Cutting(offset + PassList[0].Pos + p, CuttingFeed));
                 }
             }

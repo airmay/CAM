@@ -36,11 +36,8 @@ namespace CAM.TechProcesses.Tactile
         [NonSerialized]
         public ObjectId[] PointObjectIds;
 
-        public MeasurementTechOperation() { }
-
-        protected override void Init()
+        public override void SerializeInit()
         {
-            Thickness = TechProcess.Thickness;
             PointObjectIds = PointsX.SelectMany((p, i) => Acad.CreateMeasurementPoint(new Point3d(PointsX[i], PointsY[i], 0))).ToArray();
         }
 
@@ -80,7 +77,7 @@ namespace CAM.TechProcesses.Tactile
                     {
                         generator.GCommand(CommandNames.Fast, 0, x: PointsX[i] + 230, y: PointsY[i] - 100 - TechProcess.Tool.Thickness.GetValueOrDefault());
                         generator.ToolLocation.Point -= new Vector3d(0, 0, 1);
-                        generator.GCommand("", 0, z: TechProcess.Thickness.GetValueOrDefault() + TechProcess.ZSafety);
+                        generator.GCommand("", 0, z: Thickness.GetValueOrDefault() + TechProcess.ZSafety);
 
                         generator.Command("M131");
                         generator.Command($"DBL THICK{i} = %TastL.ZLastra - %TastL.ZBanco", "Измерение");
@@ -95,7 +92,7 @@ namespace CAM.TechProcesses.Tactile
                     {
                         generator.GCommand(CommandNames.Fast, 0, x: PointsX[i] + 230, y: PointsY[i] - 100 - TechProcess.Tool.Thickness.GetValueOrDefault());
                         generator.ToolLocation.Point -= new Vector3d(0, 0, 1);
-                        generator.GCommand("", 0, z: TechProcess.Thickness.GetValueOrDefault() + TechProcess.ZSafety);
+                        generator.GCommand("", 0, z: Thickness.GetValueOrDefault() + TechProcess.ZSafety);
 
                         generator.Command("M131");
                         generator.Command($"DBL THICK{i} = %TastL.ZLastra - %TastL.ZBanco", "Измерение");

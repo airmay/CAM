@@ -49,9 +49,9 @@ namespace CAM.TechProcesses.Sawing
                     : view.GetParams<SawingTechProcess>().SawingTechProcessParams.SawingCurveModes;
         }
 
-        public override void Setup()
+        public override void SerializeInit()
         {
-            base.Setup();
+            base.SerializeInit();
             CreateExtraObjects();
         }
 

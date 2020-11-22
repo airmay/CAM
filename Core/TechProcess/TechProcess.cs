@@ -47,7 +47,7 @@ namespace CAM
         [NonSerialized]
         public ObjectId? ExtraObjectsGroup;
        
-        public virtual void Setup()
+        public virtual void SerializeInit()
         {
             if (OriginX != 0 || OriginY != 0)
                 OriginObject = Acad.CreateOriginObject(new Point3d(OriginX, OriginY, 0));
@@ -58,6 +58,7 @@ namespace CAM
             {
                 AcadObject.LoadAcadProps(p);
                 p.TechProcessBase = this;
+                p.SerializeInit();
             });
         }
 
