@@ -92,8 +92,8 @@
     <Compile Include="Acad\AcadObjectNames.cs" />
     <Compile Include="Core\CamDocument.cs" />
     <Compile Include="Core\UI\MenuItemAttribute.cs" />
-    <Compile Include="Core\TechProcess\TechOperation.cs" />
-    <Compile Include="Core\TechProcess\TechProcess.cs" />
+    <Compile Include="Core\TechOperation.cs" />
+    <Compile Include="Core\TechProcess.cs" />
     <Compile Include="Core\UI\ParamsView.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -164,8 +164,8 @@
     </Compile>
     <Compile Include="TechProcesses\Tactile\TactileTechProcess.cs" />
     <Compile Include="TechProcesses\Tactile\TactileTechProcessParams.cs" />
-    <Compile Include="Core\TechProcess\TechProcessFactory.cs" />
-    <Compile Include="Core\TechProcess\TechProcessLoader.cs" />
+    <Compile Include="Core\TechProcessFactory.cs" />
+    <Compile Include="Core\TechProcessLoader.cs" />
     <Compile Include="PaletteSet\CamPaletteSet.cs" />
     <Compile Include="Program\CommandNames.cs" />
     <Compile Include="Core\Enums\Corner.cs" />
