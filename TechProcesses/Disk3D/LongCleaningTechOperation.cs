@@ -19,8 +19,6 @@ namespace CAM.TechProcesses.Disk3D
 
         public double StepY { get; set; }
 
-        public double StepPass { get; set; }
-
         public double Delta { get; set; }
 
         public double StepX1 { get; set; }
@@ -50,7 +48,6 @@ namespace CAM.TechProcesses.Disk3D
             view.AddParam(nameof(StepX1), "Шаг X1")
                 .AddParam(nameof(StepX2), "Шаг X2")
                 .AddParam(nameof(StepY), "Шаг Y")
-                .AddParam(nameof(StepPass))
                 .AddParam(nameof(StepZ), "Шаг Z")
                 .AddIndent()
                 .AddParam(nameof(Departure))
@@ -299,16 +296,16 @@ namespace CAM.TechProcesses.Disk3D
             {
                 lastPassDist++;
 
-                if (lastPassDist >= maxDist)
+                if (lastPassDist > maxDist)
                 {
-                    AddPass(i);
+                    AddPass(i-1);
                     continue;
                 }
                 for (int j = 0; j < zArray.GetLength(1); j++)
                 {
                     if (passZArray[i][j].HasValue && passZArray[lastPassIndex][j].HasValue && Math.Abs(passZArray[i][j].Value - passZArray[lastPassIndex][j].Value) > StepZ)
                     {
-                        AddPass(i);
+                        AddPass(i-1);
                         break;
                     }
                 }
@@ -316,11 +313,11 @@ namespace CAM.TechProcesses.Disk3D
             if (_disk3DTechProcess.IsExactlyEnd && lastPassIndex != passZArray.Length - 1)
                 AddPass(passZArray.Length - 1);
 
-            void AddPass(int i)
+            void AddPass(int index)
             {
-                var y = minPoint.Y + i * StepY;
-                passList.Add(passZArray[i].Select((z, ind) => new {z, ind}).Where(p => p.z.HasValue).Select(p => new Point3d(minPoint.X + p.ind * StepX2, y, minPoint.Z + p.z.Value)).ToList());
-                lastPassIndex = i;
+                var y = minPoint.Y + index * StepY;
+                passList.Add(passZArray[index].Select((z, ind) => new {z, ind}).Where(p => p.z.HasValue).Select(p => new Point3d(minPoint.X + p.ind * StepX2, y, minPoint.Z + p.z.Value)).ToList());
+                lastPassIndex = index + 1;
                 lastPassDist = 0;
             }
         

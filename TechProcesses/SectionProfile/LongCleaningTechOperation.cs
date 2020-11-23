@@ -12,6 +12,8 @@ namespace CAM.TechProcesses.SectionProfile
 
         public double StepYmin { get; set; }
 
+        public double? StepYmax { get; set; }
+
         public double StartY { get; set; }
 
         public double Delta { get; set; }
@@ -29,6 +31,7 @@ namespace CAM.TechProcesses.SectionProfile
         public static void ConfigureParamsView(ParamsView view)
         {
             view.AddParam(nameof(StepYmin), "Шаг Y мин.")
+                .AddParam(nameof(StepYmax), "Шаг Y макс.")
                 .AddParam(nameof(StartY), "Y начала")
                 .AddParam(nameof(StepZmax), "Шаг Z макс.")
                 .AddIndent()
@@ -81,27 +84,27 @@ namespace CAM.TechProcesses.SectionProfile
             }
 
             var thicknessCnt = (int)(toolThickness / StepYmin) + 1;
-            var coeff = toolThickness * 0.8 / StepYmin;
+            var coeff = (StepYmax ?? toolThickness * 0.8) / StepYmin;
             var lastY = yArray[0];
             var lastI = 1 - thicknessCnt;
 
-            for (int i = 0; i < count; i++)
+            for (int i = -thicknessCnt; i < count; i++)
             {
                 //if (i * StepYmin < StartY)
                 //    continue;
 
-                var y = double.NegativeInfinity;
+                double? y = null;
                 for (int j = 0; j < thicknessCnt && i + j < count; j++)
-                    if (i + j >= 0 && yArray[i + j] > y)
+                    if (i + j >= 0 && (!y.HasValue || yArray[i + j] > y))
                         y = yArray[i + j];
 
-                if (Math.Abs(y - lastY) >= StepZmax || i - lastI >= coeff)
+                if (y.HasValue && (Math.Abs(y.Value - lastY) >= StepZmax || i - lastI >= coeff))
                 {
-                    generator.Cutting(startPass + crossVector * (profileX[1] - i * StepYmin - shift) + y * Vector3d.ZAxis, passVector, CuttingFeed, sectionProfile.PenetrationFeed);
+                    generator.Cutting(startPass + crossVector * (profileX[1] - i * StepYmin - shift) + y.Value * Vector3d.ZAxis, passVector, CuttingFeed, sectionProfile.PenetrationFeed);
                     if (IsUplifting)
                         generator.Uplifting();
 
-                    lastY = y;
+                    lastY = y.Value;
                     lastI = i;
                 }
             }
