@@ -1,6 +1,6 @@
 ﻿namespace CAM
 {
-    partial class TechProcessView
+    partial class CamView
     {
         /// <summary> 
         /// Required designer variable.

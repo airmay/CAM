@@ -197,11 +197,11 @@
     <Compile Include="PaletteSet\PullingView.Designer.cs">
       <DependentUpon>PullingView.cs</DependentUpon>
     </Compile>
-    <Compile Include="Core\UI\TechProcessView.cs">
+    <Compile Include="Core\UI\CamView.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Core\UI\TechProcessView.Designer.cs">
-      <DependentUpon>TechProcessView.cs</DependentUpon>
+    <Compile Include="Core\UI\CamView.Designer.cs">
+      <DependentUpon>CamView.cs</DependentUpon>
     </Compile>
   </ItemGroup>
   <ItemGroup>
@@ -231,8 +231,8 @@
     <EmbeddedResource Include="TechProcesses\Tactile\Bands\PassListControl.resx">
       <DependentUpon>PassListControl.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Core\UI\TechProcessView.resx">
-      <DependentUpon>TechProcessView.cs</DependentUpon>
+    <EmbeddedResource Include="Core\UI\CamView.resx">
+      <DependentUpon>CamView.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Core\Tool\ToolsForm.resx">
       <DependentUpon>ToolsForm.cs</DependentUpon>

@@ -8,14 +8,14 @@ using System.Windows.Forms;
 
 namespace CAM
 {
-    public partial class TechProcessView : UserControl
+    public partial class CamView : UserControl
     {
 	    private CamDocument _camDocument;
         private Type _currentTechProcessType;
         private TechProcess CurrentTechProcess => (treeView.SelectedNode?.Parent ?? treeView.SelectedNode)?.Tag as TechProcess;
         private ProcessCommand CurrentProcessCommand => processCommandBindingSource.Current as ProcessCommand;
 
-        public TechProcessView()
+        public CamView()
         {
             InitializeComponent();
 

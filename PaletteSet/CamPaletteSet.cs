@@ -6,7 +6,7 @@ namespace CAM
 {
     public class CamPaletteSet
     {
-        private TechProcessView _techProcessView { get; } = new TechProcessView();
+        private CamView _techProcessView { get; } = new CamView();
 
         public CamPaletteSet()
         {
