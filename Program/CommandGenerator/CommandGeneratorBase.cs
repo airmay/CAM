@@ -20,7 +20,7 @@ namespace CAM
         protected int _frequency;
 
         private const int UpperZ = 100;
-        private bool _isEngineStarted = false;
+        public bool _isEngineStarted = false;
 
         private DocumentLock _documentLock;
         private Transaction _transaction;
@@ -43,6 +43,10 @@ namespace CAM
         public bool WithThick { get; set; }
         public Location ToolLocation { get; set; } = new Location();
         public string ThickCommand { get; set; }
+        public int CuttingFeed { get; set; }
+        public int SmallFeed { get; set; }
+        public Side EngineSide { get; set; }
+        public double? AngleA { get; set; }
 
         public void StartTechProcess(TechProcess techProcess)
         {
@@ -130,13 +134,13 @@ namespace CAM
         /// <summary>
         /// Подвод
         /// </summary>
-        public void Move(double? x = null, double? y = null, double? z = null, double? angleC = null, double angleA = 0)
+        public void Move(double? x = null, double? y = null, double? z = null, double? angleC = null, double? angleA = null)
         {
             GCommand(_isEngineStarted ? CommandNames.Fast : CommandNames.InitialMove, 0, x: x, y: y, z: z, angleC: angleC);
             if (!_isEngineStarted)
                 GCommand(CommandNames.InitialMove, 0, z: ZSafety);
 
-            if (angleA != ToolLocation.AngleA)
+            if ((angleA ?? AngleA) != ToolLocation.AngleA)
                 GCommand("Наклон", 1, angleA: angleA, feed: 500);
 
             if (!_isEngineStarted)
@@ -146,7 +150,7 @@ namespace CAM
             }
         }
 
-        public void Transition(double? x = null, double? y = null, double? z = null, int? feed = null) => GCommand(CommandNames.Transition, 1, x: x, y: y, z: z);
+        public void Transition(double? x = null, double? y = null, double? z = null, int? feed = null) => GCommand(CommandNames.Transition, 1, x: x, y: y, z: z, feed: feed ?? SmallFeed);
 
         protected abstract void StartEngineCommands();
 
@@ -158,17 +162,17 @@ namespace CAM
         /// <summary>
         /// Рез между точками
         /// </summary>
-        public void Cutting(Point3d startPoint, Point3d endPoint, int cuttingFeed, int transitionFeed, double angleA = 0) => Cutting(NoDraw.Line(startPoint, endPoint), cuttingFeed, transitionFeed, angleA: angleA);
+        public void Cutting(Point3d startPoint, Point3d endPoint, int cuttingFeed, int transitionFeed, double? angleA = null) => Cutting(NoDraw.Line(startPoint, endPoint), cuttingFeed, transitionFeed, angleA: angleA);
 
-        public void Cutting(Point3d startPoint, Vector3d delta, int cuttingFeed, int smallFeed) => Cutting(startPoint, startPoint + delta, cuttingFeed, smallFeed);
+        public void Cutting(Point3d startPoint, Vector3d delta, int cuttingFeed, int smallFeed, double? angleA = null) => Cutting(startPoint, startPoint + delta, cuttingFeed, smallFeed, angleA);
 
-        public void Cutting(Point3d startPoint, Vector3d delta, double[] zArray, int cuttingFeed, int smallFeed, Side engineSide = Side.None, double? angleC = null, double angleA = 0)
+        public void Cutting(Point3d startPoint, Vector3d delta, double[] zArray, int cuttingFeed, int smallFeed, Side engineSide = Side.None, double? angleC = null, double? angleA = null)
         {
             using (var line = NoDraw.Line(startPoint, startPoint + delta))
                 Cutting(line, zArray, cuttingFeed, smallFeed, engineSide, angleC, angleA);
         }
 
-        public void Cutting(Curve curve, double[] zArray, int cuttingFeed, int smallFeed, Side engineSide = Side.None, double? angleC = null, double angleA = 0)
+        public void Cutting(Curve curve, double[] zArray, int cuttingFeed, int smallFeed, Side engineSide = Side.None, double? angleC = null, double? angleA = null)
         {
             foreach (var z in zArray)
             {
@@ -178,19 +182,27 @@ namespace CAM
             }
         }
 
+        public void Cutting(Curve curve, double offset = 0, double? dz = null, double? angleA = null)
+        {
+            var toolpathCurve = curve.GetOffsetCurves(offset)[0] as Curve;
+            if (dz.HasValue)
+                toolpathCurve.TransformBy(Matrix3d.Displacement(Vector3d.ZAxis * dz.Value));
+            Cutting(toolpathCurve, CuttingFeed, SmallFeed, EngineSide, angleA: angleA);
+        }
+
         /// <summary>
         /// Рез по кривой
         /// </summary>
-        public void Cutting(Curve curve, int cuttingFeed, int smallFeed, Side engineSide = Side.None, double? angleC = null, double angleA = 0)
+        public void Cutting(Curve curve, int cuttingFeed, int smallFeed, Side engineSide = Side.None, double? angleC = null, double? angleA = null)
         {
             var point = curve.GetClosestPoint(ToolLocation.Point);
 
-            if (IsUpperTool && angleA == 0)
+            if (IsUpperTool) // && (angleA ?? AngleA).GetValueOrDefault() == 0)
             {
                 var upperPoint = new Point3d(point.X, point.Y, ZSafety);
                 if (!ToolLocation.Point.IsEqualTo(upperPoint))
                 {
-                    Move(upperPoint.X, upperPoint.Y, angleC: angleC ?? BuilderUtils.CalcToolAngle(curve, point, engineSide));
+                    Move(upperPoint.X, upperPoint.Y, angleC: angleC ?? BuilderUtils.CalcToolAngle(curve, point, engineSide), angleA: angleA);
                 }
             }
             else if (!(curve is Line))
@@ -260,8 +272,8 @@ namespace CAM
                         HasTool = _hasTool,
                         ToolLocation = ToolLocation.Clone()
                     });
-
-            command.Text = GCommandText(gCode, paramsString, point.Value, curve, angleC, angleA, feed, center);
+            AngleA = angleA ?? AngleA;
+            command.Text = GCommandText(gCode, paramsString, point.Value, curve, angleC, AngleA, feed, center);
             
             if (ToolLocation.IsDefined)
             {
@@ -286,7 +298,7 @@ namespace CAM
             }
 
             _GCode = gCode;
-            ToolLocation.Set(point.Value, angleC, angleA);
+            ToolLocation.Set(point.Value, angleC, AngleA);
             _feed = feed ?? _feed;
 
             command.HasTool = _hasTool;

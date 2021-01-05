@@ -271,6 +271,8 @@ namespace CAM
                 Circle ci = c as Circle;
                 if (ci != null)
                     ca = ci.ToCurve2dArray();
+                else if (c is Line)
+                    ca = new Curve2d[] { new LineSegment2d(c.StartPoint.To2d(), c.EndPoint.To2d()) };
                 else
                     ca = c.ToCurve2dArray();
             }
