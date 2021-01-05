@@ -108,7 +108,7 @@ namespace CAM
                     BackColor = readOnly ? SystemColors.Control : SystemColors.Window,
                     Dock = DockStyle.Fill
                 };
-                control.DataBindings.Add(new Binding("Text", BindingSource, paramName, true));
+                control.DataBindings.Add(new Binding("Text", BindingSource, paramName, true, DataSourceUpdateMode.OnPropertyChanged, string.Empty));
             }
             tablePanel.Controls.Add(control, 1, tablePanel.RowStyles.Count - 1);
 

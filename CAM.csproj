@@ -146,9 +146,9 @@
     <Compile Include="TechProcesses\Sawing\SawingTechOperation.cs" />
     <Compile Include="TechProcesses\Sawing\SawingTechProcess.cs" />
     <Compile Include="TechProcesses\Sawing\SawingTechProcessParams.cs" />
-    <Compile Include="TechProcesses\SectionProfile\CombTechOperation.cs" />
     <Compile Include="TechProcesses\SectionProfile\CrossCleaningTechOperation.cs" />
     <Compile Include="TechProcesses\SectionProfile\LongCleaningTechOperation.cs" />
+    <Compile Include="TechProcesses\SectionProfile\LongProcessingTechOperation.cs" />
     <Compile Include="TechProcesses\SectionProfile\SectionProfileTechProcess.cs" />
     <Compile Include="TechProcesses\Tactile\Bands\BandsTechOperation.cs" />
     <Compile Include="TechProcesses\Tactile\Bands\CuttingType.cs" />

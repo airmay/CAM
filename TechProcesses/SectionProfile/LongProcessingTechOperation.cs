@@ -9,7 +9,7 @@ namespace CAM.TechProcesses.SectionProfile
 {
     [Serializable]
     [MenuItem("Продольная обработка", 1)]
-    public class CombTechOperation : TechOperation<SectionProfileTechProcess>
+    public class LongProcessingTechOperation : TechOperation<SectionProfileTechProcess>
     {
         public double StepPass { get; set; } = 10;
         public bool IsProfileStep { get; set; }
@@ -46,6 +46,13 @@ namespace CAM.TechProcesses.SectionProfile
                 .AddParam(nameof(Delta))
                 .AddParam(nameof(ChangeProcessSide), "Сторона обработки")
                 .AddParam(nameof(ChangeEngineSide), "Сторона двигателя");
+        }
+
+        public override bool Validate()
+        {
+            if (StepPass == 0)
+                Acad.Alert("Не заполнено поле \"Шаг межстрочный\"");
+            return StepPass != 0;
         }
 
         public override void BuildProcessing(CommandGeneratorBase generator)

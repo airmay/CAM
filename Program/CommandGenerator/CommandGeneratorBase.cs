@@ -46,7 +46,6 @@ namespace CAM
         public int CuttingFeed { get; set; }
         public int SmallFeed { get; set; }
         public Side EngineSide { get; set; }
-        public double? AngleA { get; set; }
 
         public void StartTechProcess(TechProcess techProcess)
         {
@@ -140,7 +139,7 @@ namespace CAM
             if (!_isEngineStarted)
                 GCommand(CommandNames.InitialMove, 0, z: ZSafety);
 
-            if ((angleA ?? AngleA) != ToolLocation.AngleA)
+            if (angleA.HasValue && angleA.Value != ToolLocation.AngleA)
                 GCommand("Наклон", 1, angleA: angleA, feed: 500);
 
             if (!_isEngineStarted)
@@ -272,8 +271,7 @@ namespace CAM
                         HasTool = _hasTool,
                         ToolLocation = ToolLocation.Clone()
                     });
-            AngleA = angleA ?? AngleA;
-            command.Text = GCommandText(gCode, paramsString, point.Value, curve, angleC, AngleA, feed, center);
+            command.Text = GCommandText(gCode, paramsString, point.Value, curve, angleC, angleA, feed, center);
             
             if (ToolLocation.IsDefined)
             {
@@ -298,7 +296,7 @@ namespace CAM
             }
 
             _GCode = gCode;
-            ToolLocation.Set(point.Value, angleC, AngleA);
+            ToolLocation.Set(point.Value, angleC, angleA);
             _feed = feed ?? _feed;
 
             command.HasTool = _hasTool;
