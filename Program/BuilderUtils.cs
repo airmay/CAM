@@ -84,7 +84,7 @@ namespace CAM
                         {
                             var intersect = intersector.GetIntersectionPoint(0);
                             max = Math.Max(max ?? double.MinValue, intersect[1 - index]);
-                            if (!point0.HasValue)
+                            if (!point0.HasValue && i == 0)
                                 point0 = intersect;
                         }
                     }
@@ -93,7 +93,7 @@ namespace CAM
                         var toolCoord = pos + shift * dir * (isMinToolCoord ^ dir < 0 ? 0 : 2);
                         result.Add(GetPoint(toolCoord, max.Value));
                     }
-                    if (isProfileStep)
+                    if (isProfileStep && point0.HasValue)
                     {
                         if (!dist.HasValue)
                             dist = curve.GetLength(0, curve.GetParameterOf(point0.Value));

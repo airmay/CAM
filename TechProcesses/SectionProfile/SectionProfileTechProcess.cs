@@ -18,7 +18,7 @@ namespace CAM.TechProcesses.SectionProfile
 
         public static void ConfigureParamsView(ParamsView view)
         {
-            view.AddMachine(CAM.MachineType.Donatoni, CAM.MachineType.ScemaLogic)
+            view.AddMachine()
                 .AddMaterial()
                 .AddTool()
                 .AddParam(nameof(Frequency))
@@ -34,6 +34,7 @@ namespace CAM.TechProcesses.SectionProfile
 
         protected override void BuildProcessing(CommandGeneratorBase generator)
         {
+            //чистка диском под углом А
             return;
 
             var rail = Rail != null ? Rail.GetCurve() as Line : new Line(Point3d.Origin, new Point3d(Length.Value, 0, 0));

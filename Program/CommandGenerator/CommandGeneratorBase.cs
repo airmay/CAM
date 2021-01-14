@@ -195,6 +195,7 @@ namespace CAM
         public void Cutting(Curve curve, int cuttingFeed, int smallFeed, Side engineSide = Side.None, double? angleC = null, double? angleA = null)
         {
             var point = curve.GetClosestPoint(ToolLocation.Point);
+            var calcAngleC = angleC == null;
 
             if (IsUpperTool) // && (angleA ?? AngleA).GetValueOrDefault() == 0)
             {
@@ -204,7 +205,7 @@ namespace CAM
                     Move(upperPoint.X, upperPoint.Y, angleC: angleC ?? BuilderUtils.CalcToolAngle(curve, point, engineSide), angleA: angleA);
                 }
             }
-            else if (!(curve is Line))
+            else if (!(curve is Line) && calcAngleC)
                 angleC = BuilderUtils.CalcToolAngle(curve, point, engineSide);
 
             GCommand(point.Z != ToolLocation.Point.Z ? CommandNames.Penetration : CommandNames.Transition, 1, point: point, angleC: angleC, angleA: angleA, feed: smallFeed);
@@ -219,7 +220,8 @@ namespace CAM
                 for (int i = 1; i < polyline.NumberOfVertices; i++)
                 {
                     point = polyline.GetPoint3dAt(i);
-                    angleC = BuilderUtils.CalcToolAngle(polyline, point, engineSide);
+                    if (calcAngleC)
+                        angleC = BuilderUtils.CalcToolAngle(polyline, point, engineSide);
                     if (polyline.GetSegmentType(i - 1) == SegmentType.Arc)
                     {
                         var arcSeg = polyline.GetArcSegment2dAt(i - 1);
@@ -232,7 +234,7 @@ namespace CAM
             else
             {
                 var arc = curve as Arc;
-                if (arc != null)
+                if (arc != null && calcAngleC)
                     angleC += arc.TotalAngle.ToDeg() * (point == curve.StartPoint ? -1 : 1);
                 var gCode = curve is Line ? 1 : point == curve.StartPoint ? 2 : 3;
                 GCommand(CommandNames.Cutting, gCode, point: curve.NextPoint(point), angleC: angleC, curve: curve, feed: cuttingFeed, center: arc?.Center.ToPoint2d());
