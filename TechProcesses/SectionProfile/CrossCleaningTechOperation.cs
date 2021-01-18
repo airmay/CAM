@@ -92,7 +92,7 @@ namespace CAM.TechProcesses.SectionProfile
             var angleA = IsA90 ? 90 : 0;
             var index = IsA90 ? 1 : 0;
 
-            var profilePoints = BuilderUtils.GetProcessPoints(profile, index, ProfileStep, TechProcess.Tool.Thickness.Value / 2, isMinToolCoord, ProfileBegin, ProfileEnd, true);
+            var profilePoints = BuilderUtils.GetProcessPoints(profile, index, ProfileStep, TechProcess.Tool.Thickness.Value, isMinToolCoord, ProfileBegin, ProfileEnd, true);
 
             var profilePline = new Polyline();
             Enumerable.Range(0, profilePoints.Count).ForEach(i => profilePline.AddVertexAt(i, profilePoints[i], 0, 0, 0));

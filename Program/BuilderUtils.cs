@@ -75,9 +75,9 @@ namespace CAM
                 while (dir > 0 ? pos < p1 : pos > p1)
                 {
                     double? max = null;
-                    for (int i = 0; i < 3; i++)
+                    for (int i = 0; i <= 10; i++)
                     {
-                        var rayPoint = GetPoint(pos + i * shift * dir, start);
+                        var rayPoint = GetPoint(pos + i * (shift / 10) * dir, start);
                         ray.Set(rayPoint, rayVector);
                         intersector.Set(curve, ray);
                         if (intersector.NumberOfIntersectionPoints > 0)
@@ -90,7 +90,7 @@ namespace CAM
                     }
                     if (max.HasValue)
                     {
-                        var toolCoord = pos + shift * dir * (isMinToolCoord ^ dir < 0 ? 0 : 2);
+                        var toolCoord = pos + shift * dir * (isMinToolCoord ^ dir < 0 ? 0 : 1);
                         result.Add(GetPoint(toolCoord, max.Value));
                     }
                     if (isProfileStep && point0.HasValue)

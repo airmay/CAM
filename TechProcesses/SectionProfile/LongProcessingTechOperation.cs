@@ -98,7 +98,7 @@ namespace CAM.TechProcesses.SectionProfile
             var angleA = IsA90 ? 90 : 0;
             var index = IsA90 ? 1 : 0;
 
-            var points = BuilderUtils.GetProcessPoints(profile, index, StepPass, TechProcess.Tool.Thickness.Value / 2, isMinToolCoord, FirstPass, LasttPass, IsProfileStep);
+            var points = BuilderUtils.GetProcessPoints(profile, index, StepPass, TechProcess.Tool.Thickness.Value, isMinToolCoord, FirstPass, LasttPass, IsProfileStep);
 
             foreach (var point in points)
             {
