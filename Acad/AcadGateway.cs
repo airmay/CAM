@@ -126,9 +126,12 @@ namespace CAM
             App.LockAndExecute(() => groupId.EraseGroup());
         }
 
-        public static ObjectId CreateGroup(this IEnumerable<ObjectId?> entityIds)
+        public static ObjectId? CreateGroup(this IEnumerable<ObjectId?> entityIds)
         {
-            return App.LockAndExecute(() => entityIds.NotNull().Distinct().Group(selectable: false));
+            var list = entityIds.NotNull().Distinct().ToList();
+            return list.Any()
+                ? (ObjectId?)App.LockAndExecute(() => list.Group(selectable: false))
+                : null;
         }
 
         public static ObjectId AppendToGroup(this ObjectId? groupId, params ObjectId[] entityIds)

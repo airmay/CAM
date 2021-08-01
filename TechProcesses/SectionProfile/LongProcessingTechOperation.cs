@@ -26,14 +26,18 @@ namespace CAM.TechProcesses.SectionProfile
         public bool IsA90 { get; set; }
         public bool ChangeProcessSide { get; set; }
         public bool ChangeEngineSide { get; set; }
+        public bool IsExactlyBegin { get; set; }
+        public bool IsExactlyEnd { get; set; }
 
         public static void ConfigureParamsView(ParamsView view)
         {
             view.AddParam(nameof(IsA90), "A=90")
                 .AddAcadObject(nameof(Profile))
                 .AddParam(nameof(CuttingFeed))
-                .AddParam(nameof(FirstPass), "Первый проход")
-                .AddParam(nameof(LasttPass), "Последний проход")
+                .AddParam(nameof(FirstPass), "Начало профиля")
+                .AddParam(nameof(IsExactlyBegin), "Начало точно")
+                .AddParam(nameof(LasttPass), "Конец профиля")
+                .AddParam(nameof(IsExactlyEnd), "Конец точно")
                 .AddParam(nameof(StepPass))
                 .AddParam(nameof(IsProfileStep), "Шаг по профилю")
                 .AddIndent()
@@ -44,8 +48,8 @@ namespace CAM.TechProcesses.SectionProfile
                 .AddParam(nameof(IsOutlet), "Отвод")
                 .AddParam(nameof(Departure))
                 .AddParam(nameof(Delta))
-                .AddParam(nameof(ChangeProcessSide), "Сторона обработки")
-                .AddParam(nameof(ChangeEngineSide), "Сторона двигателя");
+                //.AddParam(nameof(ChangeProcessSide), "Сторона обработки")
+                .AddParam(nameof(ChangeEngineSide), "Разворот двигателя на 180");
         }
 
         public override bool Validate()
@@ -59,8 +63,10 @@ namespace CAM.TechProcesses.SectionProfile
         {
             var railBase = TechProcess.Rail?.GetCurve() ?? new Line(Point3d.Origin, Point3d.Origin + Vector3d.XAxis * TechProcess.Length.Value);
             var profile = (Profile ?? TechProcess.ProcessingArea[0]).GetCurve();
-            var processSide = ChangeProcessSide ? 1 : -1;
-            CreateProfile3D(profile, railBase, processSide);
+            var processSide = ChangeEngineSide ? -1 : 1;
+            CreateProfile3D(profile, railBase, 1);
+            //var processSide = ChangeProcessSide ? -1 : 1;
+            //CreateProfile3D(profile, railBase, processSide);
 
             var rail = CreateDepartureRail(railBase, Departure);
 
@@ -98,7 +104,7 @@ namespace CAM.TechProcesses.SectionProfile
             var angleA = IsA90 ? 90 : 0;
             var index = IsA90 ? 1 : 0;
 
-            var points = BuilderUtils.GetProcessPoints(profile, index, StepPass, TechProcess.Tool.Thickness.Value, isMinToolCoord, FirstPass, LasttPass, IsProfileStep);
+            var points = BuilderUtils.GetProcessPoints(profile, index, StepPass, TechProcess.Tool.Thickness.Value, isMinToolCoord, FirstPass, LasttPass, IsExactlyBegin, IsExactlyEnd, IsProfileStep);
 
             foreach (var point in points)
             {

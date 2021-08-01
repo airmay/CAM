@@ -44,7 +44,7 @@ namespace CAM
                             camDocument.TechProcessList = (List<TechProcess>)formatter.Deserialize(stream);
                         }
 
-                if (camDocument.TechProcessList != null)
+                if (camDocument.TechProcessList?.Any() == true)
                 {
                     camDocument.TechProcessList.ForEach(p => p.SerializeInit());
                     Acad.Write($"Загружены техпроцессы: {string.Join(", ", camDocument.TechProcessList.Select(p => p.Caption))}");

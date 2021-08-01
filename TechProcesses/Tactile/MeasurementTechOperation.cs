@@ -34,7 +34,7 @@ namespace CAM.TechProcesses.Tactile
         public CalcMethodType CalcMethod { get; set; } = CalcMethodType.Average;
 
         [NonSerialized]
-        public ObjectId[] PointObjectIds;
+        public ObjectId[] PointObjectIds = Array.Empty<ObjectId>();
 
         public override void SerializeInit()
         {
@@ -117,7 +117,7 @@ namespace CAM.TechProcesses.Tactile
                     {
                         generator.GCommand(CommandNames.Fast, 0, x: corners[i].X + 230, y: corners[i].Y - 100 - TechProcess.Tool.Thickness.GetValueOrDefault());
                         generator.ToolLocation.Point -= new Vector3d(0, 0, 1);
-                        generator.GCommand("", 0, z: TechProcess.Thickness.GetValueOrDefault() + TechProcess.ZSafety);
+                        generator.GCommand("", 0, z: Thickness.GetValueOrDefault() + TechProcess.ZSafety);
 
                         generator.Command("M131");
                         generator.Command($"DBL THICK{i} = (%TastL.ZLastra - %TastL.ZBanco)/1000", "Измерение");

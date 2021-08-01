@@ -37,22 +37,26 @@ namespace CAM
 
         public static Side CalcEngineSide(double angle)
         {
+            var deg = angle.ToDeg().Round();
+            if (deg % 180 == 0)
+                return (deg % 360 == 0) ? Side.Left : Side.Right;
+
             angle = angle.Round(6);
             var upDownSign = Math.Sign(Math.Sin(angle)); // переделать
             return upDownSign > 0 ? Side.Right : upDownSign < 0 ? Side.Left : Math.Cos(angle) > 0 ? Side.Left : Side.Right;
         }
 
-        public static double CalcToolAngle(Curve curve, Point3d point, Side engineSide = Side.None) 
+        public static double CalcToolAngle(Curve curve, Point3d point, Side engineSide = Side.None)
             => CalcToolAngle(curve.GetFirstDerivative(point).ToVector2d().Angle, engineSide);
 
         public static double CalcToolAngle(double angle, Side engineSide = Side.None)
         {
             if (engineSide == Side.None)
                 engineSide = CalcEngineSide(angle);
-            return ((engineSide == Side.Right ? 180 : 360) + 360 - angle.Round(6).ToDeg()) % 360;
+            return ((engineSide == Side.Right ? 180 : 360) + 360 - angle.ToDeg().Round()) % 360;
         }
 
-        public static List<Point2d> GetProcessPoints(Curve profile, int index, double step, double shift, bool isMinToolCoord, double? begin, double? end, bool isProfileStep = false) //, bool isExactlyBegin, bool isExactlyEnd)
+        public static List<Point2d> GetProcessPoints1(Curve profile, int index, double step, double shift, bool isMinToolCoord, double? begin, double? end, bool isProfileStep = false) //, bool isExactlyBegin, bool isExactlyEnd)
         {
             var result = new List<Point2d>();
             var start = 10000D;
@@ -77,7 +81,7 @@ namespace CAM
                     double? max = null;
                     for (int i = 0; i <= 10; i++)
                     {
-                        var rayPoint = GetPoint(pos + i * (shift / 10) * dir, start);
+                        var rayPoint = GetPoint(pos + i * (shift / 10) * dir, start, index);
                         ray.Set(rayPoint, rayVector);
                         intersector.Set(curve, ray);
                         if (intersector.NumberOfIntersectionPoints > 0)
@@ -91,7 +95,7 @@ namespace CAM
                     if (max.HasValue)
                     {
                         var toolCoord = pos + shift * dir * (isMinToolCoord ^ dir < 0 ? 0 : 1);
-                        result.Add(GetPoint(toolCoord, max.Value));
+                        result.Add(GetPoint(toolCoord, max.Value, index));
                     }
                     if (isProfileStep && point0.HasValue)
                     {
@@ -109,13 +113,100 @@ namespace CAM
             }
             return result;
 
-            Point2d GetPoint(double coord0, double coord1)
+        }
+
+        private static Point2d GetPoint(double coord0, double coord1, int index)
+        {
+            var coord = new double[2];
+            coord[index] = coord0;
+            coord[1 - index] = coord1;
+            return new Point2d(coord);
+        }
+
+        public static List<Point2d> GetProcessPoints(Curve profile, int index, double step, double shift, bool isMinToolCoord, double? begin, double? end, bool isExactlyBegin, bool isExactlyEnd, bool isProfileStep = false)
+        {
+            var result = new List<Point2d>();
+
+            var p0 = begin ?? Math.Max(profile.StartPoint[index], profile.EndPoint[index]);
+            var p1 = end ?? Math.Min(profile.StartPoint[index], profile.EndPoint[index]);
+            var dir = Math.Sign(p1 - p0);
+            p0 *= dir;
+            p1 *= dir;
+            var polyline = profile as Polyline;
+            var points = polyline.GetPolylineFitPoints(1).Select(p => new Point2d(p[index] * dir, p[1 - index])).ToList();
+            if (points.Last().X < points.First().X)
+                points.Reverse();
+
+            const double inf = 100000;
+            points.Insert(0, new Point2d(-inf, points.First().Y));
+            points.Add(new Point2d(inf, points.Last().Y));
+
+            if (!isExactlyBegin)
+                p0 -= shift;
+            if (isExactlyEnd)
+                p1 -= shift;
+
+            var ind = 1;
+            var pos = p0 - step;
+            do
             {
-                var coord = new double[2];
-                coord[index] = coord0;
-                coord[1 - index] = coord1;
-                return new Point2d(coord);
+                pos += step;
+                if (pos > p1)
+                    pos = p1;
+
+                var max = Iterate(ref ind, pos);
+                var ind2 = ind;
+                max = Iterate(ref ind2, pos + shift, max);
+
+                var toolCoord = isMinToolCoord ^ dir < 0 ? pos : pos + shift;
+                result.Add(GetPoint(toolCoord * dir, max, index));
             }
+            while (pos < p1 - 0.1);
+
+            return result;         
+            
+            double Iterate(ref int i, double p, double? max = null)
+            {
+                while (points[i].X <= p)
+                {
+                    if (max.HasValue)
+                        max = Math.Max(max.Value, points[i].Y);
+                    i++;
+                }
+                var m = points[i - 1].Y + (points[i].Y - points[i - 1].Y) / (points[i].X - points[i - 1].X) * (p - points[i - 1].X);
+                return max.HasValue ? Math.Max(max.Value, m) : m;
+            }
+        }
+    }
+
+    public class Interval
+    {
+        public Point2d Start { get; }
+
+        public Point2d End { get; }
+
+        private readonly double _koeff;
+
+        public Interval(Point3d p1, Point3d p2, int index)
+        {
+            var start = p2[index] >= p1[index] ? p1 : p2;
+            var end = p2[index] >= p1[index] ? p2 : p1;
+
+            Start = new Point2d(start[index], start[1 - index]);
+            End = new Point2d(end[index], end[1 - index]);
+
+            if (End.X != Start.X)
+                _koeff = (End.Y - Start.Y) / (End.X - Start.X);
+        }
+
+        public bool IsIn(double x)
+        {
+            return x >= Start.X && x < End.X;
+        }
+
+        public double GetY(double x)
+        {
+            return Start.Y + _koeff * (x - Start.X);
         }
     }
 }

@@ -24,6 +24,8 @@ namespace CAM.TechProcesses.SectionProfile
         public bool IsA90 { get; set; }
         public bool ChangeProcessSide { get; set; }
         public bool ChangeEngineSide { get; set; }
+        public bool IsExactlyBegin { get; set; }
+        public bool IsExactlyEnd { get; set; }
 
         public static void ConfigureParamsView(ParamsView view)
         {
@@ -34,6 +36,8 @@ namespace CAM.TechProcesses.SectionProfile
                 .AddParam(nameof(ProfileStep), "Шаг по профилю")
                 .AddParam(nameof(ProfileBegin), "Профиль начало")
                 .AddParam(nameof(ProfileEnd), "Профиль конец")
+                .AddParam(nameof(IsExactlyBegin), "Начало точно")
+                .AddParam(nameof(IsExactlyEnd), "Конец точно")
                 .AddIndent()
                 .AddParam(nameof(IsOutlet), "Отвод")
                 .AddParam(nameof(Departure))
@@ -92,7 +96,7 @@ namespace CAM.TechProcesses.SectionProfile
             var angleA = IsA90 ? 90 : 0;
             var index = IsA90 ? 1 : 0;
 
-            var profilePoints = BuilderUtils.GetProcessPoints(profile, index, ProfileStep, TechProcess.Tool.Thickness.Value, isMinToolCoord, ProfileBegin, ProfileEnd, true);
+            var profilePoints = BuilderUtils.GetProcessPoints(profile, index, ProfileStep, TechProcess.Tool.Thickness.Value, isMinToolCoord, ProfileBegin, ProfileEnd, IsExactlyBegin, IsExactlyEnd, true);
 
             var profilePline = new Polyline();
             Enumerable.Range(0, profilePoints.Count).ForEach(i => profilePline.AddVertexAt(i, profilePoints[i], 0, 0, 0));

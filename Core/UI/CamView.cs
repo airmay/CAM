@@ -294,7 +294,6 @@ namespace CAM
             processCommandBindingSource.DataSource = CurrentTechProcess.ProcessCommands;
 
             RefreshParamsView();
-            tabControl.SelectedTab = tabPageCommands;
 
             if (IsToolpathVisible)
             {
