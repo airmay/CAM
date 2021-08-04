@@ -102,6 +102,7 @@
     </Compile>
     <Compile Include="Core\UI\Progressor.cs" />
     <Compile Include="Program\BuilderUtils.cs" />
+    <Compile Include="Program\CommandGenerator\CableSawingCommandGenerator.cs" />
     <Compile Include="Program\CommandGenerator\CommandGeneratorBase.cs" />
     <Compile Include="Program\CommandGenerator\CommandGeneratorFactory.cs" />
     <Compile Include="Program\CommandGenerator\KreaCommandGenerator.cs" />
@@ -125,6 +126,7 @@
     <Compile Include="Core\Enums\MachineType.cs" />
     <Compile Include="Core\Enums\Material.cs" />
     <Compile Include="Program\ProcessCommand.cs" />
+    <Compile Include="TechProcesses\CableSawing\CableSawingTechProcess.cs" />
     <Compile Include="TechProcesses\Disk3D\CombTechOperation.cs" />
     <Compile Include="TechProcesses\Disk3D\CrossCleaningTechOperation.cs" />
     <Compile Include="TechProcesses\Disk3D\Disk3DTechProcess.cs" />

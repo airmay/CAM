@@ -35,6 +35,8 @@ namespace CAM
 
         internal static double ToDeg(this double angle) => angle * 180 / Math.PI;
 
+        internal static double ToDeg(this double angle, int digits) => angle.ToDeg().Round(digits) % 360;
+
         public static double Length(this Curve curve) => curve.GetDistanceAtParameter(curve.EndParam) - curve.GetDistanceAtParameter(curve.StartParam);
 
         public static Vector2d GetTangent(this Curve curve, Point3d point) => curve.GetFirstDerivative(point).ToVector2d();

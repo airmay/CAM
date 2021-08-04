@@ -8,6 +8,9 @@ namespace CAM
         Disk,
 
         [Description("Фреза")]
-        Mill
+        Mill,
+
+        [Description("Трос")]
+        Cable
     }
 }

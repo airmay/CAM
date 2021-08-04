@@ -280,7 +280,7 @@ namespace CAM
         {
             var originX = _type.GetProperty("OriginX");
             var originY = _type.GetProperty("OriginY");
-            var originObject = _type.GetProperty("OriginObject");
+            var originObject = _type.GetField(nameof(TechProcess.OriginObject));
 
             var selector = CreateSelector("Начало координат", "۞");
 
