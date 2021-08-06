@@ -15,6 +15,7 @@ namespace CAM.TechProcesses.CableSawing
         public CableSawingTechProcess()
         {
             MachineType = CAM.MachineType.CableSawing;
+            Tool = new Tool { Type = ToolType.Cable };
         }
 
         public static void ConfigureParamsView(ParamsView view)
@@ -30,6 +31,7 @@ namespace CAM.TechProcesses.CableSawing
         {
             ///generator.ZSafety = ZSafety;
             //generator.SetTool(1, Frequency, hasTool: false);
+
 
             var regions = ProcessingArea.Select(p => p.ObjectId.QOpenForRead());
 
@@ -57,9 +59,18 @@ namespace CAM.TechProcesses.CableSawing
                 var u3 = u2 + ZSafety * (u2 - u1) / (z2 - z1);
                 var z3 = z2 + ZSafety;
 
+                generator.ToolLocation.Center = origin;
+                generator.ToolLocation.AngleA = angle;
+                generator.ToolLocation.Point = new Point3d(OriginX - u3, OriginY, z3);
                 generator.Command($"G05 A{angle} S{S}");
+
+                generator.ToolLocation.Point = new Point3d(OriginX - u3, OriginY, z3);
                 generator.Command($"G0 U{u3.Round(4)} V{z3.Round(4)}");
+
+                generator.ToolLocation.Point = new Point3d(OriginX - u1, OriginY, z1);
                 generator.Command($"G01 U{u1.Round(4)} V{z1.Round(4)}");
+
+                generator.ToolLocation.Point = new Point3d(OriginX - u3, OriginY, z3);
                 generator.Command($"G0 U{u3.Round(4)} V{z3.Round(4)}");
             }
         }

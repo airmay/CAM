@@ -16,6 +16,9 @@ namespace CAM
 
         public static ToolObject CreateToolObject(Tool tool, bool isFrontPlaneZero)
         {
+            if (tool.Type == ToolType.Cable)
+                return CreateToolObjectInt(true, new Line(new Point3d(0, -1000, 0), new Point3d(0, 1000, 0)));
+
             var circle0 = new Circle(new Point3d(0, isFrontPlaneZero ? 0 : -tool.Thickness.Value, tool.Diameter / 2), Vector3d.YAxis, tool.Diameter / 2);
             var circle1 = new Circle(circle0.Center + Vector3d.YAxis * tool.Thickness.Value, Vector3d.YAxis, tool.Diameter / 2);
             var axis = new Line(circle1.Center, circle1.Center + Vector3d.YAxis * tool.Diameter / 4);

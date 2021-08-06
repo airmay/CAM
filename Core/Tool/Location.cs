@@ -5,6 +5,7 @@ namespace CAM
     public class Location
     {
         public Point3d Point { get; set; } = new Point3d(double.NaN, double.NaN, double.NaN);
+        public Point3d Center { get; set; } = new Point3d(double.NaN, double.NaN, double.NaN);
         public double AngleC { get; set; }
         public double AngleA { get; set; }
 

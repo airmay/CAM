@@ -10,6 +10,11 @@ namespace CAM.Program.CommandGenerator
     [MachineType(MachineType.CableSawing)]
     public class CableSawingCommandGenerator : CommandGeneratorBase
     {
+        public CableSawingCommandGenerator()
+        {
+            _hasTool = true;
+        }
+
         protected override void StartMachineCommands(string caption)
         {
         }
