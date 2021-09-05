@@ -8,7 +8,7 @@ namespace CAM
     /// Базовая технологическая операция
     /// </summary>
     [Serializable]
-    public abstract class TechOperation<T> : TechOperation where T: TechProcess
+    public abstract class TechOperation<T> : TechOperation where T: MillingTechProcess
     {
         public T TechProcess => (T)TechProcessBase;
     }
@@ -20,7 +20,7 @@ namespace CAM
         /// Технологический процесс обработки
         /// </summary>
         [NonSerialized]
-        public TechProcess TechProcessBase;
+        public ITechProcess TechProcessBase;
 
         [NonSerialized]
         public ObjectId? ToolpathObjectsGroup;
@@ -38,7 +38,7 @@ namespace CAM
         /// </summary>
         public AcadObject ProcessingArea { get; set; }
 
-        public void Setup(TechProcess techProcess, string caption)
+        public void Setup(ITechProcess techProcess, string caption)
         {
             TechProcessBase = techProcess;
             TechProcessBase.TechOperations.Add(this);
@@ -51,9 +51,9 @@ namespace CAM
 
         public virtual void SerializeInit() { }
 
-        public abstract void BuildProcessing(CommandGeneratorBase generator);
+        public abstract void BuildProcessing(MillingCommandGenerator generator);
 
-        public virtual void PrepareBuild(CommandGeneratorBase generator) { }
+        public virtual void PrepareBuild(MillingCommandGenerator generator) { }
 
         public virtual void Teardown() { }
 

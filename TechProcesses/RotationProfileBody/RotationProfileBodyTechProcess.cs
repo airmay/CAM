@@ -8,7 +8,7 @@ namespace CAM.TechProcesses.RotationProfileBody
 {
     [Serializable]
     [MenuItem("Тело вращения по профилю", 7)]
-    public class RotationProfileBodyTechProcess : TechProcess
+    public class RotationProfileBodyTechProcess : MillingTechProcess
     {
         public int CuttingFeed { get; set; }
 
@@ -49,7 +49,7 @@ namespace CAM.TechProcesses.RotationProfileBody
                 .AddParam(nameof(ZSafety));
         }
 
-        protected override void BuildProcessing(CommandGeneratorBase generator)
+        protected override void BuildProcessing(MillingCommandGenerator generator)
         {
             var toolThickness = Tool.Thickness.Value;
             var profile = ProcessingArea[0].GetCurve();

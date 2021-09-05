@@ -43,7 +43,7 @@ namespace CAM.TechProcesses.Disk3D
                 .AddParam(nameof(IsDepartureOnBorderSection), "Выезд по границе сечения");
         }
 
-        public override void BuildProcessing(CommandGeneratorBase generator)
+        public override void BuildProcessing(MillingCommandGenerator generator)
         {
             var disk3DTechProcess = (Disk3DTechProcess)TechProcess;
 
@@ -54,7 +54,7 @@ namespace CAM.TechProcesses.Disk3D
                 offsetSurface.TransformBy(matrix);
             var bounds = offsetSurface.GeometricExtents;
             generator.ZSafety = bounds.MinPoint.Z + TechProcess.Thickness.Value + TechProcess.ZSafety;
-            generator.ToolLocation.Point += Vector3d.ZAxis * generator.ZSafety;
+            generator.ToolPosition.Point += Vector3d.ZAxis * generator.ZSafety;
 
 
             //var ray = new Ray { UnitDir = Vector3d.XAxis };
@@ -212,7 +212,7 @@ namespace CAM.TechProcesses.Disk3D
                     points = points.ConvertAll(x => new Point3d(x.X, x.Y + TechProcess.Tool.Thickness.Value, x.Z));
                 if (disk3DTechProcess.Angle != 0)
                     points = points.ConvertAll(x => x.TransformBy(matrix));
-                var loc = generator.ToolLocation;
+                var loc = generator.ToolPosition;
                 if (loc.IsDefined && loc.Point.DistanceTo(points.First()) > loc.Point.DistanceTo(points.Last()))
                     points.Reverse();
 
@@ -301,7 +301,7 @@ namespace CAM.TechProcesses.Disk3D
             return offsetSurface;
         }
 
-        private void BuildPass(CommandGeneratorBase generator, List<Point3d> points)
+        private void BuildPass(MillingCommandGenerator generator, List<Point3d> points)
         {
             var z = generator.ZSafety - TechProcess.ZSafety;
             bool isComplete;
@@ -327,7 +327,7 @@ namespace CAM.TechProcesses.Disk3D
                     }
                     if (point.IsNull())
                     {
-                        if (generator.ToolLocation.Point != p)
+                        if (generator.ToolPosition.Point != p)
                             generator.GCommand(CommandNames.Penetration, 1, point: p, feed: TechProcess.PenetrationFeed);
                         else
                         {

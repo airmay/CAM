@@ -6,7 +6,7 @@ namespace CAM.TechProcesses.SectionProfile
 {
     [Serializable]
     [MenuItem("Профиль по сечению", 4)]
-    public class SectionProfileTechProcess : TechProcess
+    public class SectionProfileTechProcess : MillingTechProcess
     {
         public AcadObject Rail { get; set; }
         public double? Length { get; set; }
@@ -32,7 +32,7 @@ namespace CAM.TechProcesses.SectionProfile
                 .AddParam(nameof(ZSafety));
         }
 
-        protected override void BuildProcessing(CommandGeneratorBase generator)
+        protected override void BuildProcessing(MillingCommandGenerator generator)
         {
             //чистка диском под углом А
             return;

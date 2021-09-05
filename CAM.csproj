@@ -90,7 +90,13 @@
   <ItemGroup>
     <Compile Include="Acad\AcadGateway.cs" />
     <Compile Include="Acad\AcadObjectNames.cs" />
+    <Compile Include="Core\CableTechProcess.cs" />
     <Compile Include="Core\CamDocument.cs" />
+    <Compile Include="Core\Tool\AngleToolPosition.cs" />
+    <Compile Include="Core\Tool\CableToolPosition.cs" />
+    <Compile Include="Core\Tool\ToolModel.cs" />
+    <Compile Include="Core\Tool\ToolPosition.cs" />
+    <Compile Include="Core\Tool\ToolTypeAttribute.cs" />
     <Compile Include="Core\UI\MenuItemAttribute.cs" />
     <Compile Include="Core\TechOperation.cs" />
     <Compile Include="Core\TechProcess.cs" />
@@ -108,6 +114,7 @@
     <Compile Include="Program\CommandGenerator\KreaCommandGenerator.cs" />
     <Compile Include="Program\CommandGenerator\DonatoniCommandGenerator.cs" />
     <Compile Include="Program\CommandGenerator\MachineTypeAttribute.cs" />
+    <Compile Include="Program\CommandGenerator\MillingCommandGenerator.cs" />
     <Compile Include="Program\CommandGenerator\ScemaLogicCommandGenerator.cs" />
     <Compile Include="Core\ExtensionApplication.cs" />
     <Compile Include="PaletteSet\TrimmingView.cs">
@@ -132,7 +139,6 @@
     <Compile Include="TechProcesses\Disk3D\Disk3DTechProcess.cs" />
     <Compile Include="TechProcesses\Disk3D\LongCleaningTechOperation.cs" />
     <Compile Include="TechProcesses\Drilling\DrillingTechProcess.cs" />
-    <Compile Include="Core\Tool\Location.cs" />
     <Compile Include="Core\Settings\CuttingMode.cs" />
     <Compile Include="Core\Settings\MachineSettings.cs" />
     <Compile Include="TechProcesses\Polishing\PolishingTechProcess.cs" />
@@ -173,7 +179,6 @@
     <Compile Include="Core\Enums\Corner.cs" />
     <Compile Include="Core\Settings\Settings.cs" />
     <Compile Include="Core\Tool\Tool.cs" />
-    <Compile Include="Core\Tool\ToolObject.cs" />
     <Compile Include="Core\Tool\ToolService.cs" />
     <Compile Include="Core\Tool\ToolsForm.cs">
       <SubType>Form</SubType>

@@ -5,7 +5,7 @@ namespace CAM.TechProcesses.Disk3D
 {
     [Serializable]
     [MenuItem("Диск 3D", 3)]
-    public class Disk3DTechProcess : TechProcess
+    public class Disk3DTechProcess : MillingTechProcess
     {
         public double Angle { get; set; }
 

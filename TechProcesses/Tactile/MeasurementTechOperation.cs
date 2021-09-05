@@ -68,7 +68,7 @@ namespace CAM.TechProcesses.Tactile
             bindingSource.DataSourceChanged += (s, e) => textBox.Text = bindingSource.GetSource<MeasurementTechOperation>().PointsX.Count.ToString();
         }
 
-        public override void BuildProcessing(CommandGeneratorBase generator)
+        public override void BuildProcessing(MillingCommandGenerator generator)
         {
             switch (CalcMethod)
             {
@@ -76,7 +76,7 @@ namespace CAM.TechProcesses.Tactile
                     for (int i = 0; i < PointsX.Count; i++)
                     {
                         generator.GCommand(CommandNames.Fast, 0, x: PointsX[i] + 230, y: PointsY[i] - 100 - TechProcess.Tool.Thickness.GetValueOrDefault());
-                        generator.ToolLocation.Point -= new Vector3d(0, 0, 1);
+                        generator.ToolPosition.Point -= new Vector3d(0, 0, 1);
                         generator.GCommand("", 0, z: Thickness.GetValueOrDefault() + TechProcess.ZSafety);
 
                         generator.Command("M131");
@@ -91,7 +91,7 @@ namespace CAM.TechProcesses.Tactile
                     for (int i = 0; i < PointsX.Count; i++)
                     {
                         generator.GCommand(CommandNames.Fast, 0, x: PointsX[i] + 230, y: PointsY[i] - 100 - TechProcess.Tool.Thickness.GetValueOrDefault());
-                        generator.ToolLocation.Point -= new Vector3d(0, 0, 1);
+                        generator.ToolPosition.Point -= new Vector3d(0, 0, 1);
                         generator.GCommand("", 0, z: Thickness.GetValueOrDefault() + TechProcess.ZSafety);
 
                         generator.Command("M131");
@@ -116,7 +116,7 @@ namespace CAM.TechProcesses.Tactile
                     for (int i = 0; i < corners.Count; i++)
                     {
                         generator.GCommand(CommandNames.Fast, 0, x: corners[i].X + 230, y: corners[i].Y - 100 - TechProcess.Tool.Thickness.GetValueOrDefault());
-                        generator.ToolLocation.Point -= new Vector3d(0, 0, 1);
+                        generator.ToolPosition.Point -= new Vector3d(0, 0, 1);
                         generator.GCommand("", 0, z: Thickness.GetValueOrDefault() + TechProcess.ZSafety);
 
                         generator.Command("M131");

@@ -9,7 +9,7 @@ namespace CAM.TechProcesses.Tactile
 {
     [Serializable]
     [MenuItem("Тактилка", 2)]
-    public class TactileTechProcess: TechProcess
+    public class TactileTechProcess: MillingTechProcess
     {
         public List<AcadObject> Objects { get; set; }
 

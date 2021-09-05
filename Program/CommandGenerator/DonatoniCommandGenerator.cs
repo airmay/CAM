@@ -8,7 +8,7 @@ namespace CAM
     /// Генератор команд для станка типа Donatoni
     /// </summary>
     [MachineType(MachineType.Donatoni)]
-    public class DonatoniCommandGenerator : CommandGeneratorBase
+    public class DonatoniCommandGenerator : MillingCommandGenerator
     {
         protected override void StartMachineCommands(string caption)
         {
@@ -62,9 +62,9 @@ namespace CAM
 
         protected override string GCommandText(int gCode, string paramsString, Point3d point, Curve curve, double? angleC, double? angleA, int? feed, Point2d? center)
         {
-            return $"G{gCode}{Format("X", point.X, ToolLocation.Point.X, _originX)}{Format("Y", point.Y, ToolLocation.Point.Y, _originY)}" +
+            return $"G{gCode}{Format("X", point.X, ToolPosition.Point.X, _originX)}{Format("Y", point.Y, ToolPosition.Point.Y, _originY)}" +
                 $"{FormatIJ("I", center?.X, _originX)}{FormatIJ("J", center?.Y, _originY)}" +
-                $"{FormatZ()}{Format("C", angleC, ToolLocation.AngleC)}{Format("A", angleA, ToolLocation.AngleA)}" +
+                $"{FormatZ()}{Format("C", angleC, ToolPosition.AngleC)}{Format("A", angleA, ToolPosition.AngleA)}" +
                 $"{Format("F", feed, _feed)}";
 
             string Format(string label, double? value, double oldValue, double origin = 0) =>
@@ -74,7 +74,7 @@ namespace CAM
 
             string FormatIJ(string label, double? value, double origin) => value.HasValue ? $" {label}{(value.Value - origin).Round(4)}" : null;
 
-            string FormatZ() => (paramsString == null || paramsString.Contains("Z")) && ((ThickCommand != null && gCode == 1) || point.Z != ToolLocation.Point.Z)
+            string FormatZ() => (paramsString == null || paramsString.Contains("Z")) && ((ThickCommand != null && gCode == 1) || point.Z != ToolPosition.Point.Z)
                 ? (WithThick ? $" Z({point.Z.Round(4)} + THICK)" : $" Z{point.Z.Round(4)}")
                 : null;
         }
