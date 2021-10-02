@@ -18,7 +18,7 @@ namespace CAM
                             .OrderBy(p => p.Attr.Position)
                             .ToDictionary(p => p.Attr.Name, p => p.Type);
             _techOperationTypes = Assembly.GetExecutingAssembly().GetTypes()
-                .Where(p => p.IsClass && !p.IsAbstract && p.BaseType.IsGenericType && p.BaseType.GetGenericTypeDefinition() == typeof(TechOperation<>))
+                .Where(p => p.IsClass && !p.IsAbstract && p.BaseType.IsGenericType && p.BaseType.GetGenericTypeDefinition() == typeof(MillingTechOperation<>))
                 .Select(p => new { tp = p.BaseType.GetGenericArguments()[0], to = p, attr = Attribute.GetCustomAttribute(p, typeof(MenuItemAttribute)) as MenuItemAttribute })
                 .GroupBy(p => p.tp)
                 .ToDictionary(p => p.Key, p => p.OrderBy(k => k.attr.Position).ToDictionary(k => k.attr.Name, v => v.to));

@@ -38,7 +38,7 @@ namespace CAM
             TechProcessList.Remove(techProcess);
         }
 
-        public void DeleteTechOperation(TechOperation techOperation)
+        public void DeleteTechOperation(MillingTechOperation techOperation)
         {
             techOperation.TechProcessBase.DeleteProcessing();
             techOperation.Teardown();

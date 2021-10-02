@@ -13,7 +13,7 @@ namespace CAM.TechProcesses.Disk3D
 {
     [Serializable]
     [MenuItem("Поперечная чистка", 3)]
-    public class CrossCleaningTechOperation : TechOperation<Disk3DTechProcess>
+    public class CrossCleaningTechOperation : MillingTechOperation<Disk3DTechProcess>
     {
         private Disk3DTechProcess _disk3DTechProcess;
 

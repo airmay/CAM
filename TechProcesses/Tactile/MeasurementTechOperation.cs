@@ -11,7 +11,7 @@ namespace CAM.TechProcesses.Tactile
 {
     [Serializable]
     [MenuItem("Измерение", 4)]
-    public class MeasurementTechOperation : TechOperation<TactileTechProcess>
+    public class MeasurementTechOperation : MillingTechOperation<TactileTechProcess>
     {
         public List<double> PointsX { get; set; } = new List<double>();
 

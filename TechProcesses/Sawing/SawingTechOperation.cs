@@ -9,7 +9,7 @@ namespace CAM.TechProcesses.Sawing
 {
     [Serializable]
     [MenuItem("Распиловка", 1)]
-    public class SawingTechOperation : TechOperation<SawingTechProcess>
+    public class SawingTechOperation : MillingTechOperation<SawingTechProcess>
     {
         public bool IsExactlyBegin { get; set; }
 

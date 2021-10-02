@@ -7,8 +7,24 @@ namespace CAM
     /// <summary>
     /// Базовая технологическая операция
     /// </summary>
-    [Serializable]
-    public abstract class TechOperation<T> : TechOperation where T: MillingTechProcess
+    public abstract class MillingTechOperation : TechOperation
+    {
+        public abstract void BuildProcessing(MillingCommandGenerator generator);
+
+        public virtual void PrepareBuild(MillingCommandGenerator generator) { }
+    }
+
+    public abstract class MillingTechOperation<T> : MillingTechOperation where T : ITechProcess
+    {
+        public T TechProcess => (T)TechProcessBase;
+    }
+
+    public abstract class WireSawingTechOperation : TechOperation
+    {
+        public abstract void BuildProcessing(CableCommandGenerator generator);
+    }
+
+    public abstract class WireSawingTechOperation<T> : WireSawingTechOperation where T : ITechProcess
     {
         public T TechProcess => (T)TechProcessBase;
     }
@@ -50,10 +66,6 @@ namespace CAM
         public virtual void Init() { }
 
         public virtual void SerializeInit() { }
-
-        public abstract void BuildProcessing(MillingCommandGenerator generator);
-
-        public virtual void PrepareBuild(MillingCommandGenerator generator) { }
 
         public virtual void Teardown() { }
 

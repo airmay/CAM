@@ -9,7 +9,7 @@ namespace CAM.TechProcesses.Tactile
 {
     [Serializable]
     [MenuItem("Полосы", 1)]
-    public class BandsTechOperation : TechOperation<TactileTechProcess>
+    public class BandsTechOperation : MillingTechOperation<TactileTechProcess>
     {
         public int ProcessingAngle { get; set; }
 

@@ -9,7 +9,7 @@ namespace CAM.TechProcesses.SectionProfile
 {
     [Serializable]
     [MenuItem("Продольная обработка", 1)]
-    public class LongProcessingTechOperation : TechOperation<SectionProfileTechProcess>
+    public class LongProcessingTechOperation : MillingTechOperation<SectionProfileTechProcess>
     {
         public double StepPass { get; set; } = 10;
         public bool IsProfileStep { get; set; }

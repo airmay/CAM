@@ -10,7 +10,7 @@ namespace CAM.TechProcesses.Disk3D
 {
     [Serializable]
     [MenuItem("Гребенка", 1)]
-    public class CombTechOperation : TechOperation<Disk3DTechProcess>
+    public class CombTechOperation : MillingTechOperation<Disk3DTechProcess>
     {
         public double StepPass { get; set; }
 

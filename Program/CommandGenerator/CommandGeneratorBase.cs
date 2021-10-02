@@ -12,6 +12,8 @@ namespace CAM
 
         public virtual void Dispose() { }
 
+        public void SetTechOperation(TechOperation techOperation) => _techOperation = techOperation;
+
         public void AddCommand(ProcessCommand command)
         {
             command.Owner = _techOperation ?? (object)_techProcess;

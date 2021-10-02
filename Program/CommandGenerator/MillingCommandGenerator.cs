@@ -84,8 +84,6 @@ namespace CAM
         /// </summary>
         //protected abstract void StopMachineCommands();
 
-        public void SetTechOperation(TechOperation techOperation) => _techOperation = techOperation;
-
         public void SetTool(int toolNo, int frequency, double angleA = 0, bool hasTool = true)
         {
             StopEngine();

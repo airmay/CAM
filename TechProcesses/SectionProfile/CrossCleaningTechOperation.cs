@@ -10,7 +10,7 @@ namespace CAM.TechProcesses.SectionProfile
 {
     [Serializable]
     [MenuItem("Поперечная чистка", 3)]
-    public class CrossCleaningTechOperation : TechOperation<SectionProfileTechProcess>
+    public class CrossCleaningTechOperation : MillingTechOperation<SectionProfileTechProcess>
     {
         public double LongStep { get; set; } = 10;
         public double ProfileStep { get; set; } = 5;

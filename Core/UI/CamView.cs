@@ -141,7 +141,7 @@ namespace CAM
 
             if (IsToolpathVisible)
             {
-                if (treeView.SelectedNode.Tag is TechOperation oper)
+                if (treeView.SelectedNode.Tag is MillingTechOperation oper)
                 {
                     CurrentTechProcess.GetToolpathObjectsGroup()?.SetGroupVisibility(false);
                     oper.ToolpathObjectsGroup?.SetGroupVisibility(true);
@@ -153,7 +153,7 @@ namespace CAM
                 Acad.Editor.UpdateScreen();
             }
 
-            if (treeView.SelectedNode.Tag is TechOperation techOperation)
+            if (treeView.SelectedNode.Tag is MillingTechOperation techOperation)
             {
                 if (techOperation.ProcessingArea != null)
                     Acad.SelectObjectIds(techOperation.ProcessingArea.ObjectId);
@@ -187,7 +187,7 @@ namespace CAM
                 case ITechProcess techProcess:
                     techProcess.Caption = e.Label;
                     break;
-                case TechOperation techOperation:
+                case MillingTechOperation techOperation:
                     techOperation.Caption = e.Label;
                     break;
             }
@@ -198,7 +198,7 @@ namespace CAM
         private void treeView_AfterCheck(object sender, TreeViewEventArgs e)
         {
             e.Node.ForeColor = e.Node.Checked ? Color.Black : Color.Gray;
-            ((TechOperation)e.Node.Tag).Enabled = e.Node.Checked;
+            ((MillingTechOperation)e.Node.Tag).Enabled = e.Node.Checked;
         }
 
         private void EndEdit()
@@ -250,7 +250,7 @@ namespace CAM
 
 	    private void bMoveUpTechOperation_Click(object sender, EventArgs e)
 	    {
-		    if (treeView.SelectedNode.Tag is TechOperation techOperation)
+		    if (treeView.SelectedNode.Tag is MillingTechOperation techOperation)
 		    {
 			    EndEdit();
 			    if (techOperation.TechProcessBase.TechOperations.SwapPrev(techOperation))
@@ -260,7 +260,7 @@ namespace CAM
 
 	    private void bMoveDownTechOperation_Click(object sender, EventArgs e)
 	    {
-		    if (treeView.SelectedNode.Tag is TechOperation techOperation)
+		    if (treeView.SelectedNode.Tag is MillingTechOperation techOperation)
 		    {
 			    EndEdit();
 			    if (techOperation.TechProcessBase.TechOperations.SwapNext(techOperation))
@@ -306,7 +306,7 @@ namespace CAM
         {
             var techProcessNode = treeView.SelectedNode.Parent ?? treeView.SelectedNode;
             techProcessNode.Text = ((ITechProcess)techProcessNode.Tag).Caption;
-            techProcessNode.Nodes.Cast<TreeNode>().ToList().ForEach(p => p.Text = ((TechOperation)p.Tag).Caption);
+            techProcessNode.Nodes.Cast<TreeNode>().ToList().ForEach(p => p.Text = ((MillingTechOperation)p.Tag).Caption);
         }
 
         private void bVisibility_Click(object sender, EventArgs e)
@@ -367,7 +367,7 @@ namespace CAM
                         _camDocument.DeleteTechProcess(techProcess);
                         _currentTechProcessType = null;
                         break;
-                    case TechOperation techOperation:
+                    case MillingTechOperation techOperation:
                         _camDocument.DeleteTechOperation(techOperation);
                         break;
                 }

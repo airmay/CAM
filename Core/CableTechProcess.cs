@@ -83,16 +83,16 @@ namespace CAM
 
                 BuildProcessing(generator);
 
-                //TechOperations.FindAll(p => p.Enabled && p.CanProcess).ForEach(p =>
-                //{
-                //    generator.SetTechOperation(p);
+                TechOperations.FindAll(p => p.Enabled && p.CanProcess).Cast<WireSawingTechOperation>().ToList().ForEach(p =>
+                {
+                    generator.SetTechOperation(p);
 
                 //    p.PrepareBuild(generator);
-                //    p.BuildProcessing(generator);
+                    p.BuildProcessing(generator);
 
                 //    if (!generator.IsUpperTool)
                 //        generator.Uplifting();
-                //});
+                });
                 //generator.FinishTechProcess();
                 ProcessCommands = generator.ProcessCommands;
             }
@@ -148,7 +148,7 @@ namespace CAM
             ToolpathObjectsGroup = ProcessCommands.Select(p => p.ToolpathObjectId).CreateGroup();
             Caption = GetCaption(Caption, ProcessCommands.Sum(p => p.Duration));
             foreach (var group in ProcessCommands.GroupBy(p => p.Owner))
-                if (group.Key is TechOperation techOperation)
+                if (group.Key is MillingTechOperation techOperation)
                 {
                     techOperation.ToolpathObjectsGroup = group.Select(p => p.ToolpathObjectId).CreateGroup();
                     techOperation.Caption = GetCaption(techOperation.Caption, group.Sum(p => p.Duration));
