@@ -54,6 +54,11 @@
       <ProgramFileExtension>txt</ProgramFileExtension>
       <ProgramLineNumberFormat>N{0} </ProgramLineNumberFormat>
     </MachineSettings>
+    <MachineSettings>
+      <MachineType>CableSawing</MachineType>
+      <ProgramFileExtension>txt</ProgramFileExtension>
+      <ProgramLineNumberFormat>{0} </ProgramLineNumberFormat>
+    </MachineSettings>
   </MachineSettings>
   <SawingTechProcessParams>
     <PenetrationFeed>200</PenetrationFeed>

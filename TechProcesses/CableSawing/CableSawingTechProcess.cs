@@ -12,9 +12,11 @@ namespace CAM.TechProcesses.CableSawing
     {
         public int S { get; set; } = 60;
 
-        public int ToolThickness { get; set; } = 60;
+        public double ToolThickness { get; set; } = 60;
 
         public int TransitionFeed { get; set; } = 300;
+
+        public double Departure { get; set; }
 
         public double Delta { get; set; }
 
@@ -34,6 +36,7 @@ namespace CAM.TechProcesses.CableSawing
                 .AddParam(nameof(TransitionFeed))
                 .AddParam(nameof(S), "Угловая скорость")
                 .AddParam(nameof(ZSafety))
+                .AddParam(nameof(Departure), "Выезд нижний")
                 .AddIndent()
                 .AddParam(nameof(ToolThickness), "Толщина троса")
                 .AddParam(nameof(Delta));
@@ -42,14 +45,13 @@ namespace CAM.TechProcesses.CableSawing
         protected override void BuildProcessing(CableCommandGenerator generator)
         {
             Tool.Thickness = ToolThickness;
-            ///generator.ZSafety = ZSafety;
-            //generator.SetTool(1, Frequency, hasTool: false);
 
             var origin = new Point3d(OriginX, OriginY, 0);
-            generator.CenterToolPosition = origin;
+            generator.CenterPoint = origin;
             generator.Command($"G92");
 
-            var regions = ProcessingArea.Select(p => p.ObjectId.QOpenForRead());
+            var regions = ProcessingArea.Select(p => p.ObjectId.QOpenForRead()).ToList();
+            generator.SetToolPosition(origin, 0, 0, regions[0].Bounds.Value.MaxPoint.Z + ZSafety);
 
             foreach (Region region in regions)
             {
@@ -61,43 +63,41 @@ namespace CAM.TechProcesses.CableSawing
                 var ofsset = region.Normal * (ToolThickness / 2 + Delta);
                 var lines = collection.Cast<Line>()
                     .Where(p => Math.Abs(p.StartPoint.Z - p.EndPoint.Z) < 1)
+                    .Where(p => Math.Abs(z1 - p.StartPoint.Z ) < 1 || Math.Abs(z2 - p.StartPoint.Z) < 1)
+                    .OrderByDescending(p => p.Length)
+                    .Take(2)
                     .Select(p => p.GetStartEndPoints().Select(pt => pt + ofsset).ToArray())
                     .OrderBy(p => p[0].Z)
                     .ToList();
-                if (lines.Count != 2)
-                    throw new Exception("Задана некорректная область");
+                //if (lines.Count != 2)
+                //    throw new Exception("Задана некорректная область");
 
                 var line1 = new Line(lines[0][0].ToPoint2d().ToPoint3d(), lines[0][1].ToPoint2d().ToPoint3d());
                 var pNearest = line1.GetClosestPointTo(origin, true);
                 var vector = (pNearest - origin).ToVector2d();
                 var u1 = vector.Length;
                 var angle = Vector2d.XAxis.Negate().ZeroTo2PiAngleTo(vector).ToDeg(2);
+                generator.GCommandAngle(angle, S);
 
                 var line2 = new Line2d(lines[1][0].ToPoint2d(), lines[1][1].ToPoint2d());
                 var u2 = line2.GetDistanceTo(origin.ToPoint2d());
 
-                var u3 = u2 + ZSafety * (u2 - u1) / (z2 - z1);
-                var z3 = z2 + ZSafety;           
-                
-                generator.AngleToolPosition= angle;
-                generator.Command($"G05 A{angle} S{S}");
-
-                generator.PointToolPosition = new Point3d(OriginX - u3, OriginY, z3);
-                generator.Command($"G00 U{u3.Round(4)} V{z3.Round(4)}");
+                var coeff = (u2 - u1) / (z2 - z1);
+                var u3 = u2 + ZSafety * coeff;
+                var z3 = z2 + ZSafety;
+                generator.GCommand(0, u3, z3);
 
                 generator.Command($"M03", "Включение");
 
-                generator.PointToolPosition = new Point3d(OriginX - u1, OriginY, z1);
-                generator.Command($"G01 U{u1.Round(4)} V{z1.Round(4)} F{PenetrationFeed}");
+                var u0 = u1 - Departure * coeff;
+                var z0 = z1 - Departure;
+                generator.GCommand(1, u0, z0, PenetrationFeed);
 
                 generator.Command($"G04 P60", "Задержка");
-
                 generator.Command($"M05", "Выключение");
                 generator.Command($"M00", "Пауза");
 
-                generator.PointToolPosition = new Point3d(OriginX - u3, OriginY, z3);
-                generator.Command($"G01 U{u3.Round(4)} V{z3.Round(4)} F{TransitionFeed}");
-
+                generator.GCommand(1, u3, z3, TransitionFeed);
             }
         }
     }

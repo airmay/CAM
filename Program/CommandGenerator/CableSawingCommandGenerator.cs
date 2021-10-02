@@ -10,14 +10,27 @@ namespace CAM
     [MachineType(MachineType.CableSawing)]
     public class CableCommandGenerator : CommandGeneratorBase
     {
-        public Point3d? CenterToolPosition { get; set; }
-        public Point3d? PointToolPosition { get; set; }
-        public double? AngleToolPosition { get; set; }
+        public Point3d CenterPoint { get; set; }
+        public double Angle { get; set; }
 
-        public CableToolPosition GetToolPosition()
+        public double U { get; set; }
+        public double V { get; set; }
+
+        private bool _isSetPosition;
+
+        public void SetToolPosition(Point3d centerPoint, double angle, double u, double v)
         {
-            return CenterToolPosition.HasValue && PointToolPosition.HasValue && AngleToolPosition.HasValue 
-                ? new CableToolPosition(PointToolPosition.Value, CenterToolPosition.Value, AngleToolPosition.Value)
+            CenterPoint = centerPoint;
+            Angle = angle;
+            U = u;
+            V = v;
+            _isSetPosition = true;
+        }
+
+        private CableToolPosition GetToolPosition()
+        {
+            return _isSetPosition
+                ? new CableToolPosition(new Point3d(CenterPoint.X - U, CenterPoint.Y, V), CenterPoint, Angle)
                 : null;
         }
 
@@ -60,9 +73,24 @@ namespace CAM
 
         public void Pause(double duration) => Command(string.Format(CultureInfo.InvariantCulture, "(DLY,{0})", duration), "Пауза", duration);
 
-        protected string GCommandText(int gCode, string paramsString, Point3d point, Curve curve, double? angleC, double? angleA, int? feed, Point2d? center)
+        public void GCommand(int gCode, double u, double v, int? feed = null, string name = "")
         {
-            return $"G{gCode} U{point.X.Round(4)} V{point.Y.Round(4)}";
+            var text = $"G0{gCode} U{(u - U).Round(4)} V{(v - V).Round(4)} {(feed.HasValue ? "F" + feed.ToString() : null)}";
+            U = u;
+            V = v;
+            Command(text, name);
+        }
+
+        public void GCommandAngle(double angle, int s)
+        {
+            var da = angle - Angle;
+            if (da > 180)
+                da -= 360;
+            if (da < -180)
+                da += 360;
+
+            Angle = angle;
+            Command($"G05 A{da} S{s}", "Rotate");
         }
     }
 }
