@@ -175,10 +175,12 @@ namespace CAM
 
         #region ToolObject
 
-        public static ToolModel ToolObject { get; set; } = new ToolModel();
+        public static ToolModel ToolObject { get; set; }
 
         public static void RegenToolObject(Tool tool, bool hasTool, ToolPosition location, bool isFrontPlaneZero)
         {
+            if (ToolObject == null)
+                ToolObject = new ToolModel();
             ToolObject.SetToolPosition(tool, location);
             Editor.UpdateScreen();
 

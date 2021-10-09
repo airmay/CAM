@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Linq;
 using Autodesk.AutoCAD.DatabaseServices;
+using Autodesk.AutoCAD.Geometry;
 
 namespace CAM
 {
     /// <summary>
     /// Базовая технологическая операция
     /// </summary>
+    [Serializable]
     public abstract class MillingTechOperation : TechOperation
     {
         public abstract void BuildProcessing(MillingCommandGenerator generator);
@@ -14,16 +16,26 @@ namespace CAM
         public virtual void PrepareBuild(MillingCommandGenerator generator) { }
     }
 
+    [Serializable]
     public abstract class MillingTechOperation<T> : MillingTechOperation where T : ITechProcess
     {
         public T TechProcess => (T)TechProcessBase;
     }
 
+    [Serializable]
     public abstract class WireSawingTechOperation : TechOperation
     {
+        public int? CuttingFeed { get; set; }
+        public int? S { get; set; }
+        public double? Departure { get; set; }
+        public bool IsRevereseDirection { get; set; }
+        public bool IsRevereseOffset { get; set; }
+
+        public abstract Point3d[][] GetProcessPoints();
         public abstract void BuildProcessing(CableCommandGenerator generator);
     }
 
+    [Serializable]
     public abstract class WireSawingTechOperation<T> : WireSawingTechOperation where T : ITechProcess
     {
         public T TechProcess => (T)TechProcessBase;

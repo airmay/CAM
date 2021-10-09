@@ -19,7 +19,7 @@ namespace CAM
 
         public static double Round(this double value, int digits = 0) => Math.Round(value, digits);
 
-        public static void BindEnum<T>(this ComboBox comboBox, params T[] values) where T: struct
+        public static void BindEnum<T>(this ComboBox comboBox, params T[] values) where T : struct
         {
             comboBox.DisplayMember = "Description";
             comboBox.ValueMember = "Value";
@@ -43,9 +43,19 @@ namespace CAM
 
         public static T GetSource<T>(this BindingSource bindingSource) => (T)bindingSource.DataSource;
 
-        public static IEnumerable<T> NotNull<T>(this IEnumerable<T?> collection) where T: struct
+        public static IEnumerable<T> NotNull<T>(this IEnumerable<T?> collection) where T : struct
         {
             return collection?.Where(p => p.HasValue).Select(p => p.Value);
+        }
+
+        public static T If<T>(this T obj, bool condition, Func<T, T> func)
+        {
+            if (condition)
+            {
+                return func(obj);
+            }
+
+            return obj;
         }
     }
 }

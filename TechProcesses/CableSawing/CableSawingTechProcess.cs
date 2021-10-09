@@ -10,15 +10,13 @@ namespace CAM.TechProcesses.CableSawing
     [MenuItem("Распиловка тросом", 8)]
     public class CableSawingTechProcess : CableTechProcess
     {
-        public int S { get; set; } = 60;
+        public double ToolThickness { get; set; } = 10;
+        public int CuttingFeed { get; set; } = 10;
+        public int S { get; set; } = 100;
+        public double Departure { get; set; } = 50;
+        public double Delta { get; set; } = 0;
 
-        public double ToolThickness { get; set; } = 60;
-
-        public int TransitionFeed { get; set; } = 300;
-
-        public double Departure { get; set; }
-
-        public double Delta { get; set; }
+        public Point2d Center => new Point2d(OriginX, OriginY);
 
         public CableSawingTechProcess()
         {
@@ -29,14 +27,13 @@ namespace CAM.TechProcesses.CableSawing
 
         public static void ConfigureParamsView(ParamsView view)
         {
-            view.AddAcadObject(nameof(ProcessingArea), "Объекты", "Выберите обрабатываемые области", AcadObjectNames.Region)
+            view.AddAcadObject(nameof(ProcessingArea), "Объекты", "Выберите обрабатываемые области")
                 .AddOrigin()
                 .AddIndent()
-                .AddParam(nameof(PenetrationFeed))
-                .AddParam(nameof(TransitionFeed))
+                .AddParam(nameof(CuttingFeed))
                 .AddParam(nameof(S), "Угловая скорость")
                 .AddParam(nameof(ZSafety))
-                .AddParam(nameof(Departure), "Выезд нижний")
+                .AddParam(nameof(Departure), "Выезд")
                 .AddIndent()
                 .AddParam(nameof(ToolThickness), "Толщина троса")
                 .AddParam(nameof(Delta));
@@ -44,14 +41,25 @@ namespace CAM.TechProcesses.CableSawing
 
         protected override void BuildProcessing(CableCommandGenerator generator)
         {
+            var extent = ProcessingArea.Select(p => p.ObjectId).GetExtents();
+            if (OriginObject == null)
+            {
+                var center = ProcessingArea.Select(p => p.ObjectId).GetCenter();
+                OriginX = center.X.Round(2);
+                OriginY = center.Y.Round(2);
+                OriginObject = Acad.CreateOriginObject(new Point3d(OriginX, OriginY, 0));
+            }
             Tool.Thickness = ToolThickness;
 
             var origin = new Point3d(OriginX, OriginY, 0);
             generator.CenterPoint = origin;
-            generator.Command($"G92");
 
             var regions = ProcessingArea.Select(p => p.ObjectId.QOpenForRead()).ToList();
-            generator.SetToolPosition(origin, 0, 0, regions[0].Bounds.Value.MaxPoint.Z + ZSafety);
+            //generator.SetToolPosition(origin, 0, 0, regions[0].Bounds.Value.MaxPoint.Z + ZSafety);
+            generator.SetToolPosition(origin, 0, 0, extent.MaxPoint.Z + ZSafety);
+            generator.Command($"G92");
+            return;
+
 
             foreach (Region region in regions)
             {
@@ -97,7 +105,7 @@ namespace CAM.TechProcesses.CableSawing
                 generator.Command($"M05", "Выключение");
                 generator.Command($"M00", "Пауза");
 
-                generator.GCommand(1, u3, z3, TransitionFeed);
+                generator.GCommand(1, u3, z3, CuttingFeed);
             }
         }
     }

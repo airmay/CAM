@@ -135,6 +135,7 @@
     <Compile Include="Program\ProcessCommand.cs" />
     <Compile Include="TechProcesses\CableSawing\ArcSawingTechOperation.cs" />
     <Compile Include="TechProcesses\CableSawing\CableSawingTechProcess.cs" />
+    <Compile Include="TechProcesses\CableSawing\LineSawingTechOperation.cs" />
     <Compile Include="TechProcesses\Disk3D\CombTechOperation.cs" />
     <Compile Include="TechProcesses\Disk3D\CrossCleaningTechOperation.cs" />
     <Compile Include="TechProcesses\Disk3D\Disk3DTechProcess.cs" />

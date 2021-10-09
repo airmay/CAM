@@ -75,9 +75,11 @@ namespace CAM
 
         public static double AngleDeg(this Line line) => Math.Round(line.Angle * 180 / Math.PI, 6);
 
-        public static Point3d ExpandStart(this Line line, double value) => line.StartPoint - line.Delta.GetNormal() * value;
+        public static Point3d ExpandStart(this Line line, double value) => line.StartPoint.GetExtendedPoint(line.EndPoint, value);
 
-        public static Point3d ExpandEnd(this Line line, double value) => line.EndPoint + line.Delta.GetNormal() * value;
+        public static Point3d ExpandEnd(this Line line, double value) => line.EndPoint.GetExtendedPoint(line.StartPoint, value);
+
+        public static Point3d GetExtendedPoint(this Point3d point, Point3d basePoint, double value) => point + (point - basePoint).GetNormal() * value;
 
         public static bool IsTurnRight(Point3d px, Point3d py, Point3d pz)
         {
@@ -95,6 +97,15 @@ namespace CAM
             var result = new List<Point3d>();
             entitys.ForEach(p => result.AddRange(entity.Intersect(p, intersectType)));
             return result;
+        }
+
+        public static IEnumerable<Point3d> GetPoints(this Curve cv, int divs)
+        {
+            double div = (cv.EndParam - cv.StartParam) / divs;
+            for (int i = 0; i <= divs; i++)
+            {
+                yield return cv.GetPointAtParam(cv.StartParam + i * div);
+            }
         }
 
         public static IEnumerable<Point3d> GetPolylineFitPoints(this Polyline poly, double distDelta)

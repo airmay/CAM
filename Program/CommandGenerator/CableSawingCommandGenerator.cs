@@ -29,9 +29,7 @@ namespace CAM
 
         private CableToolPosition GetToolPosition()
         {
-            return _isSetPosition
-                ? new CableToolPosition(new Point3d(CenterPoint.X - U, CenterPoint.Y, V), CenterPoint, Angle)
-                : null;
+            return new CableToolPosition(new Point3d(CenterPoint.X - U, CenterPoint.Y, V), CenterPoint, Angle);
         }
 
         public void Command(string text, string name = null, double duration = 0)
@@ -83,6 +81,9 @@ namespace CAM
 
         public void GCommandAngle(double angle, int s)
         {
+            if (angle == Angle)
+                return;
+
             var da = angle - Angle;
             if (da > 180)
                 da -= 360;
@@ -90,7 +91,7 @@ namespace CAM
                 da += 360;
 
             Angle = angle;
-            Command($"G05 A{da} S{s}", "Rotate");
+            Command($"G05 A{da.Round(4)} S{s}", "Rotate");
         }
     }
 }

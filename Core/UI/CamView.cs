@@ -187,7 +187,7 @@ namespace CAM
                 case ITechProcess techProcess:
                     techProcess.Caption = e.Label;
                     break;
-                case MillingTechOperation techOperation:
+                case TechOperation techOperation:
                     techOperation.Caption = e.Label;
                     break;
             }
@@ -198,7 +198,7 @@ namespace CAM
         private void treeView_AfterCheck(object sender, TreeViewEventArgs e)
         {
             e.Node.ForeColor = e.Node.Checked ? Color.Black : Color.Gray;
-            ((MillingTechOperation)e.Node.Tag).Enabled = e.Node.Checked;
+            ((TechOperation)e.Node.Tag).Enabled = e.Node.Checked;
         }
 
         private void EndEdit()
@@ -306,7 +306,7 @@ namespace CAM
         {
             var techProcessNode = treeView.SelectedNode.Parent ?? treeView.SelectedNode;
             techProcessNode.Text = ((ITechProcess)techProcessNode.Tag).Caption;
-            techProcessNode.Nodes.Cast<TreeNode>().ToList().ForEach(p => p.Text = ((MillingTechOperation)p.Tag).Caption);
+            techProcessNode.Nodes.Cast<TreeNode>().ToList().ForEach(p => p.Text = ((TechOperation)p.Tag).Caption);
         }
 
         private void bVisibility_Click(object sender, EventArgs e)
