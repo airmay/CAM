@@ -161,9 +161,10 @@ namespace CAM.TechProcesses.Tactile
                     var dist = lines.Select(p => p.GetDistToPoint(point)).OrderBy(p => p).ToArray();
                     var s1 = dist[1] - dist[0];
                     var s2 = dist[2] - dist[1];
-                    BandWidth = Math.Max(s1, s2);
-                    BandSpacing = Math.Min(s1, s2);
-                    BandStart1 = (s1 > s2 ? dist[0] : dist[1]) % (BandWidth + BandSpacing);
+                    BandWidth = s2; // Math.Max(s1, s2);
+                    BandSpacing = s1; // Math.Min(s1, s2);
+                    //BandStart1 = (s1 > s2 ? dist[0] : dist[1]) % (BandWidth + BandSpacing);
+                    BandStart1 = dist[1] % (BandWidth + BandSpacing);
 
                     RoundParams();
                     return;
