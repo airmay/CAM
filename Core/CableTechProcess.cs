@@ -83,16 +83,16 @@ namespace CAM
 
                 BuildProcessing(generator);
 
-                TechOperations.FindAll(p => p.Enabled && p.CanProcess).Cast<WireSawingTechOperation>().ToList().ForEach(p =>
-                {
-                    generator.SetTechOperation(p);
+                //TechOperations.FindAll(p => p.Enabled && p.CanProcess).Cast<WireSawingTechOperation>().ToList().ForEach(p =>
+                //{
+                //    generator.SetTechOperation(p);
 
-                //    p.PrepareBuild(generator);
-                    p.BuildProcessing(generator);
+                ////    p.PrepareBuild(generator);
+                //    p.BuildProcessing(generator);
 
-                //    if (!generator.IsUpperTool)
-                //        generator.Uplifting();
-                });
+                ////    if (!generator.IsUpperTool)
+                ////        generator.Uplifting();
+                //});
                 //generator.FinishTechProcess();
                 ProcessCommands = generator.ProcessCommands;
             }

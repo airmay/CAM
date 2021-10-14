@@ -17,10 +17,22 @@ namespace CAM
                             .Select(p => new { Type = p, Attr = Attribute.GetCustomAttribute(p, typeof(MenuItemAttribute)) as MenuItemAttribute })
                             .OrderBy(p => p.Attr.Position)
                             .ToDictionary(p => p.Attr.Name, p => p.Type);
+
+    //        var t = typeof(TechProcesses.CableSawing.LineSawingTechOperation);
+    //        var tt = t.GetProperty(nameof(TechOperation.TechProcessBase));
+
+    //        var v1 = Assembly.GetExecutingAssembly().GetTypes().ToList();
+    //var v2 = v1.Where(p => p.IsClass && !p.IsAbstract && p.IsSubclassOf(typeof(TechOperation))).ToList();
+    //        var v3 = v2.Select(p => new { tp = p.BaseType.GetGenericArguments()[0], to = p, attr = Attribute.GetCustomAttribute(p, typeof(MenuItemAttribute)) as MenuItemAttribute }).ToList();
+    //        var v4 = v3.GroupBy(p => p.tp).ToList();
+    //        var v5 = v4.ToDictionary(p => p.Key, p => p.OrderBy(k => k.attr.Position).ToDictionary(k => k.attr.Name, v => v.to));
+
             _techOperationTypes = Assembly.GetExecutingAssembly().GetTypes()
-                .Where(p => p.IsClass && !p.IsAbstract && p.BaseType.IsGenericType && 
-                    (p.BaseType.GetGenericTypeDefinition() == typeof(MillingTechOperation<>) || p.BaseType.GetGenericTypeDefinition() == typeof(WireSawingTechOperation<>)))
-                .Select(p => new { tp = p.BaseType.GetGenericArguments()[0], to = p, attr = Attribute.GetCustomAttribute(p, typeof(MenuItemAttribute)) as MenuItemAttribute })
+                .Where(p => p.IsClass && !p.IsAbstract && p.IsSubclassOf(typeof(TechOperation)))
+                //p.BaseType.IsGenericType && 
+
+                //    (p.BaseType.GetGenericTypeDefinition() == typeof(MillingTechOperation<>) || p.BaseType.GetGenericTypeDefinition() == typeof(WireSawingTechOperation<>)))
+                .Select(p => new { tp = p.GetProperty("TechProcess").PropertyType, to = p, attr = Attribute.GetCustomAttribute(p, typeof(MenuItemAttribute)) as MenuItemAttribute })
                 .GroupBy(p => p.tp)
                 .ToDictionary(p => p.Key, p => p.OrderBy(k => k.attr.Position).ToDictionary(k => k.attr.Name, v => v.to));
         }

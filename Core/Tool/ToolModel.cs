@@ -57,8 +57,10 @@ namespace CAM
             Acad.Editor.UpdateScreen();
         }
 
-        private void DeleteCurves()
+        public void DeleteCurves()
         {
+            if (Curves == null)
+                return;
             using (var doclock = Application.DocumentManager.MdiActiveDocument.LockDocument())
             using (Transaction tr = Acad.Database.TransactionManager.StartTransaction())
                 foreach (var item in Curves)
@@ -67,6 +69,8 @@ namespace CAM
                     item.Dispose();
                 }
             Curves = null;
+            _tool = null;
+            _toolPosition = null;
         }
 
         //public bool HasTool { get; set; }

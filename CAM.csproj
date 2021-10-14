@@ -107,6 +107,7 @@
       <DependentUpon>ParamsView.cs</DependentUpon>
     </Compile>
     <Compile Include="Core\UI\Progressor.cs" />
+    <Compile Include="Core\WireSawingTechOperation.cs" />
     <Compile Include="Program\BuilderUtils.cs" />
     <Compile Include="Program\CommandGenerator\CableSawingCommandGenerator.cs" />
     <Compile Include="Program\CommandGenerator\CommandGeneratorBase.cs" />
@@ -134,6 +135,7 @@
     <Compile Include="Core\Enums\Material.cs" />
     <Compile Include="Program\ProcessCommand.cs" />
     <Compile Include="TechProcesses\CableSawing\ArcSawingTechOperation.cs" />
+    <Compile Include="TechProcesses\CableSawing\CableSawingTechOperation.cs" />
     <Compile Include="TechProcesses\CableSawing\CableSawingTechProcess.cs" />
     <Compile Include="TechProcesses\CableSawing\LineSawingTechOperation.cs" />
     <Compile Include="TechProcesses\Disk3D\CombTechOperation.cs" />

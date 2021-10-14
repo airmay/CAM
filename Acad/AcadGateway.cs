@@ -175,12 +175,10 @@ namespace CAM
 
         #region ToolObject
 
-        public static ToolModel ToolObject { get; set; }
+        private static ToolModel ToolObject { get; } = new ToolModel();
 
         public static void RegenToolObject(Tool tool, bool hasTool, ToolPosition location, bool isFrontPlaneZero)
         {
-            if (ToolObject == null)
-                ToolObject = new ToolModel();
             ToolObject.SetToolPosition(tool, location);
             Editor.UpdateScreen();
 
@@ -220,16 +218,7 @@ namespace CAM
 
         public static void DeleteToolObject()
         {
-            if (ToolObject == null)
-                return;
-            using (var doclock = Application.DocumentManager.MdiActiveDocument.LockDocument())
-            using (Transaction tr = Database.TransactionManager.StartTransaction())
-                foreach (var item in ToolObject.Curves)
-                {
-                    TransientManager.CurrentTransientManager.EraseTransient(item, new IntegerCollection());
-                    item.Dispose();
-                }
-            ToolObject = null;
+            ToolObject.DeleteCurves();
         }
 
         #endregion

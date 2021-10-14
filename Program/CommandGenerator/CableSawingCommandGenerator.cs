@@ -1,5 +1,7 @@
 ﻿using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
+using Dreambuild.AutoCAD;
+using System;
 using System.Globalization;
 
 namespace CAM
@@ -71,27 +73,28 @@ namespace CAM
 
         public void Pause(double duration) => Command(string.Format(CultureInfo.InvariantCulture, "(DLY,{0})", duration), "Пауза", duration);
 
-        public void GCommand(int gCode, double u, double v, int? feed = null, string name = "")
+        public void GCommand(int gCode, double u, double? v = null, int? feed = null, string name = "")
         {
-            var text = $"G0{gCode} U{(u - U).Round(4)} V{(v - V).Round(4)} {(feed.HasValue ? "F" + feed.ToString() : null)}";
+            var text = $"G0{gCode} U{(u - U).Round(4)} V{((v ?? V) - V).Round(4)} {(feed.HasValue ? "F" + feed.ToString() : null)}";
             U = u;
-            V = v;
+            V = v ?? V;
             Command(text, name);
         }
 
         public void GCommandAngle(double angle, int s)
         {
-            if (angle == Angle)
+            if (Math.Abs(angle - Angle) < 0.000001)
                 return;
 
             var da = angle - Angle;
-            if (da > 180)
-                da -= 360;
-            if (da < -180)
-                da += 360;
+            //if (da > 180)
+            //    da -= 360;
+            //if (da < -180)
+            //    da += 360;
 
             Angle = angle;
-            Command($"G05 A{da.Round(4)} S{s}", "Rotate");
+            Command($"G05 A{da.Round(6)} S{s}", "Rotate");
+//            Command($"G05 A{da.Round(6)} S{s} A={Angle.Round(6)} U={U.Round(6)}", "Rotate");
         }
     }
 }

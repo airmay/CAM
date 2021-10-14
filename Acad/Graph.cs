@@ -101,6 +101,9 @@ namespace CAM
 
         public static IEnumerable<Point3d> GetPoints(this Curve cv, int divs)
         {
+            if (cv is Spline spline)
+                cv = spline.ToPolyline();
+            
             double div = (cv.EndParam - cv.StartParam) / divs;
             for (int i = 0; i <= divs; i++)
             {

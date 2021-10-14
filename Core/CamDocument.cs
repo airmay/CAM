@@ -38,7 +38,7 @@ namespace CAM
             TechProcessList.Remove(techProcess);
         }
 
-        public void DeleteTechOperation(MillingTechOperation techOperation)
+        public void DeleteTechOperation(TechOperation techOperation)
         {
             techOperation.TechProcessBase.DeleteProcessing();
             techOperation.Teardown();
@@ -55,6 +55,7 @@ namespace CAM
 
             try
             {
+                Acad.DeleteToolObject();
                 Acad.Write($"Выполняется расчет обработки по техпроцессу {techProcess.Caption} ...");
                 var stopwatch = Stopwatch.StartNew();
                 Acad.CreateProgressor($"Расчет обработки по техпроцессу \"{techProcess.Caption}\"");
@@ -101,11 +102,37 @@ namespace CAM
                     var contents = techProcess.ProcessCommands.Select(p => p.GetProgrammLine(Settings.GetMachineSettings(techProcess.MachineType.Value).ProgramLineNumberFormat)).ToArray();
                     File.WriteAllLines(fileName, contents);
                     Acad.Write($"Создан файл {fileName}");
+                    if (techProcess.MachineType == MachineType.CableSawing)
+                        CreateImitationProgramm(contents, fileName);
                 }
                 catch (Exception ex)
                 {
                     Acad.Alert($"Ошибка при записи файла {fileName}", ex);
                 }
+        }
+
+        private void CreateImitationProgramm(string[] contents, string fileName)
+        {
+            List<string> result = new List<string>(contents.Length * 2);
+            foreach (var item in contents)
+            {
+                if (item.StartsWith("M03"))
+                    continue;
+
+                var line = item.Replace("G01", "G00");
+                var vi = line.IndexOf('V');
+                if (vi > 0)
+                    line = line.Substring(0, vi) + "V0";
+
+                result.Add(line);
+
+                if (line.StartsWith("G00"))
+                    result.Add("M00");
+            }
+            var parts = fileName.Split('.');
+            fileName = parts[0] + "_i." + parts[1];
+            File.WriteAllLines(fileName, result);
+            Acad.Write($"Создан файл с имитацией {fileName}");
         }
     }
 }
