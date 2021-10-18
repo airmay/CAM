@@ -35,6 +35,7 @@ namespace CAM.TechProcesses.CableSawing
                 .AddParam(nameof(CuttingFeed))
                 .AddParam(nameof(S), "Угловая скорость")
                 .AddParam(nameof(ZSafety))
+                .AddText("Z безопасности отсчитывается от верха выбранных объектов техпроцесса")
                 .AddIndent()
                 .AddParam(nameof(Approach), "Заезд")
                 .AddParam(nameof(Departure), "Выезд")
@@ -62,6 +63,7 @@ namespace CAM.TechProcesses.CableSawing
         protected override void BuildProcessing(CableCommandGenerator generator)
         {
             Tool = new Tool { Type = ToolType.Cable, Diameter = ToolThickness, Thickness = ToolThickness };
+            var z0 = ProcessingArea.Select(p => p.ObjectId).GetExtents().MaxPoint.Z + ZSafety;
             //if (OriginObject == null)
             //{
             //    var center = ProcessingArea.Select(p => p.ObjectId).GetCenter();
@@ -98,17 +100,23 @@ namespace CAM.TechProcesses.CableSawing
 
                 if (!isStarted)
                 {
-                    generator.SetToolPosition(new Point3d(OriginX, OriginY, 0), 0, 0, entity.Bounds.Value.MaxPoint.Z + ZSafety);
+                    generator.SetToolPosition(new Point3d(OriginX, OriginY, 0), 0, 0, z0);
                     generator.Command($"G92");
                 }
+                int? direction = null;
                 for (int i = 0; i < points0.Count; i++)
                 {
                     var line = new Line2d(points0[i].ToPoint2d(), points1[i].ToPoint2d());
                     var pNearest = line.GetClosestPointTo(Center).Point;
                     var vector = pNearest - Center;
-                    var u = vector.Length;
+                    if (direction == null)
+                        direction = vector.X.Round(6) > 0 ? -1 : 1;
+                    var newDir = vector.X.Round(6) > 0 ? -1 : 1;
+                    if (newDir != direction)
+                        direction *= -1;
+                    var u = vector.Length * direction.Value;
                     var z = (points0[i] + (points1[i] - points0[i]) / 2).Z;
-                    var angle = Vector2d.XAxis.Negate().ZeroTo2PiAngleTo(vector).ToDeg();
+                    //var angle = Vector2d.XAxis.Negate().ZeroTo2PiAngleTo(vector).ToDeg();
 
                     //if (operation is ArcSawingTechOperation)
                     //{
@@ -142,7 +150,7 @@ namespace CAM.TechProcesses.CableSawing
 
                     if (!isStarted)
                     {
-                        generator.GCommandAngle(angle, operation.S);
+                        generator.GCommandAngle(line.Direction, operation.S);
                         generator.GCommand(0, u);
                         generator.GCommand(0, u, z);
                         generator.Command($"M03", "Включение");
@@ -152,7 +160,7 @@ namespace CAM.TechProcesses.CableSawing
                     {
                         generator.GCommand(1, u, z, operation.CuttingFeed);
                         if (i == 0 || !(entity is PlaneSurface))
-                            generator.GCommandAngle(angle, operation.S);
+                            generator.GCommandAngle(line.Direction, operation.S);
                     }
                 }
                 generator.Command($"G04 P{operation.Delay}", "Задержка");

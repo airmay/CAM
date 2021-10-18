@@ -115,7 +115,7 @@ namespace CAM
             return this;
         }
 
-        public ParamsView AddText(string displayName, Action<Label> labelProvider = null)
+        public ParamsView AddText(string displayName, Action<Label> labelProvider)
         {
             AddRow();
             AddLabel(displayName);
@@ -127,6 +127,22 @@ namespace CAM
             };
             tablePanel.Controls.Add(label, 1, tablePanel.RowStyles.Count - 1);
             labelProvider?.Invoke(label);
+
+            return this;
+        }
+
+        public ParamsView AddText(string text)
+        {
+            AddRow();
+
+            var textbox = new Label
+            {
+                Text = text,
+                Dock = DockStyle.Fill,
+                TextAlign = ContentAlignment.TopLeft
+            };
+            tablePanel.Controls.Add(textbox, 0, tablePanel.RowStyles.Count - 1);
+            tablePanel.SetColumnSpan(textbox, 2);
 
             return this;
         }

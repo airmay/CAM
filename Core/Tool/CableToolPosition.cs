@@ -13,7 +13,7 @@ namespace CAM
             //AngleA = angleA;
 
             var mat1 = Matrix3d.Displacement(Point.GetAsVector());
-            var mat2 = Matrix3d.Rotation(angleA.ToRad(), Vector3d.ZAxis, center);
+            var mat2 = Matrix3d.Rotation(angleA, Vector3d.ZAxis, center);
             Matrix = mat2 * mat1;
             InvMatrix = Matrix.Inverse();
         }

@@ -23,5 +23,9 @@ namespace CAM
 
         public object Owner { get; set; }
 
+        public double? U { get; set; }
+        public double? V { get; set; }
+        public double? A { get; set; }
+
     }
 }

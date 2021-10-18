@@ -124,6 +124,9 @@ namespace CAM
                 if (vi > 0)
                     line = line.Substring(0, vi) + "V0";
 
+                if (line == "G00 U0 V0")
+                    continue;
+
                 result.Add(line);
 
                 if (line.StartsWith("G00"))

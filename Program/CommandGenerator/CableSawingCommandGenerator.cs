@@ -12,8 +12,10 @@ namespace CAM
     [MachineType(MachineType.CableSawing)]
     public class CableCommandGenerator : CommandGeneratorBase
     {
+        const double Epsilon = 0.000001;
+
         public Point3d CenterPoint { get; set; }
-        public double Angle { get; set; }
+        public Vector2d Vector { get; set; } = Vector2d.YAxis;
 
         public double U { get; set; }
         public double V { get; set; }
@@ -23,15 +25,17 @@ namespace CAM
         public void SetToolPosition(Point3d centerPoint, double angle, double u, double v)
         {
             CenterPoint = centerPoint;
-            Angle = angle;
-            U = u;
-            V = v;
+            //Angle = angle;
+            U = u.Round(6);
+            V = v.Round(6);
             _isSetPosition = true;
         }
 
         private CableToolPosition GetToolPosition()
         {
-            return new CableToolPosition(new Point3d(CenterPoint.X - U, CenterPoint.Y, V), CenterPoint, Angle);
+            var point = new Point3d(CenterPoint.X - U, CenterPoint.Y, V);
+            var angle = Vector2d.YAxis.MinusPiToPiAngleTo(Vector);
+            return new CableToolPosition(point, CenterPoint, angle);
         }
 
         public void Command(string text, string name = null, double duration = 0)
@@ -42,7 +46,10 @@ namespace CAM
                 Text = text,
                 //HasTool = _hasTool,
                 ToolLocation = GetToolPosition(),
-                Duration = duration
+                Duration = duration,
+                U = U.Round(6),
+                V = V.Round(6),
+                A = Vector2d.YAxis.MinusPiToPiAngleTo(Vector).ToDeg(6)
             });
         }
 
@@ -75,26 +82,36 @@ namespace CAM
 
         public void GCommand(int gCode, double u, double? v = null, int? feed = null, string name = "")
         {
-            var text = $"G0{gCode} U{(u - U).Round(4)} V{((v ?? V) - V).Round(4)} {(feed.HasValue ? "F" + feed.ToString() : null)}";
-            U = u;
-            V = v ?? V;
+            var ur = u.Round(6);
+            var vr = v?.Round(6) ?? V;
+            if (ur == U && vr == V)
+                return;
+            var text = $"G0{gCode} U{(ur - U).Round(4)} V{(vr - V).Round(4)} {(feed.HasValue ? "F" + feed.ToString() : null)}";
+            U = ur;
+            V = vr;
             Command(text, name);
         }
 
-        public void GCommandAngle(double angle, int s)
+        public void GCommandAngle(Vector2d vector, int s)
         {
-            if (Math.Abs(angle - Angle) < 0.000001)
+            var angle = Vector.MinusPiToPiAngleTo(vector);
+            if (Math.Abs(angle.ToDeg(6)) >= 90)
+            {
+                vector = vector.Negate();
+                angle = Vector.MinusPiToPiAngleTo(vector);
+            }
+            if (Math.Abs(angle.ToDeg()) < 0.000001)
                 return;
 
-            var da = angle - Angle;
+            //var da = angle - Angle;
             //if (da > 180)
             //    da -= 360;
             //if (da < -180)
             //    da += 360;
 
-            Angle = angle;
-            Command($"G05 A{da.Round(6)} S{s}", "Rotate");
-//            Command($"G05 A{da.Round(6)} S{s} A={Angle.Round(6)} U={U.Round(6)}", "Rotate");
+            Vector = vector;
+            Command($"G05 A{angle.ToDeg(6)} S{s}", "Rotate");
+            //Command($"G05 A{angle.ToDeg(6)} S{s} A={Vector.Angle.ToDeg(6)} U={U.Round(6)}", "Rotate");
         }
     }
 }
