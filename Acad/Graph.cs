@@ -81,6 +81,8 @@ namespace CAM
 
         public static Point3d GetExtendedPoint(this Point3d point, Point3d basePoint, double value) => point + (point - basePoint).GetNormal() * value;
 
+        public static bool IsEqual(this double value1, double value2) => Math.Abs(value1 - value2) < Consts.Epsilon;
+
         public static bool IsTurnRight(Point3d px, Point3d py, Point3d pz)
         {
             double num = 0;

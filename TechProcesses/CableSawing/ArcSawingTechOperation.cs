@@ -14,7 +14,7 @@ namespace CAM.TechProcesses.CableSawing
     {
         public static void ConfigureParamsView(ParamsView view)
         {
-            view.AddAcadObject()
+            view.AddAcadObject("AcadObjects")
                 .AddParam(nameof(CuttingFeed))
                 .AddParam(nameof(S), "Угловая скорость")
                 .AddIndent()
@@ -24,6 +24,7 @@ namespace CAM.TechProcesses.CableSawing
                 .AddParam(nameof(IsRevereseDirection), "Обратное напр.")
                 .AddParam(nameof(IsRevereseOffset), "Обратный Offset")
                 .AddIndent()
+                .AddParam(nameof(Delta))
                 .AddParam(nameof(Delay), "Задержка")
                 .AddParam(nameof(StepCount), "Количество шагов");
         }
@@ -35,7 +36,12 @@ namespace CAM.TechProcesses.CableSawing
 
         public override Curve[] GetRailCurves(List<Curve> curves)
         {
-            return curves.Cast<Curve>().Where(p => !(p is Line)).ToArray();
+            var cv = curves.Cast<Curve>().Where(p => !(p is Line)).ToArray();
+            if (cv.Length > 2)
+                //cv = cv.Where(p => !(p is Arc)).ToArray();
+                return new Curve[2] { cv.First(p => p is Arc), cv.OrderBy(p => p.Length()).First(p => p is Spline) };
+            else
+                return cv;
         }
             
         //public void BuildProcessing(CableCommandGenerator generator)

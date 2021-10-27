@@ -16,7 +16,7 @@ namespace CAM.TechProcesses.CableSawing
 
         public static void ConfigureParamsView(ParamsView view)
         {
-            view.AddAcadObject()
+            view.AddAcadObject("AcadObjects")
                 .AddParam(nameof(CuttingFeed))
                 .AddParam(nameof(S), "Угловая скорость")
                 .AddIndent()
@@ -26,12 +26,13 @@ namespace CAM.TechProcesses.CableSawing
                 .AddParam(nameof(IsRevereseDirection), "Обратное напр.")
                 .AddParam(nameof(IsRevereseOffset), "Обратный Offset")
                 .AddIndent()
+                .AddParam(nameof(Delta))
                 .AddParam(nameof(Delay), "Задержка");
         }
 
         public override Curve[] GetRailCurves(List<Curve> curves)
         {
-            var bounds = ProcessingArea.ObjectId.QOpenForRead<Entity>().Bounds.Value;
+            var bounds = AcadObjects.First().ObjectId.QOpenForRead<Entity>().Bounds.Value;
 
             var pts = curves.SelectMany(p => p.GetStartEndPoints()).ToList();
             var p0 = pts.OrderBy(p => p.DistanceTo(bounds.MaxPoint)).First();
