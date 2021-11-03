@@ -114,16 +114,18 @@ namespace CAM.TechProcesses.CableSawing
                 //if (railCurves[1].StartPoint.DistanceTo(railCurves[0].StartPoint) > railCurves[1].StartPoint.DistanceTo(railCurves[0].EndPoint))
                 if (railCurves[0].StartPoint.GetVectorTo(railCurves[0].EndPoint).GetAngleTo(railCurves[1].StartPoint.GetVectorTo(railCurves[1].EndPoint)) > Math.PI / 2)
                     railCurves[1].ReverseCurve();
-                    if (railCurves[0] is Line)
+
+                if (railCurves[0] is Line)
+                {
+                    var dz = Math.Abs(railCurves[0].StartPoint.Z - railCurves[1].StartPoint.Z); // TODO dz
+                    if (dz > 1)
                     {
-                        if (!railCurves[0].StartPoint.Z.IsEqual(railCurves[1].StartPoint.Z))
-                        {
-                            if (railCurves[0].StartPoint.Z > railCurves[1].StartPoint.Z)
-                                railCurves[1].StartPoint = railCurves[1].StartPoint.GetExtendedPoint(railCurves[1].EndPoint, railCurves[0].Length() - railCurves[1].Length());
-                            else
-                                railCurves[0].StartPoint = railCurves[0].StartPoint.GetExtendedPoint(railCurves[0].EndPoint, railCurves[1].Length() - railCurves[0].Length());
-                        }
+                        if (railCurves[0].StartPoint.Z > railCurves[1].StartPoint.Z)
+                            railCurves[1].StartPoint = railCurves[1].StartPoint.GetExtendedPoint(railCurves[1].EndPoint, dz);
+                        else
+                            railCurves[0].StartPoint = railCurves[0].StartPoint.GetExtendedPoint(railCurves[0].EndPoint, dz);
                     }
+                }
                 
                 var points0 = GetRailPoints(railCurves[0], operation);
                 var points1 = GetRailPoints(railCurves[1], operation);
