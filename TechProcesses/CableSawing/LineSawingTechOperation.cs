@@ -45,92 +45,149 @@ namespace CAM.TechProcesses.CableSawing
             return new Curve[] { rail0, rail1 };
         }
 
-        //public override void BuildProcessing(CableCommandGenerator generator)
-        //{
-        //    CuttingFeed = CuttingFeed ?? TechProcess.CuttingFeed;
-        //    S = S ?? TechProcess.S;
-        //    Departure = Departure ?? TechProcess.Departure;
+        public void BuildProcessing(CableCommandGenerator generator)
+        {
+            //var dbObject = ProcessingArea.ObjectId.QOpenForRead();
+            var dbObject = AcadObjects.First().ObjectId.QOpenForRead();
+            var surface = dbObject as PlaneSurface;
+            if (dbObject is Region region)
+            {
+                surface = new PlaneSurface();
+                surface.CreateFromRegion(region);
+            }
+            var offsetDistance = TechProcess.ToolThickness / 2 + Delta;
+            if (IsRevereseOffset)
+                offsetDistance *= -1;
+            var offsetSurface = DbSurface.CreateOffsetSurface(surface, offsetDistance);
+            var curves = new DBObjectCollection();
+            surface.Explode(curves);
+            if (curves[0] is Region r)
+            {
+                curves.Clear();
+                r.Explode(curves);
+            }
+            var plane = ((Entity)curves[0]).GetPlane();
+            var zl = curves.Cast<Curve>().SelectMany(p => p.GetStartEndPoints().Select(x => x.Z)).ToList();
+            var zStart = zl.Max();
+            var zEnd = zl.Min();
+            var zPos = new List<double>();
+            if (Approach > 0)
+                zPos.Add(zStart + Approach);
+            if (Approach < 0)
+                zStart += Approach;
+            zPos.Add(zStart);
+            zPos.Add(zEnd);
+            if (Departure > 0)
+                zPos.Add(zEnd - Departure);
 
-        //    var entity = ProcessingArea.ObjectId.QOpenForRead<Entity>();
-        //    if (entity is Region region)
-        //    {
-        //        entity = new PlaneSurface();
-        //        ((PlaneSurface)entity).CreateFromRegion(region);
-        //    }
-        //    var offsetDistance = TechProcess.ToolThickness / 2 + TechProcess.Delta;
-        //    if (IsRevereseOffset)
-        //        offsetDistance *= -1;
-        //    var surface = DbSurface.CreateOffsetSurface(entity, offsetDistance) as DbSurface;
+            generator.SetToolPosition(new Point3d(TechProcess.OriginX, TechProcess.OriginY, 0), 0, 0, zPos[0] + TechProcess.ZSafety);
+            generator.Command($"G92");
 
-        //    var collection = new DBObjectCollection();
-        //    surface.Explode(collection);
+            foreach (var z in zPos)
+            {
+                var line = plane.IntersectWith(new Plane(new Point3d(0, 0, z), Vector3d.ZAxis));
+                var u = line.GetDistanceTo(new Point3d(TechProcess.OriginX, TechProcess.OriginY, z));
+                if (z == zPos[0])
+                {
+                    //var angle = line.Direction.ToVector2d().MinusPiToPiAngleTo(Vector2d.YAxis);
+                    generator.GCommandAngle(line.Direction.ToVector2d(), S);
+                    generator.GCommand(0, u);
+                    generator.GCommand(0, u, z);
+                    generator.Command($"M03", "Включение");
+                }
+                else
+                {
+                    generator.GCommand(1, u, z, CuttingFeed);
+                }
+            }
+            generator.Command($"G04 P{Delay}", "Задержка");
+            generator.Command($"M05", "Выключение");
+            generator.Command($"M00", "Пауза");
+        }
+            //    CuttingFeed = CuttingFeed ?? TechProcess.CuttingFeed;
+            //    S = S ?? TechProcess.S;
+            //    Departure = Departure ?? TechProcess.Departure;
 
-        //    var lines = collection.Cast<Line>().ToList();
-        //    var pts = lines.SelectMany(p => p.GetStartEndPoints()).ToList();
-        //    var p0 = pts.OrderBy(p => p.DistanceTo(surface.Bounds.Value.MaxPoint)).First();
-        //    var rail0 = lines.Where(p => p.HasPoint(p0)).OrderBy(p => Math.Min(p.StartPoint.Z, p.EndPoint.Z)).First();
+            //    var entity = ProcessingArea.ObjectId.QOpenForRead<Entity>();
+            //    if (entity is Region region)
+            //    {
+            //        entity = new PlaneSurface();
+            //        ((PlaneSurface)entity).CreateFromRegion(region);
+            //    }
+            //    var offsetDistance = TechProcess.ToolThickness / 2 + TechProcess.Delta;
+            //    if (IsRevereseOffset)
+            //        offsetDistance *= -1;
+            //    var surface = DbSurface.CreateOffsetSurface(entity, offsetDistance) as DbSurface;
 
-        //    //var v1 = lines.Where(p => p.HasPoint(region.Bounds.Value.MinPoint));
-        //    //var c = lines.Select(p => new { start = $"{p.StartPoint.X.Round(2)} {p.StartPoint.Y.Round(2)} {p.StartPoint.Z.Round(2)}", end = $"{p.EndPoint.X.Round(2)} {p.EndPoint.Y.Round(2)} {p.EndPoint.Z.Round(2)}" }).ToList();
-        //    var p1 = pts.OrderBy(p => p.DistanceTo(surface.Bounds.Value.MinPoint)).First();
-        //    var rail1 = lines.Where(p => p.HasPoint(p1)).OrderBy(p => Math.Max(p.StartPoint.Z, p.EndPoint.Z)).Last();
+            //    var collection = new DBObjectCollection();
+            //    surface.Explode(collection);
 
-        //    //var regionPpoints = collection.Cast<Line>().SelectMany(p => p.GetPoints()).ToList();
-        //    //var railPoints0 = new Point3d[2];
-        //    //var railPoints1 = new Point3d[2];
-        //    //railPoints0[0] = region.Bounds.Value.MaxPoint;
-        //    //railPoints1[1] = region.Bounds.Value.MinPoint;
-        //    //railPoints0[1] = regionPpoints.Where(p => p.Z < railPoints1[1].Z + 10).OrderBy(p => p.DistanceTo(railPoints1[1])).Last();
-        //    //railPoints1[0] = regionPpoints.Where(p => p.Z > railPoints0[0].Z - 10).OrderBy(p => p.DistanceTo(railPoints0[0])).Last();
+            //    var lines = collection.Cast<Line>().ToList();
+            //    var pts = lines.SelectMany(p => p.GetStartEndPoints()).ToList();
+            //    var p0 = pts.OrderBy(p => p.DistanceTo(surface.Bounds.Value.MaxPoint)).First();
+            //    var rail0 = lines.Where(p => p.HasPoint(p0)).OrderBy(p => Math.Min(p.StartPoint.Z, p.EndPoint.Z)).First();
+
+            //    //var v1 = lines.Where(p => p.HasPoint(region.Bounds.Value.MinPoint));
+            //    //var c = lines.Select(p => new { start = $"{p.StartPoint.X.Round(2)} {p.StartPoint.Y.Round(2)} {p.StartPoint.Z.Round(2)}", end = $"{p.EndPoint.X.Round(2)} {p.EndPoint.Y.Round(2)} {p.EndPoint.Z.Round(2)}" }).ToList();
+            //    var p1 = pts.OrderBy(p => p.DistanceTo(surface.Bounds.Value.MinPoint)).First();
+            //    var rail1 = lines.Where(p => p.HasPoint(p1)).OrderBy(p => Math.Max(p.StartPoint.Z, p.EndPoint.Z)).Last();
+
+            //    //var regionPpoints = collection.Cast<Line>().SelectMany(p => p.GetPoints()).ToList();
+            //    //var railPoints0 = new Point3d[2];
+            //    //var railPoints1 = new Point3d[2];
+            //    //railPoints0[0] = region.Bounds.Value.MaxPoint;
+            //    //railPoints1[1] = region.Bounds.Value.MinPoint;
+            //    //railPoints0[1] = regionPpoints.Where(p => p.Z < railPoints1[1].Z + 10).OrderBy(p => p.DistanceTo(railPoints1[1])).Last();
+            //    //railPoints1[0] = regionPpoints.Where(p => p.Z > railPoints0[0].Z - 10).OrderBy(p => p.DistanceTo(railPoints0[0])).Last();
 
 
-        //    //var offsetVector = region.Normal * (TechProcess.ToolThickness / 2 + TechProcess.Delta);
-        //    //if (IsRevereseOffset)
-        //    //    offsetVector = offsetVector.Negate();
+            //    //var offsetVector = region.Normal * (TechProcess.ToolThickness / 2 + TechProcess.Delta);
+            //    //if (IsRevereseOffset)
+            //    //    offsetVector = offsetVector.Negate();
 
-        //    var points0 = GetRailPoints(rail0, 1, surface.Bounds.Value.MaxPoint, Departure.Value, IsRevereseDirection);
-        //    var points1 = GetRailPoints(rail1, 1, surface.Bounds.Value.MaxPoint, Departure.Value, IsRevereseDirection);
+            //    var points0 = GetRailPoints(rail0, 1, surface.Bounds.Value.MaxPoint, Departure.Value, IsRevereseDirection);
+            //    var points1 = GetRailPoints(rail1, 1, surface.Bounds.Value.MaxPoint, Departure.Value, IsRevereseDirection);
 
-        //    for (int i = 0; i < points0.Length; i++)
-        //    {
-        //        var line = new Line2d(points0[i].ToPoint2d(), points1[i].ToPoint2d());
-        //        var pNearest = line.GetClosestPointTo(TechProcess.Center).Point;
-        //        var vector = pNearest - TechProcess.Center;
-        //        var u = vector.Length;
-        //        var z = (points0[i] + (points1[i] - points0[i]) / 2).Z;
-        //        var angle = Vector2d.XAxis.Negate().ZeroTo2PiAngleTo(vector).ToDeg(6);
+            //    for (int i = 0; i < points0.Length; i++)
+            //    {
+            //        var line = new Line2d(points0[i].ToPoint2d(), points1[i].ToPoint2d());
+            //        var pNearest = line.GetClosestPointTo(TechProcess.Center).Point;
+            //        var vector = pNearest - TechProcess.Center;
+            //        var u = vector.Length;
+            //        var z = (points0[i] + (points1[i] - points0[i]) / 2).Z;
+            //        var angle = Vector2d.XAxis.Negate().ZeroTo2PiAngleTo(vector).ToDeg(6);
 
-        //        if (i == 0)
-        //        {
-        //            generator.GCommand(0, u, surface.Bounds.Value.MaxPoint.Z + TechProcess.ZSafety);
-        //            generator.GCommandAngle(angle, S.Value);
-        //            generator.GCommand(0, u, z);
-        //            generator.Command($"M03", "Включение");
-        //        }
-        //        else
-        //        {
-        //            generator.GCommand(1, u, z, CuttingFeed);
-        //            generator.GCommandAngle(angle, S.Value);
-        //        }
-        //    }
-        //    generator.Command($"M05", "Выключение");
-        //}
+            //        if (i == 0)
+            //        {
+            //            generator.GCommand(0, u, surface.Bounds.Value.MaxPoint.Z + TechProcess.ZSafety);
+            //            generator.GCommandAngle(angle, S.Value);
+            //            generator.GCommand(0, u, z);
+            //            generator.Command($"M03", "Включение");
+            //        }
+            //        else
+            //        {
+            //            generator.GCommand(1, u, z, CuttingFeed);
+            //            generator.GCommandAngle(angle, S.Value);
+            //        }
+            //    }
+            //    generator.Command($"M05", "Выключение");
+            //}
 
-        //public Point3d[] GetRailPoints(Curve rail, int divs, Point3d startPoint, double departure, bool IsRevereseDirection)
-        //{
-        //    return AddDeparture(rail.GetPoints(divs).ToArray(), Departure.Value)
-        //        .If(rail.StartPoint.DistanceTo(startPoint) > rail.EndPoint.DistanceTo(startPoint) ^ IsRevereseDirection, p => p.Reverse())
-        //        .ToArray();
-        //}
+            //public Point3d[] GetRailPoints(Curve rail, int divs, Point3d startPoint, double departure, bool IsRevereseDirection)
+            //{
+            //    return AddDeparture(rail.GetPoints(divs).ToArray(), Departure.Value)
+            //        .If(rail.StartPoint.DistanceTo(startPoint) > rail.EndPoint.DistanceTo(startPoint) ^ IsRevereseDirection, p => p.Reverse())
+            //        .ToArray();
+            //}
 
-        //public IEnumerable<Point3d> AddDeparture(Point3d[] points, double departure)
-        //{
-        //    yield return points[0].GetExtendedPoint(points[1], departure);
-        //    for (int i = 0; i < points.Length; i++)
-        //    {
-        //        yield return points[i];
-        //    }
-        //    yield return points[points.Length - 1].GetExtendedPoint(points[points.Length - 2], departure);
-        //}
-    }
+            //public IEnumerable<Point3d> AddDeparture(Point3d[] points, double departure)
+            //{
+            //    yield return points[0].GetExtendedPoint(points[1], departure);
+            //    for (int i = 0; i < points.Length; i++)
+            //    {
+            //        yield return points[i];
+            //    }
+            //    yield return points[points.Length - 1].GetExtendedPoint(points[points.Length - 2], departure);
+            //}
+        }
 }

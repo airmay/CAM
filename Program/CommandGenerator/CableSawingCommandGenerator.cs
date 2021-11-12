@@ -19,6 +19,8 @@ namespace CAM
 
         public double U { get; set; }
         public double V { get; set; }
+        public int Feed { get; set; }
+        public int S { get; set; }
 
         private bool _isSetPosition;
 
@@ -33,9 +35,9 @@ namespace CAM
 
         private CableToolPosition GetToolPosition()
         {
-            var point = new Point3d(CenterPoint.X - U, CenterPoint.Y, V);
-            var angle = Vector2d.YAxis.MinusPiToPiAngleTo(Vector);
-            return new CableToolPosition(point, CenterPoint, angle);
+            var point = new Point3d(Center.X - U, Center.Y, V);
+            var angle = _angle.ToRad(); // Vector2d.YAxis.MinusPiToPiAngleTo(Vector);
+            return new CableToolPosition(point, Center.ToPoint3d(), angle);
         }
 
         public void Command(string text, string name = null, double duration = 0)
@@ -47,9 +49,10 @@ namespace CAM
                 //HasTool = _hasTool,
                 ToolLocation = GetToolPosition(),
                 Duration = duration,
-                U = U.Round(6),
-                V = V.Round(6),
-                A = Vector2d.YAxis.MinusPiToPiAngleTo(Vector).ToDeg(6)
+                U = U,
+                V = V,
+                //A =  Vector2d.YAxis.MinusPiToPiAngleTo(Vector).ToDeg(6)
+                A = _angle
             });
         }
 
@@ -112,6 +115,51 @@ namespace CAM
             Vector = vector;
             Command($"G05 A{angle.ToDeg(6)} S{s}", "Rotate");
             //Command($"G05 A{angle.ToDeg(6)} S{s} A={Vector.Angle.ToDeg(6)} U={U.Round(6)}", "Rotate");
+        }
+
+        public Point2d Center { get; set; }
+        private Vector2d _normal;
+        private double _angle = 0;
+        private double _signU;
+
+        public void GCommand(Point3d point1, Point3d point2, int gCode)
+        {
+            var line2d = new Line2d(point1.To2d(), point2.To2d());
+            var angle = Vector2d.YAxis.MinusPiToPiAngleTo(line2d.Direction).ToDeg(4);
+            var da = Math.Sign(_angle - angle) * 180;
+            while (Math.Abs(angle - _angle) > 90)
+                angle += da;
+            angle = angle.Round(4);
+
+            var normal = !line2d.IsOn(Center) ? line2d.GetClosestPointTo(Center).Point - Center : new Vector2d();
+            if (!_normal.IsZeroLength() && !normal.IsZeroLength())
+            {
+                if (Math.Abs(angle) == 90)
+                    angle = normal.MinusPiToPiAngleTo(_normal) > 0 ? 90 : -90;
+                else
+                    if (normal.GetAngleTo(_normal) > Math.PI / 2)
+                        _signU *= -1;
+            }
+            if (_normal.IsZeroLength())
+                _signU = Math.Sign(angle);
+
+            if (angle != _angle)
+            {
+                var text = $"G05 A{(angle - _angle).Round(4)} S{S}";
+                _angle = angle;
+                Command(text, "Rotate");
+            }
+
+            var u = (_signU * normal.Length).Round(4);
+            var v = ((point1.Z + point2.Z) / 2).Round(4);
+            if (u != U || v != V)
+            {
+                var text = $"G0{gCode} U{(u - U).Round(4)} V{(v - V).Round(4)} {(gCode == 1 ? "F" + Feed : null)}";
+                U = u;
+                V = v;
+                Command(text);
+            }
+            _normal = normal;
         }
     }
 }

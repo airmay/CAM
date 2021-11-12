@@ -72,11 +72,50 @@ namespace CAM.TechProcesses.CableSawing
             //    OriginObject = Acad.CreateOriginObject(new Point3d(OriginX, OriginY, 0));
             //}
 
+
+            //var surface1 = ProcessingArea.First().ObjectId.QOpenForRead<Autodesk.AutoCAD.DatabaseServices.Surface>();
+            //var bounds = surface1.Bounds;
+            //var min = bounds.Value.MinPoint;
+            //var max = bounds.Value.MaxPoint;
+            //var cnt = 500;
+            //var cntz = 20;
+            //for (int i = 0; i < cntz; i++)
+            //{
+            //    for (int j = 0; j < cnt; j++)
+            //    {
+            //        var pt = new Point3d(min.X, min.Y + (max.Y - min.Y) / cnt * j, min.Z + (max.Z - min.Z) / cntz * i);
+            //        surface1.RayTest(pt, Vector3d.XAxis, 0.0001, out SubentityId[] col, out DoubleCollection par);
+            //        if (par.Count == 1)
+            //        {
+            //            App.LockAndExecute(() => Draw.Circle(pt + Vector3d.XAxis * par[0], 1));
+            //        }
+            //    }
+            //}
+            //return;
+            //surface1.Intersect(new)
+
+
+
+
+
+
             var isStarted = false;
 
             foreach (var operation in TechOperations.FindAll(p => p.Enabled && p.CanProcess).Cast<CableSawingTechOperation>())
             {
                 SetOperationParams(operation);
+
+                //if (operation is LineSawingTechOperation lineSawingTechOperation)
+                //{
+                //    lineSawingTechOperation.BuildProcessing(generator);
+                //    continue;
+                //}
+
+                if (operation is ArcSawingTechOperation arcSawingTechOperation)
+                {
+                    arcSawingTechOperation.BuildProcessing(generator);
+                    continue;
+                }
 
                 Curve[] railCurves = new Curve[2];
                 var entityes = operation.AcadObjects.ConvertAll(p => p.ObjectId.QOpenForRead<Entity>());

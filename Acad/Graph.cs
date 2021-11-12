@@ -132,6 +132,19 @@ namespace CAM
             yield return poly.GetPointAtParameter(poly.EndParam);
         }
 
+        /// <summary>
+        /// Converts line to polyline.
+        /// </summary>
+        /// <param name="line">The line.</param>
+        /// <returns>A polyline.</returns>
+        public static Polyline3d ToPolyline3d(this Line line)
+        {
+            var poly = new Polyline3d();
+            poly.AppendVertex(new PolylineVertex3d(line.StartPoint));
+            poly.AppendVertex(new PolylineVertex3d(line.EndPoint));
+            return poly;
+        }
+
         public static ObjectId? CreateHatch(List<Curve> contour, int sign)
         {
             try
