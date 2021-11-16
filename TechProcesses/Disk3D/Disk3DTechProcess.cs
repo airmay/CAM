@@ -13,6 +13,8 @@ namespace CAM.TechProcesses.Disk3D
 
         public bool IsExactlyEnd { get; set; }
 
+        public bool IsA90 { get; set; }
+
         public static void ConfigureParamsView(ParamsView view)
         {
             Label sizeLabel = null;
@@ -32,7 +34,8 @@ namespace CAM.TechProcesses.Disk3D
                 .AddParam(nameof(Angle), "Угол")
                 .AddParam(nameof(IsExactlyBegin), "Начало точно")
                 .AddParam(nameof(IsExactlyEnd), "Конец точно")
-                .AddParam(nameof(ZSafety));
+                .AddParam(nameof(ZSafety))
+                .AddParam(nameof(IsA90), "Угол A = 90");
         }
     }
 }

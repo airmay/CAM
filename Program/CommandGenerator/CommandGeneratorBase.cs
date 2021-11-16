@@ -149,6 +149,8 @@ namespace CAM
             }
         }
 
+        public void Move(Point3d point, double? angleC = null, double? angleA = null) => Move(point.X, point.Y, point.Z, angleC, angleA);
+
         public void Transition(double? x = null, double? y = null, double? z = null, int? feed = null) => GCommand(CommandNames.Transition, 1, x: x, y: y, z: z, feed: feed ?? SmallFeed);
 
         protected abstract void StartEngineCommands();

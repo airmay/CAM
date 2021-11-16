@@ -28,6 +28,8 @@ namespace CAM.TechProcesses.Disk3D
 
         public bool IsDepartureOnBorderSection { get; set; }
 
+        public double PenetrationAll { get; set; }
+
         public static void ConfigureParamsView(ParamsView view)
         {
             view.AddParam(nameof(StepPass))
@@ -40,7 +42,8 @@ namespace CAM.TechProcesses.Disk3D
                 .AddParam(nameof(CuttingFeed))
                 .AddIndent()
                 .AddParam(nameof(Delta))
-                .AddParam(nameof(IsDepartureOnBorderSection), "Выезд по границе сечения");
+                .AddParam(nameof(IsDepartureOnBorderSection), "Выезд по границе сечения")
+                .AddParam(nameof(PenetrationAll), "Заглубление всего");
         }
 
         public override void BuildProcessing(CommandGeneratorBase generator)
@@ -49,13 +52,24 @@ namespace CAM.TechProcesses.Disk3D
 
             var offsetSurface = CreateOffsetSurface();
 
-            var matrix = Matrix3d.Rotation(disk3DTechProcess.Angle.ToRad(), Vector3d.ZAxis, Point3d.Origin);
-            if (disk3DTechProcess.Angle != 0)
-                offsetSurface.TransformBy(matrix);
-            var bounds = offsetSurface.GeometricExtents;
-            generator.ZSafety = bounds.MinPoint.Z + TechProcess.Thickness.Value + TechProcess.ZSafety;
+            generator.ZSafety = offsetSurface.GeometricExtents.MinPoint.Z + TechProcess.Thickness.Value + TechProcess.ZSafety;
             generator.ToolLocation.Point += Vector3d.ZAxis * generator.ZSafety;
+            //generator.ToolLocation.Set(new Point3d(double.NaN, double.NaN, generator.ZSafety), 0, TechProcess.IsA90 ? 90 : 0);
 
+            Matrix3d? matrix = null;
+            if (TechProcess.IsA90)
+                matrix = Matrix3d.Rotation(-Math.PI / 2, Vector3d.XAxis, Point3d.Origin);
+            if (TechProcess.Angle != 0)
+            {
+                var m = Matrix3d.Rotation(disk3DTechProcess.Angle.ToRad(), Vector3d.ZAxis, Point3d.Origin);
+                matrix = matrix.HasValue ? matrix.Value * m : m;
+            }
+            if (matrix.HasValue)
+                offsetSurface.TransformBy(matrix.Value);
+            var bounds = offsetSurface.GeometricExtents;
+
+            //generator.ZSafety = bounds.MinPoint.Z + TechProcess.Thickness.Value + TechProcess.ZSafety;
+            //generator.ToolLocation.Point += Vector3d.ZAxis * generator.ZSafety;
 
             //var ray = new Ray { UnitDir = Vector3d.XAxis };
             //var y = StartPass;
@@ -204,19 +218,26 @@ namespace CAM.TechProcesses.Disk3D
             }
             offsetSurface.Dispose();
 
-            matrix = matrix.Inverse();
+            if (matrix.HasValue)
+                matrix = matrix.Value.Inverse();
+            if (TechProcess.IsA90 && PassList.First()[0].TransformBy(matrix.Value).Z < PassList.Last()[0].TransformBy(matrix.Value).Z)
+                PassList.Reverse();
+
             PassList.ForEach(p =>
             {
                 var points = p;
                 if (TechProcess.MachineType == MachineType.ScemaLogic) //Settongs.IsFrontPlaneZero
                     points = points.ConvertAll(x => new Point3d(x.X, x.Y + TechProcess.Tool.Thickness.Value, x.Z));
-                if (disk3DTechProcess.Angle != 0)
-                    points = points.ConvertAll(x => x.TransformBy(matrix));
+                if (matrix.HasValue && !TechProcess.IsA90)
+                    points = points.ConvertAll(x => x.TransformBy(matrix.Value));
                 var loc = generator.ToolLocation;
                 if (loc.IsDefined && loc.Point.DistanceTo(points.First()) > loc.Point.DistanceTo(points.Last()))
                     points.Reverse();
 
-                BuildPass(generator, points);
+                if (TechProcess.IsA90)
+                    BuildPassA90(generator, points, matrix.Value, bounds.MinPoint.Z + PenetrationAll);
+                else
+                    BuildPass(generator, points);
             });
             //progressor.Stop();
         }
@@ -228,7 +249,7 @@ namespace CAM.TechProcesses.Disk3D
             var offsetCurves = pline.GetTrimmedOffset(distance, -Vector3d.YAxis, OffsetCurveExtensionType.Fillet);
             var matrix = Matrix3d.Displacement(Vector3d.ZAxis.Negate() * distance);
             offsetCurves.ForEach(p => p.TransformBy(matrix));
-
+            
             var firstPoint = offsetCurves[0].StartPoint;
             var departurePoint = new Point3d((IsDepartureOnBorderSection ? firstPoint.X : bounds.MinPoint.X) - Departure, firstPoint.Y, firstPoint.Z);
             var offsetPoints = new List<Point3d> { departurePoint, firstPoint };
@@ -351,6 +372,112 @@ namespace CAM.TechProcesses.Disk3D
 
             generator.Uplifting();
         }
+
+        private void BuildPassA90(CommandGeneratorBase generator, List<Point3d> points, Matrix3d matrix, double z0)
+        {
+            var z = z0;
+            bool isComplete;
+            var point = Algorithms.NullPoint3d;
+            do
+            {
+                isComplete = true;
+                z -= Penetration;
+                var point0 = Algorithms.NullPoint3d;
+                point = Algorithms.NullPoint3d;
+                //var isPassStarted = false;
+
+                foreach (var pt in points)
+                {
+                    var p = pt;
+                    if (z > p.Z)
+                    {
+                        p = new Point3d(p.X, p.Y, z);
+                        isComplete = false;
+                    }
+                    if (generator.IsUpperTool)
+                    {
+                        generator.Move(p.TransformBy(matrix), angleC: TechProcess.Angle, angleA: 90);
+                        generator.Cycle();
+                    }
+                    if (point.IsNull())
+                    {
+                        if (generator.ToolLocation.Point != p.TransformBy(matrix))
+                            generator.GCommand(CommandNames.Penetration, 1, point: p.TransformBy(matrix), feed: TechProcess.PenetrationFeed);
+                        else
+                        {
+                            generator.Move(p.TransformBy(matrix), angleA: 90);
+                            generator.Cycle();
+                        }
+                    }
+                    else if (point0 != point && point != p && !point0.GetVectorTo(point).IsCodirectionalTo(point.GetVectorTo(p)))
+                    {
+                        generator.GCommand(CommandNames.Cutting, 1, point: point.TransformBy(matrix), feed: CuttingFeed);
+                        point0 = point;
+                    }
+                    if (point0.IsNull())
+                        point0 = p;
+                    point = p;
+                }
+                generator.GCommand(CommandNames.Cutting, 1, point: point.TransformBy(matrix), feed: CuttingFeed);
+                points.Reverse();
+            }
+            while (!isComplete);
+
+            //generator.Move(point.Add(Vector3d.ZAxis * z0).TransformBy(matrix));
+        }
+
+        //private void BuildPassA90(CommandGeneratorBase generator, List<Point3d> points, Matrix3d? matrix)
+        //{
+        //    var z = generator.ZSafety - TechProcess.ZSafety;
+        //    bool isComplete;
+        //    do
+        //    {
+        //        isComplete = true;
+        //        z -= Penetration;
+        //        var point0 = Algorithms.NullPoint3d;
+        //        var point = Algorithms.NullPoint3d;
+
+        //        foreach (var pt in points)
+        //        {
+        //            var p = pt;
+        //            if (z > p.Z)
+        //            {
+        //                p = new Point3d(p.X, p.Y, z);
+        //                isComplete = false;
+        //            }
+        //            if (generator.IsUpperTool)
+        //            {
+        //                generator.Move(Transform(p).X, Transform(p).Y, angleC: ((Disk3DTechProcess)TechProcess).Angle);
+        //                generator.Cycle();
+        //            }
+        //            if (point.IsNull())
+        //            {
+        //                if (generator.ToolLocation.Point != Transform(p))
+        //                    generator.GCommand(CommandNames.Penetration, 1, point: Transform(p), feed: TechProcess.PenetrationFeed);
+        //                else
+        //                {
+        //                    generator.Move(Transform(p).X, Transform(p).Y);
+        //                    generator.Cycle();
+        //                }
+        //            }
+        //            else if (point0 != point && point != p && !point0.GetVectorTo(point).IsCodirectionalTo(point.GetVectorTo(p)))
+        //            {
+        //                generator.GCommand(CommandNames.Cutting, 1, point: Transform(point), feed: CuttingFeed);
+        //                point0 = point;
+        //            }
+        //            if (point0.IsNull())
+        //                point0 = p;
+        //            point = p;
+        //        }
+        //        generator.GCommand(CommandNames.Cutting, 1, point: Transform(point), feed: CuttingFeed);
+        //        points.Reverse();
+        //    }
+        //    while (!isComplete);
+
+        //    generator.Uplifting();
+
+        //    Point3d Transform(Point3d pbase) => matrix.HasValue ? pbase.TransformBy(matrix.Value) : pbase;
+        //}
 
         //    var startTime = System.Diagnostics.Stopwatch.StartNew();
         //    for (var y = bounds.MinPoint.Y + StartPass; y < bounds.MaxPoint.Y; y += StepPass)
