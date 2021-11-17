@@ -47,26 +47,116 @@ namespace CAM.TechProcesses.CableSawing
 
         public void BuildProcessing(CableCommandGenerator generator)
         {
-            //var dbObject = ProcessingArea.ObjectId.QOpenForRead();
+            var offsetDistance = TechProcess.ToolThickness / 2 + Delta;
             var dbObject = AcadObjects.First().ObjectId.QOpenForRead();
+
+            if (AcadObjects.Count == 2 && dbObject is Line)
+            {
+                var matrix = Matrix3d.Displacement(Vector3d.ZAxis * offsetDistance);
+                var railCurves = AcadObjects.Select(p => (Line)p.ObjectId.QOpenForRead<Entity>().GetTransformedCopy(matrix)).ToArray();
+
+                if (railCurves[0].StartPoint.GetVectorTo(railCurves[0].EndPoint).GetAngleTo(railCurves[1].StartPoint.GetVectorTo(railCurves[1].EndPoint)) > Math.PI / 2)
+                    railCurves[1].ReverseCurve();
+
+                if (IsRevereseDirection)
+                {
+                    railCurves[0].ReverseCurve();
+                    railCurves[1].ReverseCurve();
+                }
+
+                var points = new List<Point3d[]>();
+                if (Approach > 0)
+                    points.Add(railCurves.Select(p => p.StartPoint.GetExtendedPoint(p.EndPoint, Approach)).ToArray());
+                //if (Approach < 0)
+                //    zStart += Approach;
+                points.Add(railCurves.Select(p => p.StartPoint).ToArray());
+                points.Add(railCurves.Select(p => p.EndPoint).ToArray());
+                if (Departure > 0)
+                    points.Add(railCurves.Select(p => p.EndPoint.GetExtendedPoint(p.StartPoint, Departure)).ToArray());
+
+                generator.S = S;
+                generator.Feed = CuttingFeed;
+                var z00 = TechProcess.ProcessingArea.Select(p => p.ObjectId).GetExtents().MaxPoint.Z + TechProcess.ZSafety;
+                generator.SetToolPosition(new Point3d(TechProcess.OriginX, TechProcess.OriginY, 0), 0, 0, z00);
+                generator.Command($"G92");
+
+                generator.GCommand(0, points[0][0], points[0][1]);
+                generator.Command($"M03", "Включение");
+
+                for (int i = 1; i < points.Count; i++)
+                {
+                    generator.GCommand(1, points[i][0], points[i][1]);
+                }
+                generator.Command($"G04 P{Delay}", "Задержка");
+                generator.Command($"M05", "Выключение");
+                generator.Command($"M00", "Пауза");
+
+                return;
+            }
+
+            if (dbObject is Line rail)
+            {
+                var matrix = Matrix3d.Displacement(Vector3d.ZAxis * offsetDistance);
+                rail = (Line)rail.GetTransformedCopy(matrix);
+
+                //if (railCurves[0].StartPoint.GetVectorTo(railCurves[0].EndPoint).GetAngleTo(railCurves[1].StartPoint.GetVectorTo(railCurves[1].EndPoint)) > Math.PI / 2)
+                //    railCurves[1].ReverseCurve();
+
+                var points = new List<Point3d>();
+                if (Approach > 0)
+                    points.Add(rail.StartPoint.GetExtendedPoint(rail.EndPoint, Approach));
+                //if (Approach < 0)
+                //    zStart += Approach;
+                points.Add(rail.StartPoint);
+                points.Add(rail.EndPoint);
+                if (Departure > 0)
+                    points.Add(rail.EndPoint.GetExtendedPoint(rail.StartPoint, Departure));
+
+                generator.S = S;
+                generator.Feed = CuttingFeed;
+                var z00 = TechProcess.ProcessingArea.Select(p => p.ObjectId).GetExtents().MaxPoint.Z + TechProcess.ZSafety;
+                generator.SetToolPosition(new Point3d(TechProcess.OriginX, TechProcess.OriginY, 0), 0, 0, z00);
+                generator.Command($"G92");
+
+                foreach (var point in points)
+                {
+                    var line = new Line3d(point, rail.Delta.GetPerpendicularVector());
+                    if (point == points[0])
+                    {
+                        generator.GCommand(0, line);
+                        generator.Command($"M03", "Включение");
+                    }
+                    else
+                    {
+                        generator.GCommand(1, line);
+                    }
+                }
+                generator.Command($"G04 P{Delay}", "Задержка");
+                generator.Command($"M05", "Выключение");
+                generator.Command($"M00", "Пауза");
+
+                return;
+            }
+
+
             var surface = dbObject as PlaneSurface;
             if (dbObject is Region region)
             {
                 surface = new PlaneSurface();
                 surface.CreateFromRegion(region);
-            }
-            var offsetDistance = TechProcess.ToolThickness / 2 + Delta;
+            }            
             if (IsRevereseOffset)
                 offsetDistance *= -1;
             var offsetSurface = DbSurface.CreateOffsetSurface(surface, offsetDistance);
             var curves = new DBObjectCollection();
-            surface.Explode(curves);
+            offsetSurface.Explode(curves);
             if (curves[0] is Region r)
             {
                 curves.Clear();
                 r.Explode(curves);
             }
-            var plane = ((Entity)curves[0]).GetPlane();
+            var plane = offsetSurface.GetPlane();
+
             var zl = curves.Cast<Curve>().SelectMany(p => p.GetStartEndPoints().Select(x => x.Z)).ToList();
             var zStart = zl.Max();
             var zEnd = zl.Min();
@@ -80,7 +170,10 @@ namespace CAM.TechProcesses.CableSawing
             if (Departure > 0)
                 zPos.Add(zEnd - Departure);
 
-            generator.SetToolPosition(new Point3d(TechProcess.OriginX, TechProcess.OriginY, 0), 0, 0, zPos[0] + TechProcess.ZSafety);
+            generator.S = S;
+            generator.Feed = CuttingFeed;
+            var z0 = TechProcess.ProcessingArea.Select(p => p.ObjectId).GetExtents().MaxPoint.Z + TechProcess.ZSafety;
+            generator.SetToolPosition(new Point3d(TechProcess.OriginX, TechProcess.OriginY, 0), 0, 0, z0);
             generator.Command($"G92");
 
             foreach (var z in zPos)
@@ -90,14 +183,16 @@ namespace CAM.TechProcesses.CableSawing
                 if (z == zPos[0])
                 {
                     //var angle = line.Direction.ToVector2d().MinusPiToPiAngleTo(Vector2d.YAxis);
-                    generator.GCommandAngle(line.Direction.ToVector2d(), S);
-                    generator.GCommand(0, u);
-                    generator.GCommand(0, u, z);
+                    //generator.GCommandAngle(line.Direction.ToVector2d(), S);
+                    //generator.GCommand(0, u);
+                    //generator.GCommand(0, u, z);
+                    generator.GCommand(0, line);
                     generator.Command($"M03", "Включение");
                 }
                 else
                 {
-                    generator.GCommand(1, u, z, CuttingFeed);
+                    generator.GCommand(1, line);
+                    //generator.GCommand(1, u, z, CuttingFeed);
                 }
             }
             generator.Command($"G04 P{Delay}", "Задержка");

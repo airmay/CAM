@@ -105,11 +105,11 @@ namespace CAM.TechProcesses.CableSawing
             {
                 SetOperationParams(operation);
 
-                //if (operation is LineSawingTechOperation lineSawingTechOperation)
-                //{
-                //    lineSawingTechOperation.BuildProcessing(generator);
-                //    continue;
-                //}
+                if (operation is LineSawingTechOperation lineSawingTechOperation)
+                {
+                    lineSawingTechOperation.BuildProcessing(generator);
+                    continue;
+                }
 
                 if (operation is ArcSawingTechOperation arcSawingTechOperation)
                 {

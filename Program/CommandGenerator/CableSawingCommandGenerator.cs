@@ -26,8 +26,8 @@ namespace CAM
 
         public void SetToolPosition(Point3d centerPoint, double angle, double u, double v)
         {
-            CenterPoint = centerPoint;
-            //Angle = angle;
+            Center = centerPoint.To2d();
+            _angle = angle;
             U = u.Round(6);
             V = v.Round(6);
             _isSetPosition = true;
@@ -122,9 +122,8 @@ namespace CAM
         private double _angle = 0;
         private double _signU;
 
-        public void GCommand(Point3d point1, Point3d point2, int gCode)
+        public void GCommand(int gCode, Line2d line2d, double z)
         {
-            var line2d = new Line2d(point1.To2d(), point2.To2d());
             var angle = Vector2d.YAxis.MinusPiToPiAngleTo(line2d.Direction).ToDeg(4);
             var da = Math.Sign(_angle - angle) * 180;
             while (Math.Abs(angle - _angle) > 90)
@@ -138,10 +137,10 @@ namespace CAM
                     angle = normal.MinusPiToPiAngleTo(_normal) > 0 ? 90 : -90;
                 else
                     if (normal.GetAngleTo(_normal) > Math.PI / 2)
-                        _signU *= -1;
+                    _signU *= -1;
             }
             if (_normal.IsZeroLength())
-                _signU = Math.Sign(angle);
+                _signU = -Math.Sign(angle) * Math.Sign(normal.Y);
 
             if (angle != _angle)
             {
@@ -151,7 +150,7 @@ namespace CAM
             }
 
             var u = (_signU * normal.Length).Round(4);
-            var v = ((point1.Z + point2.Z) / 2).Round(4);
+            var v = z.Round(4);
             if (u != U || v != V)
             {
                 var text = $"G0{gCode} U{(u - U).Round(4)} V{(v - V).Round(4)} {(gCode == 1 ? "F" + Feed : null)}";
@@ -161,5 +160,9 @@ namespace CAM
             }
             _normal = normal;
         }
+
+        public void GCommand(int gCode, Line3d line3d) => GCommand(gCode, new Line2d(line3d.PointOnLine.To2d(), line3d.Direction.ToVector2d()), line3d.PointOnLine.Z);
+
+        public void GCommand(int gCode, Point3d point1, Point3d point2) => GCommand(gCode, new Line2d(point1.To2d(), point2.To2d()), (point1.Z + point2.Z) / 2);
     }
 }

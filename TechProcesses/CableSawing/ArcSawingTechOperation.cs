@@ -195,7 +195,7 @@ namespace CAM.TechProcesses.CableSawing
                 //    }
                 //}
 
-                generator.GCommand(rail1.Point, rail2.Point, 1);
+                generator.GCommand(1, rail1.Point, rail2.Point);
             }
         }
 
