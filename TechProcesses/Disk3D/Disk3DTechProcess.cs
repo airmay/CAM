@@ -15,6 +15,8 @@ namespace CAM.TechProcesses.Disk3D
 
         public bool IsA90 { get; set; }
 
+        public int OriginCellNumber { get; set; }
+
         public static void ConfigureParamsView(ParamsView view)
         {
             Label sizeLabel = null;
@@ -36,6 +38,7 @@ namespace CAM.TechProcesses.Disk3D
                 .AddParam(nameof(IsExactlyEnd), "Конец точно")
                 .AddParam(nameof(ZSafety))
                 .AddParam(nameof(IsA90), "Угол A = 90");
+                //.AddParam(nameof(OriginCellNumber), "Ячейка начала координат");
         }
     }
 }

@@ -149,7 +149,15 @@ namespace CAM
             }
         }
 
-        public void Move(Point3d point, double? angleC = null, double? angleA = null) => Move(point.X, point.Y, point.Z, angleC, angleA);
+        public Matrix3d? Matrix { get; set; }
+
+        public void Move(Point3d point, double? angleC = null, double? angleA = null)
+        {
+            if (Matrix.HasValue)
+                point = point.TransformBy(Matrix.Value);
+
+            Move(point.X, point.Y, point.Z, angleC, angleA);
+        }
 
         public void Transition(double? x = null, double? y = null, double? z = null, int? feed = null) => GCommand(CommandNames.Transition, 1, x: x, y: y, z: z, feed: feed ?? SmallFeed);
 
@@ -263,6 +271,9 @@ namespace CAM
             double? angleC = null, double? angleA = null, Curve curve = null, int? feed = null, Point2d? center = null)
         {
             var command = new ProcessCommand { Name = name };
+
+            if (Matrix.HasValue && point.HasValue)
+                point = point.Value.TransformBy(Matrix.Value);
 
             if (point == null)
                 point = new Point3d(x ?? ToolLocation.Point.X, y ?? ToolLocation.Point.Y, z ?? ToolLocation.Point.Z);

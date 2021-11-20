@@ -27,6 +27,7 @@ namespace CAM
             ["StepPass"] = "Шаг межстрочный",
             ["StepLong"] = "Шаг продольный",
             ["StartPass"] = "Первый проход",
+            ["EndPass"] = "Последний проход",
 
             ["Thickness"] = "Толщина",
             ["Depth"] = "Глубина",
