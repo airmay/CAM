@@ -32,6 +32,8 @@ namespace CAM.TechProcesses.Disk3D
 
         public double PenetrationAll { get; set; }
 
+        public bool IsUplifting { get; set; }
+
         public static void ConfigureParamsView(ParamsView view)
         {
             view.AddParam(nameof(StepPass))
@@ -46,7 +48,8 @@ namespace CAM.TechProcesses.Disk3D
                 .AddIndent()
                 .AddParam(nameof(Delta))
                 .AddParam(nameof(IsDepartureOnBorderSection), "Выезд по границе сечения")
-                .AddParam(nameof(PenetrationAll), "Заглубление всего");
+                .AddParam(nameof(PenetrationAll), "Заглубление всего")
+                .AddParam(nameof(IsUplifting));
         }
 
         public override void BuildProcessing(CommandGeneratorBase generator)
@@ -408,7 +411,8 @@ namespace CAM.TechProcesses.Disk3D
             }
             while (!isComplete);
 
-            generator.Uplifting();
+            if (IsUplifting)
+                generator.Uplifting();
 
             return point;
         }
