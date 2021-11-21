@@ -83,17 +83,17 @@ namespace CAM
 
         public void Pause(double duration) => Command(string.Format(CultureInfo.InvariantCulture, "(DLY,{0})", duration), "Пауза", duration);
 
-        public void GCommand(int gCode, double u, double? v = null, int? feed = null, string name = "")
-        {
-            var ur = u.Round(6);
-            var vr = v?.Round(6) ?? V;
-            if (ur == U && vr == V)
-                return;
-            var text = $"G0{gCode} U{(ur - U).Round(4)} V{(vr - V).Round(4)} {(feed.HasValue ? "F" + feed.ToString() : null)}";
-            U = ur;
-            V = vr;
-            Command(text, name);
-        }
+        //public void GCommand(int gCode, double u, double? v = null, int? feed = null, string name = "")
+        //{
+        //    var ur = u.Round(6);
+        //    var vr = v?.Round(6) ?? V;
+        //    if (ur == U && vr == V)
+        //        return;
+        //    var text = $"G0{gCode} U{(ur - U).Round(4)} V{(vr - V).Round(4)} {(feed.HasValue ? "F" + feed.ToString() : null)}";
+        //    U = ur;
+        //    V = vr;
+        //    Command(text, name);
+        //}
 
         public void GCommandAngle(Vector2d vector, int s)
         {
@@ -142,7 +142,7 @@ namespace CAM
             if (_normal.IsZeroLength())
                 _signU = -Math.Sign(angle) * Math.Sign(normal.Y);
 
-            if (angle != _angle)
+            if (Math.Abs(angle - _angle) > 0.01)
             {
                 var text = $"G05 A{(angle - _angle).Round(4)} S{S}";
                 _angle = angle;
@@ -153,12 +153,37 @@ namespace CAM
             var v = z.Round(4);
             if (u != U || v != V)
             {
-                var text = $"G0{gCode} U{(u - U).Round(4)} V{(v - V).Round(4)} {(gCode == 1 ? "F" + Feed : null)}";
-                U = u;
-                V = v;
-                Command(text);
+                if (gCode == 0)
+                {
+                    GCommand(0, u: u);
+                    GCommand(0, v: v);
+                }
+                else
+                {
+                    GCommand(1, u, v, Feed);
+                }
             }
             _normal = normal;
+        }
+
+        public void GCommand(int gCode, double? u = null, double? v = null, double? feed = null)
+        {
+            var text = $"G0{gCode}";
+            if (u.HasValue && u.Value != U)
+            {
+                text += $" U{(u.Value - U).Round(4)}";
+                U = u.Value;
+            }
+            if (v.HasValue && v.Value != V)
+            {
+                text += $" V{(v.Value - V).Round(4)}";
+                V = v.Value;
+            }
+            if (feed.HasValue)
+            {
+                text += $" F{feed}";
+            }
+            Command(text);
         }
 
         public void GCommand(int gCode, Line3d line3d) => GCommand(gCode, new Line2d(line3d.PointOnLine.To2d(), line3d.Direction.ToVector2d()), line3d.PointOnLine.Z);

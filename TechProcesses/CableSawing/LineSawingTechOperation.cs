@@ -12,6 +12,8 @@ namespace CAM.TechProcesses.CableSawing
     [MenuItem("Распиловка по прямой", 1)]
     public class LineSawingTechOperation : CableSawingTechOperation
     {
+        public bool Across { get; set; }
+
         public override int StepCount => 1;
 
         public static void ConfigureParamsView(ParamsView view)
@@ -23,6 +25,7 @@ namespace CAM.TechProcesses.CableSawing
                 .AddParam(nameof(Approach), "Заезд")
                 .AddParam(nameof(Departure), "Выезд")
                 .AddIndent()
+                .AddParam(nameof(Across), "Поперек")
                 .AddParam(nameof(IsRevereseDirection), "Обратное напр.")
                 .AddParam(nameof(IsRevereseOffset), "Обратный Offset")
                 .AddIndent()
@@ -49,12 +52,12 @@ namespace CAM.TechProcesses.CableSawing
         {
             var offsetDistance = TechProcess.ToolThickness / 2 + Delta;
             var dbObject = AcadObjects.First().ObjectId.QOpenForRead();
-
-            if (AcadObjects.Count == 2 && dbObject is Line)
+            
+            if (AcadObjects.Count == 2)
             {
                 var matrix = Matrix3d.Displacement(Vector3d.ZAxis * offsetDistance);
-                var railCurves = AcadObjects.Select(p => (Line)p.ObjectId.QOpenForRead<Entity>().GetTransformedCopy(matrix)).ToArray();
-
+                var railCurves = AcadObjects.Select(p => (Curve)p.ObjectId.QOpenForRead<Curve>().GetTransformedCopy(matrix))
+                    .Select(p => new Line(p.StartPoint, p.EndPoint)).ToArray();
                 if (railCurves[0].StartPoint.GetVectorTo(railCurves[0].EndPoint).GetAngleTo(railCurves[1].StartPoint.GetVectorTo(railCurves[1].EndPoint)) > Math.PI / 2)
                     railCurves[1].ReverseCurve();
 
@@ -139,27 +142,90 @@ namespace CAM.TechProcesses.CableSawing
             }
 
 
-            var surface = dbObject as PlaneSurface;
+            var surface = dbObject as DbSurface;
             if (dbObject is Region region)
             {
-                surface = new PlaneSurface();
-                surface.CreateFromRegion(region);
-            }            
+                var planeSurface = new PlaneSurface();
+                planeSurface.CreateFromRegion(region);
+                surface = planeSurface;
+            }
+            
+            surface.GeometricExtents.GetCenter();
+            var basePoint = surface.GeometricExtents.GetCenter();
+
             if (IsRevereseOffset)
                 offsetDistance *= -1;
             var offsetSurface = DbSurface.CreateOffsetSurface(surface, offsetDistance);
+            var basePointOffset = offsetSurface.GeometricExtents.GetCenter();
+
+            //if (curves[0] is Region r)
+            //{
+            //    curves.Clear();
+            //    r.Explode(curves);
+            //}
+            //var plane = offsetSurface.GetPlane();
+
             var curves = new DBObjectCollection();
             offsetSurface.Explode(curves);
-            if (curves[0] is Region r)
-            {
-                curves.Clear();
-                r.Explode(curves);
-            }
-            var plane = offsetSurface.GetPlane();
+            var pts = curves.Cast<Curve>().SelectMany(p => p.GetStartEndPoints()).OrderBy(x => x.Z).ToList();
+            var maxPoint = pts.Last();
+            var minPoint = pts.First();
 
-            var zl = curves.Cast<Curve>().SelectMany(p => p.GetStartEndPoints().Select(x => x.Z)).ToList();
-            var zStart = zl.Max();
-            var zEnd = zl.Min();
+            if (maxPoint.Z - minPoint.Z < 10) // горизонтальная
+            {
+                var matrix = Matrix3d.Displacement(Vector3d.ZAxis * offsetDistance);
+                var railCurvesAll = curves.Cast<Curve>().ToList();
+                var railCurves = new Curve[2];
+                var rc = railCurvesAll.Where(p => p.HasPoint(maxPoint)).OrderBy(p => p.Length());
+                railCurves[0] = Across ?  rc.First() : rc.Last();
+                railCurves[1] = railCurvesAll.Where(p => !p.HasPoint(railCurves[0].StartPoint) && !p.HasPoint(railCurves[0].EndPoint)).First();
+
+                if (railCurves[0].StartPoint.GetVectorTo(railCurves[0].EndPoint).GetAngleTo(railCurves[1].StartPoint.GetVectorTo(railCurves[1].EndPoint)) > Math.PI / 2)
+                    railCurves[1].ReverseCurve();
+
+                if (IsRevereseDirection)
+                {
+                    railCurves[0].ReverseCurve();
+                    railCurves[1].ReverseCurve();
+                }
+
+                var points = new List<Point3d[]>();
+                if (Approach > 0)
+                    points.Add(railCurves.Select(p => p.StartPoint.GetExtendedPoint(p.EndPoint, Approach)).ToArray());
+                //if (Approach < 0)
+                //    zStart += Approach;
+                points.Add(railCurves.Select(p => p.StartPoint).ToArray());
+                points.Add(railCurves.Select(p => p.EndPoint).ToArray());
+                if (Departure > 0)
+                    points.Add(railCurves.Select(p => p.EndPoint.GetExtendedPoint(p.StartPoint, Departure)).ToArray());
+
+                generator.S = S;
+                generator.Feed = CuttingFeed;
+                var z00 = TechProcess.ProcessingArea.Select(p => p.ObjectId).GetExtents().MaxPoint.Z + TechProcess.ZSafety;
+                generator.SetToolPosition(new Point3d(TechProcess.OriginX, TechProcess.OriginY, 0), 0, 0, z00);
+                generator.Command($"G92");
+
+                generator.GCommand(0, points[0][0], points[0][1]);
+                generator.Command($"M03", "Включение");
+
+                for (int i = 1; i < points.Count; i++)
+                {
+                    generator.GCommand(1, points[i][0], points[i][1]);
+                }
+                generator.Command($"G04 P{Delay}", "Задержка");
+                generator.Command($"M05", "Выключение");
+                generator.Command($"M00", "Пауза");
+
+                return;
+            }
+
+
+            var baseCurves = curves.Cast<Curve>().Where(p => p.HasPoint(maxPoint)).ToArray();
+
+            var plane = new Plane(maxPoint, baseCurves[0].EndPoint - baseCurves[0].StartPoint, baseCurves[1].EndPoint - baseCurves[1].StartPoint);
+
+            var zStart = pts.Last().Z;
+            var zEnd = pts.First().Z;
             var zPos = new List<double>();
             if (Approach > 0)
                 zPos.Add(zStart + Approach);
