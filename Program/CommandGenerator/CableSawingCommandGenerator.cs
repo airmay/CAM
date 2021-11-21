@@ -144,9 +144,11 @@ namespace CAM
 
             if (Math.Abs(angle - _angle) > 0.01)
             {
-                var text = $"G05 A{(angle - _angle).Round(4)} S{S}";
+                var da1 = (angle - _angle).Round(4);
+                var text = $"G05 A{da1} S{S}";
                 _angle = angle;
-                Command(text, "Rotate");
+                var duration = Math.Abs(da1) / S * 60;
+                Command(text, "Rotate", duration);
             }
 
             var u = (_signU * normal.Length).Round(4);
@@ -169,21 +171,27 @@ namespace CAM
         public void GCommand(int gCode, double? u = null, double? v = null, double? feed = null)
         {
             var text = $"G0{gCode}";
+            double du= 0, dv = 0;
             if (u.HasValue && u.Value != U)
             {
-                text += $" U{(u.Value - U).Round(4)}";
+                du = (u.Value - U).Round(4);
+                text += $" U{du}";
                 U = u.Value;
             }
             if (v.HasValue && v.Value != V)
             {
-                text += $" V{(v.Value - V).Round(4)}";
+                dv = (v.Value - V).Round(4);
+                text += $" V{dv}";
                 V = v.Value;
             }
             if (feed.HasValue)
             {
                 text += $" F{feed}";
             }
-            Command(text);
+            if (gCode == 0)
+                feed = 500;
+            var duration = Math.Sqrt(du * du + dv * dv) / (gCode == 0 ? 500 : feed.GetValueOrDefault()) * 60;
+            Command(text, duration: duration);
         }
 
         public void GCommand(int gCode, Line3d line3d) => GCommand(gCode, new Line2d(line3d.PointOnLine.To2d(), line3d.Direction.ToVector2d()), line3d.PointOnLine.Z);
