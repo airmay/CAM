@@ -19,6 +19,7 @@ namespace CAM.TechProcesses.CableSawing
         public double Departure { get; set; } = 50;
         public double Delta { get; set; } = 0;
         public double Delay { get; set; } = 60;
+        public bool IsExtraRotate { get; set; }
 
         public Point2d Center => new Point2d(OriginX, OriginY);
 
@@ -42,7 +43,8 @@ namespace CAM.TechProcesses.CableSawing
                 .AddIndent()
                 .AddParam(nameof(ToolThickness), "Толщина троса")
                 .AddParam(nameof(Delta))
-                .AddParam(nameof(Delay), "Задержка");
+                .AddParam(nameof(Delay), "Задержка")
+                .AddParam(nameof(IsExtraRotate), "Поворот+возврат");
         }
 
         public override List<TechOperation> CreateTechOperations()
@@ -64,6 +66,8 @@ namespace CAM.TechProcesses.CableSawing
         {
             Tool = new Tool { Type = ToolType.Cable, Diameter = ToolThickness, Thickness = ToolThickness };
             var z0 = ProcessingArea.Select(p => p.ObjectId).GetExtents().MaxPoint.Z + ZSafety;
+            generator.IsExtraRotate = IsExtraRotate;
+
             //if (OriginObject == null)
             //{
             //    var center = ProcessingArea.Select(p => p.ObjectId).GetCenter();
@@ -227,14 +231,14 @@ namespace CAM.TechProcesses.CableSawing
                     if (!isStarted)
                     {
                         generator.GCommandAngle(direction, operation.S);
-                        generator.GCommand(0, u);
-                        generator.GCommand(0, u, z);
+                        //generator.GCommand(0, u);
+                        //generator.GCommand(0, u, z);
                         generator.Command($"M03", "Включение");
                         isStarted = true;
                     }
                     else
                     {
-                        generator.GCommand(1, u, z, operation.CuttingFeed);
+                        //generator.GCommand(1, u, z, operation.CuttingFeed);
                         generator.GCommandAngle(direction, operation.S);
                     }
                 }

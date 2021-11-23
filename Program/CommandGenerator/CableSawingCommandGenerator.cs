@@ -118,6 +118,7 @@ namespace CAM
         }
 
         public Point2d Center { get; set; }
+        public bool IsExtraRotate { get; set; }
         private Vector2d _normal;
         private double _angle = 0;
         private double _signU;
@@ -133,66 +134,66 @@ namespace CAM
             var normal = !line2d.IsOn(Center) ? line2d.GetClosestPointTo(Center).Point - Center : new Vector2d();
             if (!_normal.IsZeroLength() && !normal.IsZeroLength())
             {
-                if (Math.Abs(angle) == 90)
-                    angle = normal.MinusPiToPiAngleTo(_normal) > 0 ? 90 : -90;
+                if (Math.Abs(angle - _angle) == 90)
+                    angle = _angle + normal.MinusPiToPiAngleTo(_normal) > 0 ? 90 : -90;
                 else
                     if (normal.GetAngleTo(_normal) > Math.PI / 2)
-                    _signU *= -1;
+                        _signU *= -1;
             }
             if (_normal.IsZeroLength())
                 _signU = -Math.Sign(angle) * Math.Sign(normal.Y);
 
-            if (Math.Abs(angle - _angle) > 0.01)
-            {
-                var da1 = (angle - _angle).Round(4);
-                var text = $"G05 A{da1} S{S}";
-                _angle = angle;
-                var duration = Math.Abs(da1) / S * 60;
-                Command(text, "Rotate", duration);
-            }
+            if (angle - _angle > 0.01 && IsExtraRotate)
+                GCommandA(angle + 1);
+            
+            GCommandA(angle);
 
             var u = (_signU * normal.Length).Round(4);
             var v = z.Round(4);
-            if (u != U || v != V)
+            
+            if (gCode == 0)
             {
-                if (gCode == 0)
-                {
-                    GCommand(0, u: u);
-                    GCommand(0, v: v);
-                }
-                else
-                {
-                    GCommand(1, u, v, Feed);
-                }
+                GCommandUV(0, u, V);
+                GCommandUV(0, u, v);
+            }
+            else
+            {
+                GCommandUV(1, u, v);
             }
             _normal = normal;
         }
 
-        public void GCommand(int gCode, double? u = null, double? v = null, double? feed = null)
+        public void GCommandUV(int gCode, double u, double v)
         {
-            var text = $"G0{gCode}";
-            double du= 0, dv = 0;
-            if (u.HasValue && u.Value != U)
-            {
-                du = (u.Value - U).Round(4);
-                text += $" U{du}";
-                U = u.Value;
-            }
-            if (v.HasValue && v.Value != V)
-            {
-                dv = (v.Value - V).Round(4);
-                text += $" V{dv}";
-                V = v.Value;
-            }
-            if (feed.HasValue)
-            {
-                text += $" F{feed}";
-            }
-            if (gCode == 0)
-                feed = 500;
-            var duration = Math.Sqrt(du * du + dv * dv) / (gCode == 0 ? 500 : feed.GetValueOrDefault()) * 60;
+            if (u == U && v == V)
+                return;
+
+            var du = (u - U).Round(4);
+            var dv = (v - V).Round(4);
+            U = u;
+            V = v;
+
+            var feed = gCode == 1 ? $"F{Feed}" : "";
+            var text = $"G0{gCode} U{du} V{dv} {feed}";
+            var duration = Math.Sqrt(du * du + dv * dv) / (gCode == 0 ? 500 : Feed) * 60;
+
             Command(text, duration: duration);
         }
+
+        public void GCommandA(double angle)
+        {
+            if (Math.Abs(angle - _angle) < 0.01)
+                return;
+            
+            var da = (angle - _angle).Round(4);
+            _angle = angle;
+
+            var text = $"G05 A{da} S{S}";
+            var duration = Math.Abs(da) / S * 60;
+
+            Command(text, "Rotate", duration);
+        }
+
 
         public void GCommand(int gCode, Line3d line3d) => GCommand(gCode, new Line2d(line3d.PointOnLine.To2d(), line3d.Direction.ToVector2d()), line3d.PointOnLine.Z);
 
