@@ -23,7 +23,7 @@ namespace CAM.Program.CommandGenerator
         {
         }
 
-        protected override void SetToolCommands(int toolNo, double angleA)
+        protected override void SetToolCommands(int toolNo, double angleA, double angleC, int originCellNumber)
         {
         }
 

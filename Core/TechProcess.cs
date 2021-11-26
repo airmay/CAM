@@ -62,6 +62,8 @@ namespace CAM
             });
         }
 
+        protected virtual void SetTool(CommandGeneratorBase generator) => generator.SetTool(MachineType.Value != CAM.MachineType.Donatoni ? Tool.Number : 1, Frequency);
+
         public virtual void BuildProcessing()
         {
             using (var generator = CommandGeneratorFactory.Create(MachineType.Value))
@@ -69,9 +71,7 @@ namespace CAM
                 generator.StartTechProcess(this);
 
                 if (Tool != null)
-                    generator.SetTool(
-                        MachineType.Value != CAM.MachineType.Donatoni ? Tool.Number : 1,
-                        Frequency);
+                    SetTool(generator);
 
                 BuildProcessing(generator);
 

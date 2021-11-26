@@ -25,7 +25,7 @@ namespace CAM
             Command("M30", "Конец");
         }
 
-        protected override void SetToolCommands(int toolNo, double angleA)
+        protected override void SetToolCommands(int toolNo, double angleA, double angleC, int originCellNumber)
         {
             Command($"T1", "Инструмент№");
             Command("G17", "Плоскость");

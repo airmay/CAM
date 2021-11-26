@@ -52,6 +52,14 @@ namespace CAM.TechProcesses.Disk3D
                 .AddParam(nameof(IsUplifting));
         }
 
+        private void SetTool(CommandGeneratorBase generator, double angleA, double angleC) 
+            => generator.SetTool(
+                TechProcess.MachineType.Value != MachineType.Donatoni ? TechProcess.Tool.Number : 1, 
+                TechProcess.Frequency, 
+                angleA: angleA,
+                angleC: angleC, 
+                originCellNumber: TechProcess.OriginCellNumber);
+
         public override void BuildProcessing(CommandGeneratorBase generator)
         {
             var disk3DTechProcess = (Disk3DTechProcess)TechProcess;

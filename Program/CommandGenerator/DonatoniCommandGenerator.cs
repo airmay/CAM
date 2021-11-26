@@ -29,12 +29,12 @@ namespace CAM
             Command("M30", "Конец");
         }
 
-        protected override void SetToolCommands(int toolNo, double angleA)
+        protected override void SetToolCommands(int toolNo, double angleA, double angleC, int originCellNumber)
         {
             Command("G0 G53 Z0");
-            Command($"G0 G53 C0 A{angleA}");
+            Command($"G0 G53 C{angleC} A{angleA}");
             Command("G64");
-            Command("G154O10");
+            Command($"G154O{originCellNumber}");
             Command($"T{toolNo}", "Инструмент№");
             Command("M6", "Инструмент");
             Command("G172 T1 H1 D1");

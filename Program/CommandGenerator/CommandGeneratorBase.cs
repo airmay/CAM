@@ -96,11 +96,11 @@ namespace CAM
 
         public void SetTechOperation(TechOperation techOperation) => _techOperation = techOperation;
 
-        public void SetTool(int toolNo, int frequency, double angleA = 0, bool hasTool = true)
+        public void SetTool(int toolNo, int frequency, double angleA = 0, bool hasTool = true, double angleC = 0, int originCellNumber = 10)
         {
             StopEngine();
             ToolLocation.Set(new Point3d(double.NaN, double.NaN, ZSafety + UpperZ), 0, 0);
-            SetToolCommands(toolNo, angleA);
+            SetToolCommands(toolNo, angleA, angleC, originCellNumber);
 
             _frequency = frequency;
             _hasTool = hasTool;
@@ -112,7 +112,7 @@ namespace CAM
             ToolLocation.Set(new Point3d(double.NaN, double.NaN, ZSafety + UpperZ), 0, 0);
         }
 
-        protected abstract void SetToolCommands(int toolNo, double angleA);
+        protected abstract void SetToolCommands(int toolNo, double angleA, double angleC, int originCellNumber);
 
         private void StopEngine()
         {

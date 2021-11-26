@@ -37,8 +37,16 @@ namespace CAM.TechProcesses.Disk3D
                 .AddParam(nameof(IsExactlyBegin), "Начало точно")
                 .AddParam(nameof(IsExactlyEnd), "Конец точно")
                 .AddParam(nameof(ZSafety))
-                .AddParam(nameof(IsA90), "Угол A = 90");
-                //.AddParam(nameof(OriginCellNumber), "Ячейка начала координат");
+                .AddParam(nameof(IsA90), "Угол A = 90")
+                .AddParam(nameof(OriginCellNumber), "Ячейка начала координат");
         }
+
+        protected override void SetTool(CommandGeneratorBase generator) =>
+            generator.SetTool(
+                MachineType.Value != CAM.MachineType.Donatoni ? Tool.Number : 1,
+                Frequency,
+                angleA: IsA90 ? 90 : 0,
+                angleC: Angle,
+                originCellNumber: OriginCellNumber);
     }
 }
