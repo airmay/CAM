@@ -284,6 +284,11 @@ namespace CAM.TechProcesses.Disk3D
                 else
                     lastPoint = BuildPass(generator, points);
             });
+            if (TechProcess.IsA90)
+                generator.Move(lastPoint.Value.Add(Vector3d.ZAxis * 100));
+
+            if (generator is DonatoniCommandGenerator donatoniCommandGenerator)
+                donatoniCommandGenerator.IsSupressMoveHome = true;
             //progressor.Stop();
         }
 
@@ -475,7 +480,7 @@ namespace CAM.TechProcesses.Disk3D
             }
             while (!isComplete);
 
-            //generator.Move(point.Add(Vector3d.ZAxis * z0).TransformBy(matrix));
+            //generator.Move(point.Add(Vector3d.ZAxis * 100));
             return point;
         }
 

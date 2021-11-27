@@ -10,6 +10,8 @@ namespace CAM
     [MachineType(MachineType.Donatoni)]
     public class DonatoniCommandGenerator : CommandGeneratorBase
     {
+        public bool IsSupressMoveHome { get; set; } = false;
+
         protected override void StartMachineCommands(string caption)
         {
             //Command($"; Donatoni \"{caption}\"");
@@ -24,8 +26,11 @@ namespace CAM
         protected override void StopMachineCommands()
         {
             Command("G0 G53 Z0 ");
-            Command("G0 G53 A0 C0");
-            Command("G0 G53 X0 Y0");
+            if (!IsSupressMoveHome)
+            {
+                Command("G0 G53 A0 C0");
+                Command("G0 G53 X0 Y0");
+            }
             Command("M30", "Конец");
         }
 
