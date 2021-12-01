@@ -123,13 +123,16 @@ namespace CAM
         private double _angle = 0;
         private double _signU;
 
-        public void GCommand(int gCode, Line2d line2d, double z)
+        public void GCommand(int gCode, Line2d line2d, double z, bool isRevereseAngle = false)
         {
             var angle = Vector2d.YAxis.MinusPiToPiAngleTo(line2d.Direction).ToDeg(4);
             var da = Math.Sign(_angle - angle) * 180;
             while (Math.Abs(angle - _angle) > 90)
                 angle += da;
             angle = angle.Round(4);
+
+            if (isRevereseAngle)
+                angle += -Math.Sign(angle) * 180;
 
             var normal = !line2d.IsOn(Center) ? line2d.GetClosestPointTo(Center).Point - Center : new Vector2d();
             if (!_normal.IsZeroLength() && !normal.IsZeroLength())
@@ -153,6 +156,8 @@ namespace CAM
             
             if (gCode == 0)
             {
+                if (u - U < 0 && IsExtraRotate)
+                    GCommandUV(0, u - 5, V);
                 GCommandUV(0, u, V);
                 GCommandUV(0, u, v);
             }
@@ -197,6 +202,6 @@ namespace CAM
 
         public void GCommand(int gCode, Line3d line3d) => GCommand(gCode, new Line2d(line3d.PointOnLine.To2d(), line3d.Direction.ToVector2d()), line3d.PointOnLine.Z);
 
-        public void GCommand(int gCode, Point3d point1, Point3d point2) => GCommand(gCode, new Line2d(point1.To2d(), point2.To2d()), (point1.Z + point2.Z) / 2);
+        public void GCommand(int gCode, Point3d point1, Point3d point2, bool isRevereseAngle = false) => GCommand(gCode, new Line2d(point1.To2d(), point2.To2d()), (point1.Z + point2.Z) / 2, isRevereseAngle);
     }
 }

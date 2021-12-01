@@ -17,6 +17,7 @@ namespace CAM.TechProcesses.CableSawing
         public double Delay { get; set; }
 
         public bool IsRevereseDirection { get; set; }
+        public bool IsRevereseAngle { get; set; }
         public bool IsRevereseOffset { get; set; }
         public virtual int StepCount { get; set; }
 

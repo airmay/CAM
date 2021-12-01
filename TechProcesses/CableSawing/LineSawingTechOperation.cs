@@ -27,6 +27,7 @@ namespace CAM.TechProcesses.CableSawing
                 .AddIndent()
                 .AddParam(nameof(Across), "Поперек")
                 .AddParam(nameof(IsRevereseDirection), "Обратное напр.")
+                .AddParam(nameof(IsRevereseAngle), "Обратный угол")
                 .AddParam(nameof(IsRevereseOffset), "Обратный Offset")
                 .AddIndent()
                 .AddParam(nameof(Delta))
@@ -83,7 +84,7 @@ namespace CAM.TechProcesses.CableSawing
                 generator.SetToolPosition(new Point3d(TechProcess.OriginX, TechProcess.OriginY, 0), 0, 0, z00);
                 generator.Command($"G92");
 
-                generator.GCommand(0, points[0][0], points[0][1]);
+                generator.GCommand(0, points[0][0], points[0][1], IsRevereseAngle);
                 generator.Command($"M03", "Включение");
 
                 for (int i = 1; i < points.Count; i++)
@@ -192,9 +193,7 @@ namespace CAM.TechProcesses.CableSawing
                 var points = new List<Point3d[]>();
                 if (Approach > 0)
                     points.Add(railCurves.Select(p => p.StartPoint.GetExtendedPoint(p.EndPoint, Approach)).ToArray());
-                //if (Approach < 0)
-                //    zStart += Approach;
-                points.Add(railCurves.Select(p => p.StartPoint).ToArray());
+                points.Add(railCurves.Select(p => Approach >= 0 ? p.StartPoint : p.GetPointAtDist(-Approach)).ToArray());
                 points.Add(railCurves.Select(p => p.EndPoint).ToArray());
                 if (Departure > 0)
                     points.Add(railCurves.Select(p => p.EndPoint.GetExtendedPoint(p.StartPoint, Departure)).ToArray());
@@ -205,7 +204,7 @@ namespace CAM.TechProcesses.CableSawing
                 generator.SetToolPosition(new Point3d(TechProcess.OriginX, TechProcess.OriginY, 0), 0, 0, z00);
                 generator.Command($"G92");
 
-                generator.GCommand(0, points[0][0], points[0][1]);
+                generator.GCommand(0, points[0][0], points[0][1], IsRevereseAngle);
                 generator.Command($"M03", "Включение");
 
                 for (int i = 1; i < points.Count; i++)
@@ -232,6 +231,8 @@ namespace CAM.TechProcesses.CableSawing
             if (Approach < 0)
                 zStart += Approach;
             zPos.Add(zStart);
+            if (Departure < 0)
+                zEnd -= Departure;
             zPos.Add(zEnd);
             if (Departure > 0)
                 zPos.Add(zEnd - Departure);
