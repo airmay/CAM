@@ -74,7 +74,7 @@ namespace CAM.TechProcesses.CableSawing
                 //if (Approach < 0)
                 //    zStart += Approach;
                 points.Add(railCurves.Select(p => p.StartPoint).ToArray());
-                points.Add(railCurves.Select(p => p.EndPoint).ToArray());
+                points.Add(railCurves.Select(p => Departure >= 0 ? p.EndPoint : p.GetPointAtDist(p.Length + Departure)).ToArray());
                 if (Departure > 0)
                     points.Add(railCurves.Select(p => p.EndPoint.GetExtendedPoint(p.StartPoint, Departure)).ToArray());
 
