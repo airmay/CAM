@@ -103,7 +103,12 @@ namespace CAM.TechProcesses.CableSawing
 
 
 
-            var isStarted = false;
+
+            generator.S = S;
+            generator.Feed = CuttingFeed;
+            var z00 = ProcessingArea.Select(p => p.ObjectId).GetExtents().MaxPoint.Z + ZSafety;
+            generator.SetToolPosition(new Point3d(OriginX, OriginY, 0), 0, 0, z00);
+            generator.Command($"G92");
 
             foreach (var operation in TechOperations.FindAll(p => p.Enabled && p.CanProcess).Cast<CableSawingTechOperation>())
             {
@@ -121,131 +126,131 @@ namespace CAM.TechProcesses.CableSawing
                     continue;
                 }
 
-                Curve[] railCurves = new Curve[2];
-                var entityes = operation.AcadObjects.ConvertAll(p => p.ObjectId.QOpenForRead<Entity>());
-                var offsetDistance = ToolThickness / 2 + operation.Delta;
+                //Curve[] railCurves = new Curve[2];
+                //var entityes = operation.AcadObjects.ConvertAll(p => p.ObjectId.QOpenForRead<Entity>());
+                //var offsetDistance = ToolThickness / 2 + operation.Delta;
 
-                if (entityes.Count == 2)
-                {
-                    //railCurves = entityes.Cast<Curve>().ToArray();
-                    //var offsetCurve0 = railCurves[0].GetOffsetCurves(offsetDistance)[0] as Curve;
-                    //if (offsetCurve0.StartPoint.DistanceTo(Center.ToPoint3d()) < railCurves[0].StartPoint.DistanceTo(Center.ToPoint3d()))
-                    //    offsetCurve0 = railCurves[0].GetOffsetCurves(-offsetDistance)[0] as Curve;
-                    //var offsetCurve1 = railCurves[1].GetOffsetCurves(offsetDistance)[0] as Curve;
-                    //if (offsetCurve1.StartPoint.DistanceTo(Center.ToPoint3d()) < railCurves[1].StartPoint.DistanceTo(Center.ToPoint3d()))
-                    //    offsetCurve1 = railCurves[1].GetOffsetCurves(-offsetDistance)[0] as Curve;
-                    var matrix = Matrix3d.Displacement(Vector3d.ZAxis * offsetDistance);
-                    railCurves = entityes.Select(p => (Curve)p.GetTransformedCopy(matrix)).ToArray();
-                }
-                else
-                {
-                    var entity = entityes.First();
-                    if (entity is Region region)
-                    {
-                        entity = new PlaneSurface();
-                        ((PlaneSurface)entity).CreateFromRegion(region);
-                    }
-                    if (operation.IsRevereseOffset)
-                        offsetDistance *= -1;
-                    var surface = DbSurface.CreateOffsetSurface(entity, offsetDistance) as DbSurface;
+                //if (entityes.Count == 2)
+                //{
+                //    //railCurves = entityes.Cast<Curve>().ToArray();
+                //    //var offsetCurve0 = railCurves[0].GetOffsetCurves(offsetDistance)[0] as Curve;
+                //    //if (offsetCurve0.StartPoint.DistanceTo(Center.ToPoint3d()) < railCurves[0].StartPoint.DistanceTo(Center.ToPoint3d()))
+                //    //    offsetCurve0 = railCurves[0].GetOffsetCurves(-offsetDistance)[0] as Curve;
+                //    //var offsetCurve1 = railCurves[1].GetOffsetCurves(offsetDistance)[0] as Curve;
+                //    //if (offsetCurve1.StartPoint.DistanceTo(Center.ToPoint3d()) < railCurves[1].StartPoint.DistanceTo(Center.ToPoint3d()))
+                //    //    offsetCurve1 = railCurves[1].GetOffsetCurves(-offsetDistance)[0] as Curve;
+                //    var matrix = Matrix3d.Displacement(Vector3d.ZAxis * offsetDistance);
+                //    railCurves = entityes.Select(p => (Curve)p.GetTransformedCopy(matrix)).ToArray();
+                //}
+                //else
+                //{
+                //    var entity = entityes.First();
+                //    if (entity is Region region)
+                //    {
+                //        entity = new PlaneSurface();
+                //        ((PlaneSurface)entity).CreateFromRegion(region);
+                //    }
+                //    if (operation.IsRevereseOffset)
+                //        offsetDistance *= -1;
+                //    var surface = DbSurface.CreateOffsetSurface(entity, offsetDistance) as DbSurface;
 
-                    var collection = new DBObjectCollection();
-                    surface.Explode(collection);
-                    var curves = collection.Cast<Curve>().ToList();
-                    railCurves = operation.GetRailCurves(curves);
-                }
-                //if (railCurves[1].StartPoint.DistanceTo(railCurves[0].StartPoint) > railCurves[1].StartPoint.DistanceTo(railCurves[0].EndPoint))
-                if (railCurves[0].StartPoint.GetVectorTo(railCurves[0].EndPoint).GetAngleTo(railCurves[1].StartPoint.GetVectorTo(railCurves[1].EndPoint)) > Math.PI / 2)
-                    railCurves[1].ReverseCurve();
+                //    var collection = new DBObjectCollection();
+                //    surface.Explode(collection);
+                //    var curves = collection.Cast<Curve>().ToList();
+                //    railCurves = operation.GetRailCurves(curves);
+                //}
+                ////if (railCurves[1].StartPoint.DistanceTo(railCurves[0].StartPoint) > railCurves[1].StartPoint.DistanceTo(railCurves[0].EndPoint))
+                //if (railCurves[0].StartPoint.GetVectorTo(railCurves[0].EndPoint).GetAngleTo(railCurves[1].StartPoint.GetVectorTo(railCurves[1].EndPoint)) > Math.PI / 2)
+                //    railCurves[1].ReverseCurve();
 
-                if (railCurves[0] is Line)
-                {
-                    var dz = Math.Abs(railCurves[0].StartPoint.Z - railCurves[1].StartPoint.Z); // TODO dz
-                    if (dz > 1)
-                    {
-                        if (railCurves[0].StartPoint.Z > railCurves[1].StartPoint.Z)
-                            railCurves[1].StartPoint = railCurves[1].StartPoint.GetExtendedPoint(railCurves[1].EndPoint, dz);
-                        else
-                            railCurves[0].StartPoint = railCurves[0].StartPoint.GetExtendedPoint(railCurves[0].EndPoint, dz);
-                    }
-                }
-                
-                var points0 = GetRailPoints(railCurves[0], operation);
-                var points1 = GetRailPoints(railCurves[1], operation);
+                //if (railCurves[0] is Line)
+                //{
+                //    var dz = Math.Abs(railCurves[0].StartPoint.Z - railCurves[1].StartPoint.Z); // TODO dz
+                //    if (dz > 1)
+                //    {
+                //        if (railCurves[0].StartPoint.Z > railCurves[1].StartPoint.Z)
+                //            railCurves[1].StartPoint = railCurves[1].StartPoint.GetExtendedPoint(railCurves[1].EndPoint, dz);
+                //        else
+                //            railCurves[0].StartPoint = railCurves[0].StartPoint.GetExtendedPoint(railCurves[0].EndPoint, dz);
+                //    }
+                //}
 
-                var direction = new Line2d(points0[1].ToPoint2d(), points1[1].ToPoint2d()).Direction;
+                //var points0 = GetRailPoints(railCurves[0], operation);
+                //var points1 = GetRailPoints(railCurves[1], operation);
 
-                if (!isStarted)
-                {
-                    generator.SetToolPosition(new Point3d(OriginX, OriginY, 0), 0, 0, z0);
-                    generator.Command($"G92");
-                }
-                int? xSign = null;
-                for (int i = 0; i < points0.Count; i++)
-                {
-                    var line = new Line2d(points0[i].ToPoint2d(), points1[i].ToPoint2d());
-                    var pNearest = line.GetClosestPointTo(Center).Point;
-                    var vector = pNearest - Center;
-                    if (xSign == null)
-                        xSign = vector.X.Round(6) > 0 ? -1 : 1;
-                    var xSignNew = vector.X.Round(6) > 0 ? -1 : 1;
-                    if (xSignNew != xSign)
-                        xSign *= -1;
-                    var u = vector.Length * xSign.Value;
-                    var z = (points0[i] + (points1[i] - points0[i]) / 2).Z;
-                    //var angle = Vector2d.XAxis.Negate().ZeroTo2PiAngleTo(vector).ToDeg();
+                //var direction = new Line2d(points0[1].ToPoint2d(), points1[1].ToPoint2d()).Direction;
 
-                    //if (operation is ArcSawingTechOperation)
-                    //{
-                    //    if (angle - generator.Angle > 150)
-                    //    {
-                    //        angle -= 180;
-                    //        u *= -1;
-                    //    }
-                    //    if (generator.Angle - angle > 150)
-                    //    {
-                    //        angle += 180;
-                    //        u *= -1;
-                    //    }
-                    //}
+                //if (!isStarted)
+                //{
+                //    generator.SetToolPosition(new Point3d(OriginX, OriginY, 0), 0, 0, z0);
+                //    generator.Command($"G92");
+                //}
+                //int? xSign = null;
+                //for (int i = 0; i < points0.Count; i++)
+                //{
+                //    var line = new Line2d(points0[i].ToPoint2d(), points1[i].ToPoint2d());
+                //    var pNearest = line.GetClosestPointTo(Center).Point;
+                //    var vector = pNearest - Center;
+                //    if (xSign == null)
+                //        xSign = vector.X.Round(6) > 0 ? -1 : 1;
+                //    var xSignNew = vector.X.Round(6) > 0 ? -1 : 1;
+                //    if (xSignNew != xSign)
+                //        xSign *= -1;
+                //    var u = vector.Length * xSign.Value;
+                //    var z = (points0[i] + (points1[i] - points0[i]) / 2).Z;
+                //    //var angle = Vector2d.XAxis.Negate().ZeroTo2PiAngleTo(vector).ToDeg();
 
-                    //if (angle > 180)
-                    //{
-                    //    angle -= 180;
-                    //    u *= -1;
-                    //}
-                    //if (i != 0 && generator.Angle - angle > 150)
-                    //{
-                    //    //angle += 360;
-                    //    u *= -1;
-                    //}
-                    //if (operation == TechOperations.Last())
-                    //{
-                    //    angle += 180;
-                    //    //u *= -1;
-                    //}
+                //    //if (operation is ArcSawingTechOperation)
+                //    //{
+                //    //    if (angle - generator.Angle > 150)
+                //    //    {
+                //    //        angle -= 180;
+                //    //        u *= -1;
+                //    //    }
+                //    //    if (generator.Angle - angle > 150)
+                //    //    {
+                //    //        angle += 180;
+                //    //        u *= -1;
+                //    //    }
+                //    //}
 
-                    if (!(railCurves[0] is Line))
-                        direction = line.Direction;
+                //    //if (angle > 180)
+                //    //{
+                //    //    angle -= 180;
+                //    //    u *= -1;
+                //    //}
+                //    //if (i != 0 && generator.Angle - angle > 150)
+                //    //{
+                //    //    //angle += 360;
+                //    //    u *= -1;
+                //    //}
+                //    //if (operation == TechOperations.Last())
+                //    //{
+                //    //    angle += 180;
+                //    //    //u *= -1;
+                //    //}
 
-                    if (!isStarted)
-                    {
-                        generator.GCommandAngle(direction, operation.S);
-                        //generator.GCommand(0, u);
-                        //generator.GCommand(0, u, z);
-                        generator.Command($"M03", "Включение");
-                        isStarted = true;
-                    }
-                    else
-                    {
-                        //generator.GCommand(1, u, z, operation.CuttingFeed);
-                        generator.GCommandAngle(direction, operation.S);
-                    }
-                }
-                generator.Command($"G04 P{operation.Delay}", "Задержка");
+                //    if (!(railCurves[0] is Line))
+                //        direction = line.Direction;
+
+                //    if (!isStarted)
+                //    {
+                //        generator.GCommandAngle(direction, operation.S);
+                //        //generator.GCommand(0, u);
+                //        //generator.GCommand(0, u, z);
+                //        generator.Command($"M03", "Включение");
+                //        isStarted = true;
+                //    }
+                //    else
+                //    {
+                //        //generator.GCommand(1, u, z, operation.CuttingFeed);
+                //        generator.GCommandAngle(direction, operation.S);
+                //    }
+                //}
+            }
+                generator.Command($"G04 P{Delay}", "Задержка");
                 generator.Command($"M05", "Выключение");
                 generator.Command($"M00", "Пауза");
-            }
 
             //foreach (Region region in regions)
             //{

@@ -23,6 +23,7 @@ namespace CAM
         public int S { get; set; }
 
         private bool _isSetPosition;
+        public bool _isEngineStarted = false;
 
         public void SetToolPosition(Point3d centerPoint, double angle, double u, double v)
         {
@@ -75,6 +76,8 @@ namespace CAM
 
         protected override void StartEngineCommands()
         {
+            Command($"M03", "Включение");
+            _isEngineStarted = true;
         }
 
         protected override void StopEngineCommands()
@@ -166,6 +169,11 @@ namespace CAM
                 GCommandUV(1, u, v);
             }
             _normal = normal;
+
+            if (!_isEngineStarted)
+            {
+                StartEngineCommands();
+            }
         }
 
         public void GCommandUV(int gCode, double u, double v)
