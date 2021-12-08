@@ -18,6 +18,8 @@ namespace CAM.TechProcesses.Disk3D
 
         public double EndPass { get; set; }
 
+        public bool IsReverse { get; set; }
+
         public double Penetration { get; set; }
 
         public double Delta { get; set; }
@@ -39,6 +41,7 @@ namespace CAM.TechProcesses.Disk3D
             view.AddParam(nameof(StepPass))
                 .AddParam(nameof(StartPass))
                 .AddParam(nameof(EndPass))
+                .AddParam(nameof(IsReverse), "Обратно")
                 .AddIndent()
                 .AddParam(nameof(StepLong))
                 .AddParam(nameof(Departure))
@@ -193,8 +196,8 @@ namespace CAM.TechProcesses.Disk3D
             //    ray.BasePoint += crossVector;
             //}
 
-            var startY = bounds.MinPoint.Y + StartPass;
-            var endY = bounds.MaxPoint.Y - (disk3DTechProcess.IsExactlyEnd ? TechProcess.Tool.Thickness : 0);
+            var startY = StartPass == 0 ? bounds.MinPoint.Y : StartPass ;
+            var endY = (EndPass == 0 ? bounds.MaxPoint.Y : EndPass) - (disk3DTechProcess.IsExactlyEnd ? TechProcess.Tool.Thickness : 0);
 
             //double startY, endY;
             //if (!TechProcess.IsA90)
@@ -220,16 +223,54 @@ namespace CAM.TechProcesses.Disk3D
             //var PassList = new List<List<Point3d>>();
             //for (var y = startY; StepPass > 0 ? y < endY : y > endY; y += StepPass)
 
-                Acad.SetLimitProgressor((int)((endY - startY) / StepPass));
+
+
+            // расчет точек начала и конца поверхности
+
+            //var boundCurves = new List<Curve>();
+            //var entitySet = new DBObjectCollection();
+            //offsetSurface.Explode(entitySet);
+            //for (int i = 0; i < entitySet.Count; i++)
+            //{
+            //    if (entitySet[i] is DbSurface)
+            //    {
+            //        var subEntitySet = new DBObjectCollection();
+            //        ((Entity)entitySet[i]).Explode(subEntitySet);
+            //        boundCurves.AddRange(subEntitySet.Cast<Curve>());
+            //    }
+            //    else
+            //    {
+            //        boundCurves.Add(entitySet[i] as Curve);
+            //    }
+            //}
+
+            //var boundCurves2d = new List<Curve>();
+            //var plene = new Plane(Point3d.Origin, Vector3d.ZAxis);
+            //foreach (var curve in boundCurves)
+            //{
+            //    if (curve != null)
+            //    {
+            //        boundCurves2d.Add(curve.ToCurve2dArray GetOrthoProjectedCurve(plene));
+            //    }
+            //}
+
+            Acad.SetLimitProgressor((int)((endY - startY) / StepPass));
             var PassList = new List<List<Point3d>>();
             for (var y = startY; y < endY; y += StepPass)
             {
                 Acad.ReportProgressor();
                 var points = new Point3dCollection();
+
+                //var pass = new Line2d(new Point2d(bounds.MinPoint.X, y), new Point2d(bounds.MinPoint.X, y));
+                //foreach (var cv in boundCurves2d)
+                //{
+                //    pass.IntersectWith(cv.to);
+                //}
+
                 for (var x = bounds.MinPoint.X; x <= bounds.MaxPoint.X; x += StepLong)
                 {
                     double z = 0;
-                    for (var s = 0; s <= TechProcess.Tool.Thickness; s += 1)
+                    for (double s = 0; s <= TechProcess.Tool.Thickness; s += TechProcess.Tool.Thickness.Value)
                     {
                         if (y + s > bounds.MaxPoint.Y)
                             break;
@@ -262,6 +303,8 @@ namespace CAM.TechProcesses.Disk3D
             if (matrix.HasValue)
                 matrix = matrix.Value.Inverse();
             if (TechProcess.IsA90 && PassList.First()[0].TransformBy(matrix.Value).Z < PassList.Last()[0].TransformBy(matrix.Value).Z)
+                PassList.Reverse();
+            if (IsReverse)
                 PassList.Reverse();
 
             if (TechProcess.IsA90)
@@ -371,9 +414,20 @@ namespace CAM.TechProcesses.Disk3D
                     surface.Dispose();
                 }
             }
-            var offsetSurface = DbSurface.CreateOffsetSurface(unionSurface, Delta) as DbSurface;
-            unionSurface.Dispose();
-            return offsetSurface;
+            if (Delta == 0)
+                return unionSurface;
+
+            try
+            {
+                var offsetSurface = DbSurface.CreateOffsetSurface(unionSurface, Delta) as DbSurface;
+                unionSurface.Dispose();
+                return offsetSurface;
+            }
+            catch
+            {
+                unionSurface.TransformBy(Matrix3d.Displacement(Vector3d.ZAxis * Delta));
+                return unionSurface;
+            }            
         }
 
         private Point3d BuildPass(CommandGeneratorBase generator, List<Point3d> points)

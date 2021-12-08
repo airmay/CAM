@@ -17,7 +17,13 @@ namespace CAM.TechProcesses.Disk3D
     {
         private Disk3DTechProcess _disk3DTechProcess;
 
+        public double StartPass { get; set; }
+
+        public double EndPass { get; set; }
+
         public double StepY { get; set; }
+
+        public bool IsReverse { get; set; }
 
         public double Delta { get; set; }
 
@@ -47,7 +53,12 @@ namespace CAM.TechProcesses.Disk3D
         {
             view.AddParam(nameof(StepX1), "Шаг X1")
                 .AddParam(nameof(StepX2), "Шаг X2")
+                .AddIndent()
+                .AddParam(nameof(StartPass), "Начало")
+                .AddParam(nameof(EndPass), "Конец")
                 .AddParam(nameof(StepY), "Шаг Y")
+                .AddParam(nameof(IsReverse), "Обратно")
+                .AddIndent()
                 .AddParam(nameof(StepZ), "Шаг Z")
                 .AddIndent()
                 .AddParam(nameof(Departure))
@@ -115,7 +126,11 @@ namespace CAM.TechProcesses.Disk3D
                 offsetSurface.TransformBy(matrix);
 
             var minPoint = offsetSurface.GeometricExtents.MinPoint;
+            if (StartPass != 0)
+                minPoint = new Point3d(minPoint.X, StartPass, minPoint.Z);
             var maxPoint = offsetSurface.GeometricExtents.MaxPoint; // - Vector3d.XAxis * 1000;
+            if (EndPass != 0)
+                maxPoint = new Point3d(maxPoint.X, EndPass, maxPoint.Z);
 
             var collections = GetPointCollections(offsetSurface, minPoint, maxPoint);
 
@@ -127,6 +142,9 @@ namespace CAM.TechProcesses.Disk3D
             var passList = CalcPassList(zArray, minPoint);
 
             matrix = matrix.Inverse();
+            if (IsReverse)
+                passList.Reverse();
+
             passList.ForEach(p =>
             {
                 var points = p;
@@ -181,9 +199,20 @@ namespace CAM.TechProcesses.Disk3D
                     surface.Dispose();
                 }
             }
-            var offsetSurface = DbSurface.CreateOffsetSurface(unionSurface, Delta) as DbSurface;
-            unionSurface.Dispose();
-            return offsetSurface;
+            if (Delta == 0)
+                return unionSurface;
+
+            try
+            {
+                var offsetSurface = DbSurface.CreateOffsetSurface(unionSurface, Delta) as DbSurface;
+                unionSurface.Dispose();
+                return offsetSurface;
+            }
+            catch
+            {
+                unionSurface.TransformBy(Matrix3d.Displacement(Vector3d.ZAxis * Delta));
+                return unionSurface;
+            }
         }
 
         private Point2dCollection[] GetPointCollections(DbSurface offsetSurface, Point3d minPoint, Point3d maxPoint)
