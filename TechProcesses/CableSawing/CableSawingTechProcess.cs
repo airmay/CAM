@@ -109,10 +109,12 @@ namespace CAM.TechProcesses.CableSawing
             var z00 = ProcessingArea.Select(p => p.ObjectId).GetExtents().MaxPoint.Z + ZSafety;
             generator.SetToolPosition(new Point3d(OriginX, OriginY, 0), 0, 0, z00);
             generator.Command($"G92");
+            CableSawingTechOperation last = null; 
 
             foreach (var operation in TechOperations.FindAll(p => p.Enabled && p.CanProcess).Cast<CableSawingTechOperation>())
             {
                 SetOperationParams(operation);
+                generator.Feed = operation.CuttingFeed;
 
                 if (operation is LineSawingTechOperation lineSawingTechOperation)
                 {
@@ -248,7 +250,7 @@ namespace CAM.TechProcesses.CableSawing
                 //    }
                 //}
             }
-                generator.Command($"G04 P{Delay}", "Задержка");
+                generator.Command($"G04 P{last?.Delay ?? Delay}", "Задержка");
                 generator.Command($"M05", "Выключение");
                 generator.Command($"M00", "Пауза");
 

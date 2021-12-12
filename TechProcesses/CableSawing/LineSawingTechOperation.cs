@@ -217,7 +217,7 @@ namespace CAM.TechProcesses.CableSawing
                     //generator.GCommandAngle(line.Direction.ToVector2d(), S);
                     //generator.GCommand(0, u);
                     //generator.GCommand(0, u, z);
-                    generator.GCommand(0, line);
+                    generator.GCommand(0, line, IsRevereseAngle);
                 }
                 else
                 {
