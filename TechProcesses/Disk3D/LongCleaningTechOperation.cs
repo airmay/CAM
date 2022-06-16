@@ -23,6 +23,8 @@ namespace CAM.TechProcesses.Disk3D
 
         public double StepY { get; set; }
 
+        public double YMax { get; set; }
+
         public bool IsReverse { get; set; }
 
         public double Delta { get; set; }
@@ -46,6 +48,7 @@ namespace CAM.TechProcesses.Disk3D
             StepX1 = 1;
             StepX2 = 1;
             StepY = 1;
+            YMax = 4;
             StepZ = 1;
         }
 
@@ -56,7 +59,8 @@ namespace CAM.TechProcesses.Disk3D
                 .AddIndent()
                 .AddParam(nameof(StartPass), "Начало")
                 .AddParam(nameof(EndPass), "Конец")
-                .AddParam(nameof(StepY), "Шаг Y")
+                .AddParam(nameof(StepY), "Шаг Y мин.")
+                .AddParam(nameof(YMax), "Шаг Y макс.")
                 .AddParam(nameof(IsReverse), "Обратно")
                 .AddIndent()
                 .AddParam(nameof(StepZ), "Шаг Z")
@@ -148,6 +152,10 @@ namespace CAM.TechProcesses.Disk3D
             passList.ForEach(p =>
             {
                 var points = p;
+
+                if (!points.Any())
+                    return;
+
                 if (Departure > 0)
                 {
                     points.Insert(0, new Point3d((IsDepartureOnBorderSection ? points.First().X : minPoint.X) - Departure, points.First().Y, points.First().Z));
@@ -298,7 +306,7 @@ namespace CAM.TechProcesses.Disk3D
         private List<List<Point3d>> CalcPassList(double?[,] zArray, Point3d minPoint)
         {
             var w = (int)(TechProcess.Tool.Thickness / StepY);
-            var maxDist = (int)(0.8 * TechProcess.Tool.Thickness / StepY);
+            var maxDist = (int)(YMax / StepY);
             var passZArray = new double?[zArray.GetLength(0) + (_disk3DTechProcess.IsExactlyEnd ? 0 : maxDist)][];
 
             Parallel.For(0, passZArray.Length, i =>
