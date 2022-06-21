@@ -5,7 +5,7 @@ namespace CAM.TechProcesses.Disk3D
 {
     [Serializable]
     [MenuItem("Диск 3D", 3)]
-    public class Disk3DTechProcess : TechProcess
+    public class Disk3DTechProcess : MillingTechProcess
     {
         public double Angle { get; set; }
 
@@ -41,7 +41,7 @@ namespace CAM.TechProcesses.Disk3D
                 .AddParam(nameof(OriginCellNumber), "Ячейка начала координат");
         }
 
-        protected override void SetTool(CommandGeneratorBase generator) =>
+        protected override void SetTool(MillingCommandGenerator generator) =>
             generator.SetTool(
                 MachineType.Value != CAM.MachineType.Donatoni ? Tool.Number : 1,
                 Frequency,

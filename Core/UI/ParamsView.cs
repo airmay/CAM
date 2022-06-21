@@ -116,7 +116,7 @@ namespace CAM
             return this;
         }
 
-        public ParamsView AddText(string displayName, Action<Label> labelProvider = null)
+        public ParamsView AddText(string displayName, Action<Label> labelProvider)
         {
             AddRow();
             AddLabel(displayName);
@@ -128,6 +128,22 @@ namespace CAM
             };
             tablePanel.Controls.Add(label, 1, tablePanel.RowStyles.Count - 1);
             labelProvider?.Invoke(label);
+
+            return this;
+        }
+
+        public ParamsView AddText(string text)
+        {
+            AddRow();
+
+            var textbox = new Label
+            {
+                Text = text,
+                Dock = DockStyle.Fill,
+                TextAlign = ContentAlignment.TopLeft
+            };
+            tablePanel.Controls.Add(textbox, 0, tablePanel.RowStyles.Count - 1);
+            tablePanel.SetColumnSpan(textbox, 2);
 
             return this;
         }
@@ -281,7 +297,7 @@ namespace CAM
         {
             var originX = _type.GetProperty("OriginX");
             var originY = _type.GetProperty("OriginY");
-            var originObject = _type.GetField(nameof(TechProcess.OriginObject));
+            var originObject = _type.GetField(nameof(MillingTechProcess.OriginObject));
 
             var selector = CreateSelector("Начало координат", "۞");
 

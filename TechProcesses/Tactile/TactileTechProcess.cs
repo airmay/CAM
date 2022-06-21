@@ -9,7 +9,7 @@ namespace CAM.TechProcesses.Tactile
 {
     [Serializable]
     [MenuItem("Тактилка", 2)]
-    public class TactileTechProcess: TechProcess
+    public class TactileTechProcess: MillingTechProcess
     {
         public List<AcadObject> Objects { get; set; }
 
@@ -183,7 +183,7 @@ namespace CAM.TechProcesses.Tactile
 
         public override List<TechOperation> CreateTechOperations()
         {
-            List<TechOperation> techOperations = new List<TechOperation>();
+            var techOperations = new List<TechOperation>();
             techOperations.Add(new BandsTechOperation(this, "Полосы", ProcessingAngle1, BandStart1));
             if (ProcessingAngle2 != null)
                 techOperations.Add(new BandsTechOperation(this, "Полосы", ProcessingAngle2, BandStart2));

@@ -12,15 +12,20 @@ namespace CAM
 
         public bool HasTool { get; set; }
 
-        public Location ToolLocation;
+        public ToolPosition ToolLocation;
 
         public ObjectId? ToolpathObjectId { get; set; }
 
         public double Duration { get; set; }
 
-        public string GetProgrammLine(string formatString) => string.Format(formatString, Number) + Text;
+        // TODO настройка формата
+        public string GetProgrammLine(string formatString) => Text; // string.Format(formatString, Number) + Text;
 
         public object Owner { get; set; }
+
+        public double? U { get; set; }
+        public double? V { get; set; }
+        public double? A { get; set; }
 
     }
 }

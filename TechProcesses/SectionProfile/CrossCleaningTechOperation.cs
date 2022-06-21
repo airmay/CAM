@@ -10,7 +10,7 @@ namespace CAM.TechProcesses.SectionProfile
 {
     [Serializable]
     [MenuItem("Поперечная чистка", 3)]
-    public class CrossCleaningTechOperation : TechOperation<SectionProfileTechProcess>
+    public class CrossCleaningTechOperation : MillingTechOperation<SectionProfileTechProcess>
     {
         public double LongStep { get; set; } = 10;
         public double ProfileStep { get; set; } = 5;
@@ -53,7 +53,7 @@ namespace CAM.TechProcesses.SectionProfile
             return !(LongStep == 0 || ProfileStep == 0);
         }
 
-        public override void BuildProcessing(CommandGeneratorBase generator)
+        public override void BuildProcessing(MillingCommandGenerator generator)
         {
             var railBase = TechProcess.Rail?.GetCurve() ?? new Line(Point3d.Origin, Point3d.Origin + Vector3d.XAxis * TechProcess.Length.Value);
             var profile = (Profile ?? TechProcess.ProcessingArea[0]).GetCurve();
@@ -117,7 +117,7 @@ namespace CAM.TechProcesses.SectionProfile
                 if (IsOutlet)
                     if (IsA90)
                     {
-                        var pt = outletCurve.GetClosestPoint(generator.ToolLocation.Point);
+                        var pt = outletCurve.GetClosestPoint(generator.ToolPosition.Point);
                         generator.Move(pt.X, pt.Y);
                     }
                     else
@@ -183,7 +183,7 @@ namespace CAM.TechProcesses.SectionProfile
         }
 
 
-        public void BuildProcessingOld(CommandGeneratorBase generator)
+        public void BuildProcessingOld(MillingCommandGenerator generator)
         {
             var sectionProfile = (SectionProfileTechProcess)TechProcess;
             var toolThickness = TechProcess.Tool.Thickness.Value;

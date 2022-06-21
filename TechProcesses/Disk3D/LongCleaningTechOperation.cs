@@ -13,7 +13,7 @@ namespace CAM.TechProcesses.Disk3D
 {
     [Serializable]
     [MenuItem("Продольная чистка", 2)]
-    public class LongCleaningTechOperation : TechOperation<Disk3DTechProcess>
+    public class LongCleaningTechOperation : MillingTechOperation<Disk3DTechProcess>
     {
         private Disk3DTechProcess _disk3DTechProcess;
 
@@ -72,14 +72,14 @@ namespace CAM.TechProcesses.Disk3D
                 .AddParam(nameof(IsUplifting));
         }
 
-        public override void PrepareBuild(CommandGeneratorBase generator)
+        public override void PrepareBuild(MillingCommandGenerator generator)
         {
             var bounds = TechProcess.ProcessingArea.Select(p => p.ObjectId).GetExtents();
             generator.ZSafety = bounds.MaxPoint.Z + TechProcess.ZSafety;
-            generator.ToolLocation.Point += Vector3d.ZAxis * generator.ZSafety;
+            generator.ToolPosition.Point += Vector3d.ZAxis * generator.ZSafety;
         }
 
-        public override void BuildProcessing(CommandGeneratorBase generator)
+        public override void BuildProcessing(MillingCommandGenerator generator)
         {
             //var progressMeter = new ProgressMeter();
             //progressMeter.Start($"test");
@@ -165,7 +165,7 @@ namespace CAM.TechProcesses.Disk3D
                     points = points.ConvertAll(x => new Point3d(x.X, x.Y - TechProcess.Tool.Thickness.Value, x.Z));
                 if (_disk3DTechProcess.Angle != 0)
                     points = points.ConvertAll(x => x.TransformBy(matrix));
-                var loc = generator.ToolLocation;
+                var loc = generator.ToolPosition;
                 if (loc.IsDefined && loc.Point.DistanceTo(points.First()) > loc.Point.DistanceTo(points.Last()))
                     points.Reverse();
 
@@ -361,7 +361,7 @@ namespace CAM.TechProcesses.Disk3D
             return passList;
         }
 
-        private void BuildPass(CommandGeneratorBase generator, List<Point3d> points)
+        private void BuildPass(MillingCommandGenerator generator, List<Point3d> points)
         {
             var point0 = Algorithms.NullPoint3d;
             var point = Algorithms.NullPoint3d;
@@ -373,7 +373,7 @@ namespace CAM.TechProcesses.Disk3D
 
                 if (point.IsNull())
                 {
-                    if (generator.ToolLocation.Point != p)
+                    if (generator.ToolPosition.Point != p)
                         generator.GCommand(CommandNames.Penetration, 1, point: p, feed: TechProcess.PenetrationFeed);
                 }
                 else if (point0 != point && point != p && !point0.GetVectorTo(point).IsCodirectionalTo(point.GetVectorTo(p)))

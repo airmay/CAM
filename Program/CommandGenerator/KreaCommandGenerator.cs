@@ -9,7 +9,7 @@ namespace CAM
     /// Генератор команд для станка типа Krea
     /// </summary>
     [MachineType(MachineType.Krea)]
-    public class KreaCommandGenerator : CommandGeneratorBase
+    public class KreaCommandGenerator : MillingCommandGenerator
     {
         protected override void StartMachineCommands(string caption)
         {
@@ -50,9 +50,9 @@ namespace CAM
 
         protected override string GCommandText(int gCode, string paramsString, Point3d point, Curve curve, double? angleC, double? angleA, int? feed, Point2d? center)
         {
-            return $"G{gCode}{Format("X", point.X, ToolLocation.Point.X, _originX)}{Format("Y", point.Y, ToolLocation.Point.Y, _originY)}" +
+            return $"G{gCode}{Format("X", point.X, ToolPosition.Point.X, _originX)}{Format("Y", point.Y, ToolPosition.Point.Y, _originY)}" +
                 $"{FormatIJ("I", center?.X, _originX)}{FormatIJ("J", center?.Y, _originY)}" +
-                $"{Format("Z", point.Z, ToolLocation.Point.Z, withThick: WithThick)}{Format("C", angleC, ToolLocation.AngleC)}{Format("A", angleA, ToolLocation.AngleA)}" +
+                $"{Format("Z", point.Z, ToolPosition.Point.Z, withThick: WithThick)}{Format("C", angleC, ToolPosition.AngleC)}{Format("A", angleA, ToolPosition.AngleA)}" +
                 $"{Format("F", feed, _feed)}";
 
             string Format(string label, double? value, double oldValue, double origin = 0, bool withThick = false) =>

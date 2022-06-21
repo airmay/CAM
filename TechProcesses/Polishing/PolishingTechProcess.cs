@@ -8,7 +8,7 @@ namespace CAM.TechProcesses.Polishing
 {
     [Serializable]
     [MenuItem("Полировка", 6)]
-    public class PolishingTechProcess : TechProcess
+    public class PolishingTechProcess : MillingTechProcess
     {
         public int Feed { get; set; }
 
@@ -55,7 +55,7 @@ namespace CAM.TechProcesses.Polishing
             return Angle2 < 90;
         }
 
-        protected override void BuildProcessing(CommandGeneratorBase generator)
+        protected override void BuildProcessing(MillingCommandGenerator generator)
         {
             generator.ZSafety = ZSafety;
             if (MachineType.Value == CAM.MachineType.Donatoni)

@@ -41,7 +41,7 @@ namespace CAM
                             }
                             stream.Position = 0;
                             var formatter = new BinaryFormatter { Binder = new MyBinder() };
-                            camDocument.TechProcessList = (List<TechProcess>)formatter.Deserialize(stream);
+                            camDocument.TechProcessList = (List<ITechProcess>)formatter.Deserialize(stream);
                         }
 
                 if (camDocument.TechProcessList?.Any() == true)

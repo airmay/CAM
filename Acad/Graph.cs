@@ -75,9 +75,13 @@ namespace CAM
 
         public static double AngleDeg(this Line line) => Math.Round(line.Angle * 180 / Math.PI, 6);
 
-        public static Point3d ExpandStart(this Line line, double value) => line.StartPoint - line.Delta.GetNormal() * value;
+        public static Point3d ExpandStart(this Line line, double value) => line.StartPoint.GetExtendedPoint(line.EndPoint, value);
 
-        public static Point3d ExpandEnd(this Line line, double value) => line.EndPoint + line.Delta.GetNormal() * value;
+        public static Point3d ExpandEnd(this Line line, double value) => line.EndPoint.GetExtendedPoint(line.StartPoint, value);
+
+        public static Point3d GetExtendedPoint(this Point3d point, Point3d basePoint, double value) => point + (point - basePoint).GetNormal() * value;
+
+        public static bool IsEqual(this double value1, double value2) => Math.Abs(value1 - value2) < Consts.Epsilon;
 
         public static bool IsTurnRight(Point3d px, Point3d py, Point3d pz)
         {
@@ -97,6 +101,18 @@ namespace CAM
             return result;
         }
 
+        public static IEnumerable<Point3d> GetPoints(this Curve cv, int divs)
+        {
+            if (cv is Spline spline)
+                cv = spline.ToPolyline();
+            
+            double div = (cv.EndParam - cv.StartParam) / divs;
+            for (int i = 0; i <= divs; i++)
+            {
+                yield return cv.GetPointAtParam(cv.StartParam + i * div);
+            }
+        }
+
         public static IEnumerable<Point3d> GetPolylineFitPoints(this Polyline poly, double distDelta)
         {
             for (int i = 0; i < poly.EndParam - Consts.Epsilon; i++)
@@ -114,6 +130,19 @@ namespace CAM
                 }
             }
             yield return poly.GetPointAtParameter(poly.EndParam);
+        }
+
+        /// <summary>
+        /// Converts line to polyline.
+        /// </summary>
+        /// <param name="line">The line.</param>
+        /// <returns>A polyline.</returns>
+        public static Polyline3d ToPolyline3d(this Line line)
+        {
+            var poly = new Polyline3d();
+            poly.AppendVertex(new PolylineVertex3d(line.StartPoint));
+            poly.AppendVertex(new PolylineVertex3d(line.EndPoint));
+            return poly;
         }
 
         public static ObjectId? CreateHatch(List<Curve> contour, int sign)

@@ -7,7 +7,7 @@ namespace CAM.Commands
     /// Генератор команд для станка типа ScemaLogic
     /// </summary>
     [MachineType(MachineType.ScemaLogic)]
-    public class ScemaLogicCommandGenerator : CommandGeneratorBase
+    public class ScemaLogicCommandGenerator : MillingCommandGenerator
     {
         protected override void StartMachineCommands(string caption)
         {
@@ -54,7 +54,7 @@ namespace CAM.Commands
             if (center!= null)
                 text += $"{(center.Value.X - _originX).Round(4)};{(center.Value.Y - _originY).Round(4)};";
             else
-                text += $"{(angleC ?? ToolLocation.AngleC).Round(4)};{point.Z.Round(4)};";
+                text += $"{(angleC ?? ToolPosition.AngleC).Round(4)};{point.Z.Round(4)};";
 
             return $"{gCode};;XYCZ;{feed ?? _feed};{text}";
         }

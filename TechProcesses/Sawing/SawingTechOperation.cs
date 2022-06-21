@@ -9,7 +9,7 @@ namespace CAM.TechProcesses.Sawing
 {
     [Serializable]
     [MenuItem("Распиловка", 1)]
-    public class SawingTechOperation : TechOperation<SawingTechProcess>
+    public class SawingTechOperation : MillingTechOperation<SawingTechProcess>
     {
         public bool IsExactlyBegin { get; set; }
 
@@ -25,7 +25,7 @@ namespace CAM.TechProcesses.Sawing
 
         public SawingTechOperation() { }
 
-        public SawingTechOperation(TechProcess techProcess, Border border)
+        public SawingTechOperation(MillingTechProcess techProcess, Border border)
         {
             Setup(techProcess, $"Распиловка{border.ObjectId.GetDesc()}");
             SetFromBorder(border);
@@ -76,7 +76,7 @@ namespace CAM.TechProcesses.Sawing
             IsExactlyEnd = border.IsExactlyEnd;
         }
 
-        public override void BuildProcessing(CommandGeneratorBase generator)
+        public override void BuildProcessing(MillingCommandGenerator generator)
         {
             const int CornerIndentIncrease = 5;
             var curve = ProcessingArea.GetCurve();

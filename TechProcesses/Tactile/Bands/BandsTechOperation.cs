@@ -9,7 +9,7 @@ namespace CAM.TechProcesses.Tactile
 {
     [Serializable]
     [MenuItem("Полосы", 1)]
-    public class BandsTechOperation : TechOperation<TactileTechProcess>
+    public class BandsTechOperation : MillingTechOperation<TactileTechProcess>
     {
         public int ProcessingAngle { get; set; }
 
@@ -97,7 +97,7 @@ namespace CAM.TechProcesses.Tactile
 
         public override bool Validate() => ToolService.Validate(TechProcess.Tool, ToolType.Disk);
 
-        public override void BuildProcessing(CommandGeneratorBase generator)
+        public override void BuildProcessing(MillingCommandGenerator generator)
         {
             if (PassList?.Any() != true)
                 CalcPassList();

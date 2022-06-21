@@ -9,7 +9,7 @@ namespace CAM.TechProcesses.Sawing
 {
     [Serializable]
     [MenuItem("Распиловка", 1)]
-    public class SawingTechProcess : TechProcess
+    public class SawingTechProcess : MillingTechProcess
     {
         public SawingTechProcessParams SawingTechProcessParams { get; }
 

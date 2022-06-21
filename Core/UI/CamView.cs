@@ -12,7 +12,7 @@ namespace CAM
     {
 	    private CamDocument _camDocument;
         private Type _currentTechProcessType;
-        private TechProcess CurrentTechProcess => (treeView.SelectedNode?.Parent ?? treeView.SelectedNode)?.Tag as TechProcess;
+        private ITechProcess CurrentTechProcess => (treeView.SelectedNode?.Parent ?? treeView.SelectedNode)?.Tag as ITechProcess;
         private ProcessCommand CurrentProcessCommand => processCommandBindingSource.Current as ProcessCommand;
 
         public CamView()
@@ -85,7 +85,7 @@ namespace CAM
 
         public void SelectProcessCommand(Autodesk.AutoCAD.DatabaseServices.ObjectId id)
         {
-            if (CurrentTechProcess.ToolpathObjectIds.TryGetValue(id, out var index))
+            if (CurrentTechProcess.GetToolpathObjectIds().TryGetValue(id, out var index))
                 processCommandBindingSource.Position = index;
         }
 
@@ -109,7 +109,7 @@ namespace CAM
         #endregion
 
         #region Tree
-        private TreeNode CreateTechProcessNode(TechProcess techProcess)
+        private TreeNode CreateTechProcessNode(ITechProcess techProcess)
         {
             var children = techProcess.TechOperations.ConvertAll(CreateTechOperationNode).ToArray();
             var techProcessNode = new TreeNode(techProcess.Caption + "   ", 0, 0, children) { Tag = techProcess, Checked = true, NodeFont = new System.Drawing.Font(treeView.Font, FontStyle.Bold) };
@@ -143,15 +143,17 @@ namespace CAM
             {
                 if (treeView.SelectedNode.Tag is TechOperation oper)
                 {
-                    CurrentTechProcess.ToolpathObjectsGroup?.SetGroupVisibility(false);
+                    CurrentTechProcess.GetToolpathObjectsGroup()?.SetGroupVisibility(false);
                     oper.ToolpathObjectsGroup?.SetGroupVisibility(true);
                 }
                 else
                 {
-                    CurrentTechProcess.ToolpathObjectsGroup?.SetGroupVisibility(true);
+                    CurrentTechProcess.GetToolpathObjectsGroup()?.SetGroupVisibility(true);
                 }
                 Acad.Editor.UpdateScreen();
             }
+
+            processCommandBindingSource.DataSource = CurrentTechProcess.ProcessCommands;
 
             if (treeView.SelectedNode.Tag is TechOperation techOperation)
             {
@@ -163,8 +165,6 @@ namespace CAM
             }
             else
                 processCommandBindingSource.Position = 0;
-
-            processCommandBindingSource.DataSource = CurrentTechProcess.ProcessCommands;
         }
 
         private void treeView_NodeMouseDoubleClick(object sender, TreeNodeMouseClickEventArgs e)
@@ -184,7 +184,7 @@ namespace CAM
             e.Node.Text = e.Label;
             switch (e.Node.Tag)
             {
-                case TechProcess techProcess:
+                case ITechProcess techProcess:
                     techProcess.Caption = e.Label;
                     break;
                 case TechOperation techOperation:
@@ -297,7 +297,7 @@ namespace CAM
 
             if (IsToolpathVisible)
             {
-                CurrentTechProcess.ToolpathObjectsGroup?.SetGroupVisibility(true);
+                CurrentTechProcess.GetToolpathObjectsGroup()?.SetGroupVisibility(true);
                 Acad.Editor.UpdateScreen();
             }
         }
@@ -305,14 +305,14 @@ namespace CAM
         private void UpdateCaptions()
         {
             var techProcessNode = treeView.SelectedNode.Parent ?? treeView.SelectedNode;
-            techProcessNode.Text = ((TechProcess)techProcessNode.Tag).Caption;
+            techProcessNode.Text = ((ITechProcess)techProcessNode.Tag).Caption;
             techProcessNode.Nodes.Cast<TreeNode>().ToList().ForEach(p => p.Text = ((TechOperation)p.Tag).Caption);
         }
 
         private void bVisibility_Click(object sender, EventArgs e)
         {
-            CurrentTechProcess.ToolpathObjectsGroup?.SetGroupVisibility(IsToolpathVisible);
-            CurrentTechProcess.ExtraObjectsGroup?.SetGroupVisibility(IsToolpathVisible);
+            CurrentTechProcess.GetToolpathObjectsGroup()?.SetGroupVisibility(IsToolpathVisible);
+            CurrentTechProcess.GetExtraObjectsGroup()?.SetGroupVisibility(IsToolpathVisible);
             Acad.Editor.UpdateScreen();
         }
 
@@ -358,12 +358,12 @@ namespace CAM
         {
             if (treeView.SelectedNode == null)
                 return;
-            if (MessageBox.Show($"Вы хотите удалить {(treeView.SelectedNode.Tag is TechProcess ? "техпроцесс" : "операцию")} '{treeView.SelectedNode.Text}'?",
+            if (MessageBox.Show($"Вы хотите удалить {(treeView.SelectedNode.Tag is ITechProcess ? "техпроцесс" : "операцию")} '{treeView.SelectedNode.Text}'?",
                     "Подтверждение", MessageBoxButtons.YesNo, MessageBoxIcon.Question, MessageBoxDefaultButton.Button1) == DialogResult.Yes)
             {
                 switch (treeView.SelectedNode.Tag)
                 {
-                    case TechProcess techProcess:
+                    case ITechProcess techProcess:
                         _camDocument.DeleteTechProcess(techProcess);
                         _currentTechProcessType = null;
                         break;
