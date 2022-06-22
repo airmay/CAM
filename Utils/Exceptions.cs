@@ -12,7 +12,6 @@ namespace CAM
             typeof (OutOfMemoryException),
             typeof (StackOverflowException),
         };
-
         public static string FullMessage(this Exception ex)
         {
             var builder = new StringBuilder();
