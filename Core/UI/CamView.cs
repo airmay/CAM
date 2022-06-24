@@ -111,7 +111,7 @@ namespace CAM
         #region Tree
         private TreeNode CreateTechProcessNode(ITechProcess techProcess)
         {
-            var children = techProcess.TechOperations.ConvertAll(CreateTechOperationNode).ToArray();
+            var children = techProcess.TechOperations.Select(CreateTechOperationNode).ToArray();
             var techProcessNode = new TreeNode(techProcess.Caption + "   ", 0, 0, children) { Tag = techProcess, Checked = true, NodeFont = new System.Drawing.Font(treeView.Font, FontStyle.Bold) };
             treeView.Nodes.Add(techProcessNode);
             techProcessNode.ExpandAll();
@@ -253,7 +253,7 @@ namespace CAM
 		    if (treeView.SelectedNode.Tag is TechOperation techOperation)
 		    {
 			    EndEdit();
-			    if (techOperation.TechProcessBase.TechOperations.SwapPrev(techOperation))
+			    if (techOperation.TechProcessBase.MoveBackwardTechOperation(treeView.SelectedNode.Index))
 				    MoveSelectedNode(-1);
 		    }
 	    }
@@ -263,8 +263,8 @@ namespace CAM
 		    if (treeView.SelectedNode.Tag is TechOperation techOperation)
 		    {
 			    EndEdit();
-			    if (techOperation.TechProcessBase.TechOperations.SwapNext(techOperation))
-				    MoveSelectedNode(1);
+			    if (techOperation.TechProcessBase.MoveForwardTechOperation(treeView.SelectedNode.Index))
+                    MoveSelectedNode(1);
 		    }
 	    }
 
@@ -283,7 +283,7 @@ namespace CAM
 
             if (node.Nodes.Count == 0)
             {
-                node.Nodes.AddRange(CurrentTechProcess.TechOperations.ConvertAll(CreateTechOperationNode).ToArray());
+                node.Nodes.AddRange(CurrentTechProcess.TechOperations.Select(CreateTechOperationNode).ToArray());
                 node.Expand();
             }
 
@@ -368,7 +368,7 @@ namespace CAM
                         _currentTechProcessType = null;
                         break;
                     case TechOperation techOperation:
-                        _camDocument.DeleteTechOperation(techOperation);
+                        _camDocument.DeleteTechOperation(CurrentTechProcess, treeView.SelectedNode.Index);
                         break;
                 }
                 Acad.UnhighlightAll();

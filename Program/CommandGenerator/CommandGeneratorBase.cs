@@ -5,10 +5,12 @@ namespace CAM
 {
     public abstract class CommandGeneratorBase : IDisposable
     {
-        protected object _techProcess;
+        protected ITechProcess _techProcess;
         protected TechOperation _techOperation;
 
         public List<ProcessCommand> ProcessCommands { get; } = new List<ProcessCommand>();
+
+
 
         public virtual void Dispose() { }
 
@@ -37,6 +39,14 @@ namespace CAM
         }
 
         protected virtual void StopEngineCommands()
+        {
+        }
+
+        public virtual void StartTechProcess(ITechProcess techProcess)
+        {
+        }
+
+        public virtual void FinishTechProcess()
         {
         }
     }

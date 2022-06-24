@@ -8,15 +8,15 @@ namespace CAM
     /// Базовая технологическая операция
     /// </summary>
     [Serializable]
-    public abstract class MillingTechOperation : TechOperation
+    public abstract class TechOperation<T> : TechOperation where T : CommandGeneratorBase
     {
-        public abstract void BuildProcessing(MillingCommandGenerator generator);
+        public abstract void BuildProcessing(T generator);
 
-        public virtual void PrepareBuild(MillingCommandGenerator generator) { }
+        public virtual void PrepareBuild(T generator) { }
     }
 
     [Serializable]
-    public abstract class MillingTechOperation<T> : MillingTechOperation where T : ITechProcess
+    public abstract class MillingTechOperation<T> : TechOperation<MillingCommandGenerator> where T : ITechProcess
     {
         public T TechProcess => (T)TechProcessBase;
     }
@@ -49,7 +49,7 @@ namespace CAM
         public void Setup(ITechProcess techProcess, string caption)
         {
             TechProcessBase = techProcess;
-            TechProcessBase.TechOperations.Add(this);
+            TechProcessBase.AddTechOperation(this);
             Caption = $"{caption}{techProcess.TechOperations.Count()}";
 
             Init();

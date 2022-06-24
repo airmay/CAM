@@ -38,13 +38,8 @@ namespace CAM
             TechProcessList.Remove(techProcess);
         }
 
-        public void DeleteTechOperation(TechOperation techOperation)
-        {
-            techOperation.TechProcessBase.DeleteProcessing();
-            techOperation.Teardown();
-            techOperation.TechProcessBase.TechOperations.Remove(techOperation);
-        }
-       
+        public void DeleteTechOperation(ITechProcess techProcess, int index) => techProcess.RemoveTechOperation(index);
+
         public void BuildProcessing(ITechProcess techProcess)
         {
             if (!techProcess.TechOperations.Any())

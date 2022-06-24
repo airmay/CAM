@@ -1,192 +1,184 @@
-﻿using Autodesk.AutoCAD.DatabaseServices;
-using Autodesk.AutoCAD.Geometry;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿//using Autodesk.AutoCAD.DatabaseServices;
+//using Autodesk.AutoCAD.Geometry;
+//using System;
+//using System.Collections.Generic;
+//using System.Linq;
+//using System.Text;
+//using System.Threading.Tasks;
 
-namespace CAM
-{
-    /// <summary>
-    /// Технологический процесс обработки
-    /// </summary>
-    [Serializable]
-    public abstract class CableTechProcess : ITechProcess
-    {
-        public string Caption { get; set; }
+//namespace CAM
+//{
+//    /// <summary>
+//    /// Технологический процесс обработки
+//    /// </summary>
+//    [Serializable]
+//    public abstract class CableTechProcess : ITechProcess
+//    {
+//        public string Caption { get; set; }
 
-        public MachineType? MachineType { get; set; }
+//        public MachineType? MachineType { get; set; }
 
-        public Material? Material { get; set; }
+//        public Tool Tool { get; set; }
 
-        public double? Thickness { get; set; }
+//        public double ZSafety { get; set; } = 20;
 
-        public Tool Tool { get; set; }
+//        public List<AcadObject> ProcessingArea { get; set; }
 
-        public int Frequency { get; set; }
+//        public List<TechOperation> TechOperations { get; } = new List<TechOperation>();
 
-        public int PenetrationFeed { get; set; }
+//        public List<ProcessCommand> ProcessCommands { get; set; }
 
-        public double ZSafety { get; set; } = 20;
+//        public double OriginX { get; set; }
 
-        public List<AcadObject> ProcessingArea { get; set; }
+//        public double OriginY { get; set; }
 
-        public List<TechOperation> TechOperations { get; } = new List<TechOperation>();
+//        [NonSerialized]
+//        public ObjectId[] OriginObject;
+//        [NonSerialized]
+//        public Dictionary<ObjectId, int> ToolpathObjectIds;
+//        [NonSerialized]
+//        public ObjectId? ToolpathObjectsGroup;
+//        [NonSerialized]
+//        public ObjectId? ExtraObjectsGroup;
 
-        public List<ProcessCommand> ProcessCommands { get; set; }
+//        public Dictionary<ObjectId, int> GetToolpathObjectIds() => ToolpathObjectIds;
 
-        public double OriginX { get; set; }
+//        public ObjectId? GetToolpathObjectsGroup() => ToolpathObjectsGroup;
 
-        public double OriginY { get; set; }
+//        public ObjectId? GetExtraObjectsGroup() => ExtraObjectsGroup;
 
-        [NonSerialized]
-        public ObjectId[] OriginObject;
-        [NonSerialized]
-        public Dictionary<ObjectId, int> ToolpathObjectIds;
-        [NonSerialized]
-        public ObjectId? ToolpathObjectsGroup;
-        [NonSerialized]
-        public ObjectId? ExtraObjectsGroup;
+//        public virtual void SerializeInit()
+//        {
+//            if (OriginX != 0 || OriginY != 0)
+//                OriginObject = Acad.CreateOriginObject(new Point3d(OriginX, OriginY, 0));
 
-        public Dictionary<ObjectId, int> GetToolpathObjectIds() => ToolpathObjectIds;
+//            AcadObject.LoadAcadProps(this);
 
-        public ObjectId? GetToolpathObjectsGroup() => ToolpathObjectsGroup;
+//            TechOperations.ForEach(p =>
+//            {
+//                AcadObject.LoadAcadProps(p);
+//                p.TechProcessBase = this;
+//                p.SerializeInit();
+//            });
+//        }
 
-        public ObjectId? GetExtraObjectsGroup() => ExtraObjectsGroup;
+//        public virtual void BuildProcessing()
+//        {
+//            using (var generator = new CableCommandGenerator())
+//            {
+//                //generator.StartTechProcess(this);
 
-        public virtual void SerializeInit()
-        {
-            if (OriginX != 0 || OriginY != 0)
-                OriginObject = Acad.CreateOriginObject(new Point3d(OriginX, OriginY, 0));
+//                //if (Tool != null)
+//                //    generator.SetTool(
+//                //        MachineType.Value != CAM.MachineType.Donatoni ? Tool.Number : 1,
+//                //        Frequency);
 
-            AcadObject.LoadAcadProps(this);
+//                BuildProcessing(generator);
 
-            TechOperations.ForEach(p =>
-            {
-                AcadObject.LoadAcadProps(p);
-                p.TechProcessBase = this;
-                p.SerializeInit();
-            });
-        }
+//                //TechOperations.FindAll(p => p.Enabled && p.CanProcess).Cast<WireSawingTechOperation>().ToList().ForEach(p =>
+//                //{
+//                //    generator.SetTechOperation(p);
 
-        public virtual void BuildProcessing()
-        {
-            using (var generator = new CableCommandGenerator())
-            {
-                //generator.StartTechProcess(this);
+//                ////    p.PrepareBuild(generator);
+//                //    p.BuildProcessing(generator);
 
-                //if (Tool != null)
-                //    generator.SetTool(
-                //        MachineType.Value != CAM.MachineType.Donatoni ? Tool.Number : 1,
-                //        Frequency);
+//                ////    if (!generator.IsUpperTool)
+//                ////        generator.Uplifting();
+//                //});
+//                //generator.FinishTechProcess();
+//                ProcessCommands = generator.ProcessCommands;
+//            }
+//            UpdateFromCommands();
+//        }
 
-                BuildProcessing(generator);
+//        protected virtual void BuildProcessing(CableCommandGenerator generator) { }
 
-                //TechOperations.FindAll(p => p.Enabled && p.CanProcess).Cast<WireSawingTechOperation>().ToList().ForEach(p =>
-                //{
-                //    generator.SetTechOperation(p);
+//        public virtual void SkipProcessing(ProcessCommand processCommand)
+//        {
+//            //if (!(processCommand.Owner is TechOperation techOperation))
+//            //    return;
 
-                ////    p.PrepareBuild(generator);
-                //    p.BuildProcessing(generator);
+//            //var objIds = ProcessCommands.SkipWhile(p => p != processCommand).Select(p => p.ToolpathObjectId).Distinct();
+//            //ProcessCommands.Select(p => p.ToolpathObjectId).Except(objIds).Delete();
 
-                ////    if (!generator.IsUpperTool)
-                ////        generator.Uplifting();
-                //});
-                //generator.FinishTechProcess();
-                ProcessCommands = generator.ProcessCommands;
-            }
-            UpdateFromCommands();
-        }
+//            //ToolpathObjectsGroup?.Delete();
+//            //ToolpathObjectsGroup = null;
 
-        protected virtual void BuildProcessing(CableCommandGenerator generator) { }
+//            //TechOperations.Select(p => p.ToolpathObjectsGroup).Delete();
+//            //TechOperations.ForEach(p =>
+//            //{
+//            //    p.ToolpathObjectsGroup = null;
+//            //    p.ProcessCommandIndex = null;
+//            //});
+//            //ToolpathObjectIds = null;
 
-        public virtual void SkipProcessing(ProcessCommand processCommand)
-        {
-            //if (!(processCommand.Owner is TechOperation techOperation))
-            //    return;
+//            //using (var generator = CommandGeneratorFactory.Create(MachineType.Value))
+//            //{
+//            //    generator.StartTechProcess(this);
+//            //    generator.SetTool(
+//            //        MachineType.Value != CAM.MachineType.Donatoni ? Tool.Number : 1,
+//            //        Frequency);
 
-            //var objIds = ProcessCommands.SkipWhile(p => p != processCommand).Select(p => p.ToolpathObjectId).Distinct();
-            //ProcessCommands.Select(p => p.ToolpathObjectId).Except(objIds).Delete();
+//            //    generator.SetTechOperation(techOperation);
+//            //    techOperation.PrepareBuild(generator);
 
-            //ToolpathObjectsGroup?.Delete();
-            //ToolpathObjectsGroup = null;
+//            //    var loc = ProcessCommands[ProcessCommands.IndexOf(processCommand) - 1].ToolLocation;
+//            //    //generator.Move(loc.Point.X, loc.Point.Y, angleC: loc.AngleC, angleA: loc.AngleA);
+//            //    generator.GCommand(CommandNames.Penetration, 1, point: loc.Point, feed: PenetrationFeed);
 
-            //TechOperations.Select(p => p.ToolpathObjectsGroup).Delete();
-            //TechOperations.ForEach(p =>
-            //{
-            //    p.ToolpathObjectsGroup = null;
-            //    p.ProcessCommandIndex = null;
-            //});
-            //ToolpathObjectIds = null;
+//            //    ProcessCommands = generator.ProcessCommands.Concat(ProcessCommands.SkipWhile(p => p != processCommand)).ToList();
+//            //}
+//            //UpdateFromCommands();
+//        }
 
-            //using (var generator = CommandGeneratorFactory.Create(MachineType.Value))
-            //{
-            //    generator.StartTechProcess(this);
-            //    generator.SetTool(
-            //        MachineType.Value != CAM.MachineType.Donatoni ? Tool.Number : 1,
-            //        Frequency);
+//        private void UpdateFromCommands()
+//        {
+//            ToolpathObjectIds = ProcessCommands.Select((command, index) => new { command, index })
+//                .Where(p => p.command.ToolpathObjectId.HasValue)
+//                .GroupBy(p => p.command.ToolpathObjectId.Value)
+//                .ToDictionary(p => p.Key, p => p.Min(k => k.index));
+//            ToolpathObjectsGroup = ProcessCommands.Select(p => p.ToolpathObjectId).CreateGroup();
+//            Caption = GetCaption(Caption, ProcessCommands.Sum(p => p.Duration));
+//            foreach (var group in ProcessCommands.GroupBy(p => p.Owner))
+//                if (group.Key is MillingTechOperation techOperation)
+//                {
+//                    techOperation.ToolpathObjectsGroup = group.Select(p => p.ToolpathObjectId).CreateGroup();
+//                    techOperation.Caption = GetCaption(techOperation.Caption, group.Sum(p => p.Duration));
+//                }
 
-            //    generator.SetTechOperation(techOperation);
-            //    techOperation.PrepareBuild(generator);
+//            string GetCaption(string caption, double duration)
+//            {
+//                var ind = caption.IndexOf('(');
+//                return $"{(ind > 0 ? caption.Substring(0, ind).Trim() : caption)} ({new TimeSpan(0, 0, 0, (int)duration)})";
+//            }
+//        }
 
-            //    var loc = ProcessCommands[ProcessCommands.IndexOf(processCommand) - 1].ToolLocation;
-            //    //generator.Move(loc.Point.X, loc.Point.Y, angleC: loc.AngleC, angleA: loc.AngleA);
-            //    generator.GCommand(CommandNames.Penetration, 1, point: loc.Point, feed: PenetrationFeed);
+//        public void DeleteProcessing()
+//        {
+//            ToolpathObjectsGroup?.DeleteGroup();
+//            ToolpathObjectsGroup = null;
 
-            //    ProcessCommands = generator.ProcessCommands.Concat(ProcessCommands.SkipWhile(p => p != processCommand)).ToList();
-            //}
-            //UpdateFromCommands();
-        }
+//            TechOperations.Select(p => p.ToolpathObjectsGroup).Delete();
+//            TechOperations.ForEach(p =>
+//            {
+//                p.ToolpathObjectsGroup = null;
+//                p.ProcessCommandIndex = null;
+//            });
+//            ExtraObjectsGroup?.DeleteGroup();
+//            ExtraObjectsGroup = null;
 
-        private void UpdateFromCommands()
-        {
-            ToolpathObjectIds = ProcessCommands.Select((command, index) => new { command, index })
-                .Where(p => p.command.ToolpathObjectId.HasValue)
-                .GroupBy(p => p.command.ToolpathObjectId.Value)
-                .ToDictionary(p => p.Key, p => p.Min(k => k.index));
-            ToolpathObjectsGroup = ProcessCommands.Select(p => p.ToolpathObjectId).CreateGroup();
-            Caption = GetCaption(Caption, ProcessCommands.Sum(p => p.Duration));
-            foreach (var group in ProcessCommands.GroupBy(p => p.Owner))
-                if (group.Key is MillingTechOperation techOperation)
-                {
-                    techOperation.ToolpathObjectsGroup = group.Select(p => p.ToolpathObjectId).CreateGroup();
-                    techOperation.Caption = GetCaption(techOperation.Caption, group.Sum(p => p.Duration));
-                }
+//            ToolpathObjectIds = null;
+//            ProcessCommands = null;
+//        }
 
-            string GetCaption(string caption, double duration)
-            {
-                var ind = caption.IndexOf('(');
-                return $"{(ind > 0 ? caption.Substring(0, ind).Trim() : caption)} ({new TimeSpan(0, 0, 0, (int)duration)})";
-            }
-        }
+//        public virtual List<TechOperation> CreateTechOperations() => new List<TechOperation>();
 
-        public void DeleteProcessing()
-        {
-            ToolpathObjectsGroup?.DeleteGroup();
-            ToolpathObjectsGroup = null;
+//        public virtual bool Validate() => true;
 
-            TechOperations.Select(p => p.ToolpathObjectsGroup).Delete();
-            TechOperations.ForEach(p =>
-            {
-                p.ToolpathObjectsGroup = null;
-                p.ProcessCommandIndex = null;
-            });
-            ExtraObjectsGroup?.DeleteGroup();
-            ExtraObjectsGroup = null;
-
-            ToolpathObjectIds = null;
-            ProcessCommands = null;
-        }
-
-        public virtual List<TechOperation> CreateTechOperations() => new List<TechOperation>();
-
-        public virtual bool Validate() => true;
-
-        public virtual void Teardown()
-        {
-            Acad.DeleteObjects(OriginObject);
-            TechOperations.ForEach(to => to.Teardown());
-        }
-    }
-}
+//        public virtual void Teardown()
+//        {
+//            Acad.DeleteObjects(OriginObject);
+//            TechOperations.ForEach(to => to.Teardown());
+//        }
+//    }
+//}

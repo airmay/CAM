@@ -8,10 +8,8 @@ namespace CAM
         {
 	        if (!(firstIndex >= 0 && firstIndex < list.Count && secondIndex >= 0 && secondIndex < list.Count && firstIndex != secondIndex))
 		        return false;
-	        var temp = list[firstIndex];
-	        list[firstIndex] = list[secondIndex];
-	        list[secondIndex] = temp;
-	        return true;
+	        (list[firstIndex], list[secondIndex]) = (list[secondIndex], list[firstIndex]);
+            return true;
         }
 
         public static bool SwapNext(this IList list, int index) => list.Swap(index, index + 1);

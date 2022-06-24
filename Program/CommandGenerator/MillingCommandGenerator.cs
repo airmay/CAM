@@ -47,7 +47,7 @@ namespace CAM
         public int SmallFeed { get; set; }
         public Side EngineSide { get; set; }
 
-        public void StartTechProcess(MillingTechProcess techProcess)
+        public override void StartTechProcess(ITechProcess techProcess)
         {
             _techProcess = techProcess;
             _originX = techProcess.OriginX;
@@ -66,7 +66,7 @@ namespace CAM
         /// </summary>
         //protected abstract void StartMachineCommands(string caption);
 
-        public void FinishTechProcess()
+        public override void FinishTechProcess()
         {
             StopEngine();
             StopMachineCommands();

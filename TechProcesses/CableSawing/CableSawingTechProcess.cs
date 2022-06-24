@@ -4,13 +4,14 @@ using Dreambuild.AutoCAD;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using CAM.Core;
 using DbSurface = Autodesk.AutoCAD.DatabaseServices.Surface;
 
 namespace CAM.TechProcesses.CableSawing
 {
     [Serializable]
     [MenuItem("Распиловка тросом", 8)]
-    public class CableSawingTechProcess : CableTechProcess
+    public class CableSawingTechProcess : TechProcessBase<CableCommandGenerator>
     {
         public double ToolThickness { get; set; } = 10;
         public int CuttingFeed { get; set; } = 10;

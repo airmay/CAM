@@ -92,6 +92,7 @@
     <Compile Include="Acad\AcadObjectNames.cs" />
     <Compile Include="Core\CableTechProcess.cs" />
     <Compile Include="Core\CamDocument.cs" />
+    <Compile Include="Core\TechProcessBase.cs" />
     <Compile Include="Core\Tool\AngleToolPosition.cs" />
     <Compile Include="Core\Tool\CableToolPosition.cs" />
     <Compile Include="Core\Tool\ToolModel.cs" />
