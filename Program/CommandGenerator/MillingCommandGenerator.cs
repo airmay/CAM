@@ -39,7 +39,7 @@ namespace CAM
 
         //public List<ProcessCommand> ProcessCommands { get; } = new List<ProcessCommand>();
 
-        public bool IsUpperTool => ToolPosition != null || ToolPosition.Point.Z >= ZSafety;
+        public bool IsUpperTool => ToolPosition == null || ToolPosition.Point.Z >= ZSafety;
         public bool WithThick { get; set; }
         public MillToolPosition ToolPosition { get; set; }
         public string ThickCommand { get; set; }
@@ -245,7 +245,7 @@ namespace CAM
                 Name = name,
                 Text = text,
                 HasTool = _hasTool,
-                ToolLocation = ToolPosition.Clone(),
+                ToolLocation = ToolPosition?.Clone(),
                 Duration = duration
             });
         }

@@ -265,6 +265,7 @@ namespace CAM
 			    EndEdit();
 			    if (techOperation.TechProcessBase.MoveForwardTechOperation(treeView.SelectedNode.Index))
                     MoveSelectedNode(1);
+                    MoveSelectedNode(1);
 		    }
 	    }
 

@@ -24,7 +24,9 @@ namespace CAM
 
         //public bool IsDefined => !double.IsNaN(Point.X) && !double.IsNaN(Point.Y) && !double.IsNaN(Point.Z);
 
-        //public abstract Matrix3d GetTransformMatrix();
+        public abstract Matrix3d GetTransformMatrixFrom(ToolPosition toolPosition);
+
+        public ToolPosition() { }
 
         public ToolPosition(Point3d point)
         {

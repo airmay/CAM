@@ -21,8 +21,8 @@ namespace CAM
         public CableToolPosition() : this(Point3d.Origin, Point3d.Origin, 0)
         { }
 
-            //public override Matrix3d GetTransformMatrix()
-            //{
+            public override Matrix3d GetTransformMatrixFrom(ToolPosition toolPosition)
+            {
             //    //var mat1 = Matrix3d.Rotation(-AngleA.ToRad(), Vector3d.ZAxis, Center);
             //    //var mat2 = Matrix3d.Displacement(Point.GetVectorTo(newToolPosition.Point));
             //    //var mat3 = Matrix3d.Rotation(newToolPosition.AngleA.ToRad(), Vector3d.ZAxis, newToolPosition.Center);
@@ -32,6 +32,7 @@ namespace CAM
             //    var mat1 = Matrix3d.Displacement(Point.GetAsVector());
             //    var mat2 = Matrix3d.Rotation(AngleA, Vector3d.ZAxis, Center);
             //    return mat2 * mat1;
-            //}
+                return new Matrix3d();
+            }
         }
 }

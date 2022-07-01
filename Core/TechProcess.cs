@@ -1,9 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
-using CAM.Core;
 
 namespace CAM
 {
@@ -52,23 +50,5 @@ namespace CAM
         double OriginX { get; set; }
 
         double OriginY { get; set; }
-    }
-
-    /// <summary>
-    /// Технологический процесс обработки
-    /// </summary>
-    [Serializable]
-    public abstract class MillingTechProcess : TechProcessBase<MillingCommandGenerator>
-    {
-        public Material? Material { get; set; }
-
-        public double? Thickness { get; set; }
-
-        public int Frequency { get; set; }
-
-        public int PenetrationFeed { get; set; }
-
-        protected virtual void SetTool(MillingCommandGenerator generator) => generator.SetTool(MachineType.Value != CAM.MachineType.Donatoni ? Tool.Number : 1, Frequency);
-
     }
 }

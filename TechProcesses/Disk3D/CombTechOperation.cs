@@ -69,9 +69,11 @@ namespace CAM.TechProcesses.Disk3D
 
             var offsetSurface = CreateOffsetSurface();
 
-            generator.ZSafety = offsetSurface.GeometricExtents.MinPoint.Z + TechProcess.Thickness.Value + TechProcess.ZSafety;
-            generator.ToolPosition.Point += Vector3d.ZAxis * generator.ZSafety;
+            //generator.ZSafety = offsetSurface.GeometricExtents.MinPoint.Z + TechProcess.Thickness.Value + TechProcess.ZSafety;
+            //generator.ToolPosition.Point += Vector3d.ZAxis * generator.ZSafety;
             //generator.ToolLocation.Set(new Point3d(double.NaN, double.NaN, generator.ZSafety), 0, TechProcess.IsA90 ? 90 : 0);
+
+            generator.SetZSafety(TechProcess.ZSafety, offsetSurface.GeometricExtents.MinPoint.Z + TechProcess.Thickness.Value);
 
             Matrix3d? matrix = null;
             if (TechProcess.IsA90)

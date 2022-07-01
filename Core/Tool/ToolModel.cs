@@ -23,9 +23,11 @@ namespace CAM
             {
                 if (Curves == null)
                     CreateCurves();
-                var matrix = toolPosition.Matrix;
-                if (_toolPosition != null)
-                    matrix = matrix * _toolPosition.InvMatrix;
+
+                var matrix = toolPosition.GetTransformMatrixFrom(_toolPosition);
+                //var matrix = toolPosition.Matrix;
+                //if (_toolPosition != null)
+                //    matrix = matrix * _toolPosition.InvMatrix;
                 TransformCurves(matrix);
             }
             _toolPosition = toolPosition;
