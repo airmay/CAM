@@ -41,7 +41,7 @@ namespace CAM
 
         public bool IsUpperTool => ToolPosition == null || ToolPosition.Point.Z >= ZSafety;
         public bool WithThick { get; set; }
-        public MillToolPosition ToolPosition { get; set; }
+        public MillToolPosition ToolPosition { get; set; } = new MillToolPosition();
         public string ThickCommand { get; set; }
         public int CuttingFeed { get; set; }
         public int SmallFeed { get; set; }
