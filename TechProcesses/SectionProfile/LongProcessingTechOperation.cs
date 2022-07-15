@@ -28,6 +28,7 @@ namespace CAM.TechProcesses.SectionProfile
         public bool ChangeEngineSide { get; set; }
         public bool IsExactlyBegin { get; set; }
         public bool IsExactlyEnd { get; set; }
+        public double? AngleC { get; set; }
 
         public static void ConfigureParamsView(ParamsView view)
         {
@@ -49,7 +50,8 @@ namespace CAM.TechProcesses.SectionProfile
                 .AddParam(nameof(Departure))
                 .AddParam(nameof(Delta))
                 //.AddParam(nameof(ChangeProcessSide), "Сторона обработки")
-                .AddParam(nameof(ChangeEngineSide), "Разворот двигателя на 180");
+                .AddParam(nameof(ChangeEngineSide), "Разворот двигателя на 180")
+                .AddParam(nameof(AngleC), "Угол С");
         }
 
         public override bool Validate()
@@ -98,7 +100,7 @@ namespace CAM.TechProcesses.SectionProfile
             if (IsA90 && IsOutlet)
             {
                 outletCurve = rail.GetOffsetCurves(TechProcess.ZSafety * processSide)[0] as Curve;
-                var angleC = BuilderUtils.CalcToolAngle(outletCurve, outletCurve.StartPoint, side);
+                var angleC = AngleC ?? BuilderUtils.CalcToolAngle(outletCurve, outletCurve.StartPoint, side);
                 generator.Move(outletCurve.StartPoint.X, outletCurve.StartPoint.Y, angleC: angleC, angleA: 90);
             }
             var angleA = IsA90 ? 90 : 0;
@@ -122,9 +124,9 @@ namespace CAM.TechProcesses.SectionProfile
 
                 var coords = Enumerable.Range(1, count).Select(p => end + (count - p) * penetrationStepCalc).ToList();
                 if (IsA90)
-                    coords.ForEach(p => generator.Cutting(rail, processSide * p, point[index], angleA: angleA));
+                    coords.ForEach(p => generator.Cutting(rail, processSide * p, point[index], angleC: AngleC, angleA: angleA));
                 else
-                    coords.ForEach(p => generator.Cutting(rail, processSide * point[index], p, angleA: angleA));
+                    coords.ForEach(p => generator.Cutting(rail, processSide * point[index], p, angleC: AngleC, angleA: angleA));
 
                 if (IsOutlet)
                     if (IsA90)

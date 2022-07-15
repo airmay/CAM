@@ -191,12 +191,12 @@ namespace CAM
             }
         }
 
-        public void Cutting(Curve curve, double offset = 0, double? dz = null, double? angleA = null)
+        public void Cutting(Curve curve, double offset = 0, double? dz = null, double? angleC = null, double? angleA = null)
         {
             var toolpathCurve = curve.GetOffsetCurves(offset)[0] as Curve;
             if (dz.HasValue)
                 toolpathCurve.TransformBy(Matrix3d.Displacement(Vector3d.ZAxis * dz.Value));
-            Cutting(toolpathCurve, CuttingFeed, SmallFeed, EngineSide, angleA: angleA);
+            Cutting(toolpathCurve, CuttingFeed, SmallFeed, EngineSide, angleC: angleC, angleA: angleA);
         }
 
         /// <summary>
