@@ -8,7 +8,7 @@ namespace CAM
 {
     public abstract class ToolPosition
     {
-        public Point3d Point { get; set; } = new Point3d(double.NaN, double.NaN, double.NaN);
+        public Point3d Point { get; set; } = Point3d.Origin;
 
         public Matrix3d Matrix { get; set; }
 

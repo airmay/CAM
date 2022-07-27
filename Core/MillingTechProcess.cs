@@ -19,5 +19,9 @@ namespace CAM
 
         protected virtual void SetTool(MillingCommandGenerator generator) => generator.SetTool(MachineType.Value != CAM.MachineType.Donatoni ? Tool.Number : 1, Frequency);
 
+        protected override void BuildProcessing(MillingCommandGenerator generator)
+        {
+            SetTool(generator);
+        }
     }
 }

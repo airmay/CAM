@@ -69,11 +69,8 @@ namespace CAM.TechProcesses.Disk3D
 
             var offsetSurface = CreateOffsetSurface();
 
-            //generator.ZSafety = offsetSurface.GeometricExtents.MinPoint.Z + TechProcess.Thickness.Value + TechProcess.ZSafety;
-            //generator.ToolPosition.Point += Vector3d.ZAxis * generator.ZSafety;
-            //generator.ToolLocation.Set(new Point3d(double.NaN, double.NaN, generator.ZSafety), 0, TechProcess.IsA90 ? 90 : 0);
-
-            generator.SetZSafety(TechProcess.ZSafety, offsetSurface.GeometricExtents.MinPoint.Z + TechProcess.Thickness.Value);
+            var zMax = offsetSurface.GeometricExtents.MinPoint.Z + TechProcess.Thickness.Value;
+            generator.SetZSafety(TechProcess.ZSafety, zMax);
 
             Matrix3d? matrix = null;
             if (TechProcess.IsA90)
@@ -86,117 +83,7 @@ namespace CAM.TechProcesses.Disk3D
             if (matrix.HasValue)
                 offsetSurface.TransformBy(matrix.Value);
             var bounds = offsetSurface.GeometricExtents;
-            
-            //generator.ZSafety = bounds.MinPoint.Z + TechProcess.Thickness.Value + TechProcess.ZSafety;
-            //generator.ToolLocation.Point += Vector3d.ZAxis * generator.ZSafety;
-
-            //var ray = new Ray { UnitDir = Vector3d.XAxis };
-            //var y = StartPass;
-            //do
-            //{
-            //    ray.BasePoint = new Point3d(0, y, 0);
-
-            //    var curves = s.ProjectOnToSurface(point, Vector3d.ZAxis);
-            //    curves[0].ColorIndex = 2;
-            //    curves[0].AddToCurrentSpace();
-            //    y += StepPass;
-            //}
-            //while (y < boundsModel.MaxPoint.Y);
-
-            //var startTime = System.Diagnostics.Stopwatch.StartNew();
-            //var point = new DBPoint();
-            //int cnt = 0;
-            //for (var y = boundsModel.MinPoint.Y + StartPass; y < boundsModel.MaxPoint.Y; y += StepPass)
-            //{
-            //    for (var x = boundsModel.MinPoint.X; x < boundsModel.MaxPoint.X; x += StepLong)
-            //    {
-            //        for (var s = 0; s <= 2; s += 4)
-            //        {
-            //            point.Position = new Point3d(x, y + s, 0);
-
-            //            //line.StartPoint = new Point3d(x, y, 0);
-            //            //line.EndPoint = new Point3d(x, y + 8, 0);
-
-            //            try
-            //            {
-            //                var curves = offsetSurfaces.ProjectOnToSurface(point, Vector3d.ZAxis);
-            //                cnt++;
-            //                if (curves.Length == 0)
-            //                    Acad.Write("111");
-            //                curves[0].ColorIndex = 6;
-            //                curves[0].AddToCurrentSpace();
-            //            }
-            //            catch
-            //            {
-            //            }
-            //        }
-            //    }
-            //}
-            //startTime.Stop();
-            //var resultTime = startTime.Elapsed;
-            //Acad.Write("timer=" + resultTime);
-            //Acad.Write("cnt=" + cnt);
-
-
-            //var startTime = System.Diagnostics.Stopwatch.StartNew();
-            //var line = new Line();
-            //int cnt = 0;
-            //int err = 0;
-            //for (var y = boundsModel.MinPoint.Y + StartPass; y < boundsModel.MaxPoint.Y; y += StepPass)
-            //{
-            //    for (var x = boundsModel.MinPoint.X; x < boundsModel.MaxPoint.X; x += StepLong)
-            //    {
-            //        for (var s = 0; s <= 2; s += 4)
-            //        {
-            //            line.StartPoint = new Point3d(x, y, 0);
-            //            line.EndPoint = new Point3d(x, y + 8, 0);
-
-            //            try
-            //            {
-            //                var curves = offsetSurfaces.ProjectOnToSurface(line, Vector3d.ZAxis);
-            //                cnt++;
-            //                if (curves.Length == 0)
-            //                    Acad.Write("111");
-            //                curves[0].ColorIndex = 6;
-            //                curves[0].AddToCurrentSpace();
-            //            }
-            //            catch (Exception ex)
-            //            {
-            //                err++;
-            //            }
-            //        }
-            //    }
-            //}
-            //startTime.Stop();
-            //var resultTime = startTime.Elapsed;
-            //Acad.Write("timer=" + resultTime);
-            //Acad.Write("cnt=" + cnt);
-
-            //var contour = NoDraw.Rectang(new Point3d(bounds.MinPoint.X, bounds.MinPoint.Y, 0), new Point3d(bounds.MaxPoint.X, bounds.MaxPoint.Y, 0));
-            //var ray = new Ray
-            //{
-            //    BasePoint = contour.StartPoint,
-            //    UnitDir = Vector3d.XAxis.RotateBy(((Disk3DTechProcess)TechProcess).Angle.ToRad(), Vector3d.ZAxis)
-            //};
-            //ray.BasePoint += ray.UnitDir.GetPerpendicularVector() * StartPass;
-            //var crossVector = ray.UnitDir.GetPerpendicularVector() * StepPass;
-            //var plane = new Plane();
-            //while (true)
-            //{
-            //    var pc = new Point3dCollection();
-            //    ray.IntersectWith(contour, Intersect.ExtendThis, plane, pc, IntPtr.Zero, IntPtr.Zero);
-            //    if (pc.Count != 2)
-            //        break;
-
-            //        var vector = (points[1] - points[0]).GetNormal() * tactileTechProcess.TactileTechProcessParams.Departure;
-            //        var startPoint = points[0] + passDir * s - vector - Vector3d.ZAxis * Depth;
-            //        var endPoint = points[1] + passDir * s + vector - Vector3d.ZAxis * Depth;
-            //        if (generator.IsUpperTool)
-            //            generator.Move(startPoint.X, startPoint.Y, angleC: BuilderUtils.CalcToolAngle(ProcessingAngle.ToRad()));
-            //        generator.Cutting(startPoint, endPoint, feed, tactileTechProcess.TactileTechProcessParams.TransitionFeed);
-
-            //    ray.BasePoint += crossVector;
-            //}
+           
 
             var startY = StartPass == 0 ? bounds.MinPoint.Y : StartPass ;
             var endY = (EndPass == 0 ? bounds.MaxPoint.Y : EndPass) - (disk3DTechProcess.IsExactlyEnd ? TechProcess.Tool.Thickness : 0);
@@ -269,31 +156,18 @@ namespace CAM.TechProcesses.Disk3D
                 //    pass.IntersectWith(cv.to);
                 //}
 
+                var zMin = -10000D;
                 for (var x = bounds.MinPoint.X; x <= bounds.MaxPoint.X; x += StepLong)
                 {
-                    double z = 0;
-                    for (double s = 0; s <= TechProcess.Tool.Thickness; s += TechProcess.Tool.Thickness.Value)
+                    var par = GetPar(new Point3d(x, y, zMin));
+                    if (par.HasValue)
                     {
-                        if (y + s > bounds.MaxPoint.Y)
-                            break;
-                        offsetSurface.RayTest(new Point3d(x, y + s, bounds.MinPoint.Z), Vector3d.ZAxis, 0.0001, out SubentityId[] col, out DoubleCollection par);
-                        //if (par.Count == 0)
-                        //{
-                        //    z = 0;
-                        //    break;
-                        //}
-                        if (par.Count > 0)
-                            z = par[par.Count - 1] > z ? par[par.Count - 1] : z;
-                    }
-                    if (z > 0)
-                    {
-                        var point = new Point3d(x, y, bounds.MinPoint.Z + z);
+                        var point = new Point3d(x, y, zMin + par.Value);
                         var ind = points.Count - 1;
                         if (ind > 0 && points[ind - 1].GetVectorTo(points[ind]).IsCodirectionalTo(points[ind].GetVectorTo(point)))
                             points[ind] = point;
                         else
                             points.Add(point);
-                        //Draw.Point(point);
                     }
                 }
                 if (points.Count > 1)
@@ -301,6 +175,19 @@ namespace CAM.TechProcesses.Disk3D
             }
             offsetSurface.Dispose();
 
+            double? GetPar(Point3d point)
+            {
+                var max = 0D;
+                for (double s = 0; s <= TechProcess.Tool.Thickness && point.Y + s <= bounds.MaxPoint.Y; s += TechProcess.Tool.Thickness.Value / 2)
+                {
+                    offsetSurface.RayTest(point + Vector3d.YAxis * s, Vector3d.ZAxis, 0.0001, out SubentityId[] col, out DoubleCollection par);
+                    if (par.Count == 0)
+                        return null;
+                    if (par[0] > max)
+                        max = par[0];
+                }
+                return max;
+            }
 
             if (matrix.HasValue)
                 matrix = matrix.Value.Inverse();
@@ -321,13 +208,13 @@ namespace CAM.TechProcesses.Disk3D
                 if (matrix.HasValue && !TechProcess.IsA90)
                     points = points.ConvertAll(x => x.TransformBy(matrix.Value));
                 var loc = generator.ToolPosition;
-                if (lastPoint.HasValue && lastPoint.Value.DistanceTo(points.First()) > lastPoint.Value.DistanceTo(points.Last()))
-                    points.Reverse();
+                //if (lastPoint.HasValue && lastPoint.Value.DistanceTo(points.First()) > lastPoint.Value.DistanceTo(points.Last()))
+                //    points.Reverse();
 
                 if (TechProcess.IsA90)
                     lastPoint = BuildPassA90(generator, points, matrix.Value, bounds.MinPoint.Z + PenetrationAll);
                 else
-                    lastPoint = BuildPass(generator, points);
+                    lastPoint = BuildPass(generator, points, zMax);
             });
             if (TechProcess.IsA90)
                 generator.Move(lastPoint.Value.Add(Vector3d.ZAxis * 100));
@@ -432,18 +319,34 @@ namespace CAM.TechProcesses.Disk3D
             }            
         }
 
-        private Point3d BuildPass(MillingCommandGenerator generator, List<Point3d> points)
+        private Point3d BuildPass(MillingCommandGenerator generator, List<Point3d> points, double z0)
         {
-            var z = generator.ZSafety - TechProcess.ZSafety;
+            var pass = new List<Point3d>[2]
+            {
+                points,
+                points.Reverse<Point3d>().ToList()
+            };
+            var direction = generator.ToolPosition?.Point.DistanceTo(pass[1][0]) < generator.ToolPosition?.Point.DistanceTo(pass[0][0]) ? 1 : 0;
+            generator.Move(pass[direction][0].X, pass[direction][0].Y, angleC: TechProcess.Angle);
+            generator.Cycle();
+
+            var z = z0;
             bool isComplete;
-            var point = Algorithms.NullPoint3d;
+
             do
             {
                 isComplete = true;
                 z -= Penetration;
-                var point0 = Algorithms.NullPoint3d;                
 
-                foreach (var pt in points)
+                var point = pass[direction][0];
+                if (z > point.Z)
+                    point = new Point3d(point.X, point.Y, z);
+                var point0 = point;
+
+                if (generator.ToolPosition.Point.Z > point.Z)
+                    generator.GCommand(CommandNames.Penetration, 1, point: point, feed: TechProcess.PenetrationFeed);
+
+                foreach (var pt in pass[direction])
                 {
                     var p = pt;
                     if (z > p.Z)
@@ -451,40 +354,24 @@ namespace CAM.TechProcesses.Disk3D
                         p = new Point3d(p.X, p.Y, z);
                         isComplete = false;
                     }
-                    if (generator.IsUpperTool)
-                    {
-                        generator.Move(p.X, p.Y, angleC: ((Disk3DTechProcess)TechProcess).Angle);
-                        generator.Cycle();
-                    }
-                    if (point.IsNull())
-                    {
-                        if (generator.ToolPosition.Point != p)
-                            generator.GCommand(CommandNames.Penetration, 1, point: p, feed: TechProcess.PenetrationFeed);
-                        else
-                        {
-                            generator.Move(p.X, p.Y);
-                            generator.Cycle();
-                        }
-                    }
-                    else if (point0 != point && point != p && !point0.GetVectorTo(point).IsCodirectionalTo(point.GetVectorTo(p)))
+                    if (point0 != point && point != p && !point0.GetVectorTo(point).IsCodirectionalTo(point.GetVectorTo(p)))
                     {
                         generator.GCommand(CommandNames.Cutting, 1, point: point, feed: CuttingFeed);
                         point0 = point;
                     }
-                    if (point0.IsNull())
-                        point0 = p;
                     point = p;
                 }
                 generator.GCommand(CommandNames.Cutting, 1, point: point, feed: CuttingFeed);
-                points.Reverse();
+                direction = 1 - direction;
             }
             while (!isComplete);
 
             if (IsUplifting)
                 generator.Uplifting();
 
-            return point;
+            return generator.ToolPosition.Point;
         }
+
 
         private Point3d BuildPassA90(MillingCommandGenerator generator, List<Point3d> points, Matrix3d matrix, double z0)
         {

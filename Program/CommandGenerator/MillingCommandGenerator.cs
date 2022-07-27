@@ -9,7 +9,7 @@ using System.Collections.Generic;
 namespace CAM
 {
     /// <summary>
-    /// Генератор команд для фрезерныйх станков
+    /// Генератор команд для фрезерных станков
     /// </summary>
     public abstract class MillingCommandGenerator: CommandGeneratorBase
     {
@@ -41,7 +41,8 @@ namespace CAM
 
         public bool IsUpperTool => ToolPosition == null || ToolPosition.Point.Z >= ZSafety;
         public bool WithThick { get; set; }
-        public MillToolPosition ToolPosition { get; set; } = new MillToolPosition();
+
+        public MillToolPosition ToolPosition { get; set; }
         public string ThickCommand { get; set; }
         public int CuttingFeed { get; set; }
         public int SmallFeed { get; set; }
@@ -58,7 +59,7 @@ namespace CAM
             _transaction = Acad.Database.TransactionManager.StartTransaction();
             _currentSpace = (BlockTableRecord)_transaction.GetObject(Acad.Database.CurrentSpaceId, OpenMode.ForWrite, false);
 
-            //StartMachineCommands(_techProcess.Caption);
+            StartMachineCommands(_techProcess.Caption);
         }
 
         /// <summary>
@@ -86,7 +87,7 @@ namespace CAM
         public void SetTool(int toolNo, int frequency, double angleA = 0, bool hasTool = true, double angleC = 0, int originCellNumber = 10)
         {
             StopEngine();
-            ToolPosition.Set(new Point3d(double.NaN, double.NaN, ZSafety + UpperZ), 0, 0);
+            //ToolPosition.Set(new Point3d(double.NaN, double.NaN, ZSafety + UpperZ), 0, 0);
             SetToolCommands(toolNo, angleA, angleC, originCellNumber);
 
             _frequency = frequency;
@@ -96,7 +97,7 @@ namespace CAM
         public void SetZSafety(double zSafety, double zMax = 0)
         {
             ZSafety = zSafety + zMax;
-            ToolPosition = new MillToolPosition(new Point3d(double.NaN, double.NaN, ZSafety + UpperZ), 0, 0);
+            //ToolPosition = new MillToolPosition(new Point3d(double.NaN, double.NaN, ZSafety + UpperZ), 0, 0);
         }
 
         protected abstract void SetToolCommands(int toolNo, double angleA, double angleC, int originCellNumber);
@@ -122,6 +123,9 @@ namespace CAM
         /// </summary>
         public void Move(double? x = null, double? y = null, double? z = null, double? angleC = null, double? angleA = null)
         {
+            if (ToolPosition == null)
+                ToolPosition = new MillToolPosition(new Point3d(double.NaN, double.NaN, ZSafety + 500), 0, 0);
+
             GCommand(_isEngineStarted ? CommandNames.Fast : CommandNames.InitialMove, 0, x: x, y: y, z: z, angleC: angleC);
             if (!_isEngineStarted)
                 GCommand(CommandNames.InitialMove, 0, z: ZSafety);
