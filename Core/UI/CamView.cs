@@ -79,7 +79,7 @@ namespace CAM
                     Acad.Show(CurrentProcessCommand.ToolpathObjectId.Value);
                     Acad.SelectObjectIds(CurrentProcessCommand.ToolpathObjectId.Value);
                 }
-                Acad.RegenToolObject(CurrentTechProcess.Tool, CurrentProcessCommand.HasTool, CurrentProcessCommand.ToolLocation, CurrentTechProcess.MachineType == MachineType.Donatoni);  //Settongs.IsFrontPlaneZero
+                Acad.RegenToolObject(CurrentTechProcess.Tool, CurrentProcessCommand.HasTool, CurrentProcessCommand.ToolLocation, CurrentTechProcess.MachineType.Value);  //Settongs.IsFrontPlaneZero
             }
         }
 

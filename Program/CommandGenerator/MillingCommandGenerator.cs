@@ -126,6 +126,8 @@ namespace CAM
             if (ToolPosition == null)
                 ToolPosition = new MillToolPosition(new Point3d(double.NaN, double.NaN, ZSafety + 500), 0, 0);
 
+            if (IsParamNotChanged(x, ToolPosition.Point.X) && IsParamNotChanged(y, ToolPosition.Point.Y) && IsParamNotChanged(z, ToolPosition.Point.Z)) return;
+
             GCommand(_isEngineStarted ? CommandNames.Fast : CommandNames.InitialMove, 0, x: x, y: y, z: z, angleC: angleC);
             if (!_isEngineStarted)
                 GCommand(CommandNames.InitialMove, 0, z: ZSafety);
@@ -139,6 +141,8 @@ namespace CAM
                 _isEngineStarted = true;
             }
         }
+
+        private bool IsParamNotChanged(double? param, double toolParam) => !param.HasValue || Math.Abs(param.Value - toolParam) < Consts.Epsilon;
 
         public Matrix3d? Matrix { get; set; }
 

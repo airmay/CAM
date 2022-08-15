@@ -177,9 +177,9 @@ namespace CAM
 
         private static ToolModel ToolObject { get; } = new ToolModel();
 
-        public static void RegenToolObject(Tool tool, bool hasTool, ToolPosition location, bool isFrontPlaneZero)
+        public static void RegenToolObject(Tool tool, bool hasTool, ToolPosition location, MachineType machineType)
         {
-            ToolObject.SetToolPosition(tool, location);
+            ToolObject.SetToolPosition(tool, location, machineType);
             Editor.UpdateScreen();
 
             //if (ToolObject != null && location.IsDefined)

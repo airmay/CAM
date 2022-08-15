@@ -14,7 +14,7 @@ namespace CAM
         private Tool _tool;
         private ToolPosition _toolPosition;
 
-        public void SetToolPosition(Tool tool, ToolPosition toolPosition)
+        public void SetToolPosition(Tool tool, ToolPosition toolPosition, MachineType machineType)
         {
             if (Curves != null && (toolPosition == null || tool != _tool))
                 DeleteCurves();
@@ -22,7 +22,7 @@ namespace CAM
             if (toolPosition != null)
             {
                 if (Curves == null)
-                    CreateCurves();
+                    CreateCurves(machineType);
 
                 var matrix = toolPosition.GetTransformMatrixFrom(_toolPosition);
                 //var matrix = toolPosition.Matrix;
@@ -33,9 +33,9 @@ namespace CAM
             _toolPosition = toolPosition;
         }
 
-        private void CreateCurves()
+        private void CreateCurves(MachineType machineType)
         {
-            Curves = _tool.GetModelCurves();
+            Curves = _tool.GetModelCurves(machineType);
 
             using (var doclock = Application.DocumentManager.MdiActiveDocument.LockDocument())
             using (Transaction tr = Acad.Database.TransactionManager.StartTransaction())

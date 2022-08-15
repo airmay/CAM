@@ -83,7 +83,8 @@ namespace CAM.TechProcesses.Disk3D
             if (matrix.HasValue)
                 offsetSurface.TransformBy(matrix.Value);
             var bounds = offsetSurface.GeometricExtents;
-           
+            if (TechProcess.IsA90)
+                zMax = bounds.MaxPoint.Z + PenetrationAll;
 
             var startY = StartPass == 0 ? bounds.MinPoint.Y : StartPass ;
             var endY = (EndPass == 0 ? bounds.MaxPoint.Y : EndPass) - (disk3DTechProcess.IsExactlyEnd ? TechProcess.Tool.Thickness : 0);
@@ -196,28 +197,34 @@ namespace CAM.TechProcesses.Disk3D
             if (IsReverse)
                 PassList.Reverse();
 
-            if (TechProcess.IsA90)
-                generator.Matrix = matrix;
+            //if (TechProcess.IsA90)
+            //    generator.Matrix = matrix;
 
-            Point3d? lastPoint = null;
+            //Point3d? lastPoint = null;
+
+            if (TechProcess.MachineType == MachineType.ScemaLogic) //Settongs.IsFrontPlaneZero
+                matrix = Matrix3d.Displacement(Vector3d.YAxis * TechProcess.Tool.Thickness.Value);
+
             PassList.ForEach(p =>
             {
                 var points = p;
-                if (TechProcess.MachineType == MachineType.ScemaLogic) //Settongs.IsFrontPlaneZero
-                    points = points.ConvertAll(x => new Point3d(x.X, x.Y + TechProcess.Tool.Thickness.Value, x.Z));
-                if (matrix.HasValue && !TechProcess.IsA90)
-                    points = points.ConvertAll(x => x.TransformBy(matrix.Value));
-                var loc = generator.ToolPosition;
+                //if (TechProcess.MachineType == MachineType.ScemaLogic) //Settongs.IsFrontPlaneZero
+                //    points = points.ConvertAll(x => new Point3d(x.X, x.Y + TechProcess.Tool.Thickness.Value, x.Z));
+//                if (matrix.HasValue && !TechProcess.IsA90)
+//                    points = points.ConvertAll(x => x.TransformBy(matrix.Value));
+                //var loc = generator.ToolPosition;
                 //if (lastPoint.HasValue && lastPoint.Value.DistanceTo(points.First()) > lastPoint.Value.DistanceTo(points.Last()))
                 //    points.Reverse();
 
-                if (TechProcess.IsA90)
-                    lastPoint = BuildPassA90(generator, points, matrix.Value, bounds.MinPoint.Z + PenetrationAll);
-                else
-                    lastPoint = BuildPass(generator, points, zMax);
+                //if (TechProcess.IsA90)
+                //    lastPoint = BuildPassA90(generator, points, matrix.Value, bounds.MinPoint.Z + PenetrationAll);
+                //else
+                BuildPass(generator, points, zMax, matrix);
             });
-            if (TechProcess.IsA90)
-                generator.Move(lastPoint.Value.Add(Vector3d.ZAxis * 100));
+            //if (TechProcess.IsA90)
+            //    generator.Move(lastPoint.Value.Add(Vector3d.ZAxis * 100));
+            if (!generator.IsUpperTool)
+                generator.Uplifting();
 
             if (generator is DonatoniCommandGenerator donatoniCommandGenerator)
                 donatoniCommandGenerator.IsSupressMoveHome = true;
@@ -319,32 +326,42 @@ namespace CAM.TechProcesses.Disk3D
             }            
         }
 
-        private Point3d BuildPass(MillingCommandGenerator generator, List<Point3d> points, double z0)
+        private void BuildPass(MillingCommandGenerator generator, List<Point3d> points, double z0, Matrix3d? matrix)
         {
-            var pass = new List<Point3d>[2]
+            var pass = new List<Point3d>[]
             {
                 points,
                 points.Reverse<Point3d>().ToList()
             };
-            var direction = generator.ToolPosition?.Point.DistanceTo(pass[1][0]) < generator.ToolPosition?.Point.DistanceTo(pass[0][0]) ? 1 : 0;
-            generator.Move(pass[direction][0].X, pass[direction][0].Y, angleC: TechProcess.Angle);
+
+            var (startPoint, direction, _) = pass
+                .Select(p => Transform(new Point3d(p[0].X, p[0].Y, z0)))
+                .Select((p, index) => (p, index, dist: generator.ToolPosition?.Point.DistanceTo(p)))
+                .OrderBy(p => p.dist)
+                .First();
+            generator.Move(startPoint.X, startPoint.Y, angleC: TechProcess.Angle, angleA: TechProcess.IsA90 ? 90 : 0);
+            if (TechProcess.IsA90)
+                generator.Move(z: startPoint.Z);
+
             generator.Cycle();
 
             var z = z0;
             bool isComplete;
+            var point = new Point3d(pass[direction][0].X, pass[direction][0].Y, z0);
 
             do
             {
                 isComplete = true;
                 z -= Penetration;
 
-                var point = pass[direction][0];
-                if (z > point.Z)
-                    point = new Point3d(point.X, point.Y, z);
-                var point0 = point;
+                var point0 = pass[direction][0];
+                if (z > point0.Z)
+                    point0 = new Point3d(point0.X, point0.Y, z);
 
-                if (generator.ToolPosition.Point.Z > point.Z)
-                    generator.GCommand(CommandNames.Penetration, 1, point: point, feed: TechProcess.PenetrationFeed);
+                if (point.Z > point0.Z)
+                    generator.GCommand(CommandNames.Penetration, 1, point: Transform(point0), feed: TechProcess.PenetrationFeed);
+
+                point = point0;
 
                 foreach (var pt in pass[direction])
                 {
@@ -356,20 +373,23 @@ namespace CAM.TechProcesses.Disk3D
                     }
                     if (point0 != point && point != p && !point0.GetVectorTo(point).IsCodirectionalTo(point.GetVectorTo(p)))
                     {
-                        generator.GCommand(CommandNames.Cutting, 1, point: point, feed: CuttingFeed);
+                        generator.GCommand(CommandNames.Cutting, 1, point: Transform(point), feed: CuttingFeed);
                         point0 = point;
                     }
                     point = p;
                 }
-                generator.GCommand(CommandNames.Cutting, 1, point: point, feed: CuttingFeed);
+                generator.GCommand(CommandNames.Cutting, 1, point: Transform(point), feed: CuttingFeed);
                 direction = 1 - direction;
             }
             while (!isComplete);
 
+            if (TechProcess.IsA90)
+                generator.Move(point: Transform(new Point3d(point.X, point.Y, z0)));
+
             if (IsUplifting)
                 generator.Uplifting();
 
-            return generator.ToolPosition.Point;
+            Point3d Transform(Point3d originPoint) => matrix != null ? originPoint.TransformBy(matrix.Value) : originPoint;
         }
 
 

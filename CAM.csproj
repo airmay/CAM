@@ -307,7 +307,7 @@
     <None Include="Resources\icons8-play.png" />
     <None Include="Resources\icons8-cinema-16.png" />
     <Content Include="settings.xml">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
   <ItemGroup>
