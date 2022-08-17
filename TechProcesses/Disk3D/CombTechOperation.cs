@@ -178,13 +178,11 @@ namespace CAM.TechProcesses.Disk3D
 
             double? GetPar(Point3d point)
             {
-                var max = 0D;
+                double? max = null;
                 for (double s = 0; s <= TechProcess.Tool.Thickness && point.Y + s <= bounds.MaxPoint.Y; s += TechProcess.Tool.Thickness.Value / 2)
                 {
                     offsetSurface.RayTest(point + Vector3d.YAxis * s, Vector3d.ZAxis, 0.0001, out SubentityId[] col, out DoubleCollection par);
-                    if (par.Count == 0)
-                        return null;
-                    if (par[0] > max)
+                    if (par.Count > 0 && par[0] > max.GetValueOrDefault())
                         max = par[0];
                 }
                 return max;
