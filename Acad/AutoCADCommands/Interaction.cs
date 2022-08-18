@@ -4,7 +4,6 @@ using Autodesk.AutoCAD.EditorInput;
 using Autodesk.AutoCAD.Geometry;
 using Autodesk.AutoCAD.GraphicsInterface;
 using Autodesk.Windows;
-using Dreambuild.AutoCAD.Internal;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -981,38 +980,38 @@ namespace Dreambuild.AutoCAD
             }
         }
 
-        /// <summary>
-        /// Starts a FlexEntityJig drag.
-        /// </summary>
-        /// <typeparam name="TOptions">The type of JigPromptOptions.</typeparam>
-        /// <typeparam name="TResult">The type of jig PromptResult.</typeparam>
-        /// <param name="options">The options.</param>
-        /// <param name="entity">The entity.</param>
-        /// <param name="updateAction">The update action.</param>
-        /// <returns>The prompt result.</returns>
-        public static PromptResult StartDrag<TOptions, TResult>(TOptions options, Entity entity, Func<Entity, TResult, bool> updateAction)
-            where TOptions : JigPromptOptions
-            where TResult : PromptResult
-        {
-            var ed = Application.DocumentManager.MdiActiveDocument.Editor;
-            var jig = new FlexEntityJig(options, entity, (ent, result) => updateAction(ent, (TResult)result));
-            return ed.Drag(jig);
-        }
+        ///// <summary>
+        ///// Starts a FlexEntityJig drag.
+        ///// </summary>
+        ///// <typeparam name="TOptions">The type of JigPromptOptions.</typeparam>
+        ///// <typeparam name="TResult">The type of jig PromptResult.</typeparam>
+        ///// <param name="options">The options.</param>
+        ///// <param name="entity">The entity.</param>
+        ///// <param name="updateAction">The update action.</param>
+        ///// <returns>The prompt result.</returns>
+        //public static PromptResult StartDrag<TOptions, TResult>(TOptions options, Entity entity, Func<Entity, TResult, bool> updateAction)
+        //    where TOptions : JigPromptOptions
+        //    where TResult : PromptResult
+        //{
+        //    var ed = Application.DocumentManager.MdiActiveDocument.Editor;
+        //    var jig = new FlexEntityJig(options, entity, (ent, result) => updateAction(ent, (TResult)result));
+        //    return ed.Drag(jig);
+        //}
 
-        /// <summary>
-        /// Starts a FlexEntityJig point drag.
-        /// </summary>
-        /// <param name="message">The message.</param>
-        /// <param name="entity">The entity.</param>
-        /// <param name="updateAction">The update action.</param>
-        /// <returns>The prompt result.</returns>
-        public static PromptResult StartDrag(string message, Entity entity, Func<Entity, PromptPointResult, bool> updateAction)
-        {
-            var ed = Application.DocumentManager.MdiActiveDocument.Editor;
-            var options = new JigPromptPointOptions(message); // TODO: other options?
-            var jig = new FlexEntityJig(options, entity, (ent, result) => updateAction(ent, (PromptPointResult)result));
-            return ed.Drag(jig);
-        }
+        ///// <summary>
+        ///// Starts a FlexEntityJig point drag.
+        ///// </summary>
+        ///// <param name="message">The message.</param>
+        ///// <param name="entity">The entity.</param>
+        ///// <param name="updateAction">The update action.</param>
+        ///// <returns>The prompt result.</returns>
+        //public static PromptResult StartDrag(string message, Entity entity, Func<Entity, PromptPointResult, bool> updateAction)
+        //{
+        //    var ed = Application.DocumentManager.MdiActiveDocument.Editor;
+        //    var options = new JigPromptPointOptions(message); // TODO: other options?
+        //    var jig = new FlexEntityJig(options, entity, (ent, result) => updateAction(ent, (PromptPointResult)result));
+        //    return ed.Drag(jig);
+        //}
 
         /// <summary>
         /// Starts a FlexDrawJig drag.
@@ -1022,28 +1021,28 @@ namespace Dreambuild.AutoCAD
         /// <param name="options">The options.</param>
         /// <param name="updateAction">The update action.</param>
         /// <returns>The prompt result.</returns>
-        public static PromptResult StartDrag<TOptions, TResult>(TOptions options, Func<TResult, Drawable> updateAction)
-            where TOptions : JigPromptOptions
-            where TResult : PromptResult
-        {
-            var ed = Application.DocumentManager.MdiActiveDocument.Editor;
-            var jig = new FlexDrawJig(options, result => updateAction((TResult)result));
-            return ed.Drag(jig);
-        }
+        //public static PromptResult StartDrag<TOptions, TResult>(TOptions options, Func<TResult, Drawable> updateAction)
+        //    where TOptions : JigPromptOptions
+        //    where TResult : PromptResult
+        //{
+        //    var ed = Application.DocumentManager.MdiActiveDocument.Editor;
+        //    var jig = new FlexDrawJig(options, result => updateAction((TResult)result));
+        //    return ed.Drag(jig);
+        //}
 
-        /// <summary>
-        /// Starts a FlexDrawJig point drag.
-        /// </summary>
-        /// <param name="message">The message.</param>
-        /// <param name="updateAction">The update action.</param>
-        /// <returns>The prompt result.</returns>
-        public static PromptResult StartDrag(string message, Func<PromptPointResult, Drawable> updateAction)
-        {
-            var ed = Application.DocumentManager.MdiActiveDocument.Editor;
-            var options = new JigPromptPointOptions(message); // TODO: other options?
-            var jig = new FlexDrawJig(options, result => updateAction((PromptPointResult)result));
-            return ed.Drag(jig);
-        }
+        ///// <summary>
+        ///// Starts a FlexDrawJig point drag.
+        ///// </summary>
+        ///// <param name="message">The message.</param>
+        ///// <param name="updateAction">The update action.</param>
+        ///// <returns>The prompt result.</returns>
+        //public static PromptResult StartDrag(string message, Func<PromptPointResult, Drawable> updateAction)
+        //{
+        //    var ed = Application.DocumentManager.MdiActiveDocument.Editor;
+        //    var options = new JigPromptPointOptions(message); // TODO: other options?
+        //    var jig = new FlexDrawJig(options, result => updateAction((PromptPointResult)result));
+        //    return ed.Drag(jig);
+        //}
     }
 
     internal class LineJig : EntityJig

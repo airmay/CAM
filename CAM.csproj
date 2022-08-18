@@ -90,6 +90,14 @@
   <ItemGroup>
     <Compile Include="Acad\AcadGateway.cs" />
     <Compile Include="Acad\AcadObjectNames.cs" />
+    <Compile Include="Acad\AutoCADCommands\Algorithms.cs" />
+    <Compile Include="Acad\AutoCADCommands\App.cs" />
+    <Compile Include="Acad\AutoCADCommands\Commands.cs" />
+    <Compile Include="Acad\AutoCADCommands\DbHelper.cs" />
+    <Compile Include="Acad\AutoCADCommands\Interaction.cs" />
+    <Compile Include="Acad\AutoCADCommands\Layouts.cs" />
+    <Compile Include="Acad\AutoCADCommands\QuickSelection.cs" />
+    <Compile Include="Acad\AutoCADCommands\SymbolPack.cs" />
     <Compile Include="Core\CableTechProcess.cs" />
     <Compile Include="Core\CamDocument.cs" />
     <Compile Include="Core\MillingTechProcess.cs" />
@@ -296,12 +304,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\disk.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="AutoCADCommands\AutoCADCommands.csproj">
-      <Project>{c5f6c326-952b-43e8-9830-311f190bab11}</Project>
-      <Name>AutoCADCommands</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\icons8-play-16.png" />

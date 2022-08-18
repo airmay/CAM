@@ -1,6 +1,5 @@
 ﻿using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
-using Dreambuild.AutoCAD.Internal;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -590,20 +589,6 @@ namespace Dreambuild.AutoCAD
                 }
                 trans.Commit();
             }
-        }
-
-        #endregion
-
-        #region ezdata
-
-        public static string GetData(this ObjectId id, string dict, string key)
-        {
-            return CustomObjectDictionary.GetValue(id, dict, key);
-        }
-
-        public static void SetData(this ObjectId id, string dict, string key, string value)
-        {
-            CustomObjectDictionary.SetValue(id, dict, key, value);
         }
 
         #endregion
