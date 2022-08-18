@@ -1,9 +1,12 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
 using System.Windows.Forms;
+using System.IO;
+using System.Text;
 
 namespace CAM
 {
@@ -57,5 +60,38 @@ namespace CAM
 
             return obj;
         }
+
+        public static void WriteToFile(this Exception ex, string message)
+        {
+            var builder = new StringBuilder();
+            while (ex != null)
+            {
+                builder.AppendFormat("{0}{1}", ex, Environment.NewLine);
+                ex = ex.InnerException;
+            }
+            try
+            {
+                File.WriteAllText($@"\\US-CATALINA3\public\Программы станок\CodeRepository\Logs\error_{DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss")}.log", $"{Acad.ActiveDocument.Name}\n\n{message}\n\n{builder}");
+            }
+            catch { }
+        }
+
+        #region IList
+        public static bool Swap(this IList list, int firstIndex, int secondIndex)
+        {
+            if (!(firstIndex >= 0 && firstIndex < list.Count && secondIndex >= 0 && secondIndex < list.Count && firstIndex != secondIndex))
+                return false;
+            (list[firstIndex], list[secondIndex]) = (list[secondIndex], list[firstIndex]);
+            return true;
+        }
+
+        public static bool SwapNext(this IList list, int index) => list.Swap(index, index + 1);
+
+        public static bool SwapPrev(this IList list, int index) => list.Swap(index, index - 1);
+
+        public static bool SwapNext(this IList list, object item) => SwapNext(list, list.IndexOf(item));
+
+        public static bool SwapPrev(this IList list, object item) => SwapPrev(list, list.IndexOf(item));
+        #endregion
     }
 }

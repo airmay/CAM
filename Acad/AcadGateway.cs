@@ -32,12 +32,7 @@ namespace CAM
             var text = ex == null ? message : $"{message}: {ex.Message}";
             Interaction.WriteLine($"{text}\n");
 #if !DEBUG
-            if (ex != null)
-                try
-                {
-                    File.WriteAllText($@"\\US-CATALINA3\public\Программы станок\CodeRepository\Logs\error_{DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss")}.log", $"{Acad.ActiveDocument.Name}\n\n{message}\n\n{ex.FullMessage()}");
-                }
-                catch { }
+            ex?.WriteToFile(message);
 #endif
         }
 
