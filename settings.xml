@@ -35,31 +35,37 @@
     </Tool>
   </ToolsDonatoni>
   <ToolsKrea />
-  <MachineSettings>
-    <MachineSettings>
-      <MachineType>ScemaLogic</MachineType>
-      <MaxFrequency>3000</MaxFrequency>
-      <ProgramFileExtension>csv</ProgramFileExtension>
-      <ProgramLineNumberFormat>{0};</ProgramLineNumberFormat>
-    </MachineSettings>
-    <MachineSettings>
-      <MachineType>Donatoni</MachineType>
-      <MaxFrequency>5000</MaxFrequency>
-      <ProgramFileExtension>pgm</ProgramFileExtension>
-      <ProgramLineNumberFormat>N{0} </ProgramLineNumberFormat>
-    </MachineSettings>
-    <MachineSettings>
-      <MachineType>Krea</MachineType>
-      <MaxFrequency>10000</MaxFrequency>
-      <ProgramFileExtension>txt</ProgramFileExtension>
-      <ProgramLineNumberFormat>N{0} </ProgramLineNumberFormat>
-    </MachineSettings>
-    <MachineSettings>
-      <MachineType>CableSawing</MachineType>
-      <ProgramFileExtension>txt</ProgramFileExtension>
-      <ProgramLineNumberFormat>{0} </ProgramLineNumberFormat>
-    </MachineSettings>
-  </MachineSettings>
+	<MachineSettings>
+		<MachineSettings>
+			<MachineType>ScemaLogic</MachineType>
+			<MaxFrequency>3000</MaxFrequency>
+			<ProgramFileExtension>csv</ProgramFileExtension>
+			<ProgramLineNumberFormat>{0};</ProgramLineNumberFormat>
+		</MachineSettings>
+		<MachineSettings>
+			<MachineType>Donatoni</MachineType>
+			<MaxFrequency>5000</MaxFrequency>
+			<ProgramFileExtension>pgm</ProgramFileExtension>
+			<ProgramLineNumberFormat>N{0} </ProgramLineNumberFormat>
+		</MachineSettings>
+		<MachineSettings>
+			<MachineType>Forma</MachineType>
+			<MaxFrequency>1200</MaxFrequency>
+			<ProgramFileExtension></ProgramFileExtension>
+			<ProgramLineNumberFormat>N{0} </ProgramLineNumberFormat>
+		</MachineSettings>
+		<MachineSettings>
+			<MachineType>Krea</MachineType>
+			<MaxFrequency>10000</MaxFrequency>
+			<ProgramFileExtension>txt</ProgramFileExtension>
+			<ProgramLineNumberFormat>N{0} </ProgramLineNumberFormat>
+		</MachineSettings>
+		<MachineSettings>
+			<MachineType>CableSawing</MachineType>
+			<ProgramFileExtension>txt</ProgramFileExtension>
+			<ProgramLineNumberFormat>{0} </ProgramLineNumberFormat>
+		</MachineSettings>
+	</MachineSettings>
   <SawingTechProcessParams>
     <PenetrationFeed>200</PenetrationFeed>
     <SawingLineModes>

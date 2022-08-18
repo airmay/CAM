@@ -23,7 +23,7 @@ namespace CAM.TechProcesses.Disk3D
             void refreshSize() => sizeLabel.Text = Acad.GetSize(view.GetParams<Disk3DTechProcess>().ProcessingArea);
             view.BindingSource.DataSourceChanged += (s, e) => refreshSize();
 
-            view.AddMachine(CAM.MachineType.Donatoni, CAM.MachineType.ScemaLogic)
+            view.AddMachine(CAM.MachineType.Donatoni, CAM.MachineType.ScemaLogic, CAM.MachineType.Forma)
                 .AddMaterial()
                 .AddParam(nameof(Thickness))
                 .AddIndent()

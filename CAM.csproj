@@ -114,6 +114,7 @@
     <Compile Include="Program\CommandGenerator\CableSawingCommandGenerator.cs" />
     <Compile Include="Program\CommandGenerator\CommandGeneratorBase.cs" />
     <Compile Include="Program\CommandGenerator\CommandGeneratorFactory.cs" />
+    <Compile Include="Program\CommandGenerator\FormaiCommandGenerator.cs" />
     <Compile Include="Program\CommandGenerator\KreaCommandGenerator.cs" />
     <Compile Include="Program\CommandGenerator\DonatoniCommandGenerator.cs" />
     <Compile Include="Program\CommandGenerator\MachineTypeAttribute.cs" />
