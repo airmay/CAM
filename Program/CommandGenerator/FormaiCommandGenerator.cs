@@ -5,7 +5,7 @@ using System.Globalization;
 namespace CAM
 {
     /// <summary>
-    /// Генератор команд для станка типа Forma
+    /// Генератор команд для станка типа Forma.
     /// </summary>
     [MachineType(MachineType.Forma)]
     public class FormaCommandGenerator : MillingCommandGenerator
