@@ -273,6 +273,9 @@ namespace CAM
             if (point == null)
                 point = new Point3d(x ?? ToolPosition.Point.X, y ?? ToolPosition.Point.Y, z ?? ToolPosition.Point.Z);
 
+            if (point.Value.IsEqual(ToolPosition.Point))
+                return;
+
             if (ThickCommand != null && (point.Value.X != ToolPosition.Point.X || point.Value.Y != ToolPosition.Point.Y))
                 AddCommand(
                     new ProcessCommand

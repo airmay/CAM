@@ -172,7 +172,13 @@ namespace CAM.TechProcesses.Disk3D
                     }
                 }
                 if (points.Count > 1)
+                {
+                    if (Graph.GetAngle(points[0], points[1], points[2]) > 0.01)
+                        points.RemoveAt(0);
+                    if (Graph.GetAngle(points[points.Count - 3], points[points.Count - 2], points[points.Count - 1]) > 0.1)
+                        points.RemoveAt(points.Count - 1);
                     PassList.Add(CalcOffsetPoints(points, bounds));
+                }
             }
             offsetSurface.Dispose();
 
