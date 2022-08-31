@@ -5,9 +5,6 @@ using Autodesk.AutoCAD.Geometry;
 
 namespace CAM
 {
-    //public abstract class MillingTechProcess : TechProcess<MillingCommandGenerator>
-    //{ }
-
     public interface ITechProcess
     {
         string Caption { get; set; }
@@ -17,11 +14,6 @@ namespace CAM
         Tool Tool { get; set; }
 
         IEnumerable<TechOperation> TechOperations { get; }
-
-        void AddTechOperation(TechOperation techOperation);
-        void RemoveTechOperation(int index);
-        bool MoveForwardTechOperation(int index);
-        bool MoveBackwardTechOperation(int index);
 
         List<ProcessCommand> ProcessCommands { get; set; }
 

@@ -43,7 +43,7 @@ namespace CAM.TechProcesses.Disk3D
 
         public double StepZ { get; set; }
 
-        public LongCleaningTechOperation()
+        public LongCleaningTechOperation(Disk3DTechProcess techProcess, string caption) : base(techProcess, caption)
         {
             StepX1 = 1;
             StepX2 = 1;

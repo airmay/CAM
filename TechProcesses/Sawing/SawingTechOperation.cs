@@ -23,11 +23,10 @@ namespace CAM.TechProcesses.Sawing
 
         public List<SawingMode> SawingModes { get; set; }
 
-        public SawingTechOperation() { }
+        public SawingTechOperation(SawingTechProcess techProcess, string caption) : base(techProcess, caption) { }
 
-        public SawingTechOperation(MillingTechProcess techProcess, Border border)
+        public SawingTechOperation(SawingTechProcess techProcess, Border border) : base(techProcess, $"Распиловка{border.ObjectId.GetDesc()}")
         {
-            Setup(techProcess, $"Распиловка{border.ObjectId.GetDesc()}");
             SetFromBorder(border);
         }
 

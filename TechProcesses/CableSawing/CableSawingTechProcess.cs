@@ -11,7 +11,7 @@ namespace CAM.TechProcesses.CableSawing
 {
     [Serializable]
     [MenuItem("Распиловка тросом", 8)]
-    public class CableSawingTechProcess : TechProcessBase<CableCommandGenerator>
+    public class CableSawingTechProcess : CableTechProcess
     {
         public double ToolThickness { get; set; } = 10;
         public int CuttingFeed { get; set; } = 10;
@@ -54,11 +54,11 @@ namespace CAM.TechProcesses.CableSawing
             {
                 var dbObject = p.ObjectId.QOpenForRead();
                 var operation = dbObject is Region || dbObject is PlaneSurface
-                    ? (TechOperation)new LineSawingTechOperation()
-                    : new ArcSawingTechOperation();
+                    ? (TechOperation)new LineSawingTechOperation(this)
+                    : new ArcSawingTechOperation(this);
                 operation.ProcessingArea = p;
                 var caption = ((MenuItemAttribute)Attribute.GetCustomAttribute(operation.GetType(), typeof(MenuItemAttribute))).Name;
-                operation.Setup(this, caption);
+                //operation.Setup(this, caption);
                 return operation;
             });
         }
@@ -112,7 +112,7 @@ namespace CAM.TechProcesses.CableSawing
             generator.Command($"G92");
             CableSawingTechOperation last = null; 
 
-            foreach (var operation in TechOperations.FindAll(p => p.Enabled && p.CanProcess).Cast<CableSawingTechOperation>())
+            foreach (var operation in TechOperations.Where(p => p.Enabled && p.CanProcess).Cast<CableSawingTechOperation>())
             {
                 SetOperationParams(operation);
                 generator.Feed = operation.CuttingFeed;

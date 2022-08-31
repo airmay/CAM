@@ -32,6 +32,8 @@ namespace CAM
                     return Instance.ToolsDonatoni;
                 case MachineType.Krea:
                     return Instance.ToolsKrea;
+                case MachineType.Forma:
+                    return Instance.ToolsKrea;
                 default:
                     return null;
             }
@@ -102,6 +104,7 @@ namespace CAM
         public List<Tool> ToolsDonatoni { get; set; }
 
         public List<Tool> ToolsKrea { get; set; } 
+
         #endregion
 
         public List<MachineSettings> MachineSettings { get; set; }

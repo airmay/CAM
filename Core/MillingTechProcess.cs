@@ -7,7 +7,7 @@ namespace CAM
     /// Технологический процесс обработки
     /// </summary>
     [Serializable]
-    public abstract class MillingTechProcess : TechProcessBase<MillingCommandGenerator>
+    public abstract class MillingTechProcess : TechProcess<MillingCommandGenerator>
     {
         public Material? Material { get; set; }
 

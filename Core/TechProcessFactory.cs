@@ -55,8 +55,8 @@ namespace CAM
                 return new List<TechOperation>();
             if (techOperationName == "Все операции")
                 return techProcess.CreateTechOperations();
-            var techOperation = (TechOperation)Activator.CreateInstance(_techOperationTypes[techProcess.GetType()][techOperationName]);
-            techOperation.Setup(techProcess, techOperationName);
+            var techOperation = (TechOperation)Activator.CreateInstance(_techOperationTypes[techProcess.GetType()][techOperationName], techProcess, techOperationName);
+            //techOperation.Setup(techProcess, techOperationName);
             return new List<TechOperation> { techOperation };
         }
 

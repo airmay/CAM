@@ -1,19 +1,21 @@
-﻿//using Autodesk.AutoCAD.DatabaseServices;
-//using Autodesk.AutoCAD.Geometry;
-//using System;
-//using System.Collections.Generic;
-//using System.Linq;
-//using System.Text;
-//using System.Threading.Tasks;
+﻿using Autodesk.AutoCAD.DatabaseServices;
+using Autodesk.AutoCAD.Geometry;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
-//namespace CAM
-//{
-//    /// <summary>
-//    /// Технологический процесс обработки
-//    /// </summary>
-//    [Serializable]
-//    public abstract class CableTechProcess : ITechProcess
-//    {
+namespace CAM
+{
+    /// <summary>
+    /// Технологический процесс обработки
+    /// </summary>
+    [Serializable]
+    public abstract class CableTechProcess : TechProcess<CableCommandGenerator>
+    {
+    }
+}
 //        public string Caption { get; set; }
 
 //        public MachineType? MachineType { get; set; }

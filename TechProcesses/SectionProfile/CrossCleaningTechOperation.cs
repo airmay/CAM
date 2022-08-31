@@ -12,6 +12,10 @@ namespace CAM.TechProcesses.SectionProfile
     [MenuItem("Поперечная чистка", 3)]
     public class CrossCleaningTechOperation : MillingTechOperation<SectionProfileTechProcess>
     {
+        public CrossCleaningTechOperation(SectionProfileTechProcess techProcess, string caption) : base(techProcess, caption)
+        {
+        }
+
         public double LongStep { get; set; } = 10;
         public double ProfileStep { get; set; } = 5;
         public double? ProfileBegin { get; set; }

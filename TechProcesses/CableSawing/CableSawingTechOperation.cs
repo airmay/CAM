@@ -7,6 +7,10 @@ namespace CAM.TechProcesses.CableSawing
     [Serializable]
     public abstract class CableSawingTechOperation : WireSawingTechOperation<CableSawingTechProcess>
     {
+        protected CableSawingTechOperation(CableSawingTechProcess techProcess, string caption) : base(techProcess, caption)
+        {
+        }
+
         public List<AcadObject> AcadObjects { get; set; }
         public int CuttingFeed { get; set; }
         public int S { get; set; }

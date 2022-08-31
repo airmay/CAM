@@ -12,6 +12,10 @@ namespace CAM.TechProcesses.Disk3D
     [MenuItem("Гребенка", 1)]
     public class CombTechOperation : MillingTechOperation<Disk3DTechProcess>
     {
+        public CombTechOperation(Disk3DTechProcess techProcess, string caption) : base(techProcess, caption)
+        {
+        }
+
         public double StepPass { get; set; }
 
         public double StartPass { get; set; }

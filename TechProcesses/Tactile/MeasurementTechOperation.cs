@@ -36,6 +36,10 @@ namespace CAM.TechProcesses.Tactile
         [NonSerialized]
         public ObjectId[] PointObjectIds = Array.Empty<ObjectId>();
 
+        public MeasurementTechOperation(TactileTechProcess techProcess, string caption) : base(techProcess, caption)
+        {
+        }
+
         public override void SerializeInit()
         {
             PointObjectIds = PointsX.SelectMany((p, i) => Acad.CreateMeasurementPoint(new Point3d(PointsX[i], PointsY[i], 0))).ToArray();

@@ -35,7 +35,7 @@ namespace CAM.TechProcesses.Disk3D
 
         public bool IsUplifting { get; set; }
 
-        public CrossCleaningTechOperation()
+        public CrossCleaningTechOperation(Disk3DTechProcess techProcess, string caption) : base(techProcess, caption)
         {
             StepX1 = 1;
             StepX2 = 1;

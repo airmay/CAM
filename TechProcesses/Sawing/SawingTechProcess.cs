@@ -60,7 +60,7 @@ namespace CAM.TechProcesses.Sawing
             ExtraObjectsGroup?.DeleteGroup();
             ExtraObjectsGroup = null;
 
-            var techOperations = TechOperations.FindAll(p => p.ProcessingArea != null);
+            var techOperations = TechOperations.Where(p => p.ProcessingArea != null).ToList();
             techOperations.FindAll(p => ids.Contains(p.ProcessingArea.ObjectId)).ForEach(p => ((SawingTechOperation)p).OuterSide = Side.None);
             _borders = ids.Except(techOperations.Select(p => p.ProcessingArea.ObjectId)).Select(p => new Border(p)).ToList();
             var borders = _borders.Concat(techOperations.Select(p => new Border((SawingTechOperation)p))).ToList();

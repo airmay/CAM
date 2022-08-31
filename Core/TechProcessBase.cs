@@ -6,42 +6,39 @@ using System.Threading.Tasks;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
 
-namespace CAM.Core
+namespace CAM
 {
     /// <summary>
     /// Технологический процесс обработки
     /// </summary>
     [Serializable]
-    public abstract class TechProcessBase<T> : ITechProcess where T : CommandGeneratorBase
+    public abstract class TechProcess<T> : ITechProcess where T : CommandGeneratorBase
     {
         public string Caption { get; set; }
 
         public MachineType? MachineType { get; set; }
 
         public CAM.Tool Tool { get; set; }
-        IEnumerable<TechOperation> ITechProcess.TechOperations => TechOperations;
 
-        public void AddTechOperation(TechOperation techOperation)
-        {
-            TechOperations.Add((TechOperation<T>)techOperation);
-        }
+        #region TechOperations
 
-        public void RemoveTechOperation(int index)
-        {
-            DeleteProcessing();
-            TechOperations[index].Teardown();
-            TechOperations.RemoveAt(index);
-        }
+        private List<TechOperation<T>> _techOperations = new List<TechOperation<T>>();
 
-        public bool MoveForwardTechOperation(int index) => TechOperations.SwapNext(index);
+        public IEnumerable<TechOperation> TechOperations => _techOperations;
 
-        public bool MoveBackwardTechOperation(int index) => TechOperations.SwapPrev(index);
+        public void AddTechOperation(TechOperation<T> techOperation) => _techOperations.Add(techOperation);
+
+        public void RemoveTechOperation(TechOperation<T> techOperation) => _techOperations.Remove(techOperation);
+
+        public bool MoveForwardTechOperation(TechOperation<T> techOperation) => _techOperations.SwapNext(techOperation);
+
+        public bool MoveBackwardTechOperation(TechOperation<T> techOperation) => _techOperations.SwapPrev(techOperation);
+
+        #endregion
 
         public double ZSafety { get; set; } = 20;
 
         public List<AcadObject> ProcessingArea { get; set; }
-
-        public List<TechOperation<T>> TechOperations { get; } = new List<TechOperation<T>>();
 
         public List<ProcessCommand> ProcessCommands { get; set; }
 
@@ -71,10 +68,10 @@ namespace CAM.Core
 
             AcadObject.LoadAcadProps(this);
 
-            TechOperations.ForEach(p =>
+            _techOperations.ForEach(p =>
             {
                 AcadObject.LoadAcadProps(p);
-                p.TechProcessBase = this;
+                //p.TechProcessBase = this;
                 p.SerializeInit();
             });
         }
@@ -92,7 +89,7 @@ namespace CAM.Core
 
                 BuildProcessing(generator);
 
-                TechOperations.FindAll(p => p.Enabled && p.CanProcess).ForEach(p =>
+                _techOperations.FindAll(p => p.Enabled && p.CanProcess).ForEach(p =>
                 {
                     generator.SetTechOperation(p);
 
@@ -175,8 +172,8 @@ namespace CAM.Core
             ToolpathObjectsGroup?.DeleteGroup();
             ToolpathObjectsGroup = null;
 
-            TechOperations.Select(p => p.ToolpathObjectsGroup).Delete();
-            TechOperations.ForEach(p =>
+            _techOperations.Select(p => p.ToolpathObjectsGroup).Delete();
+            _techOperations.ForEach(p =>
             {
                 p.ToolpathObjectsGroup = null;
                 p.ProcessCommandIndex = null;
@@ -195,7 +192,7 @@ namespace CAM.Core
         public virtual void Teardown()
         {
             Acad.DeleteObjects(OriginObject);
-            TechOperations.ForEach(to => to.Teardown());
+            _techOperations.ForEach(to => to.Teardown());
         }
     }
 }

@@ -23,12 +23,7 @@ namespace CAM.TechProcesses.Tactile
 
         public double Depth { get; set; }
 
-        public ConesTechOperation() { }
-
-        public ConesTechOperation(TactileTechProcess techProcess, string caption)
-        {
-            Setup(techProcess, caption);
-        }
+        public ConesTechOperation(TactileTechProcess techProcess, string caption) : base(techProcess, caption) { }
 
         public override void Init()
         { 

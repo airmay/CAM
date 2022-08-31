@@ -8,17 +8,48 @@ namespace CAM
     /// Базовая технологическая операция
     /// </summary>
     [Serializable]
-    public abstract class TechOperation<T> : TechOperation where T : CommandGeneratorBase
+    public abstract class TechOperation<TGenerator> : TechOperation where TGenerator : CommandGeneratorBase
     {
-        public abstract void BuildProcessing(T generator);
+        public abstract void BuildProcessing(TGenerator generator);
 
-        public virtual void PrepareBuild(T generator) { }
+        public virtual void PrepareBuild(TGenerator generator) { }
     }
 
     [Serializable]
-    public abstract class MillingTechOperation<T> : TechOperation<MillingCommandGenerator> where T : ITechProcess
+    public abstract class TechOperation<TTechProcess, TGenerator> : TechOperation<TGenerator> where TGenerator : CommandGeneratorBase where TTechProcess : TechProcess<TGenerator>
     {
-        public T TechProcess => (T)TechProcessBase;
+        public TTechProcess TechProcess { set; get; } //=> (TTechProcess)TechProcessBase;
+
+        public TechOperation(TTechProcess techProcess, string caption)
+        {
+            TechProcess = techProcess;
+            TechProcess.AddTechOperation(this);
+            Caption = $"{caption}{techProcess.TechOperations.Count()}";
+
+            Init();
+        }
+
+        public override bool TryMoveBackward() => TechProcess.MoveBackwardTechOperation(this);
+
+        public override bool TryMoveForward() => TechProcess.MoveForwardTechOperation(this);
+
+        public override void Remove()
+        {
+            Teardown();
+            TechProcess.RemoveTechOperation(this);
+        }
+    }
+
+    [Serializable]
+    public abstract class MillingTechOperation<TTechProcess> : TechOperation<TTechProcess, MillingCommandGenerator> where TTechProcess : MillingTechProcess
+    {
+        protected MillingTechOperation(TTechProcess techProcess, string caption) : base(techProcess, caption) { }
+    }
+
+    [Serializable]
+    public abstract class WireSawingTechOperation<TTechProcess> : TechOperation<TTechProcess, CableCommandGenerator> where TTechProcess : CableTechProcess
+    {
+        protected WireSawingTechOperation(TTechProcess techProcess, string caption) : base(techProcess, caption) { }
     }
 
     [Serializable]
@@ -27,8 +58,8 @@ namespace CAM
         /// <summary>
         /// Технологический процесс обработки
         /// </summary>
-        [NonSerialized]
-        public ITechProcess TechProcessBase;
+        //[NonSerialized]
+        //public ITechProcess TechProcessBase;
 
         [NonSerialized]
         public ObjectId? ToolpathObjectsGroup;
@@ -46,14 +77,14 @@ namespace CAM
         /// </summary>
         public AcadObject ProcessingArea { get; set; }
 
-        public void Setup(ITechProcess techProcess, string caption)
-        {
-            TechProcessBase = techProcess;
-            TechProcessBase.AddTechOperation(this);
-            Caption = $"{caption}{techProcess.TechOperations.Count()}";
+        //public void Setup(ITechProcess techProcess, string caption)
+        //{
+        //    TechProcessBase = techProcess;
+        //    TechProcessBase.AddTechOperation(this);
+        //    Caption = $"{caption}{techProcess.TechOperations.Count()}";
 
-            Init();
-        }
+        //    Init();
+        //}
 
         public virtual void Init() { }
 
@@ -67,5 +98,10 @@ namespace CAM
 
         public virtual bool Validate() => true;
 
+        public abstract bool TryMoveBackward();
+
+        public abstract bool TryMoveForward();
+
+        public abstract void Remove();
     }
 }

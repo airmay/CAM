@@ -29,7 +29,7 @@ namespace CAM.TechProcesses.CableSawing
                 .AddParam(nameof(StepCount), "Количество шагов");
         }
 
-        public ArcSawingTechOperation()
+        public ArcSawingTechOperation(CableSawingTechProcess techProcess) : base(techProcess, "Распиловка по дуге")
         {
             StepCount = 100;
         }
@@ -92,7 +92,7 @@ namespace CAM.TechProcesses.CableSawing
             return objectId.QOpenForRead<Polyline3d>();
         }
 
-        public void BuildProcessing(CableCommandGenerator generator)
+        public override void BuildProcessing(CableCommandGenerator generator)
         {
             //var dbObject = ProcessingArea.ObjectId.QOpenForRead();
             var surface = AcadObjects.First().ObjectId.QOpenForRead<DbSurface>();

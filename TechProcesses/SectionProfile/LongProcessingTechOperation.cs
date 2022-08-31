@@ -11,6 +11,10 @@ namespace CAM.TechProcesses.SectionProfile
     [MenuItem("Продольная обработка", 1)]
     public class LongProcessingTechOperation : MillingTechOperation<SectionProfileTechProcess>
     {
+        public LongProcessingTechOperation(SectionProfileTechProcess techProcess, string caption) : base(techProcess, caption)
+        {
+        }
+
         public double StepPass { get; set; } = 10;
         public bool IsProfileStep { get; set; }
         public double? FirstPass { get; set; }

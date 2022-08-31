@@ -253,7 +253,7 @@ namespace CAM
 		    if (treeView.SelectedNode.Tag is TechOperation techOperation)
 		    {
 			    EndEdit();
-			    if (techOperation.TechProcessBase.MoveBackwardTechOperation(treeView.SelectedNode.Index))
+			    if (techOperation.TryMoveBackward())
 				    MoveSelectedNode(-1);
 		    }
 	    }
@@ -263,7 +263,7 @@ namespace CAM
 		    if (treeView.SelectedNode.Tag is TechOperation techOperation)
 		    {
 			    EndEdit();
-			    if (techOperation.TechProcessBase.MoveForwardTechOperation(treeView.SelectedNode.Index))
+			    if (techOperation.TryMoveForward())
                     MoveSelectedNode(1);
                     MoveSelectedNode(1);
 		    }
@@ -369,7 +369,7 @@ namespace CAM
                         _currentTechProcessType = null;
                         break;
                     case TechOperation techOperation:
-                        _camDocument.DeleteTechOperation(CurrentTechProcess, treeView.SelectedNode.Index);
+                        techOperation.Remove();
                         break;
                 }
                 Acad.UnhighlightAll();

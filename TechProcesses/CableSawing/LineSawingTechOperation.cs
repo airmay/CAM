@@ -34,6 +34,11 @@ namespace CAM.TechProcesses.CableSawing
                 .AddParam(nameof(Delay), "Задержка");
         }
 
+        public LineSawingTechOperation(CableSawingTechProcess techProcess) : base(techProcess, "Распиловка по прямой")
+        {
+        }
+
+
         public override Curve[] GetRailCurves(List<Curve> curves)
         {
             var bounds = AcadObjects.First().ObjectId.QOpenForRead<Entity>().Bounds.Value;
@@ -49,7 +54,7 @@ namespace CAM.TechProcesses.CableSawing
             return new Curve[] { rail0, rail1 };
         }
 
-        public void BuildProcessing(CableCommandGenerator generator)
+        public override void BuildProcessing(CableCommandGenerator generator)
         {
             var offsetDistance = TechProcess.ToolThickness / 2 + Delta;
             var dbObject = AcadObjects.First().ObjectId.QOpenForRead();

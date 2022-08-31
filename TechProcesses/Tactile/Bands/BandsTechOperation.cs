@@ -31,12 +31,10 @@ namespace CAM.TechProcesses.Tactile
 
         public bool IsEdgeProcessing { get; set; }
 
-        public BandsTechOperation() { }
+        public BandsTechOperation(TactileTechProcess techProcess, string caption) : base(techProcess, caption) { }
 
-        public BandsTechOperation(TactileTechProcess techProcess, string caption, int? processingAngle, double? bandStart)
+        public BandsTechOperation(TactileTechProcess techProcess, string caption, int? processingAngle, double? bandStart) : base(techProcess, caption)
         {
-            Setup(techProcess, caption);
-
             BandStart = bandStart ?? BandStart;
             ProcessingAngle = processingAngle ?? ProcessingAngle;
         }
