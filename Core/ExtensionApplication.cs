@@ -11,7 +11,6 @@ namespace CAM
 {
     public class ExtensionApplication : IExtensionApplication
     {
-        private Dictionary<Document, CamDocument> _documents = new Dictionary<Document, CamDocument>();
         private TechProcessFactory _techProcessFactory;
         private CamPaletteSet _camPaletteSet;
 
@@ -52,17 +51,16 @@ namespace CAM
 
         public void SetActiveDocument(Document document)
         {
-            if (document != null && !_documents.ContainsKey(document))
+            if (document != null && !Acad.Documents.ContainsKey(document))
             {
                 document.CommandWillStart += Document_CommandWillStart;
                 document.BeginDocumentClose += Document_BeginDocumentClose;
                 document.ImpliedSelectionChanged += ImpliedSelectionChanged;
-                _documents[document] = new CamDocument(_techProcessFactory);
-                TechProcessLoader.LoadTechProsess(_documents[document]);
+                Acad.Documents[document] = new CamDocument(_techProcessFactory);
+                TechProcessLoader.LoadTechProsess(Acad.Documents[document]);
             }
+            Acad.CamView.RefreshView();
             Acad.ClearHighlighted();
-            _camPaletteSet.SetCamDocument(document != null ? _documents[document] : null);
-
         }
 
         private void ImpliedSelectionChanged(object sender, EventArgs e)
@@ -75,9 +73,9 @@ namespace CAM
         {
             if (e.GlobalCommandName == "CLOSE" || e.GlobalCommandName == "QUIT" || e.GlobalCommandName == "QSAVE" || e.GlobalCommandName == "SAVEAS")
             {
-                _documents[sender as Document].TechProcessList.ForEach(p => p.DeleteProcessing());
-                TechProcessLoader.SaveTechProsess(_documents[sender as Document]);
-                _camPaletteSet.ClearCommands();
+                Acad.Documents[sender as Document].TechProcessList.ForEach(p => p.DeleteProcessing());
+                TechProcessLoader.SaveTechProsess(Acad.Documents[sender as Document]);
+                Acad.CamView.ClearCommandsView();
                 Acad.DeleteAll();
             }
         }
@@ -87,10 +85,10 @@ namespace CAM
             var document = sender as Document;
             document.CommandWillStart -= Document_CommandWillStart;
             document.BeginDocumentClose -= Document_BeginDocumentClose;
-            _documents.Remove(document);
+            Acad.Documents.Remove(document);
 
-            if (!_documents.Any())
-                _camPaletteSet.SetCamDocument();
+            if (!Acad.Documents.Any())
+                Acad.CamView.RefreshView();
         }
 
         public void Terminate()

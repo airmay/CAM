@@ -65,7 +65,7 @@ namespace CAM
         public ObjectId? ToolpathObjectsGroup;
 
         [NonSerialized]
-        public int? ProcessCommandIndex;
+        public int? FirstCommandIndex;
 
         /// <summary>
         /// Наименование

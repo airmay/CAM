@@ -21,6 +21,12 @@ namespace CAM
     /// </summary>
     public static class Acad
     {
+        public static Dictionary<Document, CamDocument> Documents = new Dictionary<Document, CamDocument>();
+
+        public static CamDocument CamDocument => ActiveDocument != null ? Documents.TryGetAndReturn(ActiveDocument) : null;
+
+        public static CamView CamView = new CamView();
+
         public static Document ActiveDocument => AcadApplication.DocumentManager.MdiActiveDocument;
 
         public static Database Database => Application.DocumentManager.MdiActiveDocument.Database;

@@ -93,5 +93,28 @@ namespace CAM
 
         public static bool SwapPrev(this IList list, object item) => SwapPrev(list, list.IndexOf(item));
         #endregion
+
+        /// <summary>
+        /// Tries to read value and returns the value if successfully read. Otherwise return default value
+        /// for value's type.
+        /// </summary>
+        /// <typeparam name="TKey"></typeparam>
+        /// <typeparam name="TValue"></typeparam>
+        /// <param name="dictionary"></param>
+        /// <param name="key"></param>
+        /// <returns></returns>
+        public static TValue TryGetAndReturn<TKey, TValue>(this IDictionary<TKey, TValue> dictionary, TKey key)
+        {
+            dictionary.TryGetValue(key, out var retValue);
+            return retValue;
+        }
+
+        public static void ForAll<T>(this IEnumerable<T> enumerable, Action<T> action)
+        {
+            foreach (var feature in enumerable)
+            {
+                action(feature);
+            }
+        }
     }
 }

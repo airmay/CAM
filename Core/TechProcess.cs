@@ -15,7 +15,7 @@ namespace CAM
 
         IEnumerable<TechOperation> TechOperations { get; }
 
-        List<ProcessCommand> ProcessCommands { get; set; }
+        List<ProcessCommand> ProcessCommands { get; }
 
         Dictionary<ObjectId, int> GetToolpathObjectIds();
 

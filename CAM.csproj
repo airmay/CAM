@@ -107,6 +107,7 @@
     <Compile Include="Core\Tool\ToolModel.cs" />
     <Compile Include="Core\Tool\ToolPosition.cs" />
     <Compile Include="Core\Tool\ToolTypeAttribute.cs" />
+    <Compile Include="Core\UI\DocumentTreeNode.cs" />
     <Compile Include="Core\UI\MenuItemAttribute.cs" />
     <Compile Include="Core\TechOperation.cs" />
     <Compile Include="Core\TechProcess.cs" />
@@ -117,6 +118,8 @@
       <DependentUpon>ParamsView.cs</DependentUpon>
     </Compile>
     <Compile Include="Core\UI\Progressor.cs" />
+    <Compile Include="Core\UI\TechOperationNode.cs" />
+    <Compile Include="Core\UI\TechProcessNode.cs" />
     <Compile Include="Program\BuilderUtils.cs" />
     <Compile Include="Program\CommandGenerator\CableSawingCommandGenerator.cs" />
     <Compile Include="Program\CommandGenerator\CommandGeneratorBase.cs" />
@@ -222,6 +225,7 @@
     <Compile Include="Core\UI\CamView.Designer.cs">
       <DependentUpon>CamView.cs</DependentUpon>
     </Compile>
+    <Compile Include="Utils\ObjectExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -252,6 +256,7 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Core\UI\CamView.resx">
       <DependentUpon>CamView.cs</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Core\Tool\ToolsForm.resx">
       <DependentUpon>ToolsForm.cs</DependentUpon>

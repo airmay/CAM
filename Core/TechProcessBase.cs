@@ -40,11 +40,16 @@ namespace CAM
 
         public List<AcadObject> ProcessingArea { get; set; }
 
-        public List<ProcessCommand> ProcessCommands { get; set; }
+        [NonSerialized]
+        private List<ProcessCommand> _processCommands = new List<ProcessCommand>();
+
+        public List<ProcessCommand> ProcessCommands => _processCommands;
 
         public double OriginX { get; set; }
 
         public double OriginY { get; set; }
+
+        public int GetFirstCommandIndex() => 0;
 
         [NonSerialized]
         public ObjectId[] OriginObject;
@@ -60,6 +65,8 @@ namespace CAM
         public ObjectId? GetToolpathObjectsGroup() => ToolpathObjectsGroup;
 
         public ObjectId? GetExtraObjectsGroup() => ExtraObjectsGroup;
+
+        public void Select() => ToolpathObjectsGroup?.SetGroupVisibility(true);
 
         public virtual void SerializeInit()
         {
@@ -100,7 +107,7 @@ namespace CAM
                     //        generator.Uplifting();
                 });
                 generator.FinishTechProcess();
-                ProcessCommands = generator.ProcessCommands;
+                _processCommands = generator.ProcessCommands;
             }
             UpdateFromCommands();
         }
@@ -176,13 +183,13 @@ namespace CAM
             _techOperations.ForEach(p =>
             {
                 p.ToolpathObjectsGroup = null;
-                p.ProcessCommandIndex = null;
+                p.FirstCommandIndex = null;
             });
             ExtraObjectsGroup?.DeleteGroup();
             ExtraObjectsGroup = null;
 
             ToolpathObjectIds = null;
-            ProcessCommands = null;
+            _processCommands = null;
         }
 
         public virtual List<TechOperation> CreateTechOperations() => new List<TechOperation>();

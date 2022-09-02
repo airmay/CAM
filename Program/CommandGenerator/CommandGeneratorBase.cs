@@ -14,7 +14,11 @@ namespace CAM
 
         public virtual void Dispose() { }
 
-        public void SetTechOperation(TechOperation techOperation) => _techOperation = techOperation;
+        public void SetTechOperation(TechOperation techOperation)
+        {
+            _techOperation = techOperation;
+            _techOperation.FirstCommandIndex = null;
+        }
 
         public void AddCommand(ProcessCommand command)
         {
@@ -22,8 +26,8 @@ namespace CAM
             command.Number = ProcessCommands.Count + 1;
             ProcessCommands.Add(command);
 
-            if (_techOperation != null && !_techOperation.ProcessCommandIndex.HasValue)
-                _techOperation.ProcessCommandIndex = ProcessCommands.Count - 1;
+            if (_techOperation?.FirstCommandIndex.HasValue == false)
+                _techOperation.FirstCommandIndex = ProcessCommands.Count - 1;
         }
 
         protected virtual void StartMachineCommands(string caption)
