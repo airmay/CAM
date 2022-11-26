@@ -23,5 +23,8 @@ namespace CAM
         {
             SetTool(generator);
         }
+
+        public override int GetFrequency() => Frequency;
+
     }
 }

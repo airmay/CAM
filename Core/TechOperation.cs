@@ -13,6 +13,8 @@ namespace CAM
         public abstract void BuildProcessing(TGenerator generator);
 
         public virtual void PrepareBuild(TGenerator generator) { }
+
+        public virtual void PostBuild(TGenerator generator) { }
     }
 
     [Serializable]
@@ -44,6 +46,12 @@ namespace CAM
     public abstract class MillingTechOperation<TTechProcess> : TechOperation<TTechProcess, MillingCommandGenerator> where TTechProcess : MillingTechProcess
     {
         protected MillingTechOperation(TTechProcess techProcess, string caption) : base(techProcess, caption) { }
+
+        public override void PostBuild(MillingCommandGenerator generator) 
+        {
+            if (!generator.IsUpperTool)
+                generator.Uplifting();
+        }
     }
 
     [Serializable]

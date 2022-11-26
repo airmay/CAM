@@ -119,9 +119,11 @@ namespace CAM.TechProcesses.Sawing
                 var angle = BuilderUtils.CalcToolAngle((curve.EndPoint - curve.StartPoint).ToVector2d().Angle, engineSide);
                 generator.Move(point.X, point.Y, angleC: angle);
                 generator.Cutting(point.X, point.Y, point.Z, TechProcess.PenetrationFeed);
+                generator.Uplifting();
+
                 return;
             }
-
+            
             var modes = SawingModes.ConvertAll(p => new CuttingMode { Depth = p.Depth, DepthStep = p.DepthStep, Feed = p.Feed });
             var passList = BuilderUtils.GetPassList(modes, thickness, !ProcessingArea.ObjectId.IsLine()).ToList();
 
@@ -143,7 +145,6 @@ namespace CAM.TechProcesses.Sawing
                 }
                 generator.Cutting(toolpathCurve, item.Value, TechProcess.PenetrationFeed, engineSide);
             }
-            generator.Uplifting(Vector3d.ZAxis.RotateBy(outerSideSign * angleA, toolpathCurve.EndPoint - toolpathCurve.StartPoint) * (thickness + generator.ZSafety) * depthCoeff);
 
             if ((!IsExactlyBegin || !IsExactlyEnd) && Departure == 0)
             {
@@ -157,6 +158,7 @@ namespace CAM.TechProcesses.Sawing
                     Modify.AppendToGroup(base.TechProcess.ExtraObjectsGroup.Value, gashList.ToArray());
                 gashCurve.Dispose();
             }
+            generator.Uplifting(Vector3d.ZAxis.RotateBy(outerSideSign * angleA, toolpathCurve.EndPoint - toolpathCurve.StartPoint) * (thickness + generator.ZSafety) * depthCoeff);
 
             // Local func ------------------------
 

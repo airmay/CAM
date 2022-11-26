@@ -83,16 +83,18 @@ namespace CAM
             });
         }
 
+        public virtual int GetFrequency() => 0;
+
         public virtual void BuildProcessing()
         {
             using (var generator = CommandGeneratorFactory.Create<T>(MachineType.Value))
             {
                 generator.StartTechProcess(this);
 
-                //if (Tool != null)
-                //    generator.SetTool(
-                //        MachineType.Value != CAM.MachineType.Donatoni ? Tool.Number : 1,
-                //        Frequency);
+                if (generator is MillingCommandGenerator millingCommandGenerator && Tool != null)
+                    millingCommandGenerator.SetTool(
+                        MachineType.Value != CAM.MachineType.Donatoni ? Tool.Number : 1,
+                        GetFrequency());
 
                 BuildProcessing(generator);
 
@@ -103,6 +105,7 @@ namespace CAM
                     //    p.PrepareBuild(generator);
                     p.BuildProcessing(generator);
 
+                    p.PostBuild(generator);
                     //    if (!generator.IsUpperTool)
                     //        generator.Uplifting();
                 });

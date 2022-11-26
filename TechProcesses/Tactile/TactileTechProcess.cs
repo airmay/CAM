@@ -153,7 +153,7 @@ namespace CAM.TechProcesses.Tactile
                 if (vector.IsParallelTo(Vector3d.YAxis, Tolerance.Global))
                     ProcessingAngle1 = 90;
                 if (vector.IsParallelTo(Vector3d.XAxis.RotateBy(Math.PI * 3 / 4, Vector3d.ZAxis)))
-                    ProcessingAngle1 = 45;
+                    ProcessingAngle1 = 135;
                 if (ProcessingAngle1.HasValue)
                 {
                     Type = $"Полосы {ProcessingAngle1}";

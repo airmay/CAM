@@ -97,7 +97,7 @@ namespace CAM
         public void SetZSafety(double zSafety, double zMax = 0)
         {
             ZSafety = zSafety + zMax;
-            //ToolPosition = new MillToolPosition(new Point3d(double.NaN, double.NaN, ZSafety + UpperZ), 0, 0);
+            ToolPosition = new MillToolPosition(new Point3d(double.NaN, double.NaN, ZSafety + UpperZ), 0, 0);
         }
 
         protected abstract void SetToolCommands(int toolNo, double angleA, double angleC, int originCellNumber);
@@ -199,6 +199,9 @@ namespace CAM
         /// </summary>
         public void Cutting(Curve curve, int cuttingFeed, int smallFeed, Side engineSide = Side.None, double? angleC = null, double? angleA = null)
         {
+            if (ToolPosition == null)
+                ToolPosition = new MillToolPosition(new Point3d(double.NaN, double.NaN, ZSafety + 500), 0, 0);
+
             var point = curve.GetClosestPoint(ToolPosition.Point);
             var calcAngleC = angleC == null;
 
