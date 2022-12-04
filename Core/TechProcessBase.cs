@@ -91,10 +91,10 @@ namespace CAM
             {
                 generator.StartTechProcess(this);
 
-                if (generator is MillingCommandGenerator millingCommandGenerator && Tool != null)
-                    millingCommandGenerator.SetTool(
-                        MachineType.Value != CAM.MachineType.Donatoni ? Tool.Number : 1,
-                        GetFrequency());
+                //if (generator is MillingCommandGenerator millingCommandGenerator && Tool != null)
+                //    millingCommandGenerator.SetTool(
+                //        MachineType.Value != CAM.MachineType.Donatoni ? Tool.Number : 1,
+                //        GetFrequency());
 
                 BuildProcessing(generator);
 

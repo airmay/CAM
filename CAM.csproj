@@ -124,6 +124,7 @@
     <Compile Include="Program\CommandGenerator\CableSawingCommandGenerator.cs" />
     <Compile Include="Program\CommandGenerator\CommandGeneratorBase.cs" />
     <Compile Include="Program\CommandGenerator\CommandGeneratorFactory.cs" />
+    <Compile Include="Program\CommandGenerator\ChampionCommandGenerator.cs" />
     <Compile Include="Program\CommandGenerator\FormaiCommandGenerator.cs" />
     <Compile Include="Program\CommandGenerator\KreaCommandGenerator.cs" />
     <Compile Include="Program\CommandGenerator\DonatoniCommandGenerator.cs" />
@@ -175,6 +176,8 @@
     <Compile Include="TechProcesses\SectionProfile\LongCleaningTechOperation.cs" />
     <Compile Include="TechProcesses\SectionProfile\LongProcessingTechOperation.cs" />
     <Compile Include="TechProcesses\SectionProfile\SectionProfileTechProcess.cs" />
+    <Compile Include="TechProcesses\9_Stolb\PazTechOperation.cs" />
+    <Compile Include="TechProcesses\9_Stolb\StolbTechProcess.cs" />
     <Compile Include="TechProcesses\Tactile\Bands\BandsTechOperation.cs" />
     <Compile Include="TechProcesses\Tactile\Bands\CuttingType.cs" />
     <Compile Include="TechProcesses\Tactile\Bands\Pass.cs" />

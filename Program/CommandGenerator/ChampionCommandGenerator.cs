@@ -1,14 +1,16 @@
 ﻿using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
+using System;
+using System.Collections.Generic;
 using System.Globalization;
 
 namespace CAM
 {
     /// <summary>
-    /// Генератор команд для станка типа Donatoni
+    /// Генератор команд для станка типа Champion
     /// </summary>
-    [MachineType(MachineType.Donatoni)]
-    public class DonatoniCommandGenerator : MillingCommandGenerator
+    [MachineType(MachineType.Champion)]
+    public class ChampionCommandGenerator : MillingCommandGenerator
     {
         public bool IsSupressMoveHome { get; set; } = false;
 
@@ -67,21 +69,30 @@ namespace CAM
 
         protected override string GCommandText(int gCode, string paramsString, MillToolPosition position, Point3d point, Curve curve, double? angleC, double? angleA, int? feed, Point2d? center)
         {
-            return $"G{gCode}{Format("X", point.X, ToolPosition.Point.X, _originX)}{Format("Y", point.Y, ToolPosition.Point.Y, _originY)}" +
-                $"{FormatIJ("I", center?.X, _originX)}{FormatIJ("J", center?.Y, _originY)}" +
-                $"{FormatZ()}{Format("C", angleC, ToolPosition.AngleC)}{Format("A", angleA, ToolPosition.AngleA)}" +
-                $"{Format("F", feed, _feed)}";
+            var par = CreateParams(position, feed);
+            var textParams = GetTextParams(par);
+            return $"G{gCode}{CommandDelimiter}{textParams}";
+        }
 
-            string Format(string label, double? value, double oldValue, double origin = 0) =>
-                 (paramsString == null || paramsString.Contains(label)) && (value.GetValueOrDefault(oldValue) != oldValue) // || (_GCode == 0 ^ gCode == 0))
-                        ? $" {label}{(value.GetValueOrDefault(oldValue) - origin).Round(4)}"
-                        : null;
+        public override Dictionary<string, double?> CreateParams(MillToolPosition position, int? feed)
+        {
+            var angleC = position.AngleC.ToRad();
+            var angleA = position.AngleA.ToRad();
+            var dl = AC * (1 - Math.Cos(angleA)) + DiskRadius * Math.Sin(angleA);
+            var angle = Math.PI * 3 / 2 - angleC;
+            var dx = dl * Math.Cos(angle);
+            var dy = dl * Math.Sin(angle);
+            var dz = AC * Math.Sin(angleA) - DiskRadius * (1 - Math.Cos(angleA));
 
-            string FormatIJ(string label, double? value, double origin) => value.HasValue ? $" {label}{(value.Value - origin).Round(4)}" : null;
-
-            string FormatZ() => (paramsString == null || paramsString.Contains("Z")) && ((ThickCommand != null && gCode == 1) || point.Z != ToolPosition.Point.Z)
-                ? (WithThick ? $" Z({point.Z.Round(4)} + THICK)" : $" Z{point.Z.Round(4)}")
-                : null;
+            return new Dictionary<string, double?>
+            {
+                ["X"] = position.Point.X + dx,
+                ["Y"] = position.Point.Y + dy,
+                ["Z"] = position.Point.Z + dz,
+                ["A"] = position.AngleC <= 180 ? position.AngleC : (position.AngleC - 360),
+                ["C"] = 90 - position.AngleA,
+                ["F"] = feed
+            };
         }
     }
 }

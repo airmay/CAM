@@ -35,5 +35,15 @@ namespace CAM
 
             return mat3 * mat2 * mat1;
         }
+
+        public MillToolPosition Create(Point3d? point = null, double? x = null, double? y = null, double? z = null, double? angleC = null, double? angleA = null)
+        {
+            return new MillToolPosition
+            {
+                Point = point ?? new Point3d(x ?? Point.X, y ?? Point.Y, z ?? Point.Z),
+                AngleC = angleC ?? AngleC,
+                AngleA = angleA ?? AngleA
+            };
+        }
     }
 }

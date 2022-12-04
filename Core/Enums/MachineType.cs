@@ -10,6 +10,8 @@
 
         CableSawing,
 
-        Forma
+        Forma,
+
+        Champion
     }
 }

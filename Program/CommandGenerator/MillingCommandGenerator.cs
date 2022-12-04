@@ -14,7 +14,6 @@ namespace CAM
     public abstract class MillingCommandGenerator: CommandGeneratorBase
     {
         protected bool _hasTool;
-        protected int _GCode;
         protected int _feed;
         protected double _originX, _originY;
         protected int _frequency;
@@ -47,6 +46,9 @@ namespace CAM
         public int CuttingFeed { get; set; }
         public int SmallFeed { get; set; }
         public Side EngineSide { get; set; }
+
+        public double AC { get; set; }
+        public double DiskRadius { get; set; }
 
         public override void StartTechProcess(ITechProcess techProcess)
         {
@@ -273,28 +275,32 @@ namespace CAM
             if (Matrix.HasValue && point.HasValue)
                 point = point.Value.TransformBy(Matrix.Value);
 
-            if (point == null)
-                point = new Point3d(x ?? ToolPosition.Point.X, y ?? ToolPosition.Point.Y, z ?? ToolPosition.Point.Z);
+            var position = ToolPosition.Create(point, x, y, z, angleC, angleA);
 
-            if (point.Value.IsEqual(ToolPosition.Point))
-                return;
+            //if (point.Value.IsEqual(ToolPosition.Point))
+            //    return;
 
-            if (ThickCommand != null && (point.Value.X != ToolPosition.Point.X || point.Value.Y != ToolPosition.Point.Y))
+            if (ThickCommand != null && (position.Point.X != ToolPosition.Point.X || position.Point.Y != ToolPosition.Point.Y)) // TODO ThickCommand
                 AddCommand(
                     new ProcessCommand
                     {
-                        Text = string.Format(ThickCommand, point.Value.X.Round(), point.Value.Y.Round()),
+                        Text = string.Format(ThickCommand, position.Point.X.Round(), position.Point.Y.Round()),
                         HasTool = _hasTool,
                         ToolLocation = ToolPosition.Clone()
                     });
-            command.Text = GCommandText(gCode, paramsString, point.Value, curve, angleC, angleA, feed, center);
             
             if (ToolPosition.IsDefined)
             {
-                if (curve == null && ToolPosition.Point.DistanceTo(point.Value) > 1)
-                    curve = NoDraw.Line(ToolPosition.Point, point.Value);
+                double length;
+                if (curve == null)
+                {
+                    length = ToolPosition.Point.DistanceTo(position.Point);
+                    if (length > 1)
+                        curve = NoDraw.Line(ToolPosition.Point, position.Point);
+                }
+                else
+                    length = curve.Length();
 
-                double length = 0;
                 if (curve != null && curve.IsNewObject)
                 {
                     if (Colors.ContainsKey(name))
@@ -303,24 +309,35 @@ namespace CAM
                     curve.Visible = false;
                     _currentSpace.AppendEntity(curve);
                     _transaction.AddNewlyCreatedDBObject(curve, true);
-                    length = curve.Length();
                 }
                 command.ToolpathObjectId = curve?.ObjectId;
 
                 if ((feed ?? _feed) != 0)
-                    command.Duration = (curve != null ? length : ToolPosition.Point.DistanceTo(point.Value)) / (gCode == 0 ? 10000 : feed ?? _feed) * 60;
+                    command.Duration = length / (gCode == 0 ? 10000 : feed ?? _feed) * 60;
             }
 
-            _GCode = gCode;
-            ToolPosition.Set(point.Value, angleC, angleA);
-            _feed = feed ?? _feed;
-
+            command.Text = GCommandText(gCode, paramsString, position, position.Point, curve, angleC, angleA, feed, center);
             command.HasTool = _hasTool;
-            command.ToolLocation = ToolPosition.Clone();
-
+            command.ToolLocation = position;
             AddCommand(command);
+
+            _feed = feed ?? _feed;
+            ToolPosition = position;
         }
 
-        protected abstract string GCommandText(int gCode, string paramsString, Point3d point, Curve curve, double? angleC, double? angleA, int? feed, Point2d? center);
+        public virtual Dictionary<string, double?> CreateParams(MillToolPosition position, int? f)
+        {
+            return new Dictionary<string, double?>
+            {
+                ["X"] = position.Point.X,
+                ["Y"] = position.Point.Y,
+                ["Z"] = position.Point.Z,
+                ["C"] = position.AngleC,
+                ["A"] = position.AngleA,
+                ["F"] = f
+            };
+        }
+
+        protected abstract string GCommandText(int gCode, string paramsString, MillToolPosition position, Point3d point, Curve curve, double? angleC, double? angleA, int? feed, Point2d? center);
     }
 }

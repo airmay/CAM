@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Collections.Generic;
 
 namespace CAM
@@ -10,7 +11,8 @@ namespace CAM
 
         public List<ProcessCommand> ProcessCommands { get; } = new List<ProcessCommand>();
 
-
+        public Dictionary<string, double> Params = new Dictionary<string, double>();
+        protected string CommandDelimiter = " ";
 
         public virtual void Dispose() { }
 
@@ -28,6 +30,23 @@ namespace CAM
 
             if (_techOperation?.FirstCommandIndex.HasValue == false)
                 _techOperation.FirstCommandIndex = ProcessCommands.Count - 1;
+        }
+
+        public virtual string GetTextParams(Dictionary<string, double?> newParams)
+        {
+            return string.Join(CommandDelimiter, newParams.ToList().Select(p =>
+                {
+                    if (p.Value == null)
+                        return null;
+
+                    var newValue = p.Value.Value.Round(4);
+                    if (Params.TryGetValue(p.Key, out var oldValue) && newValue == oldValue)
+                        return null;
+
+                    Params[p.Key] = newValue;
+                    return $"{p.Key}{newValue}";
+                })
+                .Where(p => p != null));
         }
 
         protected virtual void StartMachineCommands(string caption)
