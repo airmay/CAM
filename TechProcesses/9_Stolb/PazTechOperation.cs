@@ -2,6 +2,7 @@
 using Autodesk.AutoCAD.Geometry;
 using Dreambuild.AutoCAD;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace CAM.TechProcesses.Tactile
@@ -10,14 +11,16 @@ namespace CAM.TechProcesses.Tactile
     [MenuItem("Паз", 2)]
     public class PazTechOperation : MillingTechOperation<StolbTechProcess>
     {
+        protected override bool IsSupressUplifting => true;
+
         public string ZList { get; set; }
 
         public PazTechOperation(StolbTechProcess techProcess, string caption) : base(techProcess, caption) { }
 
         public static void ConfigureParamsView(ParamsView view)
         {
-            view.AddAcadObject(displayName: "Верхняя грань паза")
-                .AddParam(nameof(ZList), "Координаты Z проходов");
+            view.AddAcadObject(displayName: "Верхняя грань паза");
+                //.AddParam(nameof(ZList), "Координаты Z проходов");
         }
 
         public override void BuildProcessing(MillingCommandGenerator generator)
@@ -35,17 +38,17 @@ namespace CAM.TechProcesses.Tactile
             var end = line.EndPoint.GetExtendedPoint(line.StartPoint, TechProcess.Departure);
             line = NoDraw.Line(start, end);
 
-            var list = ZList.Split(new char[] { ',', ';' }).Select(p => double.Parse(p));
-            foreach (var z in list)
+            foreach (var pass in TechProcess.PassList)
             {
+                generator.CuttingFeed = pass.CuttingType == CuttingType.Roughing ? TechProcess.RoughingFeed : TechProcess.FinishingFeed; 
+                var step = pass.CuttingType == CuttingType.Roughing ? TechProcess.RoughingStep : TechProcess.FinishingStep;
                 var s = 0D;
                 do
                 {
-                    s += TechProcess.PenetrationStep.Value;
+                    s += step;
                     if (s > TechProcess.Depth)
                         s = TechProcess.Depth;
-                    generator.Cutting(line, s * sign, -z, angleA: 90);
-
+                    generator.Cutting(line, s * sign, -pass.Pos, angleA: 90);
                 }
                 while (s < TechProcess.Depth);
             }

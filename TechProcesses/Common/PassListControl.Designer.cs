@@ -36,10 +36,10 @@
             this.gvPassList = new System.Windows.Forms.DataGridView();
             this.posDataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.cuttingTypeDataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewComboBoxColumn();
-            this.bindingSource = new System.Windows.Forms.BindingSource(this.components);
+            this.BindingSource = new System.Windows.Forms.BindingSource(this.components);
             this.panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.gvPassList)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.bindingSource)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.BindingSource)).BeginInit();
             this.SuspendLayout();
             // 
             // panel1
@@ -97,7 +97,7 @@
             this.gvPassList.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.posDataGridViewTextBoxColumn,
             this.cuttingTypeDataGridViewTextBoxColumn});
-            this.gvPassList.DataSource = this.bindingSource;
+            this.gvPassList.DataSource = this.BindingSource;
             this.gvPassList.Dock = System.Windows.Forms.DockStyle.Fill;
             this.gvPassList.Location = new System.Drawing.Point(0, 30);
             this.gvPassList.MultiSelect = false;
@@ -124,10 +124,10 @@
             this.cuttingTypeDataGridViewTextBoxColumn.Resizable = System.Windows.Forms.DataGridViewTriState.True;
             this.cuttingTypeDataGridViewTextBoxColumn.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.Automatic;
             // 
-            // bindingSource
+            // BindingSource
             // 
-            this.bindingSource.DataMember = "PassList";
-            this.bindingSource.DataSource = typeof(CAM.TechProcesses.Tactile.BandsTechOperation);
+            this.BindingSource.DataMember = "PassList";
+            this.BindingSource.DataSource = typeof(CAM.TechProcesses.Tactile.BandsTechOperation);
             // 
             // PassListControl
             // 
@@ -139,7 +139,7 @@
             this.Size = new System.Drawing.Size(225, 280);
             this.panel1.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.gvPassList)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.bindingSource)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.BindingSource)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -151,8 +151,8 @@
         private System.Windows.Forms.Button bUp;
         private System.Windows.Forms.Button bCalculate;
         private System.Windows.Forms.DataGridView gvPassList;
-        private System.Windows.Forms.BindingSource bindingSource;
         private System.Windows.Forms.DataGridViewTextBoxColumn posDataGridViewTextBoxColumn;
         private System.Windows.Forms.DataGridViewComboBoxColumn cuttingTypeDataGridViewTextBoxColumn;
+        public System.Windows.Forms.BindingSource BindingSource;
     }
 }

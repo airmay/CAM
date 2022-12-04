@@ -45,11 +45,13 @@ namespace CAM
     [Serializable]
     public abstract class MillingTechOperation<TTechProcess> : TechOperation<TTechProcess, MillingCommandGenerator> where TTechProcess : MillingTechProcess
     {
+        protected virtual bool IsSupressUplifting => false;
+
         protected MillingTechOperation(TTechProcess techProcess, string caption) : base(techProcess, caption) { }
 
         public override void PostBuild(MillingCommandGenerator generator) 
         {
-            if (!generator.IsUpperTool)
+            if (!generator.IsUpperTool && !IsSupressUplifting)
                 generator.Uplifting();
         }
     }

@@ -178,16 +178,16 @@
     <Compile Include="TechProcesses\SectionProfile\SectionProfileTechProcess.cs" />
     <Compile Include="TechProcesses\9_Stolb\PazTechOperation.cs" />
     <Compile Include="TechProcesses\9_Stolb\StolbTechProcess.cs" />
-    <Compile Include="TechProcesses\Tactile\Bands\BandsTechOperation.cs" />
-    <Compile Include="TechProcesses\Tactile\Bands\CuttingType.cs" />
-    <Compile Include="TechProcesses\Tactile\Bands\Pass.cs" />
+    <Compile Include="TechProcesses\Tactile\BandsTechOperation.cs" />
+    <Compile Include="TechProcesses\Common\CuttingType.cs" />
+    <Compile Include="TechProcesses\Common\Pass.cs" />
     <Compile Include="TechProcesses\Tactile\ChamfersTechOperation.cs" />
     <Compile Include="TechProcesses\Tactile\ConesTechOperation.cs" />
     <Compile Include="TechProcesses\Tactile\MeasurementTechOperation.cs" />
-    <Compile Include="TechProcesses\Tactile\Bands\PassListControl.cs">
+    <Compile Include="TechProcesses\Common\PassListControl.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="TechProcesses\Tactile\Bands\PassListControl.Designer.cs">
+    <Compile Include="TechProcesses\Common\PassListControl.Designer.cs">
       <DependentUpon>PassListControl.cs</DependentUpon>
     </Compile>
     <Compile Include="TechProcesses\Tactile\TactileTechProcess.cs" />
@@ -254,7 +254,7 @@
     <EmbeddedResource Include="TechProcesses\Sawing\SawingModesView.resx">
       <DependentUpon>SawingModesView.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="TechProcesses\Tactile\Bands\PassListControl.resx">
+    <EmbeddedResource Include="TechProcesses\Common\PassListControl.resx">
       <DependentUpon>PassListControl.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Core\UI\CamView.resx">
