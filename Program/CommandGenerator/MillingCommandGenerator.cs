@@ -38,7 +38,7 @@ namespace CAM
 
         //public List<ProcessCommand> ProcessCommands { get; } = new List<ProcessCommand>();
 
-        public bool IsUpperTool => ToolPosition == null || ToolPosition.Point.Z >= ZSafety;
+        public bool IsUpperTool => !ToolPosition.IsDefined || ToolPosition.Point.Z >= ZSafety;
         public bool WithThick { get; set; }
 
         public MillToolPosition ToolPosition { get; set; }
@@ -48,6 +48,7 @@ namespace CAM
         public Side EngineSide { get; set; }
 
         public double AC { get; set; }
+        public double DZ { get; set; }
         public double DiskRadius { get; set; }
 
         public override void StartTechProcess(ITechProcess techProcess)
@@ -56,6 +57,9 @@ namespace CAM
             _originX = techProcess.OriginX;
             _originY = techProcess.OriginY;
             ZSafety = techProcess.ZSafety;
+
+            ToolPosition = new MillToolPosition();
+            Params = CreateParams(ToolPosition, 0);
 
             _documentLock = Acad.ActiveDocument.LockDocument();
             _transaction = Acad.Database.TransactionManager.StartTransaction();
@@ -128,7 +132,7 @@ namespace CAM
             if (ToolPosition == null)
                 ToolPosition = new MillToolPosition(new Point3d(double.NaN, double.NaN, ZSafety + 500), 0, 0);
 
-            if (IsParamNotChanged(x, ToolPosition.Point.X) && IsParamNotChanged(y, ToolPosition.Point.Y) && IsParamNotChanged(z, ToolPosition.Point.Z)) return;
+            //if (IsParamNotChanged(x, ToolPosition.Point.X) && IsParamNotChanged(y, ToolPosition.Point.Y) && IsParamNotChanged(z, ToolPosition.Point.Z)) return;
 
             GCommand(_isEngineStarted ? CommandNames.Fast : CommandNames.InitialMove, 0, x: x, y: y, z: z, angleC: angleC);
             if (!_isEngineStarted)
@@ -188,12 +192,12 @@ namespace CAM
             }
         }
 
-        public void Cutting(Curve curve, double offset = 0, double? dz = null, double? angleA = null)
+        public void Cutting(Curve curve, double offset = 0, double? dz = null, double? angleC = null, double? angleA = null)
         {
             var toolpathCurve = curve.GetOffsetCurves(offset)[0] as Curve;
             if (dz.HasValue)
                 toolpathCurve.TransformBy(Matrix3d.Displacement(Vector3d.ZAxis * dz.Value));
-            Cutting(toolpathCurve, CuttingFeed, SmallFeed, EngineSide, angleA: angleA);
+            Cutting(toolpathCurve, CuttingFeed, SmallFeed, EngineSide, angleC: angleC, angleA: angleA);
         }
 
         /// <summary>
@@ -204,16 +208,16 @@ namespace CAM
             if (ToolPosition == null)
                 ToolPosition = new MillToolPosition(new Point3d(double.NaN, double.NaN, ZSafety + 500), 0, 0);
 
-            var point = curve.GetClosestPoint(ToolPosition.Point);
+            var point = ToolPosition.IsDefined ? curve.GetClosestPoint(ToolPosition.Point) : curve.StartPoint;
             var calcAngleC = angleC == null;
 
             if (IsUpperTool) // && (angleA ?? AngleA).GetValueOrDefault() == 0)
             {
-                var upperPoint = new Point3d(point.X, point.Y, ZSafety);
-                if (!ToolPosition.Point.IsEqualTo(upperPoint))
-                {
-                    Move(upperPoint.X, upperPoint.Y, angleC: angleC ?? BuilderUtils.CalcToolAngle(curve, point, engineSide), angleA: angleA);
-                }
+                //var upperPoint = new Point3d(point.X, point.Y, ZSafety);
+                //if (!ToolPosition.Point.IsEqualTo(upperPoint))
+                //{
+                    Move(point.X, point.Y, angleC: angleC ?? BuilderUtils.CalcToolAngle(curve, point, engineSide), angleA: angleA);
+                //}
             }
             else if (!(curve is Line) && calcAngleC)
                 angleC = BuilderUtils.CalcToolAngle(curve, point, engineSide);
@@ -258,7 +262,7 @@ namespace CAM
                 Name = name,
                 Text = text,
                 HasTool = _hasTool,
-                ToolLocation = ToolPosition?.Clone(),
+                ToolLocation = ToolPosition.IsDefined ? ToolPosition : null,
                 Duration = duration
             });
         }
@@ -316,28 +320,27 @@ namespace CAM
                     command.Duration = length / (gCode == 0 ? 10000 : feed ?? _feed) * 60;
             }
 
-            command.Text = GCommandText(gCode, paramsString, position, position.Point, curve, angleC, angleA, feed, center);
+            if (position.IsDefined)
+                command.ToolLocation = position;
+
+            ToolPosition = position;
+            //command.Text = GCommandText(gCode, paramsString, position, position.Point, curve, angleC, angleA, feed, center);
+            command.Text = GetGCommand(gCode, feed);
             command.HasTool = _hasTool;
-            command.ToolLocation = position;
             AddCommand(command);
 
             _feed = feed ?? _feed;
-            ToolPosition = position;
         }
 
-        public virtual Dictionary<string, double?> CreateParams(MillToolPosition position, int? f)
+        public virtual Dictionary<string, double?> CreateParams(MillToolPosition position, int? feed)
         {
-            return new Dictionary<string, double?>
-            {
-                ["X"] = position.Point.X,
-                ["Y"] = position.Point.Y,
-                ["Z"] = position.Point.Z,
-                ["C"] = position.AngleC,
-                ["A"] = position.AngleA,
-                ["F"] = f
-            };
+            var newParams = position.GetParams();
+            newParams["F"] = feed;
+            return newParams;
         }
 
         protected abstract string GCommandText(int gCode, string paramsString, MillToolPosition position, Point3d point, Curve curve, double? angleC, double? angleA, int? feed, Point2d? center);
+
+        protected virtual string GetGCommand(int gCode, int? feed) => null;
     }
 }

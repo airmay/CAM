@@ -11,7 +11,7 @@ namespace CAM
 
         public List<ProcessCommand> ProcessCommands { get; } = new List<ProcessCommand>();
 
-        public Dictionary<string, double> Params = new Dictionary<string, double>();
+        public Dictionary<string, double?> Params = new Dictionary<string, double?>();
         protected string CommandDelimiter = " ";
 
         public virtual void Dispose() { }
@@ -34,13 +34,13 @@ namespace CAM
 
         public virtual string GetTextParams(Dictionary<string, double?> newParams)
         {
-            return string.Join(CommandDelimiter, newParams.ToList().Select(p =>
+            return string.Join(CommandDelimiter, Params.ToList().Select(p =>
                 {
-                    if (p.Value == null)
+                    if (!newParams.TryGetValue(p.Key, out var value) || !value.HasValue)
                         return null;
 
-                    var newValue = p.Value.Value.Round(4);
-                    if (Params.TryGetValue(p.Key, out var oldValue) && newValue == oldValue)
+                    var newValue = value.Value.Round(4);
+                    if (p.Value == newValue)
                         return null;
 
                     Params[p.Key] = newValue;

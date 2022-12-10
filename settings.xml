@@ -55,6 +55,12 @@
 			<ProgramLineNumberFormat>N{0} </ProgramLineNumberFormat>
 		</MachineSettings>
 		<MachineSettings>
+			<MachineType>Champion</MachineType>
+			<MaxFrequency>1200</MaxFrequency>
+			<ProgramFileExtension></ProgramFileExtension>
+			<ProgramLineNumberFormat>N{0} </ProgramLineNumberFormat>
+		</MachineSettings>
+		<MachineSettings>
 			<MachineType>Krea</MachineType>
 			<MaxFrequency>10000</MaxFrequency>
 			<ProgramFileExtension>txt</ProgramFileExtension>

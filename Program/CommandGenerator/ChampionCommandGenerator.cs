@@ -67,32 +67,40 @@ namespace CAM
 
         public override void Pause(double duration) => Command("G4 F" + duration.ToString(CultureInfo.InvariantCulture), "Пауза", duration);
 
-        protected override string GCommandText(int gCode, string paramsString, MillToolPosition position, Point3d point, Curve curve, double? angleC, double? angleA, int? feed, Point2d? center)
+        protected override string GetGCommand(int gCode, int? feed)
         {
-            var par = CreateParams(position, feed);
+            var par = CreateParams(ToolPosition, feed);
             var textParams = GetTextParams(par);
             return $"G{gCode}{CommandDelimiter}{textParams}";
         }
 
         public override Dictionary<string, double?> CreateParams(MillToolPosition position, int? feed)
         {
-            var angleC = position.AngleC.ToRad();
-            var angleA = position.AngleA.ToRad();
-            var dl = AC * (1 - Math.Cos(angleA)) + DiskRadius * Math.Sin(angleA);
-            var angle = Math.PI * 3 / 2 - angleC;
-            var dx = dl * Math.Cos(angle);
-            var dy = dl * Math.Sin(angle);
-            var dz = AC * Math.Sin(angleA) - DiskRadius * (1 - Math.Cos(angleA));
+            var newParams = base.CreateParams(position, feed);
 
-            return new Dictionary<string, double?>
+            newParams["A"] = position.AngleC < 180 ? -position.AngleC : (360 - position.AngleC);
+            newParams["C"] = 90 - position.AngleA;
+
+            if (position.AngleA > 0)
             {
-                ["X"] = position.Point.X + dx,
-                ["Y"] = position.Point.Y + dy,
-                ["Z"] = position.Point.Z + dz,
-                ["A"] = position.AngleC <= 180 ? position.AngleC : (position.AngleC - 360),
-                ["C"] = 90 - position.AngleA,
-                ["F"] = feed
-            };
+                var angleC = position.AngleC.ToRad();
+                var angleA = position.AngleA.ToRad();
+                var dl = AC * (1 - Math.Cos(angleA)) + DiskRadius * Math.Sin(angleA);
+                var angle = Math.PI * 3 / 2 - angleC;
+                if (position.X.HasValue)
+                    newParams["X"] = position.X.Value + dl * Math.Cos(angle);
+                if (position.Y.HasValue)
+                    newParams["Y"] = position.Y.Value + dl * Math.Sin(angle);
+                if (position.Z.HasValue)
+                    newParams["Z"] = position.Z.Value + AC * Math.Sin(angleA) - DiskRadius * (1 - Math.Cos(angleA)) + DZ;
+            }
+
+            return newParams;
+        }
+
+        protected override string GCommandText(int gCode, string paramsString, MillToolPosition position, Point3d point, Curve curve, double? angleC, double? angleA, int? feed, Point2d? center)
+        {
+            throw new NotImplementedException();
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using Autodesk.AutoCAD.Geometry;
+using System.Collections.Generic;
 
 namespace CAM
 {
@@ -15,16 +16,18 @@ namespace CAM
             AngleA = angleA;
         }
 
-        public void Set(Point3d? point, double? angleC, double? angleA)
+        public void Set(Point3d? point, double? x, double? y, double? z, double? angleC, double? angleA)
         {
-            Point = point ?? Point;
+            X = point?.X ?? x ?? X;
+            Y = point?.Y ?? y ?? Y;
+            Z = point?.Z ?? z ?? Z;
             AngleC = angleC ?? AngleC;
             AngleA = angleA ?? AngleA;
         }
 
         public override Matrix3d GetTransformMatrixFrom(ToolPosition toolPosition)
         {
-            var millPosition = (MillToolPosition)toolPosition ?? new MillToolPosition();
+            var millPosition = (MillToolPosition)toolPosition ?? new MillToolPosition(Point3d.Origin, 0, 0);
             var mat1 = Matrix3d.Displacement(millPosition.Point.GetVectorTo(Point));
             var mat2 = Matrix3d.Rotation(Graph.ToRad(millPosition.AngleC - AngleC), Vector3d.ZAxis, Point);
             var mat3 = Matrix3d.Rotation(Graph.ToRad(AngleA - millPosition.AngleA), Vector3d.XAxis.RotateBy(Graph.ToRad(-AngleC), Vector3d.ZAxis), Point);
@@ -40,9 +43,23 @@ namespace CAM
         {
             return new MillToolPosition
             {
-                Point = point ?? new Point3d(x ?? Point.X, y ?? Point.Y, z ?? Point.Z),
+                X = point?.X ?? x ?? X,
+                Y = point?.Y ?? y ?? Y,
+                Z = point?.Z ?? z ?? Z,
                 AngleC = angleC ?? AngleC,
                 AngleA = angleA ?? AngleA
+            };
+        }
+
+        public Dictionary<string, double?> GetParams()
+        {
+            return new Dictionary<string, double?>
+            {
+                ["X"] = X,
+                ["Y"] = Y,
+                ["Z"] = Z,
+                ["C"] = AngleC,
+                ["A"] = AngleA
             };
         }
     }

@@ -34,6 +34,8 @@ namespace CAM
                     return Instance.ToolsKrea;
                 case MachineType.Forma:
                     return Instance.ToolsKrea;
+                case MachineType.Champion:
+                    return Instance.ToolsKrea;
                 default:
                     return null;
             }

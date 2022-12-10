@@ -23,6 +23,8 @@ namespace CAM.TechProcesses.Tactile
 
         public double AC { get; set; }
 
+        public double DZ { get; set; }
+
         public List<Pass> PassList { get; set; } = new List<Pass>();
 
         public StolbTechProcess()
@@ -40,6 +42,7 @@ namespace CAM.TechProcesses.Tactile
                 .AddTool()
                 .AddParam(nameof(Frequency))
                 .AddParam(nameof(AC), "a + c")
+                .AddParam(nameof(DZ), "dz")
                 //.AddParam(nameof(CuttingFeed))
                 .AddParam(nameof(PenetrationFeed))
                 .AddText("________ПАЗ________")

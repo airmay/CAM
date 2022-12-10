@@ -26,6 +26,7 @@ namespace CAM.TechProcesses.Tactile
         public override void BuildProcessing(MillingCommandGenerator generator)
         {
             generator.AC = TechProcess.AC;
+            generator.DZ = TechProcess.DZ;
             generator.DiskRadius = TechProcess.Tool.Diameter / 2;
             generator.CuttingFeed = TechProcess.CuttingFeed;
             generator.SmallFeed = TechProcess.PenetrationFeed;
@@ -33,6 +34,7 @@ namespace CAM.TechProcesses.Tactile
             var line = (Line)ProcessingArea.GetCurve();
             var sign = line.IsTurnRight(Point3d.Origin) ? -1 : 1;
             generator.EngineSide = line.IsTurnRight(Point3d.Origin) ? Side.Right : Side.Left;
+            var angleC = BuilderUtils.CalcToolAngle(line, line.StartPoint, generator.EngineSide);
 
             var start = line.StartPoint.GetExtendedPoint(line.EndPoint, TechProcess.Departure);
             var end = line.EndPoint.GetExtendedPoint(line.StartPoint, TechProcess.Departure);
@@ -48,7 +50,7 @@ namespace CAM.TechProcesses.Tactile
                     s += step;
                     if (s > TechProcess.Depth)
                         s = TechProcess.Depth;
-                    generator.Cutting(line, s * sign, -pass.Pos, angleA: 90);
+                    generator.Cutting(line, s * sign, -pass.Pos, angleC: angleC, angleA: 90);
                 }
                 while (s < TechProcess.Depth);
             }

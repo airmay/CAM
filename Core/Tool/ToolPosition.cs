@@ -8,21 +8,42 @@ namespace CAM
 {
     public abstract class ToolPosition
     {
-        public Point3d Point { get; set; } = Point3d.Origin;
+        public double? X { get; set; }
+
+        public double? Y { get; set; }
+
+        public double? Z { get; set; }
+
+        public Point3d Point 
+        {
+            get => new Point3d(X.Value, Y.Value, Z.Value);
+            //get => (X.HasValue && Y.HasValue && Z.HasValue) ? (Point3d?)new Point3d(X.Value, Y.Value, Z.Value) : null;
+
+            set
+            {
+                X = value.X;
+                Y = value.Y;
+                Z = value.Z;
+            } 
+            //set
+            //{
+            //    X = value.Value.X;
+            //    Y = value.Value.Y;
+            //    Z = value.Value.Z;
+            //} 
+        }
 
         public Matrix3d Matrix { get; set; }
 
         public Matrix3d InvMatrix { get; set; }
 
-        public bool IsDefined = true;
+        //public bool IsDefined = true;
 
         //public Point3d Center { get; set; } = new Point3d(double.NaN, double.NaN, double.NaN);
         //public double AngleC { get; set; }
         //public double AngleA { get; set; }
 
-
-
-        //public bool IsDefined => !double.IsNaN(Point.X) && !double.IsNaN(Point.Y) && !double.IsNaN(Point.Z);
+        public bool IsDefined => X.HasValue && Y.HasValue && Z.HasValue;
 
         public abstract Matrix3d GetTransformMatrixFrom(ToolPosition toolPosition);
 
