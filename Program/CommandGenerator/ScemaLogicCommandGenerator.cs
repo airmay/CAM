@@ -30,7 +30,7 @@ namespace CAM.Commands
             Command($"97;6;;{toolNo};;;;;", "Инструмент№");
         }
 
-        protected override void StartEngineCommands()
+        public override void StartEngineCommands()
         {
             Command("97;7;;;;;;;", "Охлаждение");
             Command("97;8;;;;;;;", "Охлаждение");

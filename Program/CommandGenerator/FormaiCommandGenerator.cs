@@ -26,7 +26,7 @@ namespace CAM
         {
         }
 
-        protected override void StartEngineCommands()
+        public override void StartEngineCommands()
         {
             Command("M08", "Охлаждение");
             Command($"M03S{_frequency}", "Шпиндель");

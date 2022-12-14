@@ -45,7 +45,7 @@ namespace CAM
     [Serializable]
     public abstract class MillingTechOperation<TTechProcess> : TechOperation<TTechProcess, MillingCommandGenerator> where TTechProcess : MillingTechProcess
     {
-        protected virtual bool IsSupressUplifting => false;
+        protected bool IsSupressUplifting;
 
         protected MillingTechOperation(TTechProcess techProcess, string caption) : base(techProcess, caption) { }
 

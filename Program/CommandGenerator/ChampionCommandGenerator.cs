@@ -16,39 +16,31 @@ namespace CAM
 
         protected override void StartMachineCommands(string caption)
         {
-            //Command($"; Donatoni \"{caption}\"");
-            //Command($"; DATE {DateTime.Now}");
-
-            Command("%300");
-            Command("RTCP=1");
-            Command("G600 X0 Y-2500 Z-370 U3800 V0 W0 N0");
-            Command("G601");
+            Command("G90");
+            Command("#MCS G0Z0.0");
+            Command("V.A.ORGT[1].Z=190");
+            Command("#FLUSH");
+            Command("G54");
+            Command("M22");
         }
 
         protected override void StopMachineCommands()
         {
-            Command("G0 G53 Z0 ");
-            if (!IsSupressMoveHome)
-            {
-                Command("G0 G53 A0 C0");
-                Command("G0 G53 X0 Y0");
-            }
+            Command("#MCS G0Z0.0");
+            Command("M23");
+            Command("D0");
+            Command("#MCS G0Z0.0");
+            Command("#MCS G0Y-1");
             Command("M30", "Конец");
         }
 
         protected override void SetToolCommands(int toolNo, double angleA, double angleC, int originCellNumber)
         {
-            Command("G0 G53 Z0");
-            Command($"G0 G53 C{angleC} A{angleA}");
-            Command("G64");
-            Command($"G154O{originCellNumber}");
-            Command($"T{toolNo}", "Инструмент№");
-            Command("M6", "Инструмент");
-            Command("G172 T1 H1 D1");
-            Command("M300");
+            Command($"T{toolNo}D1", "Инструмент№");
+            Command("M6", "Смена инструмента");
         }
 
-        protected override void StartEngineCommands()
+        public override void StartEngineCommands()
         {
             Command(_hasTool ? "M7" : "M8", "Охлаждение");
             Command($"S{_frequency}", "Шпиндель");
@@ -57,12 +49,8 @@ namespace CAM
 
         protected override void StopEngineCommands()
         {
-            Command("M5", "Шпиндель откл.");
-            Command("M9", "Охлаждение откл.");
-            Command("G61");
-            Command("G153");
-            Command("G0 G53 Z0");
-            Command("SETMSP=1");
+            Command("M05", "Шпиндель откл.");
+            Command("M09", "Охлаждение откл.");
         }
 
         public override void Pause(double duration) => Command("G4 F" + duration.ToString(CultureInfo.InvariantCulture), "Пауза", duration);

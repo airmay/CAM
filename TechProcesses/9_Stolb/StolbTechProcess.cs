@@ -1,7 +1,8 @@
-﻿using System;
+﻿using CAM.TechProcesses.Tactile;
+using System;
 using System.Collections.Generic;
 
-namespace CAM.TechProcesses.Tactile
+namespace CAM.TechProcesses.Stolb
 {
     [Serializable]
     [MenuItem("Столб", 9)]
@@ -17,6 +18,12 @@ namespace CAM.TechProcesses.Tactile
 
         public int CuttingFeed { get; set; }
 
+        public double PenetrationStep { get; set; }
+
+        public int LastFeed { get; set; }
+
+        public double LastStep { get; set; }
+
         public int RoughingFeed { get; set; }
 
         public int FinishingFeed { get; set; }
@@ -29,7 +36,7 @@ namespace CAM.TechProcesses.Tactile
 
         public StolbTechProcess()
         {
-            MachineType = CAM.MachineType.Forma;
+            MachineType = CAM.MachineType.Champion;
             Material = CAM.Material.Granite;
         }
 
@@ -43,15 +50,19 @@ namespace CAM.TechProcesses.Tactile
                 .AddParam(nameof(Frequency))
                 .AddParam(nameof(AC), "a + c")
                 .AddParam(nameof(DZ), "dz")
-                //.AddParam(nameof(CuttingFeed))
                 .AddParam(nameof(PenetrationFeed))
+                .AddParam(nameof(Departure))
+                .AddText("______Пирамида_____")
+                .AddParam(nameof(PenetrationStep), "Шаг")
+                .AddParam(nameof(CuttingFeed))
+                .AddParam(nameof(LastStep), "Последний шаг")
+                .AddParam(nameof(LastFeed), "Последняя подача")
                 .AddText("________ПАЗ________")
                 .AddParam(nameof(Depth), "Глубина паза")
                 .AddParam(nameof(RoughingStep), "Заглубление гребенка")
                 .AddParam(nameof(FinishingStep), "Заглубление чистка")
                 .AddParam(nameof(RoughingFeed), "Подача гребенка")
                 .AddParam(nameof(FinishingFeed), "Подача чистка")
-                .AddParam(nameof(Departure))
                 .AddControl(passView, 10);
             ;
         }

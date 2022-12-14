@@ -1,21 +1,23 @@
 ﻿using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
+using CAM.TechProcesses.Tactile;
 using Dreambuild.AutoCAD;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace CAM.TechProcesses.Tactile
+namespace CAM.TechProcesses.Stolb
 {
     [Serializable]
     [MenuItem("Паз", 2)]
     public class PazTechOperation : MillingTechOperation<StolbTechProcess>
     {
-        protected override bool IsSupressUplifting => true;
-
         public string ZList { get; set; }
 
-        public PazTechOperation(StolbTechProcess techProcess, string caption) : base(techProcess, caption) { }
+        public PazTechOperation(StolbTechProcess techProcess, string caption) : base(techProcess, caption) 
+        {
+            IsSupressUplifting = true;
+        }
 
         public static void ConfigureParamsView(ParamsView view)
         {

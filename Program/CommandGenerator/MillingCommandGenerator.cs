@@ -138,7 +138,7 @@ namespace CAM
             if (!_isEngineStarted)
                 GCommand(CommandNames.InitialMove, 0, z: ZSafety);
 
-            if (angleA.HasValue && angleA.Value != ToolPosition.AngleA)
+            if (angleA.HasValue && !angleA.Value.IsEqual(ToolPosition.AngleA))
                 GCommand("Наклон", 1, angleA: angleA, feed: 500);
 
             if (!_isEngineStarted)
@@ -162,7 +162,7 @@ namespace CAM
 
         public void Transition(double? x = null, double? y = null, double? z = null, int? feed = null) => GCommand(CommandNames.Transition, 1, x: x, y: y, z: z, feed: feed ?? SmallFeed);
 
-        protected abstract void StartEngineCommands();
+        public abstract void StartEngineCommands();
 
         /// <summary>
         /// Рез к точке
@@ -222,7 +222,8 @@ namespace CAM
             else if (!(curve is Line) && calcAngleC)
                 angleC = BuilderUtils.CalcToolAngle(curve, point, engineSide);
 
-            GCommand(point.Z != ToolPosition.Point.Z ? CommandNames.Penetration : CommandNames.Transition, 1, point: point, angleC: angleC, angleA: angleA, feed: smallFeed);
+            if (!point.IsEqual(ToolPosition.Point))
+                GCommand(point.Z != ToolPosition.Point.Z ? CommandNames.Penetration : CommandNames.Transition, 1, point: point, angleC: angleC, angleA: angleA, feed: smallFeed);
 
             if (curve is Polyline polyline)
             {

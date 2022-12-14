@@ -32,7 +32,7 @@ namespace CAM
             Command("G79Z(@ZUP)");
         }
 
-        protected override void StartEngineCommands()
+        public override void StartEngineCommands()
         {
             Command("M7", "Охлаждение");
             Command("M8", "Охлаждение");

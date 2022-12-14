@@ -46,7 +46,7 @@ namespace CAM
             Command("M300");
         }
 
-        protected override void StartEngineCommands()
+        public override void StartEngineCommands()
         {
             Command(_hasTool ? "M7" : "M8", "Охлаждение");
             Command($"S{_frequency}", "Шпиндель");

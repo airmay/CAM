@@ -148,6 +148,7 @@
     <Compile Include="Core\Enums\MachineType.cs" />
     <Compile Include="Core\Enums\Material.cs" />
     <Compile Include="Program\ProcessCommand.cs" />
+    <Compile Include="TechProcesses\9_Stolb\SawingTechOperation.cs" />
     <Compile Include="TechProcesses\CableSawing\ArcSawingTechOperation.cs" />
     <Compile Include="TechProcesses\CableSawing\CableSawingTechOperation.cs" />
     <Compile Include="TechProcesses\CableSawing\CableSawingTechProcess.cs" />
