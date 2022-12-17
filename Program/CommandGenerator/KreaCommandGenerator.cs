@@ -48,7 +48,7 @@ namespace CAM
 
         public override void Pause(double duration) => Command(string.Format(CultureInfo.InvariantCulture, "(DLY,{0})", duration), "Пауза", duration);
 
-        protected override string GCommandText(int gCode, string paramsString, MillToolPosition position, Point3d point, Curve curve, double? angleC, double? angleA, int? feed, Point2d? center)
+        protected override string GCommandText(int gCode, string paramsString, Point3d point, Curve curve, double? angleC, double? angleA, int? feed, Point2d? center)
         {
             return $"G{gCode}{Format("X", point.X, ToolPosition.Point.X, _originX)}{Format("Y", point.Y, ToolPosition.Point.Y, _originY)}" +
                 $"{FormatIJ("I", center?.X, _originX)}{FormatIJ("J", center?.Y, _originY)}" +

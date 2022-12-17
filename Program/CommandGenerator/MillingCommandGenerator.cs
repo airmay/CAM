@@ -172,7 +172,8 @@ namespace CAM
         /// <summary>
         /// Рез между точками
         /// </summary>
-        public void Cutting(Point3d startPoint, Point3d endPoint, int cuttingFeed, int transitionFeed, double? angleA = null) => Cutting(NoDraw.Line(startPoint, endPoint), cuttingFeed, transitionFeed, angleA: angleA);
+        public void Cutting(Point3d startPoint, Point3d endPoint, int cuttingFeed, int transitionFeed, double? angleC = null, double? angleA = null, Side engineSide = Side.None) 
+            => Cutting(NoDraw.Line(startPoint, endPoint), cuttingFeed, transitionFeed, engineSide, angleC, angleA: angleA);
 
         public void Cutting(Point3d startPoint, Vector3d delta, int cuttingFeed, int smallFeed, double? angleA = null) => Cutting(startPoint, startPoint + delta, cuttingFeed, smallFeed, angleA);
 
@@ -325,12 +326,20 @@ namespace CAM
                 command.ToolLocation = position;
 
             ToolPosition = position;
+            //command.Text = GCommandText(gCode, paramsString, point.Value, curve, angleC, angleA, feed, center);
             //command.Text = GCommandText(gCode, paramsString, position, position.Point, curve, angleC, angleA, feed, center);
             command.Text = GetGCommand(gCode, feed);
             command.HasTool = _hasTool;
             AddCommand(command);
 
             _feed = feed ?? _feed;
+        }
+
+        protected virtual string GetGCommand(int gCode, int? feed)
+        {
+            var par = CreateParams(ToolPosition, feed);
+            var textParams = GetTextParams(par);
+            return $"G{gCode}{CommandDelimiter}{textParams}";
         }
 
         public virtual Dictionary<string, double?> CreateParams(MillToolPosition position, int? feed)
@@ -340,8 +349,6 @@ namespace CAM
             return newParams;
         }
 
-        protected abstract string GCommandText(int gCode, string paramsString, MillToolPosition position, Point3d point, Curve curve, double? angleC, double? angleA, int? feed, Point2d? center);
-
-        protected virtual string GetGCommand(int gCode, int? feed) => null;
+        protected abstract string GCommandText(int gCode, string paramsString, Point3d point, Curve curve, double? angleC, double? angleA, int? feed, Point2d? center);
     }
 }

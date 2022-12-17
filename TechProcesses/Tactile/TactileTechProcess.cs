@@ -158,7 +158,7 @@ namespace CAM.TechProcesses.Tactile
                 {
                     Type = $"Полосы {ProcessingAngle1}";
                     var point = ProcessingAngle1 == 45 ? contourPoints[3] : contourPoints[0];
-                    var dist = lines.Select(p => p.GetDistToPoint(point)).OrderBy(p => p).ToArray();
+                    var dist = lines.Select(p => p.GetDistToPoint(point, true)).OrderBy(p => p).ToArray();
                     var s1 = dist[1] - dist[0];
                     var s2 = dist[2] - dist[1];
                     BandWidth = s2; // Math.Max(s1, s2);

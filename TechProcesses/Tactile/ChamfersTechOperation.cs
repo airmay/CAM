@@ -2,6 +2,7 @@
 using Autodesk.AutoCAD.Geometry;
 using Dreambuild.AutoCAD;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace CAM.TechProcesses.Tactile
@@ -54,32 +55,48 @@ namespace CAM.TechProcesses.Tactile
             var passDir = ray.UnitDir.GetPerpendicularVector();
             if (ProcessingAngle >= 90)
                 passDir = passDir.Negate();
-            ray.BasePoint += passDir * (tactileTechProcess.BandStart1.Value - tactileTechProcess.BandSpacing.Value);
-            var step = tactileTechProcess.BandWidth.Value + tactileTechProcess.BandSpacing.Value;
             var engineSide = ProcessingAngle < 90 ? Side.Right : Side.Left;
+
+            var start = tactileTechProcess.BandStart1.Value - tactileTechProcess.BandSpacing.Value;
+            if (start <= 0)
+                start += tactileTechProcess.BandWidth.Value + tactileTechProcess.BandSpacing.Value;
+            ray.BasePoint += passDir * start;
+
+            var pointCollections = new List<Point3dCollection[]>();
             while (true)
             {
-                var points = new Point3dCollection();
-                ray.IntersectWith(contour, Intersect.ExtendThis, new Plane(), points, IntPtr.Zero, IntPtr.Zero);
-                if (points.Count == 2 && !points[0].IsEqualTo(points[1]))
+                var pts = new Point3dCollection[]
                 {
-                    var vector = (points[1] - points[0]).GetNormal() * tactileTechProcess.Departure;
-                    var startPoint = points[0] - vector - Vector3d.ZAxis * tactileTechProcess.Depth;
-                    var endPoint = points[1] + vector - Vector3d.ZAxis * tactileTechProcess.Depth;
-                    if (generator.IsUpperTool)
-                        generator.Move(startPoint.X, startPoint.Y, angleC: BuilderUtils.CalcToolAngle(ProcessingAngle.ToRad(), engineSide), angleA: AngleA);
-                    generator.Cutting(startPoint, endPoint, CuttingFeed, tactileTechProcess.TransitionFeed);
-                }
-                else if (step > 0)
-                {
-                    ray.BasePoint += passDir * tactileTechProcess.BandSpacing.Value;
-                    step = -step;
-                    generator.Uplifting();
-                    engineSide = engineSide.Opposite();
-                }
-                else
+                    new Point3dCollection(),
+                    new Point3dCollection()
+                };
+                ray.IntersectWith(contour, Intersect.ExtendThis, new Plane(), pts[0], IntPtr.Zero, IntPtr.Zero);
+                if (pts[0].Count != 2)
                     break;
-                ray.BasePoint += passDir * step;
+
+                ray.BasePoint += passDir * tactileTechProcess.BandSpacing.Value;
+                ray.IntersectWith(contour, Intersect.ExtendThis, new Plane(), pts[1], IntPtr.Zero, IntPtr.Zero);
+                if (pts[1].Count != 2)
+                    break;
+
+                ray.BasePoint += passDir * tactileTechProcess.BandWidth.Value;
+
+                pointCollections.Add(pts);
+            }
+
+            for (int index = 0; index < 2; index++)
+            {
+                foreach (var points in pointCollections)
+                {
+                    var vector = (points[index][1] - points[index][0]).GetNormal() * tactileTechProcess.Departure;
+                    var startPoint = points[index][0] - vector - Vector3d.ZAxis * tactileTechProcess.Depth;
+                    var endPoint = points[index][1] + vector - Vector3d.ZAxis * tactileTechProcess.Depth;
+
+                    generator.Cutting(startPoint, endPoint, CuttingFeed, tactileTechProcess.TransitionFeed, BuilderUtils.CalcToolAngle(ProcessingAngle.ToRad(), engineSide), AngleA, engineSide: engineSide);
+                }
+                pointCollections.Reverse();
+                generator.Uplifting();
+                engineSide = engineSide.Opposite();
             }
         }
     }

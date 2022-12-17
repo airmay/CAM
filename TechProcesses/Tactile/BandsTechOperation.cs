@@ -63,7 +63,7 @@ namespace CAM.TechProcesses.Tactile
                 .AddIndent()
                 .AddParam(nameof(MaxCrestWidth), "Макс.шир.гребня")
                 .AddParam(nameof(IsEdgeProcessing), "Обработка краев")
-                .AddControl(new PassListControl(view.BindingSource), 10);
+                .AddControl(new PassListControl(view.BindingSource, true), 10);
         }
 
         public void CalcPassList()

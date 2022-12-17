@@ -55,13 +55,6 @@ namespace CAM
 
         public override void Pause(double duration) => Command("G4 F" + duration.ToString(CultureInfo.InvariantCulture), "Пауза", duration);
 
-        protected override string GetGCommand(int gCode, int? feed)
-        {
-            var par = CreateParams(ToolPosition, feed);
-            var textParams = GetTextParams(par);
-            return $"G{gCode}{CommandDelimiter}{textParams}";
-        }
-
         public override Dictionary<string, double?> CreateParams(MillToolPosition position, int? feed)
         {
             var newParams = base.CreateParams(position, feed);
@@ -86,7 +79,7 @@ namespace CAM
             return newParams;
         }
 
-        protected override string GCommandText(int gCode, string paramsString, MillToolPosition position, Point3d point, Curve curve, double? angleC, double? angleA, int? feed, Point2d? center)
+        protected override string GCommandText(int gCode, string paramsString, Point3d point, Curve curve, double? angleC, double? angleA, int? feed, Point2d? center)
         {
             throw new NotImplementedException();
         }

@@ -45,7 +45,7 @@ namespace CAM.Commands
             Command("97;5;;;;;;;", "Шпиндель откл.");
         }
 
-        protected override string GCommandText(int gCode, string paramsString, MillToolPosition position, Point3d point, Curve curve, double? angleC, double? angleA, int? feed, Point2d? center)
+        protected override string GCommandText(int gCode, string paramsString, Point3d point, Curve curve, double? angleC, double? angleA, int? feed, Point2d? center)
         {
             var text = $"{(point.X - _originX).Round(4)};{(point.Y - _originY).Round(4)};";
             if (gCode == 0)
