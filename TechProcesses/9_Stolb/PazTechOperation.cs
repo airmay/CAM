@@ -12,7 +12,9 @@ namespace CAM.TechProcesses.Stolb
     [MenuItem("Паз", 2)]
     public class PazTechOperation : MillingTechOperation<StolbTechProcess>
     {
-        public string ZList { get; set; }
+        public bool IsUplifting { get; set; }
+
+        public bool IsChangeStart { get; set; }
 
         public PazTechOperation(StolbTechProcess techProcess, string caption) : base(techProcess, caption) 
         {
@@ -21,12 +23,14 @@ namespace CAM.TechProcesses.Stolb
 
         public static void ConfigureParamsView(ParamsView view)
         {
-            view.AddAcadObject(displayName: "Верхняя грань паза");
-                //.AddParam(nameof(ZList), "Координаты Z проходов");
+            view.AddAcadObject(displayName: "Верхняя грань паза")
+                .AddParam(nameof(IsUplifting))
+                .AddParam(nameof(IsChangeStart), "Сменить начало");
         }
 
         public override void BuildProcessing(MillingCommandGenerator generator)
         {
+            IsSupressUplifting = !IsUplifting;
             generator.AC = TechProcess.AC;
             generator.DZ = TechProcess.DZ;
             generator.DiskRadius = TechProcess.Tool.Diameter / 2;
@@ -52,7 +56,7 @@ namespace CAM.TechProcesses.Stolb
                     s += step;
                     if (s > TechProcess.Depth)
                         s = TechProcess.Depth;
-                    generator.Cutting(line, s * sign, -pass.Pos, angleC: angleC, angleA: 90);
+                    generator.Cutting(line, s * sign, -pass.Pos, angleC: angleC, angleA: 90, IsChangeStart);
                 }
                 while (s < TechProcess.Depth);
             }

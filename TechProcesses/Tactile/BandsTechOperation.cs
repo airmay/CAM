@@ -91,8 +91,6 @@ namespace CAM.TechProcesses.Tactile
             }
         }
 
-        public override bool CanProcess => TechProcess.MachineType == MachineType.ScemaLogic || TechProcess.MachineType == MachineType.Donatoni;
-
         public override bool Validate() => ToolService.Validate(TechProcess.Tool, ToolType.Disk);
 
         public override void BuildProcessing(MillingCommandGenerator generator)
@@ -117,7 +115,7 @@ namespace CAM.TechProcesses.Tactile
 
             if (IsEdgeProcessing)
             {
-                if (ProcessingAngle == 45 ^ TechProcess.MachineType == MachineType.Donatoni)
+                if (ProcessingAngle == 45 ^ (TechProcess.MachineType == MachineType.Donatoni || TechProcess.MachineType == MachineType.Champion))
                     Cutting(0.8 * thickness, CuttingFeed, -thickness);
 
                 if (offset > -0.5 * thickness)

@@ -37,8 +37,6 @@ namespace CAM.TechProcesses.Tactile
                 .AddParam(nameof(CuttingFeed));
         }
 
-        public override bool CanProcess => TechProcess.MachineType == MachineType.Donatoni;
-
         public override bool Validate() => ToolService.Validate(TechProcess.Tool, ToolType.Disk);
 
         public override void BuildProcessing(MillingCommandGenerator generator)

@@ -35,6 +35,9 @@ namespace CAM.TechProcesses.Tactile
 
         public double Delta { get; set; }
 
+        public double AC { get; set; }
+        public double AC_V { get; set; }
+
         public TactileTechProcess()
         {
             Material = CAM.Material.Granite;
@@ -65,7 +68,19 @@ namespace CAM.TechProcesses.Tactile
                 .AddParam(nameof(BandWidth), "Ширина полосы")
                 .AddParam(nameof(BandSpacing), "Расст.м/у полосами")
                 .AddParam(nameof(BandStart1), "Начало полосы 1")
-                .AddParam(nameof(BandStart2), "Начало полосы 2");
+                .AddParam(nameof(BandStart2), "Начало полосы 2")
+                .AddIndent()
+                .AddParam(nameof(AC), "a + c")
+                .AddParam(nameof(AC_V), "a + c (верт)")
+                ;
+        }
+
+        protected override void BuildProcessing(MillingCommandGenerator generator)
+        {
+            base.BuildProcessing(generator);
+            generator.AC = AC;
+            generator.AC_V = AC_V;
+            generator.DiskRadius = Tool.Diameter / 2;
         }
 
         public Polyline GetContour()

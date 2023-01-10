@@ -18,6 +18,7 @@ namespace CAM
         {
             Command("G90");
             Command("#MCS G0Z0.0");
+            Command("C90 A0");
             Command("V.A.ORGT[1].Z=190");
             Command("#FLUSH");
             Command("G54");
@@ -62,19 +63,19 @@ namespace CAM
             newParams["A"] = position.AngleC < 180 ? -position.AngleC : (360 - position.AngleC);
             newParams["C"] = 90 - position.AngleA;
 
-            if (position.AngleA > 0)
-            {
+            //if (position.AngleA > 0)
+            //{
                 var angleC = position.AngleC.ToRad();
                 var angleA = position.AngleA.ToRad();
                 var dl = AC * (1 - Math.Cos(angleA)) + DiskRadius * Math.Sin(angleA);
                 var angle = Math.PI * 3 / 2 - angleC;
                 if (position.X.HasValue)
-                    newParams["X"] = position.X.Value + dl * Math.Cos(angle);
+                    newParams["X"] = position.X.Value + dl * Math.Cos(angle) + AC_V * Math.Sin(angleC);
                 if (position.Y.HasValue)
-                    newParams["Y"] = position.Y.Value + dl * Math.Sin(angle);
+                    newParams["Y"] = position.Y.Value + dl * Math.Sin(angle) + AC_V * Math.Cos(angleC); ;
                 if (position.Z.HasValue)
                     newParams["Z"] = position.Z.Value + AC * Math.Sin(angleA) - DiskRadius * (1 - Math.Cos(angleA)) + DZ;
-            }
+            //}
 
             return newParams;
         }

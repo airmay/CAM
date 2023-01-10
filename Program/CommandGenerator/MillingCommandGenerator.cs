@@ -48,6 +48,7 @@ namespace CAM
         public Side EngineSide { get; set; }
 
         public double AC { get; set; }
+        public double AC_V { get; set; }
         public double DZ { get; set; }
         public double DiskRadius { get; set; }
 
@@ -193,18 +194,18 @@ namespace CAM
             }
         }
 
-        public void Cutting(Curve curve, double offset = 0, double? dz = null, double? angleC = null, double? angleA = null)
+        public void Cutting(Curve curve, double offset = 0, double? dz = null, double? angleC = null, double? angleA = null, bool IsChangeStart = false)
         {
             var toolpathCurve = curve.GetOffsetCurves(offset)[0] as Curve;
             if (dz.HasValue)
                 toolpathCurve.TransformBy(Matrix3d.Displacement(Vector3d.ZAxis * dz.Value));
-            Cutting(toolpathCurve, CuttingFeed, SmallFeed, EngineSide, angleC: angleC, angleA: angleA);
+            Cutting(toolpathCurve, CuttingFeed, SmallFeed, EngineSide, angleC: angleC, angleA: angleA, IsChangeStart: IsChangeStart);
         }
 
         /// <summary>
         /// Рез по кривой
         /// </summary>
-        public void Cutting(Curve curve, int cuttingFeed, int smallFeed, Side engineSide = Side.None, double? angleC = null, double? angleA = null)
+        public void Cutting(Curve curve, int cuttingFeed, int smallFeed, Side engineSide = Side.None, double? angleC = null, double? angleA = null, bool IsChangeStart = false)
         {
             if (ToolPosition == null)
                 ToolPosition = new MillToolPosition(new Point3d(double.NaN, double.NaN, ZSafety + 500), 0, 0);
@@ -214,10 +215,12 @@ namespace CAM
 
             if (IsUpperTool) // && (angleA ?? AngleA).GetValueOrDefault() == 0)
             {
+                if (IsChangeStart)
+                    point = curve.NextPoint(point);
                 //var upperPoint = new Point3d(point.X, point.Y, ZSafety);
                 //if (!ToolPosition.Point.IsEqualTo(upperPoint))
                 //{
-                    Move(point.X, point.Y, angleC: angleC ?? BuilderUtils.CalcToolAngle(curve, point, engineSide), angleA: angleA);
+                Move(point.X, point.Y, angleC: angleC ?? BuilderUtils.CalcToolAngle(curve, point, engineSide), angleA: angleA);
                 //}
             }
             else if (!(curve is Line) && calcAngleC)

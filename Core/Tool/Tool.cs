@@ -42,7 +42,7 @@ namespace CAM
             switch (Type)
             {
                 case ToolType.Disk:
-                    var isFrontPlaneZero = machineType == MachineType.Donatoni;
+                    var isFrontPlaneZero = machineType == MachineType.Donatoni || machineType == MachineType.Champion;
                     var circle0 = new Circle(new Point3d(0, isFrontPlaneZero ? 0 : -Thickness.Value, Diameter / 2), Vector3d.YAxis, Diameter / 2);
                     var circle1 = new Circle(circle0.Center + Vector3d.YAxis * Thickness.Value, Vector3d.YAxis, Diameter / 2);
                     var axis = new Line(circle1.Center, circle1.Center + Vector3d.YAxis * Diameter / 4);
