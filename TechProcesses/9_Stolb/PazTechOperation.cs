@@ -31,9 +31,8 @@ namespace CAM.TechProcesses.Stolb
         public override void BuildProcessing(MillingCommandGenerator generator)
         {
             IsSupressUplifting = !IsUplifting;
-            generator.AC = TechProcess.AC;
+            generator.Tool = TechProcess.Tool;
             generator.DZ = TechProcess.DZ;
-            generator.DiskRadius = TechProcess.Tool.Diameter / 2;
             generator.CuttingFeed = TechProcess.CuttingFeed;
             generator.SmallFeed = TechProcess.PenetrationFeed;
 

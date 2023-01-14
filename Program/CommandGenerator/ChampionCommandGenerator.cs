@@ -43,7 +43,6 @@ namespace CAM
 
         public override void StartEngineCommands()
         {
-            Command(_hasTool ? "M7" : "M8", "Охлаждение");
             Command($"S{_frequency}", "Шпиндель");
             Command($"M3", "Шпиндель");
         }
@@ -51,7 +50,6 @@ namespace CAM
         protected override void StopEngineCommands()
         {
             Command("M05", "Шпиндель откл.");
-            Command("M09", "Охлаждение откл.");
         }
 
         public override void Pause(double duration) => Command("G4 F" + duration.ToString(CultureInfo.InvariantCulture), "Пауза", duration);
@@ -63,19 +61,19 @@ namespace CAM
             newParams["A"] = position.AngleC < 180 ? -position.AngleC : (360 - position.AngleC);
             newParams["C"] = 90 - position.AngleA;
 
-            //if (position.AngleA > 0)
-            //{
+            if (position.X.HasValue || position.Y.HasValue || position.Z.HasValue)
+            {
                 var angleC = position.AngleC.ToRad();
                 var angleA = position.AngleA.ToRad();
-                var dl = AC * (1 - Math.Cos(angleA)) + DiskRadius * Math.Sin(angleA);
+                var dl = AC * (1 - Math.Cos(angleA)) + Tool.Diameter / 2 * Math.Sin(angleA);
                 var angle = Math.PI * 3 / 2 - angleC;
                 if (position.X.HasValue)
                     newParams["X"] = position.X.Value + dl * Math.Cos(angle) + AC_V * Math.Sin(angleC);
                 if (position.Y.HasValue)
                     newParams["Y"] = position.Y.Value + dl * Math.Sin(angle) + AC_V * Math.Cos(angleC); ;
                 if (position.Z.HasValue)
-                    newParams["Z"] = position.Z.Value + AC * Math.Sin(angleA) - DiskRadius * (1 - Math.Cos(angleA)) + DZ;
-            //}
+                    newParams["Z"] = position.Z.Value + AC * Math.Sin(angleA) - Tool.Diameter / 2 * (1 - Math.Cos(angleA)) + DZ;
+            }
 
             return newParams;
         }

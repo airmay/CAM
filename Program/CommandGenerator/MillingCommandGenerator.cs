@@ -47,10 +47,10 @@ namespace CAM
         public int SmallFeed { get; set; }
         public Side EngineSide { get; set; }
 
-        public double AC { get; set; }
-        public double AC_V { get; set; }
+        public double AC => 173 + Tool.Thickness.Value;
+        public double AC_V => 169 + +Tool.Thickness.Value;
         public double DZ { get; set; }
-        public double DiskRadius { get; set; }
+        public Tool Tool { get; set; }
 
         public override void StartTechProcess(ITechProcess techProcess)
         {
@@ -95,6 +95,7 @@ namespace CAM
         {
             StopEngine();
             //ToolPosition.Set(new Point3d(double.NaN, double.NaN, ZSafety + UpperZ), 0, 0);
+            ToolPosition = new MillToolPosition(new Point3d(double.NaN, double.NaN, ZSafety + UpperZ), angleC, angleA);
             SetToolCommands(toolNo, angleA, angleC, originCellNumber);
 
             _frequency = frequency;
@@ -104,7 +105,7 @@ namespace CAM
         public void SetZSafety(double zSafety, double zMax = 0)
         {
             ZSafety = zSafety + zMax;
-            ToolPosition = new MillToolPosition(new Point3d(double.NaN, double.NaN, ZSafety + UpperZ), 0, 0);
+            //ToolPosition = new MillToolPosition(new Point3d(double.NaN, double.NaN, ZSafety + UpperZ), 0, 0);
         }
 
         protected abstract void SetToolCommands(int toolNo, double angleA, double angleC, int originCellNumber);

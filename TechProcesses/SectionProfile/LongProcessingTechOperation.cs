@@ -32,6 +32,7 @@ namespace CAM.TechProcesses.SectionProfile
         public bool ChangeEngineSide { get; set; }
         public bool IsExactlyBegin { get; set; }
         public bool IsExactlyEnd { get; set; }
+        public double DzBillet { get; set; }
 
         public static void ConfigureParamsView(ParamsView view)
         {
@@ -52,8 +53,9 @@ namespace CAM.TechProcesses.SectionProfile
                 .AddParam(nameof(IsOutlet), "Отвод")
                 .AddParam(nameof(Departure))
                 .AddParam(nameof(Delta))
-                //.AddParam(nameof(ChangeProcessSide), "Сторона обработки")
-                .AddParam(nameof(ChangeEngineSide), "Разворот двигателя на 180");
+                .AddParam(nameof(ChangeProcessSide), "Сторона обработки")
+                .AddParam(nameof(ChangeEngineSide), "Разворот двигателя на 180")
+                .AddParam(nameof(DzBillet), "dZ заготовки");
         }
 
         public override bool Validate()
@@ -65,19 +67,22 @@ namespace CAM.TechProcesses.SectionProfile
 
         public override void BuildProcessing(MillingCommandGenerator generator)
         {
+            generator.Tool = TechProcess.Tool;
+            generator.CuttingFeed = CuttingFeed;
+
             var railBase = TechProcess.Rail?.GetCurve() ?? new Line(Point3d.Origin, Point3d.Origin + Vector3d.XAxis * TechProcess.Length.Value);
             var profile = (Profile ?? TechProcess.ProcessingArea[0]).GetCurve();
-            var processSide = ChangeEngineSide ? -1 : 1;
-            CreateProfile3D(profile, railBase, 1);
-            //var processSide = ChangeProcessSide ? -1 : 1;
-            //CreateProfile3D(profile, railBase, processSide);
+            //var processSide = 1;// ChangeEngineSide ? -1 : 1;
+            //CreateProfile3D(profile, railBase, 1);
+            var processSide = ChangeProcessSide ? -1 : 1;
+            CreateProfile3D(profile, railBase, processSide);
 
             var rail = CreateDepartureRail(railBase, Departure);
 
             if (Delta != 0)
             {
                 var profileOffset = (Curve)profile.GetOffsetCurves(Delta)[0];
-                profile = profileOffset.EndPoint.GetAsVector().Length < profile.EndPoint.GetAsVector().Length
+                profile = profileOffset.StartPoint.Y < profile.StartPoint.Y
                     ? (Curve)profile.GetOffsetCurves(-Delta)[0]
                     : profileOffset;
                 CreateProfile3D(profile, railBase, processSide);
@@ -115,7 +120,12 @@ namespace CAM.TechProcesses.SectionProfile
                 var end = Math.Max(point[1 - index], PenetrationEnd ?? double.MinValue);
                 var count = 1;
                 var penetrationStepCalc = 0D;
-                if (PenetrationStep.GetValueOrDefault() > 0 && PenetrationBegin.GetValueOrDefault() > end)
+                if (DzBillet != 0)
+                {
+                    count = (int)Math.Ceiling(DzBillet / PenetrationStep.Value);
+                    penetrationStepCalc = DzBillet / count;
+                }
+                else if (PenetrationStep.GetValueOrDefault() > 0 && PenetrationBegin.GetValueOrDefault() > end)
                 {
                     var allPenetration = PenetrationBegin.Value - end;
                     count = (int)Math.Ceiling(allPenetration / PenetrationStep.Value);

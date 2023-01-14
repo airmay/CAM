@@ -29,9 +29,8 @@ namespace CAM.TechProcesses.Stolb
             var line = curves.Cast<Curve>().Select(p => new { Z = p.StartPoint.Z + p.EndPoint.Z, Curve = p }).OrderBy(p => p.Z).First().Curve as Line;
             var maxPoint = curves.Cast<Curve>().SelectMany(p => p.GetStartEndPoints()).OrderBy(x => x.Z).Last();
 
-            generator.AC = TechProcess.AC;
+            generator.Tool = TechProcess.Tool;
             generator.DZ = TechProcess.DZ;
-            generator.DiskRadius = TechProcess.Tool.Diameter / 2;
             generator.CuttingFeed = TechProcess.CuttingFeed;
             generator.SmallFeed = TechProcess.PenetrationFeed;
 
