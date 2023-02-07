@@ -17,13 +17,17 @@ namespace CAM.TechProcesses.Disk3D
 
         public int OriginCellNumber { get; set; }
 
+        public double AngleA { get; set; }
+
+        //public double DzBillet { get; set; }
+
         public static void ConfigureParamsView(ParamsView view)
         {
             Label sizeLabel = null;
             void refreshSize() => sizeLabel.Text = Acad.GetSize(view.GetParams<Disk3DTechProcess>().ProcessingArea);
             view.BindingSource.DataSourceChanged += (s, e) => refreshSize();
 
-            view.AddMachine(CAM.MachineType.Donatoni, CAM.MachineType.ScemaLogic, CAM.MachineType.Forma)
+            view.AddMachine(CAM.MachineType.Donatoni, CAM.MachineType.ScemaLogic, CAM.MachineType.Forma, CAM.MachineType.Champion)
                 .AddMaterial()
                 .AddParam(nameof(Thickness))
                 .AddIndent()
@@ -38,6 +42,8 @@ namespace CAM.TechProcesses.Disk3D
                 .AddParam(nameof(IsExactlyEnd), "Конец точно")
                 .AddParam(nameof(ZSafety))
                 .AddParam(nameof(IsA90), "Угол A = 90")
+                .AddParam(nameof(AngleA), "Угол вертикальный")
+                //.AddParam(nameof(DzBillet), "dZ заготовки")
                 .AddParam(nameof(OriginCellNumber), "Ячейка начала координат");
         }
 
@@ -45,7 +51,7 @@ namespace CAM.TechProcesses.Disk3D
             generator.SetTool(
                 MachineType.Value != CAM.MachineType.Donatoni ? Tool.Number : 1,
                 Frequency,
-                angleA: IsA90 ? 90 : 0,
+                angleA: IsA90 ? 90 : AngleA,
                 angleC: Angle,
                 originCellNumber: OriginCellNumber);
     }

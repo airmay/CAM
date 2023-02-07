@@ -57,7 +57,7 @@
 		<MachineSettings>
 			<MachineType>Champion</MachineType>
 			<MaxFrequency>1200</MaxFrequency>
-			<ProgramFileExtension></ProgramFileExtension>
+			<ProgramFileExtension>pim</ProgramFileExtension>
 			<ProgramLineNumberFormat>N{0} </ProgramLineNumberFormat>
 		</MachineSettings>
 		<MachineSettings>

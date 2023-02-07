@@ -71,12 +71,18 @@ namespace CAM.TechProcesses.Disk3D
         {
             var disk3DTechProcess = (Disk3DTechProcess)TechProcess;
 
+            generator.Tool = TechProcess.Tool;
+
             var offsetSurface = CreateOffsetSurface();
 
-            var zMax = offsetSurface.GeometricExtents.MinPoint.Z + TechProcess.Thickness.Value;
-            generator.SetZSafety(TechProcess.ZSafety, zMax);
+            var zMax = TechProcess.Thickness.Value + TechProcess.ZSafety;
+            //var zMax = offsetSurface.GeometricExtents.MinPoint.Z + TechProcess.Thickness.Value;
+            //generator.SetZSafety(TechProcess.ZSafety, zMax);
 
             Matrix3d? matrix = null;
+
+            //matrix = Matrix3d.Rotation(-TechProcess.AngleA.ToRad(), Vector3d.XAxis, Point3d.Origin);
+            
             if (TechProcess.IsA90)
                 matrix = Matrix3d.Rotation(-Math.PI / 2, Vector3d.XAxis, Point3d.Origin);
             if (TechProcess.Angle != 0)
@@ -169,20 +175,21 @@ namespace CAM.TechProcesses.Disk3D
                     {
                         var point = new Point3d(x, y, zMin + par.Value);
                         var ind = points.Count - 1;
-                        if (ind > 0 && points[ind - 1].GetVectorTo(points[ind]).IsCodirectionalTo(points[ind].GetVectorTo(point)))
-                            points[ind] = point;
-                        else
+                        //if (ind > 0 && points[ind - 1].GetVectorTo(points[ind]).IsCodirectionalTo(points[ind].GetVectorTo(point)))
+                        //    points[ind] = point;
+                        //else
                             points.Add(point);
                     }
                 }
-                if (points.Count > 1)
+                if (points.Count > 2)
                 {
                     if (Graph.GetAngle(points[0], points[1], points[2]) > 0.01)
                         points.RemoveAt(0);
                     if (Graph.GetAngle(points[points.Count - 3], points[points.Count - 2], points[points.Count - 1]) > 0.1)
                         points.RemoveAt(points.Count - 1);
-                    PassList.Add(CalcOffsetPoints(points, bounds));
                 }
+                if (points.Count > 1)
+                    PassList.Add(CalcOffsetPoints(points, bounds));
             }
             offsetSurface.Dispose();
 
@@ -212,6 +219,7 @@ namespace CAM.TechProcesses.Disk3D
 
             if (TechProcess.MachineType == MachineType.ScemaLogic) //Settongs.IsFrontPlaneZero
                 matrix = Matrix3d.Displacement(Vector3d.YAxis * TechProcess.Tool.Thickness.Value);
+            int dir = 0;
 
             PassList.ForEach(p =>
             {
@@ -227,7 +235,7 @@ namespace CAM.TechProcesses.Disk3D
                 //if (TechProcess.IsA90)
                 //    lastPoint = BuildPassA90(generator, points, matrix.Value, bounds.MinPoint.Z + PenetrationAll);
                 //else
-                BuildPass(generator, points, zMax, matrix);
+                BuildPass(generator, points, zMax, matrix, ref dir);
             });
             //if (TechProcess.IsA90)
             //    generator.Move(lastPoint.Value.Add(Vector3d.ZAxis * 100));
@@ -249,7 +257,8 @@ namespace CAM.TechProcesses.Disk3D
             
             var firstPoint = offsetCurves[0].StartPoint;
             var departurePoint = new Point3d((IsDepartureOnBorderSection ? firstPoint.X : bounds.MinPoint.X) - Departure, firstPoint.Y, firstPoint.Z);
-            var offsetPoints = new List<Point3d> { departurePoint, firstPoint };
+            //var offsetPoints = new List<Point3d> { departurePoint, firstPoint };
+            var offsetPoints = new List<Point3d> { firstPoint };
 
             switch (offsetCurves[0])
             {
@@ -274,8 +283,8 @@ namespace CAM.TechProcesses.Disk3D
                     throw new Exception($"Полученный тип кривой не может быть обработан {offsetCurves[0].GetType()}");
             }
 
-            var lastPoint = offsetPoints.Last();
-            offsetPoints.Add(new Point3d((IsDepartureOnBorderSection ? lastPoint.X : bounds.MaxPoint.X) + Departure, lastPoint.Y, lastPoint.Z));
+            //var lastPoint = offsetPoints.Last();
+            //offsetPoints.Add(new Point3d((IsDepartureOnBorderSection ? lastPoint.X : bounds.MaxPoint.X) + Departure, lastPoint.Y, lastPoint.Z));
             return offsetPoints;
 
             Point3d GetArcPoints(CircularArc3d arc)
@@ -334,28 +343,45 @@ namespace CAM.TechProcesses.Disk3D
             }            
         }
 
-        private void BuildPass(MillingCommandGenerator generator, List<Point3d> points, double z0, Matrix3d? matrix)
+        private void BuildPass(MillingCommandGenerator generator, List<Point3d> points, double z0, Matrix3d? matrix, ref int direction)
         {
+
             var pass = new List<Point3d>[]
             {
                 points,
                 points.Reverse<Point3d>().ToList()
             };
 
-            var (startPoint, direction, _) = pass
-                .Select(p => Transform(new Point3d(p[0].X, p[0].Y, z0)))
-                .Select((p, index) => (p, index, dist: generator.ToolPosition?.Point.DistanceTo(p)))
-                .OrderBy(p => p.dist)
-                .First();
-            generator.Move(startPoint.X, startPoint.Y, angleC: TechProcess.Angle, angleA: TechProcess.IsA90 ? 90 : 0);
+            //if (Departure < 0) // Залипон
+            //{
+            //    var v = (points.Last() - points.First()).GetNormal();
+            //    var p1 = points.First(); // - v * Departure;
+            //    var p2 = points.Last(); // + v * Departure;
+            //    pass = new List<Point3d>[]
+            //    {
+            //        new List<Point3d>{ p1, p2 - v * 20, p2 },
+            //        new List<Point3d>{ p2, p1 + v * 20, p1 }
+            //    };
+            //};
+
+                //var (startPoint, direction, _) = pass
+                //    .Select(p => p[0] + Vector3d.ZAxis * TechProcess.DzBillet)
+                //    //.Select(p => Transform(new Point3d(p[0].X, p[0].Y, z0)))
+                //    .Select((p, index) => (p, index, dist: generator.ToolPosition.IsDefined ? generator.ToolPosition?.Point.DistanceTo(p) : 0))
+                //    .OrderBy(p => p.dist)
+                //    .First();
+            var startPoint = pass[direction][0] + Vector3d.ZAxis * z0;
+            //generator.Move(startPoint.X, startPoint.Y, angleC: TechProcess.Angle, angleA: TechProcess.IsA90 ? 90 : TechProcess.AngleA);
+
+            generator.Move(point: Transform(startPoint), angleC: TechProcess.Angle, angleA: TechProcess.IsA90 ? 90 : TechProcess.AngleA);
             if (TechProcess.IsA90)
                 generator.Move(z: startPoint.Z);
 
             generator.Cycle();
 
-            var z = z0;
+            var z = points[0].Z + TechProcess.Thickness.Value;
             bool isComplete;
-            var point = new Point3d(pass[direction][0].X, pass[direction][0].Y, z0);
+            var point = new Point3d(pass[direction][0].X, pass[direction][0].Y, z);
 
             do
             {
@@ -371,22 +397,38 @@ namespace CAM.TechProcesses.Disk3D
 
                 point = point0;
 
-                foreach (var pt in pass[direction])
-                {
-                    var p = pt;
-                    if (z > p.Z)
+                //if (Departure < 0) // Залипон
+                //{
+                //    var p = pass[direction][1];
+                //    isComplete = z <= p.Z;
+                //    if (!isComplete)
+                //        p = new Point3d(p.X, p.Y, z);
+                //    generator.GCommand(CommandNames.Cutting, 1, point: Transform(p), feed: CuttingFeed);
+                //    p = pass[direction][2];
+                //    if (!isComplete)
+                //        p = new Point3d(p.X, p.Y, z);
+                //    generator.GCommand(CommandNames.Cutting, 1, point: Transform(p), feed: CuttingFeed / 10 - 1);
+                //    point = p;
+                //}
+                //else
+                //{
+                    foreach (var pt in pass[direction])
                     {
-                        p = new Point3d(p.X, p.Y, z);
-                        isComplete = false;
+                        var p = pt;
+                        if (z > p.Z)
+                        {
+                            p = new Point3d(p.X, p.Y, z);
+                            isComplete = false;
+                        }
+                        if (point0 != point && point != p && !point0.GetVectorTo(point).IsCodirectionalTo(point.GetVectorTo(p)))
+                        {
+                            generator.GCommand(CommandNames.Cutting, 1, point: Transform(point), feed: CuttingFeed);
+                            point0 = point;
+                        }
+                        point = p;
                     }
-                    if (point0 != point && point != p && !point0.GetVectorTo(point).IsCodirectionalTo(point.GetVectorTo(p)))
-                    {
-                        generator.GCommand(CommandNames.Cutting, 1, point: Transform(point), feed: CuttingFeed);
-                        point0 = point;
-                    }
-                    point = p;
-                }
-                generator.GCommand(CommandNames.Cutting, 1, point: Transform(point), feed: CuttingFeed);
+                    generator.GCommand(CommandNames.Cutting, 1, point: Transform(point), feed: CuttingFeed);
+                //}
                 direction = 1 - direction;
             }
             while (!isComplete);
@@ -395,7 +437,10 @@ namespace CAM.TechProcesses.Disk3D
                 generator.Move(point: Transform(new Point3d(point.X, point.Y, z0)));
 
             if (IsUplifting)
-                generator.Uplifting();
+                if (TechProcess.AngleA > 0)
+                    generator.GCommand(CommandNames.Uplifting, 0, point: Transform(point + Vector3d.ZAxis * z0));
+                else
+                    generator.Uplifting();
 
             Point3d Transform(Point3d originPoint) => matrix != null ? originPoint.TransformBy(matrix.Value) : originPoint;
         }

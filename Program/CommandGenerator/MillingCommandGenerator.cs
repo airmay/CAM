@@ -47,8 +47,8 @@ namespace CAM
         public int SmallFeed { get; set; }
         public Side EngineSide { get; set; }
 
-        public double AC => 173 + Tool.Thickness.Value;
-        public double AC_V => 169 + +Tool.Thickness.Value;
+        public double AC { get; set; } = 165; // + Tool.Thickness.Value;
+        public double AC_V { get; set; } = 169; // + +Tool.Thickness.Value;
         public double DZ { get; set; }
         public Tool Tool { get; set; }
 
@@ -60,7 +60,7 @@ namespace CAM
             ZSafety = techProcess.ZSafety;
 
             ToolPosition = new MillToolPosition();
-            Params = CreateParams(ToolPosition, 0);
+            Params = CreateParams(ToolPosition, 0, null);
 
             _documentLock = Acad.ActiveDocument.LockDocument();
             _transaction = Acad.Database.TransactionManager.StartTransaction();
@@ -95,7 +95,12 @@ namespace CAM
         {
             StopEngine();
             //ToolPosition.Set(new Point3d(double.NaN, double.NaN, ZSafety + UpperZ), 0, 0);
-            ToolPosition = new MillToolPosition(new Point3d(double.NaN, double.NaN, ZSafety + UpperZ), angleC, angleA);
+            ToolPosition = new MillToolPosition
+            {
+                Z = ZSafety + UpperZ,
+                AngleC = angleC,
+                AngleA = angleA
+            };
             SetToolCommands(toolNo, angleA, angleC, originCellNumber);
 
             _frequency = frequency;
@@ -105,6 +110,7 @@ namespace CAM
         public void SetZSafety(double zSafety, double zMax = 0)
         {
             ZSafety = zSafety + zMax;
+            ToolPosition.Z = ZSafety;
             //ToolPosition = new MillToolPosition(new Point3d(double.NaN, double.NaN, ZSafety + UpperZ), 0, 0);
         }
 
@@ -131,8 +137,8 @@ namespace CAM
         /// </summary>
         public void Move(double? x = null, double? y = null, double? z = null, double? angleC = null, double? angleA = null)
         {
-            if (ToolPosition == null)
-                ToolPosition = new MillToolPosition(new Point3d(double.NaN, double.NaN, ZSafety + 500), 0, 0);
+            //if (ToolPosition == null)
+            //    ToolPosition = new MillToolPosition(new Point3d(double.NaN, double.NaN, ZSafety + 500), 0, 0);
 
             //if (IsParamNotChanged(x, ToolPosition.Point.X) && IsParamNotChanged(y, ToolPosition.Point.Y) && IsParamNotChanged(z, ToolPosition.Point.Z)) return;
 
@@ -332,24 +338,26 @@ namespace CAM
             ToolPosition = position;
             //command.Text = GCommandText(gCode, paramsString, point.Value, curve, angleC, angleA, feed, center);
             //command.Text = GCommandText(gCode, paramsString, position, position.Point, curve, angleC, angleA, feed, center);
-            command.Text = GetGCommand(gCode, feed);
+            command.Text = GetGCommand(gCode, feed, center);
             command.HasTool = _hasTool;
             AddCommand(command);
 
             _feed = feed ?? _feed;
         }
 
-        protected virtual string GetGCommand(int gCode, int? feed)
+        protected virtual string GetGCommand(int gCode, int? feed, Point2d? center = null)
         {
-            var par = CreateParams(ToolPosition, feed);
+            var par = CreateParams(ToolPosition, feed, center);
             var textParams = GetTextParams(par);
             return $"G{gCode}{CommandDelimiter}{textParams}";
         }
 
-        public virtual Dictionary<string, double?> CreateParams(MillToolPosition position, int? feed)
+        public virtual Dictionary<string, double?> CreateParams(MillToolPosition position, int? feed, Point2d? center)
         {
             var newParams = position.GetParams();
             newParams["F"] = feed;
+            newParams["I"] = center?.X;
+            newParams["J"] = center?.Y;
             return newParams;
         }
 

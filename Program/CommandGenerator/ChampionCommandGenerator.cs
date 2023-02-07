@@ -54,9 +54,9 @@ namespace CAM
 
         public override void Pause(double duration) => Command("G4 F" + duration.ToString(CultureInfo.InvariantCulture), "Пауза", duration);
 
-        public override Dictionary<string, double?> CreateParams(MillToolPosition position, int? feed)
+        public override Dictionary<string, double?> CreateParams(MillToolPosition position, int? feed, Point2d? center)
         {
-            var newParams = base.CreateParams(position, feed);
+            var newParams = base.CreateParams(position, feed, center);
 
             newParams["A"] = position.AngleC < 180 ? -position.AngleC : (360 - position.AngleC);
             newParams["C"] = 90 - position.AngleA;
