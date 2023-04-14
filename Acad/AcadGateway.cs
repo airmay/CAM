@@ -35,9 +35,9 @@ namespace CAM
 
         public static void Write(string message, Exception ex = null)
         {
+#if !DEBUG
             var text = ex == null ? message : $"{message}: {ex.Message}";
             Interaction.WriteLine($"{text}\n");
-#if !DEBUG
             ex?.WriteToFile(message);
 #endif
         }
@@ -47,7 +47,7 @@ namespace CAM
         public static void Alert(string message, Exception ex = null)
         {
             Write(message, ex);
-            Application.ShowAlertDialog(ex == null ? message : $"{message}: {ex.Message}");
+            Application.ShowAlertDialog(ex == null ? message : $"{message}: {ex}");
         }
 
         public static void Alert(Exception ex) => Alert("Ошибка", ex);

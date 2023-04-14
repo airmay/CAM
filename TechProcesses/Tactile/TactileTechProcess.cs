@@ -77,10 +77,10 @@ namespace CAM.TechProcesses.Tactile
 
         protected override void BuildProcessing(MillingCommandGenerator generator)
         {
-            base.BuildProcessing(generator);
+            //base.BuildProcessing(generator);
             generator.Tool = Tool;
-            generator.AC = AC + Tool.Thickness.Value;
-            generator.AC_V = AC_V + Tool.Thickness.Value;
+            generator.AC = AC + Tool.Thickness.GetValueOrDefault();
+            generator.AC_V = AC_V + Tool.Thickness.GetValueOrDefault();
         }
 
         public Polyline GetContour()

@@ -37,7 +37,7 @@ namespace CAM
 
         protected override void SetToolCommands(int toolNo, double angleA, double angleC, int originCellNumber)
         {
-            Command($"T{toolNo}D1", "Инструмент№");
+            Command($"T{toolNo}D{(originCellNumber == 10 ? 1 : originCellNumber)}", "Инструмент№");
             Command("M6", "Смена инструмента");
         }
 

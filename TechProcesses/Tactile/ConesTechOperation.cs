@@ -1,4 +1,5 @@
 ﻿using Autodesk.AutoCAD.DatabaseServices;
+using Autodesk.AutoCAD.Geometry;
 using Dreambuild.AutoCAD;
 using System;
 using System.Linq;
@@ -46,7 +47,7 @@ namespace CAM.TechProcesses.Tactile
                 .AddParam(nameof(Depth));
         }
 
-        public override bool CanProcess => TechProcess.MachineType == MachineType.Donatoni || TechProcess.MachineType == MachineType.Krea;
+        public override bool CanProcess => TechProcess.MachineType == MachineType.Donatoni || TechProcess.MachineType == MachineType.Krea || TechProcess.MachineType == MachineType.Champion;
 
         public override void BuildProcessing(MillingCommandGenerator generator)
         {
@@ -66,8 +67,17 @@ namespace CAM.TechProcesses.Tactile
                 stepY /= Math.Sqrt(2);
                 stepX = stepY * 2;
             }
-            generator.SetTool(2, Frequency, 90, false);
+            //generator.SetTool(2, Frequency, 90, false);
+            generator.SetTool(TechProcess.Tool.Number, Frequency, 90, false, originCellNumber: 2);
+
             generator.ZSafety = ZSafety;
+
+            if (TechProcess.MachineType == MachineType.Champion)
+            {
+                var radius = TechProcess.Tool.Diameter / 2;
+                y += radius;
+                contourPoints[1] += Vector3d.YAxis * radius;
+            }
 
             while (y < contourPoints[1].Y)
             {
