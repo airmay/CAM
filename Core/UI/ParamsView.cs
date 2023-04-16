@@ -4,6 +4,7 @@ using System.Windows.Forms;
 using System.Collections.Generic;
 using Dreambuild.AutoCAD;
 using Autodesk.AutoCAD.DatabaseServices;
+using System.Drawing.Printing;
 
 namespace CAM
 {
@@ -68,37 +69,56 @@ namespace CAM
             tablePanel.RowStyles.Add(new RowStyle(SizeType.Absolute, RowHeight * height));
             tablePanel.Height += RowHeight * height;
         }
+        
+        private void AddRowH(int height)
+        {
+            var rowStyle = new RowStyle(SizeType.Absolute, height + Font.Size * 2);
+            //tablePanel.RowStyles.Add(rowStyle);
+            tablePanel.Height += (int)rowStyle.Height;
+        }
 
         public ParamsView AddIndent()
         {
-            AddRow();
+            var panel = new Panel
+            {
+                Height = (int)(Font.Height / 1.5)
+            };
+            tablePanel.SetColumnSpan(panel, 2);
+            tablePanel.Controls.Add(panel);
+
             return this;
         }
 
-        #region AddParam
+        private void AddLabel(string paramName, string displayName) => AddLabel(displayName ?? GetDisplayName(paramName));
+
         private void AddLabel(string displayName)
         {
             var label = new Label
             {
                 Text = displayName,
                 Dock = DockStyle.Fill,
-                TextAlign = ContentAlignment.MiddleLeft,
-                AutoEllipsis = true
+                TextAlign = ContentAlignment.TopLeft,
+                AutoEllipsis = true,
+                Padding = new Padding(0, (int)(Font.Height * 0.15), 0, 0)
             };
-            tablePanel.Controls.Add(label, 0, tablePanel.RowStyles.Count - 1);
+            tablePanel.Controls.Add(label);
         }
+
+        #region AddParam
 
         public ParamsView AddParam(string paramName, string displayName = null, bool readOnly = false)
         {
-            AddRow();
-            AddLabel(displayName ?? GetDisplayName(paramName));
+            AddLabel(paramName, displayName);
 
             Control control;
             var propType = _type.GetProperty(paramName).PropertyType;
 
             if (propType.UnderlyingSystemType == typeof(bool))
             {
-                control = new CheckBox();
+                control = new CheckBox
+                {
+                    Height = (int)(Font.Height * 1.4)
+                };
                 control.DataBindings.Add(new Binding("Checked", BindingSource, paramName, true));
             }
             else
@@ -106,12 +126,14 @@ namespace CAM
                 control = new TextBox
                 {
                     ReadOnly = readOnly,
-                    BackColor = readOnly ? SystemColors.Control : SystemColors.Window,
-                    Dock = DockStyle.Fill
+                    Dock = DockStyle.Top,
                 };
                 control.DataBindings.Add(new Binding("Text", BindingSource, paramName, true, DataSourceUpdateMode.OnPropertyChanged, string.Empty));
             }
-            tablePanel.Controls.Add(control, 1, tablePanel.RowStyles.Count - 1);
+
+            var margin = Font.Height / 3;
+            control.Margin = new Padding(0, 0, 0, margin);
+            tablePanel.Controls.Add(control);
 
             return this;
         }
@@ -153,16 +175,19 @@ namespace CAM
 
         public ParamsView AddEnumParam<T>(string paramName, string displayName = null, params T[] values) where T : struct
         {
-            AddRow();
-            AddLabel(displayName ?? GetDisplayName(paramName));
+            AddLabel(paramName, displayName);
+            var margin = (int)(Font.Height / 1.5);
 
-            var comboBox = new ComboBox();
+            var comboBox = new ComboBox
+            {
+                DropDownStyle = ComboBoxStyle.DropDownList,
+                Dock = DockStyle.Top,
+                FormattingEnabled = true,
+                Margin = new Padding(0, 0, 0, margin),
+            };
             comboBox.BindEnum(values);
             comboBox.DataBindings.Add(new Binding("SelectedValue", BindingSource, paramName, true));
-            comboBox.DropDownStyle = ComboBoxStyle.DropDownList;
-            comboBox.FormattingEnabled = true;
-            comboBox.Dock = DockStyle.Fill;
-            tablePanel.Controls.Add(comboBox, 1, tablePanel.RowStyles.Count - 1);
+            tablePanel.Controls.Add(comboBox);
 
             return this;
         }
@@ -184,37 +209,34 @@ namespace CAM
 
         private UserControl CreateSelector(string displayName, string buttonText)
         {
-            AddRow();
             AddLabel(displayName);
 
+            var margin = (int)(Font.Height / 1.5);
             var userControl = new UserControl
             {
-                Margin = new Padding(3, 3, 3, 0),
-                Size = new Size(124, RowHeight)
+                Margin = new Padding(0, 0, 0, 0),
+                Padding = new Padding(0, 0, 0, margin / 2),
+                Width = 900,
             };
 
             var textBox = new TextBox
             {
-                Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right,
-                Location = new Point(0, 0),
-                Size = new Size(100, 20),
-                ReadOnly = true,
-                BackColor = SystemColors.Control
+                Dock = DockStyle.Top,
+                ReadOnly = true
             };
             userControl.Controls.Add(textBox);
 
             var button = new Button
             {
-                Anchor = AnchorStyles.Top | AnchorStyles.Right,
-                Location = new Point(102, 0),
-                Size = new Size(22, 21),
+                Dock = DockStyle.Right,
+                Width = (int)(textBox.Height * 1.5),
                 TabStop = false,
-                Text = buttonText
+                Text = buttonText,
             };
-            userControl.Controls.Add(button);            
+            userControl.Controls.Add(button);
 
-            userControl.Dock = DockStyle.Fill;
-            tablePanel.Controls.Add(userControl, 1, tablePanel.RowStyles.Count - 1);
+            userControl.Height = textBox.Height + margin;
+            tablePanel.Controls.Add(userControl);
 
             return userControl;
         }
@@ -355,7 +377,8 @@ namespace CAM
                 comboBox.SelectedIndex = 0;
                 SelectedIndexChanged.Invoke(0);
             };
-            tablePanel.Controls.Add(comboBox, 1, tablePanel.RowStyles.Count - 1);
+            tablePanel.Controls.Add(comboBox, 1, tablePanel.RowStyles.Count);
+            AddRowH(comboBox.Height);
 
             return this;
         }

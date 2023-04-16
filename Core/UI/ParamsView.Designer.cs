@@ -36,27 +36,31 @@
             // 
             // tablePanel
             // 
+            this.tablePanel.AutoSize = true;
             this.tablePanel.ColumnCount = 2;
             this.tablePanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
             this.tablePanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
             this.tablePanel.Dock = System.Windows.Forms.DockStyle.Top;
             this.tablePanel.Location = new System.Drawing.Point(0, 0);
+            this.tablePanel.Margin = new System.Windows.Forms.Padding(8, 8, 8, 8);
             this.tablePanel.Name = "tablePanel";
             this.tablePanel.RowCount = 1;
             this.tablePanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tablePanel.Size = new System.Drawing.Size(252, 92);
+            this.tablePanel.Size = new System.Drawing.Size(672, 0);
             this.tablePanel.TabIndex = 0;
             // 
             // ParamsView
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.AutoScaleDimensions = new System.Drawing.SizeF(240F, 240F);
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
             this.AutoScroll = true;
             this.Controls.Add(this.tablePanel);
+            this.Margin = new System.Windows.Forms.Padding(8, 8, 8, 8);
             this.Name = "ParamsView";
-            this.Size = new System.Drawing.Size(252, 408);
+            this.Size = new System.Drawing.Size(672, 972);
             ((System.ComponentModel.ISupportInitialize)(this.BindingSource)).EndInit();
             this.ResumeLayout(false);
+            this.PerformLayout();
 
         }
 
