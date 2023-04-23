@@ -4,13 +4,12 @@ using System.Windows.Forms;
 using System.Collections.Generic;
 using Dreambuild.AutoCAD;
 using Autodesk.AutoCAD.DatabaseServices;
-using System.Drawing.Printing;
 
 namespace CAM
 {
     public partial class ParamsView : UserControl
     {
-        private Dictionary<string, string> _displayNames = new Dictionary<string, string>
+        private readonly Dictionary<string, string> _displayNames = new Dictionary<string, string>
         {
             ["Frequency"] = "Шпиндель",
             ["Feed"] = "Подача",
@@ -56,9 +55,6 @@ namespace CAM
             _type = type;
             BindingSource.DataSource = type;
 
-            tablePanel.Height = 0;
-            tablePanel.RowStyles.RemoveAt(0);
-
             type.GetMethod("ConfigureParamsView").Invoke(null, new[] { this });
         }
 
@@ -89,19 +85,22 @@ namespace CAM
             return this;
         }
 
-        private void AddLabel(string paramName, string displayName) => AddLabel(displayName ?? GetDisplayName(paramName));
+        private Label AddLabel(string paramName, string displayName) => AddLabel(displayName ?? GetDisplayName(paramName));
 
-        private void AddLabel(string displayName)
+        private Label AddLabel(string displayName)
         {
             var label = new Label
             {
                 Text = displayName,
-                Dock = DockStyle.Fill,
+                Dock = DockStyle.Top,
+                Height = (int)(Font.Height * 1.8),
+                Padding = new Padding(0, (int)(Font.Height * 0.1), 0, 0),
                 TextAlign = ContentAlignment.TopLeft,
                 AutoEllipsis = true,
-                Padding = new Padding(0, (int)(Font.Height * 0.15), 0, 0)
             };
             tablePanel.Controls.Add(label);
+
+            return label;
         }
 
         #region AddParam
@@ -110,30 +109,36 @@ namespace CAM
         {
             AddLabel(paramName, displayName);
 
-            Control control;
-            var propType = _type.GetProperty(paramName).PropertyType;
-
-            if (propType.UnderlyingSystemType == typeof(bool))
+            var control = new TextBox
             {
-                control = new CheckBox
-                {
-                    Height = (int)(Font.Height * 1.4)
-                };
-                control.DataBindings.Add(new Binding("Checked", BindingSource, paramName, true));
-            }
-            else
-            {
-                control = new TextBox
-                {
-                    ReadOnly = readOnly,
-                    Dock = DockStyle.Top,
-                };
-                control.DataBindings.Add(new Binding("Text", BindingSource, paramName, true, DataSourceUpdateMode.OnPropertyChanged, string.Empty));
-            }
-
-            var margin = Font.Height / 3;
-            control.Margin = new Padding(0, 0, 0, margin);
+                ReadOnly = readOnly,
+                Dock = DockStyle.Fill,
+            };
+            control.DataBindings.Add(new Binding("Text", BindingSource, paramName, true,
+                DataSourceUpdateMode.OnPropertyChanged, string.Empty));
             tablePanel.Controls.Add(control);
+
+            return this;
+        }
+
+        public ParamsView AddCheckBox(string paramName, string displayName = null)
+        {
+            AddLabel(paramName, displayName);
+
+            var control = new CheckBox
+            {
+                Height = (int)(Font.Height * 1.4)
+            };
+            control.DataBindings.Add(new Binding("Checked", BindingSource, paramName, true));
+            tablePanel.Controls.Add(control);
+
+            return this;
+        }
+
+        public ParamsView AddLabelText(string label, string text)
+        {
+            AddLabel(label);
+            AddLabel(text);
 
             return this;
         }
@@ -156,16 +161,8 @@ namespace CAM
 
         public ParamsView AddText(string text)
         {
-            AddRow();
-
-            var textbox = new Label
-            {
-                Text = text,
-                Dock = DockStyle.Fill,
-                TextAlign = ContentAlignment.TopLeft
-            };
-            tablePanel.Controls.Add(textbox, 0, tablePanel.RowStyles.Count - 1);
-            tablePanel.SetColumnSpan(textbox, 2);
+            var label = AddLabel(text);
+            tablePanel.SetColumnSpan(label, 2);
 
             return this;
         }
@@ -182,7 +179,6 @@ namespace CAM
             {
                 DropDownStyle = ComboBoxStyle.DropDownList,
                 Dock = DockStyle.Top,
-                FormattingEnabled = true,
                 Margin = new Padding(0, 0, 0, margin),
             };
             comboBox.BindEnum(values);
@@ -207,21 +203,19 @@ namespace CAM
             return this;
         }
 
-        private UserControl CreateSelector(string displayName, string buttonText)
+        private UserControl CreateSelector(string displayName, string buttonText = "Ξ")
         {
             AddLabel(displayName);
 
-            var margin = (int)(Font.Height / 1.5);
             var userControl = new UserControl
             {
-                Margin = new Padding(0, 0, 0, 0),
-                Padding = new Padding(0, 0, 0, margin / 2),
-                Width = 900,
+                Dock = DockStyle.Fill,
+                Height = 0
             };
 
             var textBox = new TextBox
             {
-                Dock = DockStyle.Top,
+                Dock = DockStyle.Fill,
                 ReadOnly = true
             };
             userControl.Controls.Add(textBox);
@@ -234,8 +228,6 @@ namespace CAM
                 Text = buttonText,
             };
             userControl.Controls.Add(button);
-
-            userControl.Height = textBox.Height + margin;
             tablePanel.Controls.Add(userControl);
 
             return userControl;
