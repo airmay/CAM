@@ -54,22 +54,22 @@ namespace CAM.TechProcesses.Disk3D
 
         public static void ConfigureParamsView(ParamsView view)
         {
-            view.AddParam(nameof(StepX1), "Шаг X1")
-                .AddParam(nameof(StepX2), "Шаг X2")
-                .AddIndent()
-                .AddParam(nameof(StartPass), "Начало")
-                .AddParam(nameof(EndPass), "Конец")
-                .AddParam(nameof(StepY), "Шаг Y мин.")
-                .AddParam(nameof(YMax), "Шаг Y макс.")
-                .AddParam(nameof(IsReverse), "Обратно")
-                .AddIndent()
-                .AddParam(nameof(StepZ), "Шаг Z")
-                .AddIndent()
-                .AddParam(nameof(Departure))
-                .AddParam(nameof(IsDepartureOnBorderSection), "Выезд по границе сечения")
-                .AddParam(nameof(CuttingFeed))
-                .AddParam(nameof(Delta))
-                .AddParam(nameof(IsUplifting));
+            view.AddTextBox(nameof(StepX1), "Шаг X1");
+            view.AddTextBox(nameof(StepX2), "Шаг X2");
+            view.AddIndent();
+            view.AddTextBox(nameof(StartPass), "Начало");
+            view.AddTextBox(nameof(EndPass), "Конец");
+            view.AddTextBox(nameof(StepY), "Шаг Y мин.");
+            view.AddTextBox(nameof(YMax), "Шаг Y макс.");
+            view.AddTextBox(nameof(IsReverse), "Обратно");
+            view.AddIndent();
+            view.AddTextBox(nameof(StepZ), "Шаг Z");
+            view.AddIndent();
+            view.AddTextBox(nameof(Departure));
+            view.AddTextBox(nameof(IsDepartureOnBorderSection), "Выезд по границе сечения");
+            view.AddTextBox(nameof(CuttingFeed));
+            view.AddTextBox(nameof(Delta));
+            view.AddTextBox(nameof(IsUplifting));
         }
 
         public override void PrepareBuild(MillingCommandGenerator generator)

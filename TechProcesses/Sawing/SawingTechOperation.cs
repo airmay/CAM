@@ -35,25 +35,25 @@ namespace CAM.TechProcesses.Sawing
             var sawingModesView = new SawingModesView();
             view.BindingSource.DataSourceChanged += (s, e) => sawingModesView.sawingModesBindingSource.DataSource = view.GetParams<SawingTechOperation>().SawingModes;
 
-            view.AddParam(nameof(IsExactlyBegin), "Начало точно")
-                .AddParam(nameof(IsExactlyEnd), "Конец точно")
-                .AddParam(nameof(AngleA))
-                .AddParam(nameof(Departure))
-                .AddIndent()
-                .AddAcadObject(message: "Выберите объект",
-                    allowedTypes: $"{AcadObjectNames.Line},{AcadObjectNames.Arc},{AcadObjectNames.Lwpolyline}",
-                    afterSelect: ids =>
-                    {
-                        var operation = view.GetParams<SawingTechOperation>();
-                        operation.ProcessingArea = null;
-                        var border = ((SawingTechProcess)operation.TechProcess).CreateExtraObjects(ids[0])[0];
-                        operation.SetFromBorder(border);
-                        view.ResetControls();
-                        sawingModesView.sawingModesBindingSource.DataSource = operation.SawingModes;
-                    }
-                )
-                .AddText("Режимы")
-                .AddControl(sawingModesView, 6);
+            view.AddTextBox(nameof(IsExactlyBegin), "Начало точно");
+            view.AddTextBox(nameof(IsExactlyEnd), "Конец точно");
+            view.AddTextBox(nameof(AngleA));
+            view.AddTextBox(nameof(Departure));
+            view.AddIndent();
+            view.AddAcadObject(message: "Выберите объект",
+                allowedTypes: $"{AcadObjectNames.Line},{AcadObjectNames.Arc},{AcadObjectNames.Lwpolyline}",
+                afterSelect: ids =>
+                {
+                    var operation = view.GetParams<SawingTechOperation>();
+                    operation.ProcessingArea = null;
+                    var border = ((SawingTechProcess)operation.TechProcess).CreateExtraObjects(ids[0])[0];
+                    operation.SetFromBorder(border);
+                    view.ResetControls();
+                    sawingModesView.sawingModesBindingSource.DataSource = operation.SawingModes;
+                }
+            );
+            view.AddText("Режимы");
+            view.AddControl(sawingModesView, 6);
         }
 
         public void SetIsExactly(Corner corner, bool value)

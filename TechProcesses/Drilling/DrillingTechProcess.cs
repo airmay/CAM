@@ -22,17 +22,17 @@ namespace CAM.TechProcesses.Drilling
 
         public static void ConfigureParamsView(ParamsView view)
         {
-            view.AddParam(nameof(Frequency))
-                .AddParam(nameof(Depth))
-                .AddIndent()
-                .AddOrigin()
-                .AddAcadObject(nameof(ProcessingArea), "Отверстия", "Выберите окружности", AcadObjectNames.Circle)
-                .AddIndent()
-                .AddParam(nameof(FeedMax), "Подача макс.")
-                .AddParam(nameof(FeedMin), "Подача мин.")
-                .AddIndent()
-                .AddParam(nameof(ZSafety))
-                .AddParam(nameof(ZEntry));
+            view.AddTextBox(nameof(Frequency));
+            view.AddTextBox(nameof(Depth));
+            view.AddIndent();
+            view.AddOrigin();
+            view.AddAcadObject(nameof(ProcessingArea), "Отверстия", "Выберите окружности", AcadObjectNames.Circle);
+            view.AddIndent();
+            view.AddTextBox(nameof(FeedMax), "Подача макс.");
+            view.AddTextBox(nameof(FeedMin), "Подача мин.");
+            view.AddIndent();
+            view.AddTextBox(nameof(ZSafety));
+            view.AddTextBox(nameof(ZEntry));
         }
 
         protected override void BuildProcessing(MillingCommandGenerator generator)

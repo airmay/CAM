@@ -47,9 +47,11 @@ namespace CAM.TechProcesses.Tactile
 
         public static void ConfigureParamsView(ParamsView view)
         {
-            var selector = view.AddSelector("Точки", "۞", ConfigurePointsSelector)
-                .AddParam(nameof(Thickness))
-                .AddEnumParam<CalcMethodType>(nameof(CalcMethod), "Метод расчета");
+            var (textbox, button) = view.CreateSelector("Точки", "۞");
+            ConfigurePointsSelector(textbox, button, view.BindingSource);
+
+            view.AddTextBox(nameof(Thickness));
+            view.AddEnumParam<CalcMethodType>(nameof(CalcMethod), "Метод расчета");
         }
 
         private static void ConfigurePointsSelector(TextBox textBox, Button button, BindingSource bindingSource)

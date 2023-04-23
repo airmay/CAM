@@ -52,18 +52,18 @@ namespace CAM.TechProcesses.Tactile
 
         public static void ConfigureParamsView(ParamsView view)
         {
-            view.AddParam(nameof(ProcessingAngle), "Угол полосы")
-                .AddParam(nameof(CuttingFeed), "Подача гребенка")
-                .AddParam(nameof(FeedFinishing), "Подача чистовая")
-                .AddIndent()
-                .AddParam(nameof(BandWidth), "Ширина полосы")
-                .AddParam(nameof(BandSpacing), "Расст.м/у полосами")
-                .AddParam(nameof(BandStart), "Начало полосы")
-                .AddParam(nameof(Depth), "Глубина")
-                .AddIndent()
-                .AddParam(nameof(MaxCrestWidth), "Макс.шир.гребня")
-                .AddParam(nameof(IsEdgeProcessing), "Обработка краев")
-                .AddControl(new PassListControl(view.BindingSource, true), 10);
+            view.AddTextBox(nameof(ProcessingAngle), "Угол полосы");
+            view.AddTextBox(nameof(CuttingFeed), "Подача гребенка");
+            view.AddTextBox(nameof(FeedFinishing), "Подача чистовая");
+            view.AddIndent();
+            view.AddTextBox(nameof(BandWidth), "Ширина полосы");
+            view.AddTextBox(nameof(BandSpacing), "Расст.м/у полосами");
+            view.AddTextBox(nameof(BandStart), "Начало полосы");
+            view.AddTextBox(nameof(Depth), "Глубина");
+            view.AddIndent();
+            view.AddTextBox(nameof(MaxCrestWidth), "Макс.шир.гребня");
+            view.AddTextBox(nameof(IsEdgeProcessing), "Обработка краев");
+            view.AddControl(new PassListControl(view.BindingSource, true), 10);
         }
 
         public void CalcPassList()

@@ -26,22 +26,22 @@ namespace CAM.TechProcesses.Sawing
         {
             var sawingModesView = new SawingModesView();
 
-            view.AddMachine(CAM.MachineType.Donatoni, CAM.MachineType.ScemaLogic, CAM.MachineType.Forma)
-                .AddMaterial()
-                .AddParam(nameof(Thickness))
-                .AddIndent()
-                .AddTool()
-                .AddParam(nameof(Frequency))
-                .AddParam(nameof(PenetrationFeed))
-                .AddParam(nameof(ZSafety))
-                .AddIndent()
-                .AddAcadObject(message: "Выберите объекты распиловки",
+            view.AddMachine(CAM.MachineType.Donatoni, CAM.MachineType.ScemaLogic, CAM.MachineType.Forma);
+            view.AddMaterial();
+            view.AddTextBox(nameof(Thickness));
+            view.AddIndent();
+            view.AddTool();
+            view.AddTextBox(nameof(Frequency));
+            view.AddTextBox(nameof(PenetrationFeed));
+            view.AddTextBox(nameof(ZSafety));
+            view.AddIndent();
+            view.AddAcadObject(message: "Выберите объекты распиловки",
                     allowedTypes: $"{AcadObjectNames.Line},{AcadObjectNames.Arc},{AcadObjectNames.Lwpolyline}",
                     afterSelect: ids => view.GetParams<SawingTechProcess>().CreateExtraObjects(ids)
-                )
-                .AddIndent()
-                .AddComboBox("Режимы", new[] { "Отрезок", "Кривая" }, SetSawingModes)
-                .AddControl(sawingModesView, 6);
+                );
+            view.AddIndent();
+            view.AddComboBox("Режимы", new[] { "Отрезок", "Кривая" }, SetSawingModes);
+            view.AddControl(sawingModesView, 6);
 
             void SetSawingModes(int index) => 
                 sawingModesView.sawingModesBindingSource.DataSource = index == 0 

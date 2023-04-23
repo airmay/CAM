@@ -30,15 +30,15 @@
 
 //        public static void ConfigureParamsView(ParamsView view)
 //        {
-//            view.AddParam(nameof(StepYmin), "Шаг Y мин.")
-//                .AddParam(nameof(StepYmax), "Шаг Y макс.")
-//                .AddParam(nameof(StartY), "Y начала")
-//                .AddParam(nameof(StepZmax), "Шаг Z макс.")
+//            view.AddTextBox(nameof(StepYmin), "Шаг Y мин.")
+//                .AddTextBox(nameof(StepYmax), "Шаг Y макс.")
+//                .AddTextBox(nameof(StartY), "Y начала")
+//                .AddTextBox(nameof(StepZmax), "Шаг Z макс.")
 //                .AddIndent()
-//                .AddParam(nameof(Departure))
-//                .AddParam(nameof(CuttingFeed))
-//                .AddParam(nameof(Delta))
-//                .AddParam(nameof(IsUplifting))
+//                .AddTextBox(nameof(Departure))
+//                .AddTextBox(nameof(CuttingFeed))
+//                .AddTextBox(nameof(Delta))
+//                .AddTextBox(nameof(IsUplifting))
 //                .AddAcadObject(nameof(Profile));
 //        }
 

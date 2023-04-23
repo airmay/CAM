@@ -38,13 +38,13 @@ namespace CAM.TechProcesses.Tactile
 
         public static void ConfigureParamsView(ParamsView view)
         {
-            view.AddParam(nameof(Frequency))
-                .AddParam(nameof(FeedMax), "Подача макс")
-                .AddParam(nameof(FeedMin), "Подача мин")
-                .AddIndent()
-                .AddParam(nameof(ZSafety))
-                .AddParam(nameof(ZEntry), "Z входа")
-                .AddParam(nameof(Depth));
+            view.AddTextBox(nameof(Frequency));
+            view.AddTextBox(nameof(FeedMax), "Подача макс");
+            view.AddTextBox(nameof(FeedMin), "Подача мин");
+            view.AddIndent();
+            view.AddTextBox(nameof(ZSafety));
+            view.AddTextBox(nameof(ZEntry), "Z входа");
+            view.AddTextBox(nameof(Depth));
         }
 
         public override bool CanProcess => TechProcess.MachineType == MachineType.Donatoni || TechProcess.MachineType == MachineType.Krea || TechProcess.MachineType == MachineType.Champion;

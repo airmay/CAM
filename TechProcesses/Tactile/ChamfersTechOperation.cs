@@ -33,8 +33,8 @@ namespace CAM.TechProcesses.Tactile
 
         public static void ConfigureParamsView(ParamsView view)
         {
-            view.AddParam(nameof(ProcessingAngle), "Угол полосы")
-                .AddParam(nameof(CuttingFeed));
+            view.AddTextBox(nameof(ProcessingAngle), "Угол полосы");
+            view.AddTextBox(nameof(CuttingFeed));
         }
 
         public override bool Validate() => ToolService.Validate(TechProcess.Tool, ToolType.Disk);

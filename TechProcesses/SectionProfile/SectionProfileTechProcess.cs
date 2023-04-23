@@ -18,18 +18,18 @@ namespace CAM.TechProcesses.SectionProfile
 
         public static void ConfigureParamsView(ParamsView view)
         {
-            view.AddMachine()
-                .AddMaterial()
-                .AddTool()
-                .AddParam(nameof(Frequency))
-                .AddParam(nameof(CuttingFeed))
-                .AddParam(nameof(PenetrationFeed))
-                .AddIndent()
-                .AddAcadObject(nameof(ProcessingArea), "Профиль")
-                .AddAcadObject(nameof(Rail), "Направляющая")
-                .AddParam(nameof(Length), "Длина направляющей")
-                .AddIndent()
-                .AddParam(nameof(ZSafety));
+            view.AddMachine();
+            view.AddMaterial();
+            view.AddTool();
+            view.AddTextBox(nameof(Frequency));
+            view.AddTextBox(nameof(CuttingFeed));
+            view.AddTextBox(nameof(PenetrationFeed));
+            view.AddIndent();
+            view.AddAcadObject(nameof(ProcessingArea), "Профиль");
+            view.AddAcadObject(nameof(Rail), "Направляющая");
+            view.AddTextBox(nameof(Length), "Длина направляющей");
+            view.AddIndent();
+            view.AddTextBox(nameof(ZSafety));
         }
 
         protected override void BuildProcessing(MillingCommandGenerator generator)

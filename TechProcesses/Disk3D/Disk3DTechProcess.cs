@@ -27,24 +27,24 @@ namespace CAM.TechProcesses.Disk3D
             void refreshSize() => sizeLabel.Text = Acad.GetSize(view.GetParams<Disk3DTechProcess>().ProcessingArea);
             view.BindingSource.DataSourceChanged += (s, e) => refreshSize();
 
-            view.AddMachine(CAM.MachineType.Donatoni, CAM.MachineType.ScemaLogic, CAM.MachineType.Forma, CAM.MachineType.Champion)
-                .AddMaterial()
-                .AddParam(nameof(Thickness))
-                .AddIndent()
-                .AddTool()
-                .AddParam(nameof(Frequency))
-                .AddParam(nameof(PenetrationFeed))
-                .AddIndent()
-                .AddAcadObject(allowedTypes: $"{AcadObjectNames.Surface},{AcadObjectNames.Region}", afterSelect: (ids) => refreshSize())
-                .AddText("Размеры", p => sizeLabel = p)
-                .AddParam(nameof(Angle), "Угол")
-                .AddParam(nameof(IsExactlyBegin), "Начало точно")
-                .AddParam(nameof(IsExactlyEnd), "Конец точно")
-                .AddParam(nameof(ZSafety))
-                .AddParam(nameof(IsA90), "Угол A = 90")
-                .AddParam(nameof(AngleA), "Угол вертикальный")
-                //.AddParam(nameof(DzBillet), "dZ заготовки")
-                .AddParam(nameof(OriginCellNumber), "Ячейка начала координат");
+            view.AddMachine(CAM.MachineType.Donatoni, CAM.MachineType.ScemaLogic, CAM.MachineType.Forma, CAM.MachineType.Champion);
+            view.AddMaterial();
+            view.AddTextBox(nameof(Thickness));
+            view.AddIndent();
+            view.AddTool();
+            view.AddTextBox(nameof(Frequency));
+            view.AddTextBox(nameof(PenetrationFeed));
+            view.AddIndent();
+            view.AddAcadObject(allowedTypes: $"{AcadObjectNames.Surface},{AcadObjectNames.Region}", afterSelect: (ids) => refreshSize());
+            sizeLabel = view.AddLabelText("Размеры");
+            view.AddTextBox(nameof(Angle), "Угол");
+            view.AddTextBox(nameof(IsExactlyBegin), "Начало точно");
+            view.AddTextBox(nameof(IsExactlyEnd), "Конец точно");
+            view.AddTextBox(nameof(ZSafety));
+            view.AddTextBox(nameof(IsA90), "Угол A = 90");
+            view.AddTextBox(nameof(AngleA), "Угол вертикальный");
+            //.AddTextBox(nameof(DzBillet), "dZ заготовки")
+            view.AddTextBox(nameof(OriginCellNumber), "Ячейка начала координат");
         }
 
         protected override void SetTool(MillingCommandGenerator generator) =>

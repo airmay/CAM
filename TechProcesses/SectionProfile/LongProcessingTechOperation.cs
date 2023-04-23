@@ -36,26 +36,26 @@ namespace CAM.TechProcesses.SectionProfile
 
         public static void ConfigureParamsView(ParamsView view)
         {
-            view.AddParam(nameof(IsA90), "A=90")
-                .AddAcadObject(nameof(Profile))
-                .AddParam(nameof(CuttingFeed))
-                .AddParam(nameof(FirstPass), "Начало профиля")
-                .AddParam(nameof(IsExactlyBegin), "Начало точно")
-                .AddParam(nameof(LasttPass), "Конец профиля")
-                .AddParam(nameof(IsExactlyEnd), "Конец точно")
-                .AddParam(nameof(StepPass))
-                .AddParam(nameof(IsProfileStep), "Шаг по профилю")
-                .AddIndent()
-                .AddParam(nameof(PenetrationStep), "Заглубление: шаг")
-                .AddParam(nameof(PenetrationBegin), "Заглубление: начало")
-                .AddParam(nameof(PenetrationEnd), "Заглубление: конец")
-                .AddIndent()
-                .AddParam(nameof(IsOutlet), "Отвод")
-                .AddParam(nameof(Departure))
-                .AddParam(nameof(Delta))
-                .AddParam(nameof(ChangeProcessSide), "Сторона обработки")
-                .AddParam(nameof(ChangeEngineSide), "Разворот двигателя на 180")
-                .AddParam(nameof(DzBillet), "dZ заготовки");
+            view.AddTextBox(nameof(IsA90), "A=90");
+            view.AddAcadObject(nameof(Profile));
+            view.AddTextBox(nameof(CuttingFeed));
+            view.AddTextBox(nameof(FirstPass), "Начало профиля");
+            view.AddTextBox(nameof(IsExactlyBegin), "Начало точно");
+            view.AddTextBox(nameof(LasttPass), "Конец профиля");
+            view.AddTextBox(nameof(IsExactlyEnd), "Конец точно");
+            view.AddTextBox(nameof(StepPass));
+            view.AddTextBox(nameof(IsProfileStep), "Шаг по профилю");
+            view.AddIndent();
+            view.AddTextBox(nameof(PenetrationStep), "Заглубление: шаг");
+            view.AddTextBox(nameof(PenetrationBegin), "Заглубление: начало");
+            view.AddTextBox(nameof(PenetrationEnd), "Заглубление: конец");
+            view.AddIndent();
+            view.AddTextBox(nameof(IsOutlet), "Отвод");
+            view.AddTextBox(nameof(Departure));
+            view.AddTextBox(nameof(Delta));
+            view.AddTextBox(nameof(ChangeProcessSide), "Сторона обработки");
+            view.AddTextBox(nameof(ChangeEngineSide), "Разворот двигателя на 180");
+            view.AddTextBox(nameof(DzBillet), "dZ заготовки");
         }
 
         public override bool Validate()

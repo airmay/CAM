@@ -73,7 +73,7 @@ namespace CAM
             tablePanel.Height += (int)rowStyle.Height;
         }
 
-        public ParamsView AddIndent()
+        public Panel AddIndent()
         {
             var panel = new Panel
             {
@@ -82,7 +82,7 @@ namespace CAM
             tablePanel.SetColumnSpan(panel, 2);
             tablePanel.Controls.Add(panel);
 
-            return this;
+            return panel;
         }
 
         private Label AddLabel(string paramName, string displayName) => AddLabel(displayName ?? GetDisplayName(paramName));
@@ -105,7 +105,7 @@ namespace CAM
 
         #region AddParam
 
-        public ParamsView AddParam(string paramName, string displayName = null, bool readOnly = false)
+        public TextBox AddTextBox(string paramName, string displayName = null, bool readOnly = false)
         {
             AddLabel(paramName, displayName);
 
@@ -118,10 +118,10 @@ namespace CAM
                 DataSourceUpdateMode.OnPropertyChanged, string.Empty));
             tablePanel.Controls.Add(control);
 
-            return this;
+            return control;
         }
 
-        public ParamsView AddCheckBox(string paramName, string displayName = null)
+        public CheckBox AddCheckBox(string paramName, string displayName = null)
         {
             AddLabel(paramName, displayName);
 
@@ -132,78 +132,79 @@ namespace CAM
             control.DataBindings.Add(new Binding("Checked", BindingSource, paramName, true));
             tablePanel.Controls.Add(control);
 
-            return this;
+            return control;
         }
 
-        public ParamsView AddLabelText(string label, string text)
+        public Label AddLabelText(string label, string text = "")
         {
             AddLabel(label);
-            AddLabel(text);
+            var control = AddLabel(text);
 
-            return this;
+            return control;
         }
 
-        public ParamsView AddText(string displayName, Action<Label> labelProvider)
-        {
-            AddRow();
-            AddLabel(displayName);
-
-            var label = new Label
-            {
-                Dock = DockStyle.Fill,
-                TextAlign = ContentAlignment.MiddleLeft
-            };
-            tablePanel.Controls.Add(label, 1, tablePanel.RowStyles.Count - 1);
-            labelProvider?.Invoke(label);
-
-            return this;
-        }
-
-        public ParamsView AddText(string text)
+        public Label AddText(string text)
         {
             var label = AddLabel(text);
             tablePanel.SetColumnSpan(label, 2);
 
-            return this;
+            return label;
         }
         #endregion
 
         #region AddEnumParam
 
-        public ParamsView AddEnumParam<T>(string paramName, string displayName = null, params T[] values) where T : struct
+        public ParamsView AddComboBox(string displayName, string[] items, Action<int> SelectedIndexChanged)
+        {
+            AddRow();
+            AddLabel(displayName);
+
+            var comboBox = new ComboBox
+            {
+                DropDownStyle = ComboBoxStyle.DropDownList,
+                FormattingEnabled = true,
+                Dock = DockStyle.Fill
+            };
+            comboBox.Items.AddRange(items);
+            comboBox.SelectedIndexChanged += new EventHandler((s, e) => SelectedIndexChanged(comboBox.SelectedIndex));
+
+            BindingSource.DataSourceChanged += (s, e) =>
+            {
+                comboBox.SelectedIndex = 0;
+                SelectedIndexChanged.Invoke(0);
+            };
+            tablePanel.Controls.Add(comboBox, 1, tablePanel.RowStyles.Count);
+            AddRowH(comboBox.Height);
+
+            return this;
+        }
+
+        public ComboBox AddEnumParam<T>(string paramName, string displayName = null, params T[] values) where T : struct
         {
             AddLabel(paramName, displayName);
-            var margin = (int)(Font.Height / 1.5);
 
             var comboBox = new ComboBox
             {
                 DropDownStyle = ComboBoxStyle.DropDownList,
                 Dock = DockStyle.Top,
-                Margin = new Padding(0, 0, 0, margin),
+                Margin = new Padding(0, 0, 0, Font.Height / 2),
             };
             comboBox.BindEnum(values);
             comboBox.DataBindings.Add(new Binding("SelectedValue", BindingSource, paramName, true));
             tablePanel.Controls.Add(comboBox);
 
-            return this;
+            return comboBox;
         }
 
-        public ParamsView AddMaterial() => AddEnumParam<Material>("Material", "Материал");
+        public ComboBox AddMaterial() => AddEnumParam<Material>("Material", "Материал");
 
-        public ParamsView AddMachine(params MachineType[] values) => AddEnumParam("MachineType", "Станок", values);
+        public ComboBox AddMachine(params MachineType[] values) => AddEnumParam("MachineType", "Станок", values);
 
         #endregion
 
         #region AddSelectorParam
 
-        public ParamsView AddSelector(string displayName, string buttonText, Action<TextBox, Button, BindingSource> configure)
-        {
-            var selector = CreateSelector(displayName, buttonText);
-            configure?.Invoke((TextBox)selector.Controls[0] , (Button)selector.Controls[1], BindingSource);
-            return this;
-        }
-
-        private UserControl CreateSelector(string displayName, string buttonText = "Ξ")
+        public (TextBox, Button) CreateSelector(string displayName, string buttonText = "Ξ")
         {
             AddLabel(displayName);
 
@@ -230,7 +231,7 @@ namespace CAM
             userControl.Controls.Add(button);
             tablePanel.Controls.Add(userControl);
 
-            return userControl;
+            return (textBox, button);
         }
 
         public ParamsView AddTool()
@@ -240,12 +241,8 @@ namespace CAM
             var materialProp = _type.GetProperty("Material");
             var frequencyProp = _type.GetProperty("Frequency");
 
-            var selector = CreateSelector("Инструмент", "Ξ");
-
-            var textBox = selector.Controls[0];
-            BindingSource.DataSourceChanged += (s, e) => textBox.Text = toolProp.GetValue(ParamsObject)?.ToString();
-
-            var button = selector.Controls[1];
+            var (textbox, button) = CreateSelector("Инструмент", "Ξ");
+            BindingSource.DataSourceChanged += (s, e) => textbox.Text = toolProp.GetValue(ParamsObject)?.ToString();
             button.Click += (s, e) =>
             {
                 var machine = (MachineType?)machineProp.GetValue(ParamsObject);
@@ -255,7 +252,7 @@ namespace CAM
                 if (ToolService.SelectTool(machine.Value) is Tool tool)
                 {
                     toolProp.SetValue(ParamsObject, tool);
-                    textBox.Text = tool.ToString();
+                    textbox.Text = tool.ToString();
                     frequencyProp.SetValue(ParamsObject, ToolService.CalcFrequency(tool, machine.Value, material.Value));
 
                     BindingSource.ResetBindings(false);
@@ -268,17 +265,14 @@ namespace CAM
         {
             var prop = _type.GetProperty(paramName);
 
-            var selector = CreateSelector(displayName ?? GetDisplayName(paramName), "۞");
+            var (textbox, button) = CreateSelector(displayName ?? GetDisplayName(paramName), "۞");
 
-            var textBox = selector.Controls[0];
             BindingSource.DataSourceChanged += prop.PropertyType == typeof(AcadObject) 
-                ? new EventHandler((s, e) => textBox.Text = ((AcadObject)prop.GetValue(ParamsObject))?.GetDesc())
-                : new EventHandler((s, e) => textBox.Text = ((List<AcadObject>)prop.GetValue(ParamsObject))?.GetDesc());
-            textBox.Enter += prop.PropertyType == typeof(AcadObject)
+                ? new EventHandler((s, e) => textbox.Text = ((AcadObject)prop.GetValue(ParamsObject))?.GetDesc())
+                : new EventHandler((s, e) => textbox.Text = ((List<AcadObject>)prop.GetValue(ParamsObject))?.GetDesc());
+            textbox.Enter += prop.PropertyType == typeof(AcadObject)
                 ? new EventHandler((s, e) => { if (prop.GetValue(ParamsObject) is AcadObject acadObj) Acad.SelectAcadObjects(new List<AcadObject> { acadObj }); })
                 : new EventHandler((s, e) => { if (prop.GetValue(ParamsObject) is List<AcadObject> acadObjList) Acad.SelectAcadObjects(acadObjList); });
-
-            var button = selector.Controls[1];
             button.Click += (s, e) =>
             {
                 //textBox.Text = "";
@@ -293,13 +287,13 @@ namespace CAM
                 {
                     var acadObject = AcadObject.Create(ids[0]);
                     prop.SetValue(ParamsObject, acadObject);
-                    textBox.Text = acadObject.GetDesc();
+                    textbox.Text = acadObject.GetDesc();
                 }
                 else
                 {
                     var acadOblects = AcadObject.CreateList(ids);
                     prop.SetValue(ParamsObject, acadOblects);
-                    textBox.Text = acadOblects.GetDesc();
+                    textbox.Text = acadOblects.GetDesc();
                 }
                 afterSelect?.Invoke(ids);
                 Acad.SelectObjectIds(ids);
@@ -313,13 +307,10 @@ namespace CAM
             var originY = _type.GetProperty("OriginY");
             var originObject = _type.GetField(nameof(MillingTechProcess.OriginObject));
 
-            var selector = CreateSelector("Начало координат", "۞");
+            var (textbox, button) = CreateSelector("Начало координат", "۞");
 
-            var textBox = selector.Controls[0];
             BindingSource.DataSourceChanged += (s, e) => RefreshText();
-            textBox.Enter += (s, e) => Acad.SelectObjectIds((ObjectId[])originObject?.GetValue(ParamsObject));
-
-            var button = selector.Controls[1];
+            textbox.Enter += (s, e) => Acad.SelectObjectIds((ObjectId[])originObject?.GetValue(ParamsObject));
             button.Click += (s, e) =>
             {
                 Interaction.SetActiveDocFocus();
@@ -336,7 +327,7 @@ namespace CAM
             };
             return this;
 
-            void RefreshText() => textBox.Text = $"{{{originX.GetValue(ParamsObject)}, {originY.GetValue(ParamsObject)}}}";
+            void RefreshText() => textbox.Text = $"{{{originX.GetValue(ParamsObject)}, {originY.GetValue(ParamsObject)}}}";
         }
         #endregion
 
@@ -350,29 +341,29 @@ namespace CAM
             return this;
         }
 
-        public ParamsView AddComboBox(string displayName, string[] items, Action<int> SelectedIndexChanged)
-        {
-            AddRow();
-            AddLabel(displayName);
+        //public ParamsView AddComboBox(string displayName, string[] items, Action<int> SelectedIndexChanged)
+        //{
+        //    AddRow();
+        //    AddLabel(displayName);
 
-            var comboBox = new ComboBox
-            {
-                DropDownStyle = ComboBoxStyle.DropDownList,
-                FormattingEnabled = true,
-                Dock = DockStyle.Fill
-            };
-            comboBox.Items.AddRange(items);
-            comboBox.SelectedIndexChanged += new EventHandler((s, e) => SelectedIndexChanged(comboBox.SelectedIndex));
+        //    var comboBox = new ComboBox
+        //    {
+        //        DropDownStyle = ComboBoxStyle.DropDownList,
+        //        FormattingEnabled = true,
+        //        Dock = DockStyle.Fill
+        //    };
+        //    comboBox.Items.AddRange(items);
+        //    comboBox.SelectedIndexChanged += new EventHandler((s, e) => SelectedIndexChanged(comboBox.SelectedIndex));
 
-            BindingSource.DataSourceChanged += (s, e) =>
-            {
-                comboBox.SelectedIndex = 0;
-                SelectedIndexChanged.Invoke(0);
-            };
-            tablePanel.Controls.Add(comboBox, 1, tablePanel.RowStyles.Count);
-            AddRowH(comboBox.Height);
+        //    BindingSource.DataSourceChanged += (s, e) =>
+        //    {
+        //        comboBox.SelectedIndex = 0;
+        //        SelectedIndexChanged.Invoke(0);
+        //    };
+        //    tablePanel.Controls.Add(comboBox, 1, tablePanel.RowStyles.Count);
+        //    AddRowH(comboBox.Height);
 
-            return this;
-        }
+        //    return this;
+        //}
     }
 }

@@ -31,21 +31,21 @@ namespace CAM.TechProcesses.CableSawing
 
         public static void ConfigureParamsView(ParamsView view)
         {
-            view.AddAcadObject(nameof(ProcessingArea), "Объекты", "Выберите обрабатываемые области")
-                .AddOrigin()
-                .AddIndent()
-                .AddParam(nameof(CuttingFeed))
-                .AddParam(nameof(S), "Угловая скорость")
-                .AddParam(nameof(ZSafety))
-                .AddText("Z безопасности отсчитывается от верха выбранных объектов техпроцесса")
-                .AddIndent()
-                .AddParam(nameof(Approach), "Заезд")
-                .AddParam(nameof(Departure), "Выезд")
-                .AddIndent()
-                .AddParam(nameof(ToolThickness), "Толщина троса")
-                .AddParam(nameof(Delta))
-                .AddParam(nameof(Delay), "Задержка")
-                .AddParam(nameof(IsExtraRotate), "Поворот+возврат");
+            view.AddAcadObject(nameof(ProcessingArea), "Объекты", "Выберите обрабатываемые области");
+            view.AddOrigin();
+            view.AddIndent();
+            view.AddTextBox(nameof(CuttingFeed));
+            view.AddTextBox(nameof(S), "Угловая скорость");
+            view.AddTextBox(nameof(ZSafety));
+            view.AddText("Z безопасности отсчитывается от верха выбранных объектов техпроцесса");
+            view.AddIndent();
+            view.AddTextBox(nameof(Approach), "Заезд");
+            view.AddTextBox(nameof(Departure), "Выезд");
+            view.AddIndent();
+            view.AddTextBox(nameof(ToolThickness), "Толщина троса");
+            view.AddTextBox(nameof(Delta));
+            view.AddTextBox(nameof(Delay), "Задержка");
+            view.AddTextBox(nameof(IsExtraRotate), "Поворот+возврат"); ;
         }
 
         public override List<TechOperation> CreateTechOperations()

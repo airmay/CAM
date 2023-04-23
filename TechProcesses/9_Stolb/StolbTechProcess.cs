@@ -45,26 +45,25 @@ namespace CAM.TechProcesses.Stolb
             var passView = new PassListControl(view.BindingSource);
             view.BindingSource.DataSourceChanged += (s, e) => passView.BindingSource.DataSource = view.GetParams<StolbTechProcess>().PassList;
 
-            view.AddMachine()
-                .AddTool()
-                .AddParam(nameof(Frequency))
-                .AddParam(nameof(AC), "a + c")
-                .AddParam(nameof(DZ), "dz")
-                .AddParam(nameof(PenetrationFeed))
-                .AddParam(nameof(Departure))
-                .AddText("______Пирамида_____")
-                .AddParam(nameof(PenetrationStep), "Шаг")
-                .AddParam(nameof(CuttingFeed))
-                .AddParam(nameof(LastStep), "Последний шаг")
-                .AddParam(nameof(LastFeed), "Последняя подача")
-                .AddText("________ПАЗ________")
-                .AddParam(nameof(Depth), "Глубина паза")
-                .AddParam(nameof(RoughingStep), "Заглубление гребенка")
-                .AddParam(nameof(FinishingStep), "Заглубление чистка")
-                .AddParam(nameof(RoughingFeed), "Подача гребенка")
-                .AddParam(nameof(FinishingFeed), "Подача чистка")
-                .AddControl(passView, 10);
-            ;
+            view.AddMachine();
+            view.AddTool();
+            view.AddTextBox(nameof(Frequency));
+            view.AddTextBox(nameof(AC), "a + c");
+            view.AddTextBox(nameof(DZ), "dz");
+            view.AddTextBox(nameof(PenetrationFeed));
+            view.AddTextBox(nameof(Departure));
+            view.AddText("______Пирамида_____");
+            view.AddTextBox(nameof(PenetrationStep), "Шаг");
+            view.AddTextBox(nameof(CuttingFeed));
+            view.AddTextBox(nameof(LastStep), "Последний шаг");
+            view.AddTextBox(nameof(LastFeed), "Последняя подача");
+            view.AddText("________ПАЗ________");
+            view.AddTextBox(nameof(Depth), "Глубина паза");
+            view.AddTextBox(nameof(RoughingStep), "Заглубление гребенка");
+            view.AddTextBox(nameof(FinishingStep), "Заглубление чистка");
+            view.AddTextBox(nameof(RoughingFeed), "Подача гребенка");
+            view.AddTextBox(nameof(FinishingFeed), "Подача чистка");
+            view.AddControl(passView, 10);
         }
     }
 }

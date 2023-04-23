@@ -42,21 +42,21 @@ namespace CAM.TechProcesses.Disk3D
 
         public static void ConfigureParamsView(ParamsView view)
         {
-            view.AddParam(nameof(StepPass))
-                .AddParam(nameof(StartPass))
-                .AddParam(nameof(EndPass))
-                .AddParam(nameof(IsReverse), "Обратно")
-                .AddIndent()
-                .AddParam(nameof(StepLong))
-                .AddParam(nameof(Departure))
-                .AddIndent()
-                .AddParam(nameof(Penetration))
-                .AddParam(nameof(CuttingFeed))
-                .AddIndent()
-                .AddParam(nameof(Delta))
-                .AddParam(nameof(IsDepartureOnBorderSection), "Выезд по границе сечения")
-                .AddParam(nameof(PenetrationAll), "Заглубление всего")
-                .AddParam(nameof(IsUplifting));
+            view.AddTextBox(nameof(StepPass));
+            view.AddTextBox(nameof(StartPass));
+            view.AddTextBox(nameof(EndPass));
+            view.AddTextBox(nameof(IsReverse), "Обратно");
+            view.AddIndent();
+            view.AddTextBox(nameof(StepLong));
+            view.AddTextBox(nameof(Departure));
+            view.AddIndent();
+            view.AddTextBox(nameof(Penetration));
+            view.AddTextBox(nameof(CuttingFeed));
+            view.AddIndent();
+            view.AddTextBox(nameof(Delta));
+            view.AddTextBox(nameof(IsDepartureOnBorderSection), "Выезд по границе сечения");
+            view.AddTextBox(nameof(PenetrationAll), "Заглубление всего");
+            view.AddTextBox(nameof(IsUplifting));
         }
 
         private void SetTool(MillingCommandGenerator generator, double angleA, double angleC) 

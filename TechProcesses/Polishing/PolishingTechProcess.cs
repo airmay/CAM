@@ -28,24 +28,24 @@ namespace CAM.TechProcesses.Polishing
 
         public static void ConfigureParamsView(ParamsView view)
         {
-            view.AddMachine(CAM.MachineType.Donatoni, CAM.MachineType.Krea)
-                .AddParam(nameof(Frequency))
-                .AddIndent()
-                .AddParam(nameof(Feed))
-                .AddParam(nameof(ZSafety))
-                .AddParam(nameof(ZEntry))
-                .AddIndent()
-                .AddOrigin()
-                .AddAcadObject(nameof(ProcessingArea), "Контур", "Выберите объекты контура")
-                .AddIndent()
-                .AddParam(nameof(Angle1), "Угол 1")
-                .AddParam(nameof(Angle2), "Угол 2")
-                .AddIndent()
-                .AddParam(nameof(AmplitudeMin), "Амплитуда мин.")
-                .AddParam(nameof(AmplitudeMax), "Амплитуда макс.")
-                .AddIndent()
-                .AddParam(nameof(StepMin), "Шаг мин.")
-                .AddParam(nameof(StepMax), "Шаг макс.");
+            view.AddMachine(CAM.MachineType.Donatoni, CAM.MachineType.Krea);
+            view.AddTextBox(nameof(Frequency));
+            view.AddIndent();
+            view.AddTextBox(nameof(Feed));
+            view.AddTextBox(nameof(ZSafety));
+            view.AddTextBox(nameof(ZEntry));
+            view.AddIndent();
+            view.AddOrigin();
+            view.AddAcadObject(nameof(ProcessingArea), "Контур", "Выберите объекты контура");
+            view.AddIndent();
+            view.AddTextBox(nameof(Angle1), "Угол 1");
+            view.AddTextBox(nameof(Angle2), "Угол 2");
+            view.AddIndent();
+            view.AddTextBox(nameof(AmplitudeMin), "Амплитуда мин.");
+            view.AddTextBox(nameof(AmplitudeMax), "Амплитуда макс.");
+            view.AddIndent();
+            view.AddTextBox(nameof(StepMin), "Шаг мин.");
+            view.AddTextBox(nameof(StepMax), "Шаг макс.");
         }
 
         public override bool Validate()

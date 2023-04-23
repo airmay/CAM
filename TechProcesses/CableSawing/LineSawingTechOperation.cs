@@ -18,20 +18,20 @@ namespace CAM.TechProcesses.CableSawing
 
         public static void ConfigureParamsView(ParamsView view)
         {
-            view.AddAcadObject("AcadObjects")
-                .AddParam(nameof(CuttingFeed))
-                .AddParam(nameof(S), "Угловая скорость")
-                .AddIndent()
-                .AddParam(nameof(Approach), "Заезд")
-                .AddParam(nameof(Departure), "Выезд")
-                .AddIndent()
-                .AddParam(nameof(Across), "Поперек")
-                .AddParam(nameof(IsRevereseDirection), "Обратное напр.")
-                .AddParam(nameof(IsRevereseAngle), "Обратный угол")
-                .AddParam(nameof(IsRevereseOffset), "Обратный Offset")
-                .AddIndent()
-                .AddParam(nameof(Delta))
-                .AddParam(nameof(Delay), "Задержка");
+            view.AddAcadObject("AcadObjects");
+            view.AddTextBox(nameof(CuttingFeed));
+            view.AddTextBox(nameof(S), "Угловая скорость");
+            view.AddIndent();
+            view.AddTextBox(nameof(Approach), "Заезд");
+            view.AddTextBox(nameof(Departure), "Выезд");
+            view.AddIndent();
+            view.AddTextBox(nameof(Across), "Поперек");
+            view.AddTextBox(nameof(IsRevereseDirection), "Обратное напр.");
+            view.AddTextBox(nameof(IsRevereseAngle), "Обратный угол");
+            view.AddTextBox(nameof(IsRevereseOffset), "Обратный Offset");
+            view.AddIndent();
+            view.AddTextBox(nameof(Delta));
+            view.AddTextBox(nameof(Delay), "Задержка");
         }
 
         public LineSawingTechOperation(CableSawingTechProcess techProcess) : base(techProcess, "Распиловка по прямой")

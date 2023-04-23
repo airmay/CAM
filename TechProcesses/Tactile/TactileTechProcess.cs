@@ -45,33 +45,33 @@ namespace CAM.TechProcesses.Tactile
 
         public static void ConfigureParamsView(ParamsView view)
         {
-            view.AddMachine()
-                .AddTool()
-                .AddParam(nameof(Frequency))
-                .AddIndent()
-                .AddParam(nameof(Depth))
-                .AddParam(nameof(Departure))
-                .AddParam(nameof(TransitionFeed))
-                .AddParam(nameof(PenetrationFeed))
-                .AddOrigin()
-                .AddIndent()
-                .AddParam(nameof(Delta), "Припуск от конуса")
-                .AddAcadObject(nameof(ProcessingArea), "Контур плитки", "Выберите объекты контура плитки", AcadObjectNames.Line)
-                .AddAcadObject(nameof(Objects), "2 элемента плитки", "Выберите 2 элемента плитки",
-                    afterSelect: ids =>
-                    {
-                        view.GetParams<TactileTechProcess>().CalcType(ids);
-                        view.ResetControls();
-                    })
-                .AddIndent()
-                .AddParam(nameof(Type), "Тип плитки", true)
-                .AddParam(nameof(BandWidth), "Ширина полосы")
-                .AddParam(nameof(BandSpacing), "Расст.м/у полосами")
-                .AddParam(nameof(BandStart1), "Начало полосы 1")
-                .AddParam(nameof(BandStart2), "Начало полосы 2")
-                .AddIndent()
-                .AddParam(nameof(AC), "a + c")
-                .AddParam(nameof(AC_V), "a + c (верт)")
+            view.AddMachine();
+            view.AddTool();
+            view.AddTextBox(nameof(Frequency));
+            view.AddIndent();
+            view.AddTextBox(nameof(Depth));
+            view.AddTextBox(nameof(Departure));
+            view.AddTextBox(nameof(TransitionFeed));
+            view.AddTextBox(nameof(PenetrationFeed));
+            view.AddOrigin();
+            view.AddIndent();
+            view.AddTextBox(nameof(Delta), "Припуск от конуса");
+            view.AddAcadObject(nameof(ProcessingArea), "Контур плитки", "Выберите объекты контура плитки", AcadObjectNames.Line);
+            view.AddAcadObject(nameof(Objects), "2 элемента плитки", "Выберите 2 элемента плитки",
+                afterSelect: ids =>
+                {
+                    view.GetParams<TactileTechProcess>().CalcType(ids);
+                    view.ResetControls();;
+                });
+            view.AddIndent();
+            view.AddTextBox(nameof(Type), "Тип плитки", true);
+            view.AddTextBox(nameof(BandWidth), "Ширина полосы");
+            view.AddTextBox(nameof(BandSpacing), "Расст.м/у полосами");
+            view.AddTextBox(nameof(BandStart1), "Начало полосы 1");
+            view.AddTextBox(nameof(BandStart2), "Начало полосы 2");
+            view.AddIndent();
+            view.AddTextBox(nameof(AC), "a + c");
+            view.AddTextBox(nameof(AC_V), "a + c (верт)");
                 ;
         }
 

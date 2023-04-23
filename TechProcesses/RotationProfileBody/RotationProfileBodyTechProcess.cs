@@ -32,21 +32,21 @@ namespace CAM.TechProcesses.RotationProfileBody
 
         public static void ConfigureParamsView(ParamsView view)
         {
-            view.AddTool()
-                .AddParam(nameof(Frequency))
-                .AddParam(nameof(CuttingFeed))
-                .AddParam(nameof(PenetrationFeed))
-                .AddIndent()
-                .AddAcadObject(nameof(ProcessingArea), "Профиль", "Укажите профиль тела вращения")
-                .AddIndent()
-                .AddParam(nameof(Penetration))
-                .AddParam(nameof(StartZ), "Z начало")
-                .AddParam(nameof(StepZ), "Шаг Z")
-                .AddParam(nameof(RadiusMin), "Радиус мин.")
-                .AddParam(nameof(RadiusMax), "Радиус макс.")
-                .AddIndent()
-                .AddParam(nameof(Delta))
-                .AddParam(nameof(ZSafety));
+            view.AddTool();
+            view.AddTextBox(nameof(Frequency));
+            view.AddTextBox(nameof(CuttingFeed));
+            view.AddTextBox(nameof(PenetrationFeed));
+            view.AddIndent();
+            view.AddAcadObject(nameof(ProcessingArea), "Профиль", "Укажите профиль тела вращения");
+            view.AddIndent();
+            view.AddTextBox(nameof(Penetration));
+            view.AddTextBox(nameof(StartZ), "Z начало");
+            view.AddTextBox(nameof(StepZ), "Шаг Z");
+            view.AddTextBox(nameof(RadiusMin), "Радиус мин.");
+            view.AddTextBox(nameof(RadiusMax), "Радиус макс.");
+            view.AddIndent();
+            view.AddTextBox(nameof(Delta));
+            view.AddTextBox(nameof(ZSafety));
         }
 
         protected override void BuildProcessing(MillingCommandGenerator generator)

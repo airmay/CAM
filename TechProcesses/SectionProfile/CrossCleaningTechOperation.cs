@@ -33,21 +33,21 @@ namespace CAM.TechProcesses.SectionProfile
 
         public static void ConfigureParamsView(ParamsView view)
         {
-            view.AddParam(nameof(IsA90), "A=90")
-                .AddAcadObject(nameof(Profile))
-                .AddParam(nameof(CuttingFeed))
-                .AddParam(nameof(LongStep), "Шаг продольный")
-                .AddParam(nameof(ProfileStep), "Шаг по профилю")
-                .AddParam(nameof(ProfileBegin), "Профиль начало")
-                .AddParam(nameof(ProfileEnd), "Профиль конец")
-                .AddParam(nameof(IsExactlyBegin), "Начало точно")
-                .AddParam(nameof(IsExactlyEnd), "Конец точно")
-                .AddIndent()
-                .AddParam(nameof(IsOutlet), "Отвод")
-                .AddParam(nameof(Departure))
-                .AddParam(nameof(Delta))
-                .AddParam(nameof(ChangeProcessSide), "Сторона обработки")
-                .AddParam(nameof(ChangeEngineSide), "Сторона двигателя");
+            view.AddTextBox(nameof(IsA90), "A=90");
+            view.AddAcadObject(nameof(Profile));
+            view.AddTextBox(nameof(CuttingFeed));
+            view.AddTextBox(nameof(LongStep), "Шаг продольный");
+            view.AddTextBox(nameof(ProfileStep), "Шаг по профилю");
+            view.AddTextBox(nameof(ProfileBegin), "Профиль начало");
+            view.AddTextBox(nameof(ProfileEnd), "Профиль конец");
+            view.AddTextBox(nameof(IsExactlyBegin), "Начало точно");
+            view.AddTextBox(nameof(IsExactlyEnd), "Конец точно");
+            view.AddIndent();
+            view.AddTextBox(nameof(IsOutlet), "Отвод");
+            view.AddTextBox(nameof(Departure));
+            view.AddTextBox(nameof(Delta));
+            view.AddTextBox(nameof(ChangeProcessSide), "Сторона обработки");
+            view.AddTextBox(nameof(ChangeEngineSide), "Сторона двигателя");
         }
 
         public override bool Validate()

@@ -23,9 +23,9 @@ namespace CAM.TechProcesses.Stolb
 
         public static void ConfigureParamsView(ParamsView view)
         {
-            view.AddAcadObject(displayName: "Верхняя грань паза")
-                .AddParam(nameof(IsUplifting))
-                .AddParam(nameof(IsChangeStart), "Сменить начало");
+            view.AddAcadObject(displayName: "Верхняя грань паза");
+            view.AddTextBox(nameof(IsUplifting));
+            view.AddTextBox(nameof(IsChangeStart), "Сменить начало");
         }
 
         public override void BuildProcessing(MillingCommandGenerator generator)
