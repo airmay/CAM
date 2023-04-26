@@ -152,34 +152,34 @@ namespace CAM
         }
         #endregion
 
-        #region AddEnumParam
+        #region AddComboBox
 
-        public ParamsView AddComboBox(string displayName, string[] items, Action<int> SelectedIndexChanged)
+        public ComboBox AddComboBox<T>(string paramName, string displayName = null, params T[] values) where T : struct
         {
-            AddRow();
-            AddLabel(displayName);
+            var comboBox = AddComboBox(paramName, displayName);
 
-            var comboBox = new ComboBox
-            {
-                DropDownStyle = ComboBoxStyle.DropDownList,
-                FormattingEnabled = true,
-                Dock = DockStyle.Fill
-            };
+            comboBox.BindEnum(values);
+            comboBox.DataBindings.Add(new Binding("SelectedValue", BindingSource, paramName, true));
+
+            return comboBox;
+        }
+
+        public ComboBox AddComboBox(string displayName, object[] items, Action<int> selectedIndexChanged)
+        {
+            var comboBox = AddComboBox(displayName);
+
             comboBox.Items.AddRange(items);
-            comboBox.SelectedIndexChanged += new EventHandler((s, e) => SelectedIndexChanged(comboBox.SelectedIndex));
-
+            comboBox.SelectedIndexChanged += new EventHandler((s, e) => selectedIndexChanged(comboBox.SelectedIndex));
             BindingSource.DataSourceChanged += (s, e) =>
             {
                 comboBox.SelectedIndex = 0;
-                SelectedIndexChanged.Invoke(0);
+                selectedIndexChanged.Invoke(0);
             };
-            tablePanel.Controls.Add(comboBox, 1, tablePanel.RowStyles.Count);
-            AddRowH(comboBox.Height);
 
-            return this;
+            return comboBox;
         }
 
-        public ComboBox AddEnumParam<T>(string paramName, string displayName = null, params T[] values) where T : struct
+        private ComboBox AddComboBox(string paramName, string displayName = null)
         {
             AddLabel(paramName, displayName);
 
@@ -187,18 +187,16 @@ namespace CAM
             {
                 DropDownStyle = ComboBoxStyle.DropDownList,
                 Dock = DockStyle.Top,
-                Margin = new Padding(0, 0, 0, Font.Height / 2),
+                Margin = new Padding(3, 3, 3, Font.Height / 2),
             };
-            comboBox.BindEnum(values);
-            comboBox.DataBindings.Add(new Binding("SelectedValue", BindingSource, paramName, true));
             tablePanel.Controls.Add(comboBox);
 
             return comboBox;
         }
 
-        public ComboBox AddMaterial() => AddEnumParam<Material>("Material", "Материал");
+        public ComboBox AddMaterial() => AddComboBox<Material>("Material", "Материал");
 
-        public ComboBox AddMachine(params MachineType[] values) => AddEnumParam("MachineType", "Станок", values);
+        public ComboBox AddMachine(params MachineType[] values) => AddComboBox("MachineType", "Станок", values);
 
         #endregion
 

@@ -51,7 +51,7 @@ namespace CAM.TechProcesses.Tactile
             ConfigurePointsSelector(textbox, button, view.BindingSource);
 
             view.AddTextBox(nameof(Thickness));
-            view.AddEnumParam<CalcMethodType>(nameof(CalcMethod), "Метод расчета");
+            view.AddComboBox<CalcMethodType>(nameof(CalcMethod), "Метод расчета");
         }
 
         private static void ConfigurePointsSelector(TextBox textBox, Button button, BindingSource bindingSource)
