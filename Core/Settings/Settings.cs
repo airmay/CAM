@@ -12,6 +12,8 @@ namespace CAM
     /// </summary>
     public class Settings
     {
+        //TODO remove Settings
+
         #region static
 
         private static Lazy<Settings> _instance = new Lazy<Settings>(Load);
