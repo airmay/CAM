@@ -95,7 +95,7 @@ namespace CAM.TechProcesses.CableSawing
         public override void BuildProcessing(CableCommandGenerator generator)
         {
             //var dbObject = ProcessingArea.ObjectId.QOpenForRead();
-            var surface = AcadObjects.First().ObjectId.QOpenForRead<DbSurface>();
+            var surface = AcadObjects.ObjectId.QOpenForRead<DbSurface>();
             var offsetDistance = TechProcess.ToolThickness / 2 + Delta;
             if (IsRevereseOffset)
                 offsetDistance *= -1;

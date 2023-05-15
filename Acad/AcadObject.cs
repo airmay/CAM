@@ -8,59 +8,47 @@ namespace CAM
     [Serializable]
     public class AcadObject
     {
-        public long Handle { get; set; }
+        public long[] Handles { get; set; }
 
-        [NonSerialized]
-        private ObjectId? _objectId;
+        [NonSerialized] 
+        public ObjectId[] ObjectIds;
 
-        private AcadObject(ObjectId id)
+        private AcadObject(ObjectId[] objectIds)
         {
-            Handle = id.Handle.Value;
-            _objectId = id;
+            ObjectIds = objectIds;
+            Handles = Array.ConvertAll(objectIds, p => p.Handle.Value);
         }
 
-        public static AcadObject Create(ObjectId id) => new AcadObject(id);
+        public static AcadObject Create(ObjectId id) => new AcadObject(new[] { id });
 
-        public static List<AcadObject> CreateList(IEnumerable<ObjectId> ids) => ids.Select(p => new AcadObject(p)).ToList();
+        public static AcadObject Create(IEnumerable<ObjectId> ids) => new AcadObject(ids.ToArray());
 
         public static void LoadAcadProps(object @object)
         {
-            bool err = false;
-            var properties = @object.GetType().GetProperties();
-            foreach (var prop in properties.Where(p => p.PropertyType == typeof(AcadObject)))
+            var acadObjects = @object.GetType().GetProperties()
+                .Where(p => p.PropertyType == typeof(AcadObject))
+                .Select(p => (AcadObject)p.GetValue(@object))
+                .Where(p => p != null);
+            foreach (var acadObject in acadObjects)
             {
-                var acadObject = (AcadObject)prop.GetValue(@object);
-                if (acadObject != null && !acadObject.LoadObject())
-                {
-                    prop.SetValue(@object, null);
-                    err = true;
-                }
+                if (!acadObject.LoadObject())
+                    Acad.Alert("Используемые в техпроцессе объекты чертежа были удалены");
             }
-            foreach (var prop in properties.Where(p => p.PropertyType == typeof(List<AcadObject>)))
-            {
-                var acadObjects = (List<AcadObject>)prop.GetValue(@object);
-                if (acadObjects != null && !acadObjects.All(p => p.LoadObject()))
-                {
-                    prop.SetValue(@object, null);
-                    err = true;
-                }
-            }
-            if (err)
-                Acad.Alert("Используемые в техпроцессе объекты чертежа были удалены");
         }
 
         private bool LoadObject()
         {
-            var result = Acad.Database.TryGetObjectId(new Handle(Handle), out var id);
-            if (result)
-                _objectId = id;
-            return result;
+            ObjectIds = Handles
+                .Select(p => Acad.Database.TryGetObjectId(new Handle(p), out var id) ? id : ObjectId.Null)
+                .Where(p => p != ObjectId.Null)
+                .ToArray();
+            return Handles.Length == ObjectIds.Length;
         }
 
-        public ObjectId ObjectId => _objectId.Value;
+        public ObjectId ObjectId => ObjectIds[0];
 
         public Curve GetCurve() => Acad.OpenForRead(ObjectId);
 
-        public string GetDesc() => ObjectId.GetDesc();
+        public override string ToString() => ObjectIds.GetDesc();
     }
 }

@@ -50,23 +50,26 @@ namespace CAM.TechProcesses.CableSawing
 
         public override List<TechOperation> CreateTechOperations()
         {
-            return ProcessingArea.ConvertAll(p =>
-            {
-                var dbObject = p.ObjectId.QOpenForRead();
-                var operation = dbObject is Region || dbObject is PlaneSurface
-                    ? (TechOperation)new LineSawingTechOperation(this)
-                    : new ArcSawingTechOperation(this);
-                operation.ProcessingArea = p;
-                var caption = ((MenuItemAttribute)Attribute.GetCustomAttribute(operation.GetType(), typeof(MenuItemAttribute))).Name;
-                //operation.Setup(this, caption);
-                return operation;
-            });
+            return ProcessingArea.ObjectIds.Select(p =>
+                {
+                    var dbObject = p.QOpenForRead();
+                    var operation = dbObject is Region || dbObject is PlaneSurface
+                        ? (TechOperation)new LineSawingTechOperation(this)
+                        : new ArcSawingTechOperation(this);
+                    operation.ProcessingArea = AcadObject.Create(p);
+                    var caption =
+                        ((MenuItemAttribute)Attribute.GetCustomAttribute(operation.GetType(),
+                            typeof(MenuItemAttribute))).Name;
+                    //operation.Setup(this, caption);
+                    return operation;
+                })
+                .ToList();
         }
 
         protected override void BuildProcessing(CableCommandGenerator generator)
         {
             Tool = new Tool { Type = ToolType.Cable, Diameter = ToolThickness, Thickness = ToolThickness };
-            var z0 = ProcessingArea.Select(p => p.ObjectId).GetExtents().MaxPoint.Z + ZSafety;
+            var z0 = ProcessingArea.ObjectIds.GetExtents().MaxPoint.Z + ZSafety;
             generator.IsExtraRotate = IsExtraRotate;
 
             //if (OriginObject == null)
@@ -107,7 +110,7 @@ namespace CAM.TechProcesses.CableSawing
 
             generator.S = S;
             generator.Feed = CuttingFeed;
-            var z00 = ProcessingArea.Select(p => p.ObjectId).GetExtents().MaxPoint.Z + ZSafety;
+            var z00 = ProcessingArea.ObjectIds.GetExtents().MaxPoint.Z + ZSafety;
             generator.SetToolPosition(new Point3d(OriginX, OriginY, 0), 0, 0, z00);
             generator.Command($"G92");
             CableSawingTechOperation last = null; 

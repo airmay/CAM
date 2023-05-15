@@ -232,14 +232,14 @@ namespace CAM
             return (textBox, button);
         }
 
-        public ParamsView AddTool()
+        public (TextBox textbox, Button button) AddTool()
         {
             var toolProp = _type.GetProperty("Tool");
             var machineProp = _type.GetProperty("MachineType");
             var materialProp = _type.GetProperty("Material");
             var frequencyProp = _type.GetProperty("Frequency");
 
-            var (textbox, button) = CreateSelector("Инструмент", "Ξ");
+            var (textbox, button) = CreateSelector("Инструмент");
             BindingSource.DataSourceChanged += (s, e) => textbox.Text = toolProp.GetValue(ParamsObject)?.ToString();
             button.Click += (s, e) =>
             {
@@ -256,47 +256,38 @@ namespace CAM
                     BindingSource.ResetBindings(false);
                 }
             };
-            return this;
+            return (textbox, button);
         }
 
-        public ParamsView AddAcadObject(string paramName = "ProcessingArea", string displayName = null, string message = "Выбор объектов", string allowedTypes = "*", Action<ObjectId[]> afterSelect = null)
+        public (TextBox textbox, Button button) AddAcadObject(string paramName = "ProcessingArea", string displayName = null, string message = "Выбор объектов", string allowedTypes = "*", Action<ObjectId[]> afterSelect = null)
         {
             var prop = _type.GetProperty(paramName);
 
             var (textbox, button) = CreateSelector(displayName ?? GetDisplayName(paramName), "۞");
 
-            BindingSource.DataSourceChanged += prop.PropertyType == typeof(AcadObject) 
-                ? new EventHandler((s, e) => textbox.Text = ((AcadObject)prop.GetValue(ParamsObject))?.GetDesc())
-                : new EventHandler((s, e) => textbox.Text = ((List<AcadObject>)prop.GetValue(ParamsObject))?.GetDesc());
-            textbox.Enter += prop.PropertyType == typeof(AcadObject)
-                ? new EventHandler((s, e) => { if (prop.GetValue(ParamsObject) is AcadObject acadObj) Acad.SelectAcadObjects(new List<AcadObject> { acadObj }); })
-                : new EventHandler((s, e) => { if (prop.GetValue(ParamsObject) is List<AcadObject> acadObjList) Acad.SelectAcadObjects(acadObjList); });
+            BindingSource.DataSourceChanged +=
+                (s, e) => textbox.Text = ((AcadObject)prop.GetValue(ParamsObject))?.ToString();
+            textbox.Enter += (s, e) => 
+            {
+                if (prop.GetValue(ParamsObject) is AcadObject acadObj)
+                    Acad.SelectObjectIds(acadObj.ObjectIds);
+            };
             button.Click += (s, e) =>
             {
-                //textBox.Text = "";
-                //prop.SetValue(ParamsObject, null);
-
                 Interaction.SetActiveDocFocus();
                 Acad.SelectObjectIds();
                 var ids = Interaction.GetSelection($"\n{message}", allowedTypes);
                 if (ids.Length == 0)
                     return;
-                if (prop.PropertyType == typeof(AcadObject))
-                {
-                    var acadObject = AcadObject.Create(ids[0]);
-                    prop.SetValue(ParamsObject, acadObject);
-                    textbox.Text = acadObject.GetDesc();
-                }
-                else
-                {
-                    var acadOblects = AcadObject.CreateList(ids);
-                    prop.SetValue(ParamsObject, acadOblects);
-                    textbox.Text = acadOblects.GetDesc();
-                }
+
+                var acadObject = AcadObject.Create(ids);
+                prop.SetValue(ParamsObject, acadObject);
+                textbox.Text = acadObject.ToString();
+
                 afterSelect?.Invoke(ids);
                 Acad.SelectObjectIds(ids);
             };
-            return this;
+            return (textbox, button);
         }
 
         public ParamsView AddOrigin()
@@ -338,30 +329,5 @@ namespace CAM
 
             return this;
         }
-
-        //public ParamsView AddComboBox(string displayName, string[] items, Action<int> SelectedIndexChanged)
-        //{
-        //    AddRow();
-        //    AddLabel(displayName);
-
-        //    var comboBox = new ComboBox
-        //    {
-        //        DropDownStyle = ComboBoxStyle.DropDownList,
-        //        FormattingEnabled = true,
-        //        Dock = DockStyle.Fill
-        //    };
-        //    comboBox.Items.AddRange(items);
-        //    comboBox.SelectedIndexChanged += new EventHandler((s, e) => SelectedIndexChanged(comboBox.SelectedIndex));
-
-        //    BindingSource.DataSourceChanged += (s, e) =>
-        //    {
-        //        comboBox.SelectedIndex = 0;
-        //        SelectedIndexChanged.Invoke(0);
-        //    };
-        //    tablePanel.Controls.Add(comboBox, 1, tablePanel.RowStyles.Count);
-        //    AddRowH(comboBox.Height);
-
-        //    return this;
-        //}
     }
 }

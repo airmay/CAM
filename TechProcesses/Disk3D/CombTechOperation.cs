@@ -299,7 +299,7 @@ namespace CAM.TechProcesses.Disk3D
         private DbSurface CreateOffsetSurface()
         {
             DbSurface unionSurface = null;
-            foreach (var dBObject in TechProcess.ProcessingArea.Select(p => p.ObjectId.QOpenForRead()))
+            foreach (var dBObject in TechProcess.ProcessingArea.ObjectIds.QOpenForRead())
             {
                 DbSurface surface;
                 switch (dBObject)

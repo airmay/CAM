@@ -38,7 +38,7 @@ namespace CAM
 
         public double ZSafety { get; set; } = 20;
 
-        public List<AcadObject> ProcessingArea { get; set; }
+        public AcadObject ProcessingArea { get; set; }
 
         [NonSerialized]
         private List<ProcessCommand> _processCommands = new List<ProcessCommand>();

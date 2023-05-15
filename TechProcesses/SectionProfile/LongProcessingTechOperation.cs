@@ -71,7 +71,7 @@ namespace CAM.TechProcesses.SectionProfile
             generator.CuttingFeed = CuttingFeed;
 
             var railBase = TechProcess.Rail?.GetCurve() ?? new Line(Point3d.Origin, Point3d.Origin + Vector3d.XAxis * TechProcess.Length.Value);
-            var profile = (Profile ?? TechProcess.ProcessingArea[0]).GetCurve();
+            var profile = (Profile ?? TechProcess.ProcessingArea).GetCurve();
             //var processSide = 1;// ChangeEngineSide ? -1 : 1;
             //CreateProfile3D(profile, railBase, 1);
             var processSide = ChangeProcessSide ? -1 : 1;

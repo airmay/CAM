@@ -52,17 +52,17 @@ namespace CAM
 
         public static void Alert(Exception ex) => Alert("Ошибка", ex);
 
-        public static void ForEach(this IEnumerable<ObjectId> ids, Action<DBObject> action)
-        {
-            if (ids.Any())
-                App.LockAndExecute(() => ids.QForEach(action));
-        }
+        //public static void QForEach(this IEnumerable<ObjectId> ids, Action<DBObject> action)
+        //{
+        //    if (ids.Any())
+        //        App.LockAndExecute(() => ids.QForEach(action));
+        //}
 
-        public static string GetSize(List<AcadObject> processingArea)
+        public static string GetSize(AcadObject processingArea)
         {
             if (processingArea == null)
                 return "";
-            var bounds = processingArea.Select(p => p.ObjectId).GetExtents();
+            var bounds = processingArea.ObjectIds.GetExtents();
             var vector = bounds.MaxPoint - bounds.MinPoint;
             return $"{vector.X.Round()} x {vector.Y.Round()} x {vector.Z.Round()}";
         }
@@ -237,8 +237,6 @@ namespace CAM
         public static void ClearHighlighted() => _highlightedObjects = Array.Empty<ObjectId>();
 
         public static void UnhighlightAll() => SelectObjectIds();
-
-        public static void SelectAcadObjects(List<AcadObject> objects) => SelectObjectIds(objects?.Select(p => p.ObjectId).ToArray());
 
         public static void SelectObjectIds(params ObjectId[] objectIds)
         {

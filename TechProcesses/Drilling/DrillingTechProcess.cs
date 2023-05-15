@@ -1,5 +1,6 @@
 ﻿using Autodesk.AutoCAD.DatabaseServices;
 using System;
+using System.Linq;
 
 namespace CAM.TechProcesses.Drilling
 {
@@ -40,9 +41,9 @@ namespace CAM.TechProcesses.Drilling
             generator.ZSafety = ZSafety;
             generator.SetTool(1, Frequency, hasTool: false);
 
-            ProcessingArea.ForEach(p =>
+            ProcessingArea.ObjectIds.ToList().ForEach(p =>
             {
-                var arc = p.GetCurve() as Circle;
+                var arc = Acad.OpenForRead(p) as Circle;
                 Cutting(generator, arc.Center.X, arc.Center.Y);
             });
         }

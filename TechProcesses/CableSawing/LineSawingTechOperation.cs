@@ -41,7 +41,7 @@ namespace CAM.TechProcesses.CableSawing
 
         public override Curve[] GetRailCurves(List<Curve> curves)
         {
-            var bounds = AcadObjects.First().ObjectId.QOpenForRead<Entity>().Bounds.Value;
+            var bounds = AcadObjects.ObjectId.QOpenForRead<Entity>().Bounds.Value;
 
             var pts = curves.SelectMany(p => p.GetStartEndPoints()).ToList();
             var p0 = pts.OrderBy(p => p.DistanceTo(bounds.MaxPoint)).First();
@@ -57,12 +57,12 @@ namespace CAM.TechProcesses.CableSawing
         public override void BuildProcessing(CableCommandGenerator generator)
         {
             var offsetDistance = TechProcess.ToolThickness / 2 + Delta;
-            var dbObject = AcadObjects.First().ObjectId.QOpenForRead();
+            var dbObject = AcadObjects.ObjectId.QOpenForRead();
             
-            if (AcadObjects.Count == 2)
+            if (AcadObjects.ObjectIds.Length == 2)
             {
                 var matrix = Matrix3d.Displacement(Vector3d.ZAxis * offsetDistance);
-                var railCurves = AcadObjects.Select(p => (Curve)p.ObjectId.QOpenForRead<Curve>().GetTransformedCopy(matrix))
+                var railCurves = AcadObjects.ObjectIds.QOpenForRead<Curve>().Select(p => (Curve)p.GetTransformedCopy(matrix))
                     .Select(p => new Line(p.StartPoint, p.EndPoint)).ToArray();
                 if (railCurves[0].StartPoint.GetVectorTo(railCurves[0].EndPoint).GetAngleTo(railCurves[1].StartPoint.GetVectorTo(railCurves[1].EndPoint)) > Math.PI / 2)
                     railCurves[1].ReverseCurve();

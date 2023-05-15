@@ -24,7 +24,7 @@ namespace CAM
 
 //        public double ZSafety { get; set; } = 20;
 
-//        public List<AcadObject> ProcessingArea { get; set; }
+//        public AcadObject ProcessingArea { get; set; }
 
 //        public List<TechOperation> TechOperations { get; } = new List<TechOperation>();
 

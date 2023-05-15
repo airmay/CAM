@@ -11,7 +11,7 @@ namespace CAM.TechProcesses.CableSawing
         {
         }
 
-        public List<AcadObject> AcadObjects { get; set; }
+        public AcadObject AcadObjects { get; set; }
         public int CuttingFeed { get; set; }
         public int S { get; set; }
         public double Approach { get; set; }

@@ -52,7 +52,7 @@ namespace CAM.TechProcesses.RotationProfileBody
         protected override void BuildProcessing(MillingCommandGenerator generator)
         {
             var toolThickness = Tool.Thickness.Value;
-            var profile = ProcessingArea[0].GetCurve();
+            var profile = ProcessingArea.GetCurve();
             if (Delta != 0)
                 profile = (Curve)profile.GetOffsetCurves(Delta)[0];
 

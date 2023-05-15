@@ -57,7 +57,7 @@ namespace CAM.TechProcesses.Disk3D
 
         public override void PrepareBuild(MillingCommandGenerator generator)
         {
-            var bounds = TechProcess.ProcessingArea.Select(p => p.ObjectId).GetExtents();
+            var bounds = TechProcess.ProcessingArea.ObjectIds.GetExtents();
             generator.ZSafety = bounds.MaxPoint.Z + TechProcess.ZSafety;
             generator.ToolPosition.Point += Vector3d.ZAxis * generator.ZSafety;
         }
@@ -110,7 +110,7 @@ namespace CAM.TechProcesses.Disk3D
         private DbSurface CreateOffsetSurface()
         {
             DbSurface unionSurface = null;
-            foreach (var dBObject in TechProcess.ProcessingArea.Select(p => p.ObjectId.QOpenForRead()))
+            foreach (var dBObject in TechProcess.ProcessingArea.ObjectIds.QOpenForRead())
             {
                 DbSurface surface;
                 switch (dBObject)

@@ -60,7 +60,7 @@ namespace CAM.TechProcesses.SectionProfile
         public override void BuildProcessing(MillingCommandGenerator generator)
         {
             var railBase = TechProcess.Rail?.GetCurve() ?? new Line(Point3d.Origin, Point3d.Origin + Vector3d.XAxis * TechProcess.Length.Value);
-            var profile = (Profile ?? TechProcess.ProcessingArea[0]).GetCurve();
+            var profile = (Profile ?? TechProcess.ProcessingArea).GetCurve();
             var processSide = ChangeProcessSide ? 1 : -1;
             CreateProfile3D(profile, railBase, processSide);
 
@@ -201,7 +201,7 @@ namespace CAM.TechProcesses.SectionProfile
             if (rail.IsNewObject)
                 rail.Dispose();
 
-            var profile = sectionProfile.ProcessingArea[0].GetCurve() as Polyline;
+            var profile = sectionProfile.ProcessingArea.GetCurve() as Polyline;
             if (profile == null) throw new Exception("Профиль должен быть полилинией");
 
             if (Delta != 0)

@@ -51,7 +51,7 @@ namespace CAM.TechProcesses.SectionProfile
             if (Rail == null)
                 rail.Dispose();
 
-            var profile = ProcessingArea[0].GetCurve();
+            var profile = ProcessingArea.GetCurve();
             var profileLength = profile.Length();
             startPass = new Point3d(startPass.X, startPass.Y - profile.StartPoint.X, profile.StartPoint.Y);
             generator.ZSafety += profile.StartPoint.Y;

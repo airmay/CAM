@@ -63,8 +63,8 @@ namespace CAM.TechProcesses.Polishing
             else
                 generator.SetTool(1, Frequency, angleA: 0, hasTool: false);
 
-            var curves = ProcessingArea.Select(p => p.ObjectId).QOpenForRead<Curve>().ToList();
-            var bounds = ProcessingArea.Select(p => p.ObjectId).GetExtents();
+            var curves = ProcessingArea.ObjectIds.QOpenForRead<Curve>().ToList();
+            var bounds = ProcessingArea.ObjectIds.GetExtents();
             var random = new Random();
             var mainDir = Vector3d.XAxis.RotateBy(Angle1.ToRad(), Vector3d.ZAxis);
             var side = 1;

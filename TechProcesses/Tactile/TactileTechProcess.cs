@@ -11,7 +11,7 @@ namespace CAM.TechProcesses.Tactile
     [MenuItem("Тактилка", 2)]
     public class TactileTechProcess: MillingTechProcess
     {
-        public List<AcadObject> Objects { get; set; }
+        public AcadObject Objects { get; set; }
 
         public double? BandWidth { get; set; }
 
@@ -51,6 +51,7 @@ namespace CAM.TechProcesses.Tactile
             view.AddIndent();
             view.AddTextBox(nameof(Depth));
             view.AddTextBox(nameof(Departure));
+            view.AddComboBox("Режимы", new[] { "Отрезок", "Кривая" }, p => { });
             view.AddTextBox(nameof(TransitionFeed));
             view.AddTextBox(nameof(PenetrationFeed));
             view.AddOrigin();
@@ -85,7 +86,7 @@ namespace CAM.TechProcesses.Tactile
 
         public Polyline GetContour()
         {
-            var points = ProcessingArea.SelectMany(p => p.GetCurve().GetStartEndPoints());
+            var points = ProcessingArea.ObjectIds.SelectMany(p => Acad.OpenForRead(p).GetStartEndPoints());
             return NoDraw.Rectang(new Point3d(points.Min(p => p.X), points.Min(p => p.Y), 0), new Point3d(points.Max(p => p.X), points.Max(p => p.Y), 0));
         }
 
