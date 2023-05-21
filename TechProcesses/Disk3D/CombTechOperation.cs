@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using DbSurface = Autodesk.AutoCAD.DatabaseServices.Surface;
 using Autodesk.AutoCAD.Geometry;
+using System.Security.Cryptography;
 
 namespace CAM.TechProcesses.Disk3D
 {
@@ -18,13 +19,15 @@ namespace CAM.TechProcesses.Disk3D
 
         public double StepPass { get; set; }
 
-        public double StartPass { get; set; }
+        public double? StartPass { get; set; }
 
-        public double EndPass { get; set; }
+        public double? EndPass { get; set; }
 
         public bool IsReverse { get; set; }
 
-        public double Penetration { get; set; }
+        public double PenetrationStep { get; set; }
+        public double? PenetrationBegin { get; set; }
+        public double? PenetrationEnd { get; set; }
 
         public double Delta { get; set; }
 
@@ -45,18 +48,20 @@ namespace CAM.TechProcesses.Disk3D
             view.AddTextBox(nameof(StepPass));
             view.AddTextBox(nameof(StartPass));
             view.AddTextBox(nameof(EndPass));
-            view.AddTextBox(nameof(IsReverse), "Обратно");
+            view.AddCheckBox(nameof(IsReverse), "Обратно");
             view.AddIndent();
             view.AddTextBox(nameof(StepLong));
             view.AddTextBox(nameof(Departure));
             view.AddIndent();
-            view.AddTextBox(nameof(Penetration));
+            view.AddTextBox(nameof(PenetrationStep), "Заглубление: шаг");
+            view.AddTextBox(nameof(PenetrationBegin), "Заглубление: начало");
+            view.AddTextBox(nameof(PenetrationEnd), "Заглубление: конец");
             view.AddTextBox(nameof(CuttingFeed));
             view.AddIndent();
             view.AddTextBox(nameof(Delta));
-            view.AddTextBox(nameof(IsDepartureOnBorderSection), "Выезд по границе сечения");
+            view.AddCheckBox(nameof(IsDepartureOnBorderSection), "Выезд по границе сечения");
             view.AddTextBox(nameof(PenetrationAll), "Заглубление всего");
-            view.AddTextBox(nameof(IsUplifting));
+            view.AddCheckBox(nameof(IsUplifting));
         }
 
         private void SetTool(MillingCommandGenerator generator, double angleA, double angleC) 
@@ -69,6 +74,27 @@ namespace CAM.TechProcesses.Disk3D
 
         public override void BuildProcessing(MillingCommandGenerator generator)
         {
+            generator.Tool = TechProcess.Tool;
+            var processor = new SurfaceProcessor(TechProcess.ProcessingArea)
+            {
+                Tool = TechProcess.Tool,
+                PassSetParams = new PassSetParams(TechProcess.Angle, StepPass, StartPass, EndPass),
+                PassParams = new PassParams
+                {
+                    ToolAngleC = TechProcess.Angle, 
+                    ToolAngleA = TechProcess.AngleA,
+                    PenetrationStep = PenetrationStep,
+                    PenetrationAll = PenetrationAll,
+                    Departure = Departure,
+                    CuttingFeed = CuttingFeed,
+                    Delta = Delta,
+                    Step = StepLong
+                }
+            };
+            processor.Execute(generator);
+            return;
+
+
             var disk3DTechProcess = (Disk3DTechProcess)TechProcess;
 
             generator.Tool = TechProcess.Tool;
@@ -170,10 +196,10 @@ namespace CAM.TechProcesses.Disk3D
                 var zMin = -10000D;
                 for (var x = bounds.MinPoint.X; x <= bounds.MaxPoint.X; x += StepLong)
                 {
-                    var par = GetPar(new Point3d(x, y, zMin));
+                    var par = GetPar(new Point3d(x, y.Value, zMin));
                     if (par.HasValue)
                     {
-                        var point = new Point3d(x, y, zMin + par.Value);
+                        var point = new Point3d(x, y.Value, zMin + par.Value);
                         var ind = points.Count - 1;
                         //if (ind > 0 && points[ind - 1].GetVectorTo(points[ind]).IsCodirectionalTo(points[ind].GetVectorTo(point)))
                         //    points[ind] = point;
@@ -386,7 +412,7 @@ namespace CAM.TechProcesses.Disk3D
             do
             {
                 isComplete = true;
-                z -= Penetration;
+                z -= PenetrationStep;
 
                 var point0 = pass[direction][0];
                 if (z > point0.Z)
@@ -454,7 +480,7 @@ namespace CAM.TechProcesses.Disk3D
             do
             {
                 isComplete = true;
-                z -= Penetration;
+                z -= PenetrationStep;
                 var point0 = Algorithms.NullPoint3d;
                 point = Algorithms.NullPoint3d;
                 //var isPassStarted = false;

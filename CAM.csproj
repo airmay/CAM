@@ -90,6 +90,7 @@
   <ItemGroup>
     <Compile Include="Acad\AcadGateway.cs" />
     <Compile Include="Acad\AcadObjectNames.cs" />
+    <Compile Include="Acad\AcadUtils.cs" />
     <Compile Include="Acad\AutoCADCommands\Algorithms.cs" />
     <Compile Include="Acad\AutoCADCommands\App.cs" />
     <Compile Include="Acad\AutoCADCommands\Commands.cs" />
@@ -158,6 +159,7 @@
     <Compile Include="TechProcesses\Disk3D\CrossCleaningTechOperation.cs" />
     <Compile Include="TechProcesses\Disk3D\Disk3DTechProcess.cs" />
     <Compile Include="TechProcesses\Disk3D\LongCleaningTechOperation.cs" />
+    <Compile Include="TechProcesses\Disk3D\SurfaceProcessor.cs" />
     <Compile Include="TechProcesses\Drilling\DrillingTechProcess.cs" />
     <Compile Include="Core\Settings\CuttingMode.cs" />
     <Compile Include="Core\Settings\MachineSettings.cs" />
