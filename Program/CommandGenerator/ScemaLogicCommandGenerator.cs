@@ -60,5 +60,14 @@ namespace CAM.Commands
         }
 
         public override void Cycle() => Command("28;;XYCZ;;;;;;", CommandNames.Cycle);
+
+        protected override string GetGCommand(int gCode, int? feed, Point2d? center = null)
+        {
+            var par = CreateParams(ToolPosition, feed, center);
+            //var textParams = GetTextParams(par);
+            //return $"G{gCode}{CommandDelimiter}{textParams}";
+
+            return $"{gCode};;XYCZ;{(gCode == 0 ? 0 : par["F"])};{par["X"]};{par["Y"]};{par["C"]};{par["Z"]};";
+        }
     }
 }

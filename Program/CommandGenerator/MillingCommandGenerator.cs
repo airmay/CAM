@@ -358,8 +358,8 @@ namespace CAM
         {
             var newParams = position.GetParams();
             newParams["F"] = feed;
-            newParams["I"] = center?.X;
-            newParams["J"] = center?.Y;
+            newParams["I"] = center?.X.Round(4);
+            newParams["J"] = center?.Y.Round(4);
             return newParams;
         }
 

@@ -55,11 +55,11 @@ namespace CAM
         {
             return new Dictionary<string, double?>
             {
-                ["X"] = X,
-                ["Y"] = Y,
-                ["Z"] = Z,
-                ["C"] = AngleC,
-                ["A"] = AngleA
+                ["X"] = X?.Round(4),
+                ["Y"] = Y?.Round(4),
+                ["Z"] = Z?.Round(4),
+                ["C"] = AngleC.Round(4),
+                ["A"] = AngleA.Round(4),
             };
         }
     }

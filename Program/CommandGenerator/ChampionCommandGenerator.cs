@@ -45,10 +45,13 @@ namespace CAM
         {
             Command($"S{_frequency}", "Шпиндель");
             Command($"M3", "Шпиндель");
+            Command("#HSC ON[CONTERROR 0.1]");
+
         }
 
         protected override void StopEngineCommands()
         {
+            Command("#HSC OFF");
             Command("M05", "Шпиндель откл.");
         }
 

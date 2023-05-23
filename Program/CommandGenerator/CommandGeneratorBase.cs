@@ -39,7 +39,7 @@ namespace CAM
                     if (!newParams.TryGetValue(p.Key, out var value) || !value.HasValue)
                         return null;
 
-                    var newValue = value.Value.Round(4);
+                    var newValue = value.Value;
                     if (p.Value == newValue)
                         return null;
 
