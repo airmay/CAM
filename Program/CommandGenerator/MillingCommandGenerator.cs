@@ -110,7 +110,9 @@ namespace CAM
         public void SetZSafety(double zSafety, double zMax = 0)
         {
             ZSafety = zSafety + zMax;
-            ToolPosition.Z = ZSafety;
+            ToolPosition.Z = ZSafety + UpperZ;
+            Params = CreateParams(ToolPosition, 0, null);
+
             //ToolPosition = new MillToolPosition(new Point3d(double.NaN, double.NaN, ZSafety + UpperZ), 0, 0);
         }
 

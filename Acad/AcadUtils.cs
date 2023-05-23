@@ -68,7 +68,7 @@ namespace CAM
                 {
                     surface.RayTest(new Point3d(x, y, zMin), Vector3d.ZAxis, Consts.Epsilon,
                         out var col, out var par);
-                    return par.Count > 0 ? (double?)par[par.Count - 1] : null;
+                    return par.Count > 0 ? (double?)par[par.Count - 1] + zMin : null;
                 })
                 .Max();
         }

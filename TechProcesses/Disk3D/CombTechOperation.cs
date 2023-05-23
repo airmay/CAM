@@ -26,7 +26,7 @@ namespace CAM.TechProcesses.Disk3D
         public bool IsReverse { get; set; }
 
         public double PenetrationStep { get; set; }
-        public double? PenetrationBegin { get; set; }
+        public double PenetrationBegin { get; set; }
         public double? PenetrationEnd { get; set; }
 
         public double Delta { get; set; }
@@ -75,6 +75,10 @@ namespace CAM.TechProcesses.Disk3D
         public override void BuildProcessing(MillingCommandGenerator generator)
         {
             generator.Tool = TechProcess.Tool;
+            var zMax = TechProcess.Thickness.Value;
+            //var zMax = offsetSurface.GeometricExtents.MinPoint.Z + TechProcess.Thickness.Value;
+            generator.SetZSafety(TechProcess.ZSafety, zMax);
+
             var processor = new SurfaceProcessor(TechProcess.ProcessingArea)
             {
                 Tool = TechProcess.Tool,
@@ -83,6 +87,7 @@ namespace CAM.TechProcesses.Disk3D
                 {
                     ToolAngleC = TechProcess.Angle, 
                     ToolAngleA = TechProcess.AngleA,
+                    PenetrationStart= PenetrationBegin,
                     PenetrationStep = PenetrationStep,
                     PenetrationAll = PenetrationAll,
                     Departure = Departure,
@@ -101,9 +106,7 @@ namespace CAM.TechProcesses.Disk3D
 
             var offsetSurface = CreateOffsetSurface();
 
-            var zMax = TechProcess.Thickness.Value + TechProcess.ZSafety;
-            //var zMax = offsetSurface.GeometricExtents.MinPoint.Z + TechProcess.Thickness.Value;
-            //generator.SetZSafety(TechProcess.ZSafety, zMax);
+
 
             Matrix3d? matrix = null;
 

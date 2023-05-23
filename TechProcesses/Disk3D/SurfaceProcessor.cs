@@ -8,6 +8,7 @@ using System.Diagnostics.Eventing.Reader;
 using System.Linq;
 using Autodesk.AutoCAD.Windows.ToolPalette;
 using System.Drawing;
+using System.Runtime.InteropServices;
 
 namespace CAM.TechProcesses.Disk3D
 {
@@ -57,11 +58,6 @@ namespace CAM.TechProcesses.Disk3D
         public void Execute(MillingCommandGenerator generator)
         {
             var surface = _processingArea.ObjectIds.CreateOffsetSurface(PassParams.Delta);
-
-            //var zMax = TechProcess.Thickness.Value + TechProcess.ZSafety;
-            //var zMax = offsetSurface.GeometricExtents.MinPoint.Z + TechProcess.Thickness.Value;
-            //generator.SetZSafety(TechProcess.ZSafety, zMax);
-
             var rotation = AcadUtils.GetRotationMatrix(PassSetParams.Angle, PassParams.ToolAngleA);
             surface.TransformBy(rotation);
             
@@ -69,12 +65,51 @@ namespace CAM.TechProcesses.Disk3D
             foreach (var targetPass in targetPassSet)
             {
                 var cuttingPassSet = CalcCuttingPassSet(targetPass);
-                foreach (var pass in cuttingPassSet)
-                {
-                    Cutting(generator, pass);
-                }
+
+                Generate(generator, cuttingPassSet, rotation.Inverse());
             }
             surface.Dispose();
+        }
+
+        private void Generate(MillingCommandGenerator generator, IEnumerable<List<Point3d>> cuttingPassSet, Matrix3d matrix)
+        {
+            foreach (var cuttingPass in cuttingPassSet)
+            {
+                var pass = cuttingPass;
+
+                pass[0] = pass[0].GetExtendedPoint(pass[1], PassParams.Departure);
+                pass[pass.Count - 1] = pass[pass.Count - 1].GetExtendedPoint(pass[pass.Count - 2], PassParams.Departure);
+
+                pass = pass.ConvertAll(p => p.TransformBy(matrix));
+
+                var tp = generator.ToolPosition.IsDefined ? generator.ToolPosition.Point : Point3d.Origin;
+                if (pass.First().DistanceTo(tp) > pass.Last().DistanceTo(tp))
+                    pass.Reverse();
+
+                if (generator.IsUpperTool)
+                {
+                    generator.Move(pass[0].X, pass[0].Y);
+                    generator.Cycle();
+                }
+                if (pass[0] != generator.ToolPosition.Point )
+                    generator.GCommand(CommandNames.Penetration, 1, point: pass[0]);
+
+                var prevPoint = pass[1];
+                var prevVector = pass[0].GetVectorTo(prevPoint);
+                foreach (var point in pass.Skip(2))
+                {
+                    var vector = prevPoint.GetVectorTo(point);
+                    if (!vector.IsCodirectionalTo(prevVector, Tolerance.Global))
+                    {
+                        generator.GCommand(CommandNames.Cutting, 1, point: prevPoint);
+                        prevVector = vector;
+                    }
+                    prevPoint = point;
+                }
+                generator.GCommand(CommandNames.Cutting, 1, point: pass.Last());
+            }
+
+            generator.Uplifting();
         }
 
         private IEnumerable<List<Point3d>> CalcTargetPassSet(DbSurface surface)
@@ -96,9 +131,12 @@ namespace CAM.TechProcesses.Disk3D
                         points.Add(new Point3d(x, y, z.Value));
                 }
 
-                var offsetPoints = points.CalcOffsetPoints(Tool.Diameter / 2, PassParams.Step).ToList();
-                if (offsetPoints.Any())
-                    yield return offsetPoints;
+                if (points.Count > 1)
+                {
+                    var offsetPoints = points.CalcOffsetPoints(Tool.Diameter / 2, PassParams.Step).ToList();
+                    if (offsetPoints.Any())
+                        yield return offsetPoints;
+                }
             }
         }
 
@@ -139,7 +177,7 @@ namespace CAM.TechProcesses.Disk3D
                 }
 
                 startIndex = nextStartIndex.GetValueOrDefault();
-                endIndex = nextEndIndex.GetValueOrDefault();
+                //endIndex = nextEndIndex.GetValueOrDefault();
 
                 yield return pass;
             }
@@ -148,6 +186,7 @@ namespace CAM.TechProcesses.Disk3D
 
         private static void Cutting(MillingCommandGenerator generator, List<Point3d> pass)
         {
+            generator.GCommand(CommandNames.Penetration, 1, point: pass.First());
             foreach (var point in pass)
             {
                 generator.GCommand(CommandNames.Cutting, 1, point: point);

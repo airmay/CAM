@@ -61,7 +61,7 @@ namespace CAM
             newParams["A"] = position.AngleC < 180 ? -position.AngleC : (360 - position.AngleC);
             newParams["C"] = 90 - position.AngleA;
 
-            if (position.X.HasValue || position.Y.HasValue || position.Z.HasValue)
+            if (position.X.HasValue && position.Y.HasValue && position.Z.HasValue)
             {
                 var angleC = position.AngleC.ToRad();
                 var angleA = position.AngleA.ToRad();

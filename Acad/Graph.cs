@@ -79,6 +79,8 @@ namespace CAM
 
         public static Point3d GetExtendedPoint(this Point3d point, Point3d basePoint, double value) => point + (point - basePoint).GetNormal() * value;
 
+        public static Point3d GetClosestPoint(this Point3d point, params Point3d[] points) => points.OrderBy(p => p.DistanceTo(point)).First();
+
         public static bool IsEqual(this double value1, double value2) => Math.Abs(value1 - value2) < Consts.Epsilon;
         public static bool IsEqual(this Point3d point1, Point3d point2) => point1.X.IsEqual(point2.X) && point1.Y.IsEqual(point2.Y) && point1.Z.IsEqual(point2.Z);
 
