@@ -159,7 +159,6 @@
     <Compile Include="TechProcesses\Disk3D\CrossCleaningTechOperation.cs" />
     <Compile Include="TechProcesses\Disk3D\Disk3DTechProcess.cs" />
     <Compile Include="TechProcesses\Disk3D\LongCleaningTechOperation.cs" />
-    <Compile Include="TechProcesses\Disk3D\SurfaceProcessor.cs" />
     <Compile Include="TechProcesses\Drilling\DrillingTechProcess.cs" />
     <Compile Include="Core\Settings\CuttingMode.cs" />
     <Compile Include="Core\Settings\MachineSettings.cs" />
