@@ -90,6 +90,41 @@ namespace CAM
             return offsetCurve.GetPoints(step);
         }
 
+        public static List<Point3d> Trim(this List<Point3d> points, double beginDist, double endDist)
+        {
+            var startSkip = 0;
+            if (beginDist > 0)
+            {
+                var length = 0D;
+                for (var i = 1; i < points.Count; i++)
+                {
+                    length += points[i].DistanceTo(points[i - 1]);
+                    if (length >= beginDist)
+                    {
+                        startSkip = i;
+                        break;
+                    }
+                }
+            }
+
+            var endSkip = 0;
+            if (endDist > 0)
+            {
+                var length = 0D;
+                for (var i = points.Count - 2; i > 1; i--)
+                {
+                    length += points[i].DistanceTo(points[i + 1]);
+                    if (length >= endDist)
+                    {
+                        endSkip = points.Count - i - 1;
+                        break;
+                    }
+                } 
+            }
+
+            return points.Skip(startSkip).Take(points.Count - startSkip - endSkip).ToList();
+        }
+
         public static IEnumerable<Point3d> GetPoints(this Curve3d curve, double step)
         {
             return new List<Point3d> { curve.StartPoint }.Concat(GetPointsInner(curve));
@@ -104,7 +139,7 @@ namespace CAM
                         var startParam = arc.GetParameterOf(arc.StartPoint);
                         var endParam = arc.GetParameterOf(arc.EndPoint);
                         var length = arc.GetLength(startParam, endParam, Consts.Epsilon);
-                        var number = (int)(length / (step * 10));
+                        var number = (int)(length / (step * 2));
                         return number > 2
                             ? arc.GetSamplePoints(number).Skip(1).Select(p => p.Point)
                             : new[] { arc.EndPoint };

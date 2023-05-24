@@ -101,9 +101,11 @@ namespace CAM.TechProcesses.Disk3D
             {
                 //var pass = cuttingPass;//.ConvertAll(p => p.TransformBy(matrix));
 
-                pass[0] = pass[0].GetExtendedPoint(pass[1], Departure);
-                pass[pass.Count - 1] = pass[pass.Count - 1].GetExtendedPoint(pass[pass.Count - 2], Departure);
-
+                if (Departure > 0)
+                {
+                    pass[0] = pass[0].GetExtendedPoint(pass[1], Departure);
+                    pass[pass.Count - 1] = pass[pass.Count - 1].GetExtendedPoint(pass[pass.Count - 2], Departure);
+                }
                 var tp = generator.ToolPosition.IsDefined ? generator.ToolPosition.Point : Point3d.Origin;
                 if (pass.First().DistanceTo(tp) > pass.Last().DistanceTo(tp))
                     pass.Reverse();
@@ -114,7 +116,7 @@ namespace CAM.TechProcesses.Disk3D
                     generator.Cycle();
                 }
                 if (pass[0] != generator.ToolPosition.Point)
-                    generator.GCommand(CommandNames.Penetration, 1, point: pass[0]);
+                    generator.GCommand(CommandNames.Penetration, 1, point: pass[0], feed: TechProcess.PenetrationFeed);
 
                 var prevPoint = pass[1];
                 var prevVector = pass[0].GetVectorTo(prevPoint);
@@ -123,12 +125,12 @@ namespace CAM.TechProcesses.Disk3D
                     var vector = prevPoint.GetVectorTo(point);
                     if (!vector.IsCodirectionalTo(prevVector, Tolerance.Global))
                     {
-                        generator.GCommand(CommandNames.Cutting, 1, point: prevPoint);
+                        generator.GCommand(CommandNames.Cutting, 1, point: prevPoint, feed: CuttingFeed);
                         prevVector = vector;
                     }
                     prevPoint = point;
                 }
-                generator.GCommand(CommandNames.Cutting, 1, point: pass.Last());
+                generator.GCommand(CommandNames.Cutting, 1, point: pass.Last(), feed: CuttingFeed);
             }
 
             //generator.Move();
@@ -160,7 +162,11 @@ namespace CAM.TechProcesses.Disk3D
                 {
                     var offsetPoints = points.CalcOffsetPoints(TechProcess.Tool.Diameter / 2, StepLong).ToList();
                     if (offsetPoints.Any())
+                    {
+                        if (Departure < 0)
+                            offsetPoints = offsetPoints.Trim(-Departure, -Departure);
                         yield return offsetPoints;
+                    }
                 }
             }
         }

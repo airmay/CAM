@@ -47,8 +47,8 @@ namespace CAM
         public int SmallFeed { get; set; }
         public Side EngineSide { get; set; }
 
-        public double AC { get; set; } = 165; // + Tool.Thickness.Value;
-        public double AC_V { get; set; } = 169; // + +Tool.Thickness.Value;
+        public double AC => 165 + Tool.Thickness.GetValueOrDefault();
+        public double AC_V => 169 + Tool.Thickness.GetValueOrDefault();
         public double DZ { get; set; }
         public Tool Tool { get; set; }
 

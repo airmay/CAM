@@ -38,10 +38,10 @@ namespace CAM.TechProcesses.Disk3D
             view.AddAcadObject(allowedTypes: $"{AcadObjectNames.Surface},{AcadObjectNames.Region}", afterSelect: (ids) => refreshSize());
             sizeLabel = view.AddLabelText("Размеры");
             view.AddTextBox(nameof(Angle), "Угол");
-            view.AddTextBox(nameof(IsExactlyBegin), "Начало точно");
-            view.AddTextBox(nameof(IsExactlyEnd), "Конец точно");
+            view.AddCheckBox(nameof(IsExactlyBegin), "Начало точно");
+            view.AddCheckBox(nameof(IsExactlyEnd), "Конец точно");
             view.AddTextBox(nameof(ZSafety));
-            view.AddTextBox(nameof(IsA90), "Угол A = 90");
+            view.AddCheckBox(nameof(IsA90), "Угол A = 90");
             view.AddTextBox(nameof(AngleA), "Угол вертикальный");
             //.AddTextBox(nameof(DzBillet), "dZ заготовки")
             view.AddTextBox(nameof(OriginCellNumber), "Ячейка начала координат");

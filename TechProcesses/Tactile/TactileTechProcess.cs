@@ -80,8 +80,8 @@ namespace CAM.TechProcesses.Tactile
         {
             //base.BuildProcessing(generator);
             generator.Tool = Tool;
-            generator.AC = AC + Tool.Thickness.GetValueOrDefault();
-            generator.AC_V = AC_V + Tool.Thickness.GetValueOrDefault();
+            //generator.AC = AC + Tool.Thickness.GetValueOrDefault();
+            //generator.AC_V = AC_V + Tool.Thickness.GetValueOrDefault();
         }
 
         public Polyline GetContour()
