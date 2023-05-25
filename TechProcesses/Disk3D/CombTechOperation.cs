@@ -42,6 +42,8 @@ namespace CAM.TechProcesses.Disk3D
         public double PenetrationAll { get; set; }
 
         public bool IsUplifting { get; set; }
+        public double? VzMax { get; set; }
+
 
         public static void ConfigureParamsView(ParamsView view)
         {
@@ -61,6 +63,7 @@ namespace CAM.TechProcesses.Disk3D
             view.AddTextBox(nameof(Delta));
             view.AddCheckBox(nameof(IsDepartureOnBorderSection), "Выезд по границе сечения");
             view.AddTextBox(nameof(PenetrationAll), "Заглубление всего");
+            view.AddTextBox(nameof(VzMax), "Vz максимальная");
             view.AddCheckBox(nameof(IsUplifting));
         }
 
@@ -125,7 +128,18 @@ namespace CAM.TechProcesses.Disk3D
                     var vector = prevPoint.GetVectorTo(point);
                     if (!vector.IsCodirectionalTo(prevVector, Tolerance.Global))
                     {
-                        generator.GCommand(CommandNames.Cutting, 1, point: prevPoint, feed: CuttingFeed);
+                        var feed = CuttingFeed;
+                        if (VzMax.HasValue) // ограничение вертикальной составляющей
+                        {
+                            var cos = Math.Cos(prevVector.GetAngleTo(Vector3d.ZAxis.Negate()));
+                            if (cos > 0)
+                            {
+                                var maxFeed = VzMax.Value / cos;
+                                if (feed > maxFeed)
+                                    feed = (int)maxFeed;
+                            }
+                        }
+                        generator.GCommand(CommandNames.Cutting, 1, point: prevPoint, feed: feed);
                         prevVector = vector;
                     }
                     prevPoint = point;
@@ -135,8 +149,8 @@ namespace CAM.TechProcesses.Disk3D
 
             //generator.Move();
             generator.Matrix = null;
-
-            //generator.Uplifting();
+            if (IsUplifting)
+                generator.Uplifting();
         }
 
         private IEnumerable<List<Point3d>> CalcTargetPassSet(DbSurface surface)
@@ -207,7 +221,7 @@ namespace CAM.TechProcesses.Disk3D
                     pass.Add(new Point3d(targetPass[index].X, targetPass[index].Y, z));
                 }
 
-                startIndex = nextStartIndex.GetValueOrDefault();
+                //startIndex = nextStartIndex.GetValueOrDefault();
                 //endIndex = nextEndIndex.GetValueOrDefault();
 
                 yield return pass;
