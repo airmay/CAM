@@ -131,6 +131,10 @@
     <Compile Include="Program\CommandGenerator\DonatoniCommandGenerator.cs" />
     <Compile Include="Program\CommandGenerator\MachineTypeAttribute.cs" />
     <Compile Include="Program\CommandGenerator\MillingCommandGenerator.cs" />
+    <Compile Include="Program\Generator\DonatoniPostProcessor.cs" />
+    <Compile Include="Program\Generator\IPostProcessor.cs" />
+    <Compile Include="Program\Generator\IPostProcessorBase.cs" />
+    <Compile Include="Program\Generator\MillingGenerator.cs" />
     <Compile Include="Program\CommandGenerator\ScemaLogicCommandGenerator.cs" />
     <Compile Include="Core\ExtensionApplication.cs" />
     <Compile Include="PaletteSet\TrimmingView.cs">
@@ -148,6 +152,7 @@
     <Compile Include="Acad\AcadObject.cs" />
     <Compile Include="Core\Enums\MachineType.cs" />
     <Compile Include="Core\Enums\Material.cs" />
+    <Compile Include="Program\Generator\PostProcessorBase.cs" />
     <Compile Include="Program\OperationProcessor.cs" />
     <Compile Include="Program\ProcessCommand.cs" />
     <Compile Include="TechProcesses\9_Stolb\SawingTechOperation.cs" />
