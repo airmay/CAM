@@ -5,7 +5,7 @@ using Dreambuild.AutoCAD;
 
 namespace CAM.Program.Generator
 {
-    public abstract class PostProcessorBase : IPostProcessorBase
+    public abstract class PostProcessorBase : IPostProcessor
     {
         protected string CommandDelimiter = " ";
         protected string ParamTypes = "GXYZCAIJF";
@@ -41,9 +41,23 @@ namespace CAM.Program.Generator
 
         public Dictionary<char, string> CreateParams(int gCode, MillToolPosition position, int feed, Point2d? arcCenter = null)
         {
-            var @params = new Dictionary<char, string>();
+            var @params = CreateParams(position);
 
             @params['G'] = gCode.ToString();
+            @params['F'] = feed.ToString();
+            if (arcCenter.HasValue)
+            {
+                @params['I'] = arcCenter.Value.X.ToStringParam();
+                @params['J'] = arcCenter.Value.X.ToStringParam();
+            }
+
+            return @params;
+        }
+
+        private Dictionary<char, string> CreateParams(MillToolPosition position)
+        {
+            var @params = new Dictionary<char, string>();
+
             if (position.X.HasValue)
                 @params['X'] = (position.X.Value - Origin.X).ToStringParam();
             if (position.Y.HasValue)
@@ -55,13 +69,6 @@ namespace CAM.Program.Generator
             @params['C'] = position.AngleC.ToStringParam();
             @params['A'] = position.AngleA.ToStringParam();
 
-            if (arcCenter.HasValue)
-            {
-                @params['I'] = arcCenter.Value.X.ToStringParam();
-                @params['J'] = arcCenter.Value.X.ToStringParam();
-            }
-
-            @params['F'] = feed.ToString();
             return @params;
         }
 
@@ -70,12 +77,22 @@ namespace CAM.Program.Generator
             newParams.ForEach(p => Params[p.Key] = p.Value);
         }
 
-        public abstract string[] StartMachine();
-        public abstract string[] StopMachine();
-        public abstract string[] SetTool(int toolNo, double angleA, double angleC, int originCellNumber);
-        public abstract string[] StartEngine(int frequency, bool hasTool);
-        public abstract string[] StopEngine();
-        public abstract string Pause(double duration);
+        public void SetParams(MillToolPosition position)
+        {
+            var @params = CreateParams(position);
+            ApplyParams(@params);
+        }
 
+        public abstract string[] StartMachine();
+
+        public abstract string[] StopMachine();
+
+        public abstract string[] SetTool(int toolNo, double angleA, double angleC, int originCellNumber);
+
+        public abstract string[] StartEngine(int frequency, bool hasTool);
+
+        public abstract string[] StopEngine();
+
+        public abstract string Pause(double duration);
     }
 }

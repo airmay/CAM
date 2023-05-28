@@ -103,7 +103,7 @@
     <Compile Include="Core\CamDocument.cs" />
     <Compile Include="Core\MillingTechProcess.cs" />
     <Compile Include="Core\TechProcessBase.cs" />
-    <Compile Include="Core\Tool\AngleToolPosition.cs" />
+    <Compile Include="Core\Tool\MillToolPosition.cs" />
     <Compile Include="Core\Tool\CableToolPosition.cs" />
     <Compile Include="Core\Tool\ToolModel.cs" />
     <Compile Include="Core\Tool\ToolPosition.cs" />
@@ -133,7 +133,6 @@
     <Compile Include="Program\CommandGenerator\MillingCommandGenerator.cs" />
     <Compile Include="Program\Generator\DonatoniPostProcessor.cs" />
     <Compile Include="Program\Generator\IPostProcessor.cs" />
-    <Compile Include="Program\Generator\IPostProcessorBase.cs" />
     <Compile Include="Program\Generator\MillingGenerator.cs" />
     <Compile Include="Program\CommandGenerator\ScemaLogicCommandGenerator.cs" />
     <Compile Include="Core\ExtensionApplication.cs" />
