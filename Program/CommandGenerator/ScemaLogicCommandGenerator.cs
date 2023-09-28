@@ -66,7 +66,8 @@ namespace CAM.Commands
             var par = CreateParams(ToolPosition, feed, center);
             //var textParams = GetTextParams(par);
             //return $"G{gCode}{CommandDelimiter}{textParams}";
-
+            if (center.HasValue)
+                return $"{gCode};;XYCZ;{par["F"]};{par["X"]};{par["Y"]};{par["I"]};{par["J"]};";
             return $"{gCode};;XYCZ;{(gCode == 0 ? 0 : par["F"])};{par["X"]};{par["Y"]};{par["C"]};{par["Z"]};";
         }
     }
