@@ -40,7 +40,7 @@ namespace CAM
             ["ZEntry"] = "Z входа",
             ["AngleA"] = "Угол вертикальный",
         };
-        private const int RowHeight = 24;
+        private int RowHeight => (int)(Font.Height * 1.8); //24;
         private readonly Type _type;
 
         public object ParamsObject => BindingSource.DataSource;
@@ -322,9 +322,13 @@ namespace CAM
 
         public ParamsView AddControl(Control control, int height = 1)
         {
-            AddRow(height);
-            tablePanel.Controls.Add(control, 0, tablePanel.RowStyles.Count - 1);
+            control.Height = height * Font.Height;
             tablePanel.SetColumnSpan(control, 2);
+            tablePanel.Controls.Add(control);
+
+            //AddRow(height);
+            //tablePanel.Controls.Add(control, 0, tablePanel.RowStyles.Count - 1);
+            //tablePanel.SetColumnSpan(control, 2);
             control.Dock = DockStyle.Fill;
 
             return this;

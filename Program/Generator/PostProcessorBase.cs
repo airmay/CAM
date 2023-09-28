@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Autodesk.AutoCAD.Geometry;
 using Dreambuild.AutoCAD;
@@ -19,7 +20,7 @@ namespace CAM.Program.Generator
             Params = ParamTypes.ToCharArray().ToDictionary(p => p, p => string.Empty);
         }
 
-        public string GCommand(int gCode, MillToolPosition position, int feed, Point2d? arcCenter = null)
+        public string GCommand(int gCode, MillToolPosition position, int? feed = null, Point2d? arcCenter = null)
         {
             var newParams = CreateParams(gCode, position, feed, arcCenter);
             var changedParams = GetChangedParams(newParams);
@@ -29,47 +30,50 @@ namespace CAM.Program.Generator
             return command;
         }
 
+        private void ApplyParams(CommandParams newParams)
+        {
+            ApplyParams(newParams.Params);
+        }
+
+        public CommandParams CreateParams(int gCode, MillToolPosition position, int? feed, Point2d? arcCenter = null)
+        {
+            var commandParams = CreateParams(position);
+
+            commandParams.Set('G', gCode);
+            if (feed.HasValue)
+                commandParams.Set('F', feed);
+            if (arcCenter.HasValue)
+            {
+                commandParams.Set('I', arcCenter.Value.X);
+                commandParams.Set('J', arcCenter.Value.Y);
+            }
+
+            return commandParams;
+        }
+
+        private CommandParams CreateParams(MillToolPosition position)
+        {
+            var commandParams = new CommandParams();
+            commandParams.Set('X', position.X, Origin.X);
+            commandParams.Set('Y', position.Y, Origin.Y);
+            if (WithThick)
+                commandParams.Set('Z', position.Z, "({0} + THICK)");
+            else
+                commandParams.Set('Z', position.Z);
+            commandParams.Set('C', position.AngleC);
+            commandParams.Set('A', position.AngleA);
+
+            return commandParams;
+        }
+
+        public IEnumerable<KeyValuePair<char, string>> GetChangedParams(CommandParams newParams)
+        {
+            return newParams.Params.Where(p => !Params.TryGetValue(p.Key, out var value) || p.Value != value);
+        }
+
         public string CreateCommand(IEnumerable<KeyValuePair<char, string>> par)
         {
             return string.Join(CommandDelimiter, par.Select(p => $"{p.Key}{p.Value}"));
-        }
-
-        public IEnumerable<KeyValuePair<char, string>> GetChangedParams(Dictionary<char, string> newParams)
-        {
-            return newParams.Where(p => Params.TryGetValue(p.Key, out var value) && p.Value != value);
-        }
-
-        public Dictionary<char, string> CreateParams(int gCode, MillToolPosition position, int feed, Point2d? arcCenter = null)
-        {
-            var @params = CreateParams(position);
-
-            @params['G'] = gCode.ToString();
-            @params['F'] = feed.ToString();
-            if (arcCenter.HasValue)
-            {
-                @params['I'] = arcCenter.Value.X.ToStringParam();
-                @params['J'] = arcCenter.Value.X.ToStringParam();
-            }
-
-            return @params;
-        }
-
-        private Dictionary<char, string> CreateParams(MillToolPosition position)
-        {
-            var @params = new Dictionary<char, string>();
-
-            if (position.X.HasValue)
-                @params['X'] = (position.X.Value - Origin.X).ToStringParam();
-            if (position.Y.HasValue)
-                @params['Y'] = (position.Y.Value - Origin.Y).ToStringParam();
-            if (position.Z.HasValue)
-                @params['Z'] = WithThick
-                    ? position.Z.Value.ToStringParam()
-                    : $"({position.Z.Value.ToStringParam()} + THICK)";
-            @params['C'] = position.AngleC.ToStringParam();
-            @params['A'] = position.AngleA.ToStringParam();
-
-            return @params;
         }
 
         private void ApplyParams(Dictionary<char, string> newParams)

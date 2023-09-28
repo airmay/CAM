@@ -229,7 +229,10 @@ namespace CAM
                 //var upperPoint = new Point3d(point.X, point.Y, ZSafety);
                 //if (!ToolPosition.Point.IsEqualTo(upperPoint))
                 //{
-                Move(point.X, point.Y, angleC: angleC ?? BuilderUtils.CalcToolAngle(curve, point, engineSide), angleA: angleA);
+                if (!angleC.HasValue)
+                    angleC = BuilderUtils.CalcToolAngle(curve, point, engineSide);
+
+                Move(point.X, point.Y, angleC: angleC, angleA: angleA);
                 //}
             }
             else if (!(curve is Line) && calcAngleC)
@@ -264,7 +267,7 @@ namespace CAM
                 var arc = curve as Arc;
                 if (arc != null && calcAngleC)
                     angleC += arc.TotalAngle.ToDeg() * (point == curve.StartPoint ? -1 : 1);
-                var gCode = curve is Line ? 1 : point == curve.StartPoint ? 2 : 3;
+                var gCode = curve is Line ? 1 : point == curve.StartPoint ? 3 : 2;
                 GCommand(CommandNames.Cutting, gCode, point: curve.NextPoint(point), angleC: angleC, curve: curve, feed: cuttingFeed, center: arc?.Center.ToPoint2d());
             }
         }

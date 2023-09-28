@@ -35,8 +35,8 @@ namespace CAM.TechProcesses.Sawing
             var sawingModesView = new SawingModesView();
             view.BindingSource.DataSourceChanged += (s, e) => sawingModesView.sawingModesBindingSource.DataSource = view.GetParams<SawingTechOperation>().SawingModes;
 
-            view.AddTextBox(nameof(IsExactlyBegin), "Начало точно");
-            view.AddTextBox(nameof(IsExactlyEnd), "Конец точно");
+            view.AddCheckBox(nameof(IsExactlyBegin), "Начало точно");
+            view.AddCheckBox(nameof(IsExactlyEnd), "Конец точно");
             view.AddTextBox(nameof(AngleA));
             view.AddTextBox(nameof(Departure));
             view.AddIndent();

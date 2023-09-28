@@ -46,7 +46,7 @@ namespace CAM.Program.Generator
 
         public string GCommand(int gCode, MillToolPosition position, int feed, Point2d? arcCenter = null)
         {
-            _postProcessor.GCommand(gCode, position, feed, arcCenter);
+            return _postProcessor.GCommand(gCode, position, feed, arcCenter);
         }
 
         private void StopMachine() => AddCommands(_postProcessor.StopMachine());
@@ -328,7 +328,7 @@ namespace CAM.Program.Generator
                 command.ToolLocation = position;
 
             ToolPosition = position;
-            command.Text = GetGCommand(gCode, feed, center);
+            command.Text = _postProcessor.GCommand(gCode, position, feed, center);
             command.HasTool = _hasTool;
             AddCommand(command);
 
