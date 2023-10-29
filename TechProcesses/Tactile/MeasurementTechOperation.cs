@@ -162,5 +162,4 @@ namespace CAM.TechProcesses.Tactile
             base.Teardown();
         }
     }
-
 }

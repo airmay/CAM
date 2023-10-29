@@ -31,7 +31,6 @@ namespace CAM
 
         public void RefreshView()
         {
-            _currentTechProcessType = null;
             ClearParamsViews();
             treeView.Nodes.Clear();
 
@@ -284,6 +283,11 @@ namespace CAM
                 treeView.Focus();
                 RefreshToolButtonsState();
             }
+        }
+
+        private void bCreateProsessing_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }
