@@ -8,7 +8,7 @@ namespace CAM
         public TechProcessNode(ITechProcess techProcess) : base(techProcess, techProcess.Caption + "   ", 0)
         {
             Checked = true;
-            NodeFont = new Font(Acad.CamView.Font, FontStyle.Bold);
+            NodeFont = new Font(Acad.ProcessingView.Font, FontStyle.Bold);
 
             TechProcess = techProcess;
             Tag = techProcess;

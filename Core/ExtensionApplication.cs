@@ -59,7 +59,7 @@ namespace CAM
                 Acad.Documents[document] = new CamDocument(_techProcessFactory);
                 TechProcessLoader.LoadTechProsess(Acad.Documents[document]);
             }
-            Acad.CamView.RefreshView();
+            Acad.ProcessingView.RefreshView();
             Acad.ClearHighlighted();
         }
 
@@ -75,7 +75,7 @@ namespace CAM
             {
                 Acad.Documents[sender as Document].TechProcessList.ForEach(p => p.DeleteProcessing());
                 TechProcessLoader.SaveTechProsess(Acad.Documents[sender as Document]);
-                Acad.CamView.ClearCommandsView();
+                Acad.ProcessingView.ClearCommandsView();
                 Acad.DeleteAll();
             }
         }
@@ -88,7 +88,7 @@ namespace CAM
             Acad.Documents.Remove(document);
 
             if (!Acad.Documents.Any())
-                Acad.CamView.RefreshView();
+                Acad.ProcessingView.RefreshView();
         }
 
         public void Terminate()

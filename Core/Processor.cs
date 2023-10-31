@@ -2,7 +2,7 @@
 using CAM.Program.Generator;
 using System.Collections.Generic;
 
-namespace CAM.Core
+namespace CAM
 {
     public class Processor
     {

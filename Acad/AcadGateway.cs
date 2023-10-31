@@ -25,7 +25,7 @@ namespace CAM
 
         public static CamDocument CamDocument => ActiveDocument != null ? Documents.TryGetAndReturn(ActiveDocument) : null;
 
-        public static CamView CamView = new CamView();
+        public static ProcessingView ProcessingView = new ProcessingView();
 
         public static Document ActiveDocument => AcadApplication.DocumentManager.MdiActiveDocument;
 

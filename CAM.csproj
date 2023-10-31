@@ -101,6 +101,7 @@
     <Compile Include="Acad\AutoCADCommands\SymbolPack.cs" />
     <Compile Include="Core\CableTechProcess.cs" />
     <Compile Include="Core\CamDocument.cs" />
+    <Compile Include="Core\GeneralOperation.cs" />
     <Compile Include="Core\MillingTechProcess.cs" />
     <Compile Include="Core\Operation.cs" />
     <Compile Include="Core\Processing.cs" />
@@ -111,6 +112,13 @@
     <Compile Include="Core\Tool\ToolModel.cs" />
     <Compile Include="Core\Tool\ToolPosition.cs" />
     <Compile Include="Core\Tool\ToolTypeAttribute.cs" />
+    <Compile Include="Core\UI\OperationNodeBase.cs" />
+    <Compile Include="Core\UI\ProcessingView.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Core\UI\ProcessingView.Designer.cs">
+      <DependentUpon>ProcessingView.cs</DependentUpon>
+    </Compile>
     <Compile Include="Core\UI\DocumentTreeNode.cs" />
     <Compile Include="Core\UI\MenuItemAttribute.cs" />
     <Compile Include="Core\TechOperation.cs" />
@@ -122,6 +130,7 @@
       <DependentUpon>ParamsView.cs</DependentUpon>
     </Compile>
     <Compile Include="Core\UI\Progressor.cs" />
+    <Compile Include="Core\UI\OperationNode.cs" />
     <Compile Include="Core\UI\TechOperationNode.cs" />
     <Compile Include="Core\UI\TechProcessNode.cs" />
     <Compile Include="Program\BuilderUtils.cs" />
@@ -245,6 +254,10 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Core\UI\ProcessingView.resx">
+      <DependentUpon>ProcessingView.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
     <EmbeddedResource Include="Core\UI\ParamsView.resx">
       <DependentUpon>ParamsView.cs</DependentUpon>
     </EmbeddedResource>

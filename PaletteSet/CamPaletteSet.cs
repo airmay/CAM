@@ -6,7 +6,7 @@ namespace CAM
 {
     public class CamPaletteSet
     {
-        //private CamView _techProcessView { get; } = new CamView();
+        //private ProcessingView _techProcessView { get; } = new ProcessingView();
 
         public CamPaletteSet()
         {
@@ -19,7 +19,7 @@ namespace CAM
                 Dock = DockSides.Left
             };
 
-            paletteSet.Add("Объекты", Acad.CamView);
+            paletteSet.Add("Объекты", Acad.ProcessingView);
 
             paletteSet.Add("Инструменты", new UtilsView());
 
@@ -34,16 +34,16 @@ namespace CAM
 
         //public void SetCamDocument(CamDocument camDocument = null)
         //{
-        //    Acad.CamView.SetCamDocument(camDocument);
+        //    Acad.ProcessingView.SetCamDocument(camDocument);
         //    //_programView.SetCamDocument(camDocument);
         //}
 
         //internal void ClearCommands()
         //{
-        //    //Acad.CamView.ClearCommandsView();
+        //    //Acad.ProcessingView.ClearCommandsView();
         //    //_programView.RefreshView();
         //}
 
-        public void SelectProcessCommand(ObjectId id) => Acad.CamView.SelectProcessCommand(id);
+        public void SelectProcessCommand(ObjectId id) => Acad.ProcessingView.SelectProcessCommand(id);
     }
 }

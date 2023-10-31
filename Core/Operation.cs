@@ -1,7 +1,7 @@
 ﻿using Autodesk.AutoCAD.DatabaseServices;
 using System;
 
-namespace CAM.Core
+namespace CAM
 {
     public abstract class Operation
     {
