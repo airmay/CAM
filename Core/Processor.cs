@@ -13,31 +13,31 @@ namespace CAM
         public Processor(Processing processing)
         {
             _processing = processing;
-            switch (_processing.MachineType)
-            {
-                case MachineType.ScemaLogic:
-                    _postProcessor = new DonatoniPostProcessor();
-                    break;
-                case MachineType.Donatoni:
-                    _postProcessor = new DonatoniPostProcessor();
-                    break;
-                case MachineType.Krea:
-                    _postProcessor = new DonatoniPostProcessor();
-                    break;
-                case MachineType.CableSawing:
-                    _postProcessor = new DonatoniPostProcessor();
-                    break;
-                case MachineType.Forma:
-                    _postProcessor = new DonatoniPostProcessor();
-                    break;
-                case MachineType.Champion:
-                    _postProcessor = new DonatoniPostProcessor();
-                    break;
-                case null:
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }
+            // switch (_processing.MachineType)
+            // {
+            //     case MachineType.ScemaLogic:
+            //         _postProcessor = new DonatoniPostProcessor();
+            //         break;
+            //     case MachineType.Donatoni:
+            //         _postProcessor = new DonatoniPostProcessor();
+            //         break;
+            //     case MachineType.Krea:
+            //         _postProcessor = new DonatoniPostProcessor();
+            //         break;
+            //     case MachineType.CableSawing:
+            //         _postProcessor = new DonatoniPostProcessor();
+            //         break;
+            //     case MachineType.Forma:
+            //         _postProcessor = new DonatoniPostProcessor();
+            //         break;
+            //     case MachineType.Champion:
+            //         _postProcessor = new DonatoniPostProcessor();
+            //         break;
+            //     case null:
+            //         break;
+            //     default:
+            //         throw new ArgumentOutOfRangeException();
+            // }
         }
 
         public void Start()

@@ -236,7 +236,6 @@
             // 
             // processCommandBindingSource
             // 
-            this.processCommandBindingSource.DataSource = typeof(CAM.ProcessCommand);
             this.processCommandBindingSource.CurrentChanged += new System.EventHandler(this.processCommandBindingSource_CurrentChanged);
             // 
             // panel1

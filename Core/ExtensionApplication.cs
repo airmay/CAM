@@ -57,7 +57,7 @@ namespace CAM
                 document.BeginDocumentClose += Document_BeginDocumentClose;
                 document.ImpliedSelectionChanged += ImpliedSelectionChanged;
                 Acad.Documents[document] = new CamDocument(_techProcessFactory);
-                TechProcessLoader.LoadTechProsess(Acad.Documents[document]);
+                // TechProcessLoader.LoadTechProsess(Acad.Documents[document]);
             }
             Acad.ProcessingView.RefreshView();
             Acad.ClearHighlighted();

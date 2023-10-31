@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
+using CAM.Core.UI;
 
 namespace CAM
 {
@@ -14,7 +15,7 @@ namespace CAM
         private ITechProcess CurrentTechProcess => (treeView.SelectedNode?.Parent ?? treeView.SelectedNode)?.Tag as ITechProcess;
         private ProcessCommand CurrentProcessCommand => processCommandBindingSource.Current as ProcessCommand;
 
-        private DocumentTreeNode SelectedDocumentNode => (DocumentTreeNode)treeView.SelectedNode;
+        private OperationNodeBase SelectedDocumentNode => (OperationNodeBase)treeView.SelectedNode;
 
         public ProcessingView()
         {
@@ -34,23 +35,7 @@ namespace CAM
             ClearParamsViews();
             treeView.Nodes.Clear();
 
-            if (bCreateTechProcess.DropDownItems.Count == 0)
-            {
-                bCreateTechProcess.DropDownItems.AddRange(Acad.CamDocument.GetTechProcessNames().Select(p =>
-                {
-                    var item = new ToolStripMenuItem { Text = p };
-                    item.Click += new EventHandler(createTechProcessItem_Click);
-                    return item;
-                })
-                .ToArray());
-                _techOperationItems = Acad.CamDocument.GetTechOperationNames().ToDictionary(p => p.Key, p => p.Select(v =>
-                {
-                    var item = new ToolStripMenuItem { Text = v };
-                    item.Click += new EventHandler(bCreateTechOperation_Click);
-                    return item;
-                })
-                .ToArray());
-            }
+
 
             if (Acad.CamDocument?.TechProcessList.Any() == true)
             {
@@ -96,7 +81,7 @@ namespace CAM
 
         public void RefreshParamsView()
         {
-            var type = SelectedDocumentNode.Data.GetType();
+            var type = SelectedDocumentNode.Tag.GetType();
             if (!_paramsViews.TryGetValue(type, out var paramsView))
             {
                 paramsView = new ParamsView(type);
@@ -104,7 +89,7 @@ namespace CAM
                 tabPageParams.Controls.Add(paramsView);
                 _paramsViews[type] = paramsView;
             }
-            paramsView.BindingSource.DataSource = SelectedDocumentNode.Data;
+            paramsView.BindingSource.DataSource = SelectedDocumentNode.Tag;
             paramsView.Show();
             paramsView.BringToFront();
         }
@@ -118,18 +103,18 @@ namespace CAM
         {
             RefreshTechProcess();
 
-            if (SelectedDocumentNode.TechProcess.GetType() != _currentTechProcessType)
-            {
-                _currentTechProcessType = SelectedDocumentNode.TechProcess.GetType();
-                bCreateTechOperation.DropDownItems.Clear();
-                if (_techOperationItems.TryGetValue(_currentTechProcessType, out var menuItems))
-                {
-                    bCreateTechOperation.DropDownItems.Add(new ToolStripMenuItem("Все операции", null, new EventHandler(bCreateTechOperation_Click)));
-                    bCreateTechOperation.DropDownItems.Add(new ToolStripSeparator());
-                    bCreateTechOperation.DropDownItems.AddRange(menuItems);
-                }
-                RefreshToolButtonsState();
-            }
+            //if (SelectedDocumentNode.TechProcess.GetType() != _currentTechProcessType)
+            //{
+            //    _currentTechProcessType = SelectedDocumentNode.TechProcess.GetType();
+            //    bCreateTechOperation.DropDownItems.Clear();
+            //    if (_techOperationItems.TryGetValue(_currentTechProcessType, out var menuItems))
+            //    {
+            //        bCreateTechOperation.DropDownItems.Add(new ToolStripMenuItem("Все операции", null, new EventHandler(bCreateTechOperation_Click)));
+            //        bCreateTechOperation.DropDownItems.Add(new ToolStripSeparator());
+            //        bCreateTechOperation.DropDownItems.AddRange(menuItems);
+            //    }
+            //    RefreshToolButtonsState();
+            //}
         }
 
         private void RefreshTechProcess()
@@ -163,15 +148,15 @@ namespace CAM
                 return;
             }
             e.Node.Text = e.Label;
-            switch (e.Node.Tag)
-            {
-                case ITechProcess techProcess:
-                    techProcess.Caption = e.Label;
-                    break;
-                case TechOperation techOperation:
-                    techOperation.Caption = e.Label;
-                    break;
-            }
+            //switch (e.Node.Tag)
+            //{
+            //    case ITechProcess techProcess:
+            //        techProcess.Caption = e.Label;
+            //        break;
+            //    case TechOperation techOperation:
+            //        techOperation.Caption = e.Label;
+            //        break;
+            //}
         }
 
         private void treeView_BeforeCheck(object sender, TreeViewCancelEventArgs e) => e.Cancel = e.Node.Parent == null;
@@ -187,9 +172,9 @@ namespace CAM
 
         private void RefreshToolButtonsState()
         {
-            bRemove.Enabled = bMoveUpTechOperation.Enabled = bMoveDownTechOperation.Enabled = bBuildProcessing.Enabled = treeView.SelectedNode != null;
-            bCreateTechOperation.Enabled = treeView.SelectedNode != null && bCreateTechOperation.DropDownItems.Count > 0;
-            bVisibility.Enabled = bSendProgramm.Enabled = bPartialProcessing.Enabled = bPlay.Enabled = SelectedDocumentNode?.ProcessCommands != null;
+            // bRemove.Enabled = bMoveUpTechOperation.Enabled = bMoveDownTechOperation.Enabled = bBuildProcessing.Enabled = treeView.SelectedNode != null;
+            // bCreateTechOperation.Enabled = treeView.SelectedNode != null && bCreateTechOperation.DropDownItems.Count > 0;
+            // bVisibility.Enabled = bSendProgramm.Enabled = bPartialProcessing.Enabled = bPlay.Enabled = SelectedDocumentNode?.ProcessCommands != null;
         }
 
         private void createTechProcessItem_Click(object sender, EventArgs e)
@@ -215,7 +200,10 @@ namespace CAM
 
         private void bRemove_Click(object sender, EventArgs e) => Delete();
 
-        private void bMoveUpTechOperation_Click(object sender, EventArgs e) => treeView.SelectedNode = SelectedDocumentNode.MoveUp();
+        private void bMoveUpTechOperation_Click(object sender, EventArgs e)
+        {
+            treeView.SelectedNode = SelectedDocumentNode.MoveUp();
+        }
 
         private void bMoveDownTechOperation_Click(object sender, EventArgs e) => treeView.SelectedNode = SelectedDocumentNode.MoveDown();
 
@@ -224,7 +212,7 @@ namespace CAM
             SelectNextControl(ActiveControl, true, true, true, true);
 
             toolStrip.Enabled = false;
-            SelectedDocumentNode.BuildProcessing(sender == bPartialProcessing ? CurrentProcessCommand : null);
+            //SelectedDocumentNode.BuildProcessing(sender == bPartialProcessing ? CurrentProcessCommand : null);
             toolStrip.Enabled = true;
 
             RefreshToolButtonsState();
@@ -287,7 +275,10 @@ namespace CAM
 
         private void bCreateProsessing_Click(object sender, EventArgs e)
         {
-
+            var node = new GeneralOperationNode();
+            treeView.Nodes.Add(node);
+            treeView.SelectedNode = node;
+            //RefreshToolButtonsState();
         }
     }
 }

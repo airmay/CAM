@@ -1,13 +1,17 @@
-﻿using System.Drawing;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace CAM
+namespace CAM.Core.UI
 {
-    public class OperationNode : OperationNodeBase
+    public class GeneralOperationNode : OperationNodeBase
     {
         public readonly TechOperation TechOperation;
 
-        public OperationNode() : base(new GeneralOperation(), "Обработка", 1)
+        public GeneralOperationNode() : base(new GeneralOperation(), "Обработка", 1)
         {
             //Checked = techOperation.Enabled;
             //ForeColor = techOperation.Enabled ? Color.Black : Color.Gray;
@@ -33,29 +37,28 @@ namespace CAM
 
         public override TreeNode MoveUp()
         {
-            TreeView.Nodes.SwapPrev(Index);
-            //if (TechOperation.TryMoveBackward())
-            //    Move(-1);
+            Move(-1);
             return this;
         }
 
         public override TreeNode MoveDown()
         {
             if (TechOperation.TryMoveBackward())
-            if (TechOperation.TryMoveForward())
-                Move(1);
+                if (TechOperation.TryMoveForward())
+                    Move(1);
             return this;
+        }
+
+        public override void Remove()
+        {
+            throw new NotImplementedException();
         }
 
         private void Move(int shift)
         {
-            // if (NextNode())
-            // var parent = Parent;
-            // parent.Nodes.Remove(this);
-            // parent.Nodes.Insert(Index + shift, this);
+            var treeView = TreeView;
+            treeView.Nodes.Remove(this);
+            treeView.Nodes.Insert(Index + shift, this);
         }
-
-        public override void Remove() => TechOperation.Remove();
-
     }
 }

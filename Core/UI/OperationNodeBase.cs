@@ -25,7 +25,7 @@ namespace CAM
 
         public abstract void ShowToolpath();
 
-        public List<ProcessCommand> ProcessCommands => TechProcess.ProcessCommands;
+        public List<ProcessCommand> ProcessCommands => null; // TechProcess.ProcessCommands;
 
         public virtual int FirstCommandIndex => 0;
 

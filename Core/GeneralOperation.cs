@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Autodesk.AutoCAD.Geometry;
+using CAM.TechProcesses.Sawing;
 
 namespace CAM
 {
@@ -12,13 +14,19 @@ namespace CAM
         public string Caption { get; set; }
         public bool Enabled { get; set; }
         public List<Operation> Operations { get; set; }
-
         public MachineType? MachineType { get; set; }
+
+
+        public Material? Material { get; set; }
+
+        public int Frequency { get; set; }
+
+        public int PenetrationFeed { get; set; }
+
         public CAM.Tool Tool { get; set; }
         public double ZSafety { get; set; } = 20;
 
-        [NonSerialized]
-        private List<ProcessCommand> _processCommands = new List<ProcessCommand>();
+        [NonSerialized] private List<ProcessCommand> _processCommands = new List<ProcessCommand>();
 
         public List<ProcessCommand> ProcessCommands => _processCommands;
 
@@ -28,14 +36,10 @@ namespace CAM
 
         public int GetFirstCommandIndex() => 0;
 
-        [NonSerialized]
-        public ObjectId[] OriginObject;
-        [NonSerialized]
-        public Dictionary<ObjectId, int> ToolpathObjectIds;
-        [NonSerialized]
-        public ObjectId? ToolpathObjectsGroup;
-        [NonSerialized]
-        public ObjectId? ExtraObjectsGroup;
+        [NonSerialized] public ObjectId[] OriginObject;
+        [NonSerialized] public Dictionary<ObjectId, int> ToolpathObjectIds;
+        [NonSerialized] public ObjectId? ToolpathObjectsGroup;
+        [NonSerialized] public ObjectId? ExtraObjectsGroup;
 
         public Dictionary<ObjectId, int> GetToolpathObjectIds() => ToolpathObjectIds;
 
@@ -58,6 +62,13 @@ namespace CAM
             });
         }
 
-
+        public static void ConfigureParamsView(ParamsView view)
+        {
+            view.AddMachine(CAM.MachineType.Donatoni, CAM.MachineType.ScemaLogic, CAM.MachineType.Forma);
+            view.AddMaterial();
+            view.AddIndent();
+            view.AddTool();
+            view.AddTextBox(nameof(Frequency));
+        }
     }
 }
