@@ -18,6 +18,24 @@ namespace CAM
             ForeColor = Checked && Parent.Checked ? Color.Black : Color.Gray;
         }
 
+        public override void MoveUp()
+        {
+            if (PrevNode != null)
+                Move(Parent.Nodes, Index - 1);
+            else if (Parent.PrevNode != null)
+                Move(Parent.PrevNode.Nodes, Parent.PrevNode.Nodes.Count);
+        }
+
+        public override void MoveDown()
+        {
+            if (NextNode != null)
+                Move(Parent.Nodes, Index + 1);
+            else if (Parent.NextNode != null)
+                Move(Parent.NextNode.Nodes, 0);
+        }
+
+        public override void Remove() => TechOperation.Remove();
+
         public override void ShowToolpath()
         {
             //TechProcess.GetToolpathObjectsGroup()?.SetGroupVisibility(false);
@@ -33,40 +51,5 @@ namespace CAM
         }
 
         public override int FirstCommandIndex => 0; //TechOperation.FirstCommandIndex.GetValueOrDefault();
-
-        public override TreeNode MoveUp()
-        {
-            var prev = PrevNode;
-            var parent = Parent;
-            parent.Nodes.Remove(this);
-
-            if (prev != null)
-                parent.Nodes.Insert(Index - 1, this);
-            else if (parent.PrevNode != null) 
-                parent.PrevNode.Nodes.Insert(parent.PrevNode.Nodes.Count, this);
-            else
-                parent.Nodes.Insert(0, this);
-
-            return this;
-        }
-
-        public override TreeNode MoveDown()
-        {
-            var next = NextNode;
-            var parent = Parent;
-            parent.Nodes.Remove(this);
-
-            if (next != null)
-                parent.Nodes.Insert(Index + 1, this);
-            else if (parent.NextNode != null)
-                parent.NextNode.Nodes.Insert(0, this);
-            else
-                parent.Nodes.Add(this);
-
-            return this;
-        }
-
-        public override void Remove() => TechOperation.Remove();
-
     }
 }

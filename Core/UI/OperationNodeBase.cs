@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Drawing;
 using System.Windows.Forms;
 
 namespace CAM
@@ -14,6 +13,20 @@ namespace CAM
 
         public abstract void RefreshColor();
 
+        public abstract void MoveUp();
+
+        public abstract void MoveDown();
+
+        protected void Move(TreeNodeCollection nodes, int index)
+        {
+            (Parent?.Nodes ?? TreeView.Nodes).Remove(this);
+            nodes.Insert(index, this);
+            TreeView.SelectedNode = this;
+        }
+
+        public new abstract void Remove();
+
+
         public virtual void SelectAcadObject() { }
 
         public abstract void ShowToolpath();
@@ -22,11 +35,6 @@ namespace CAM
 
         public virtual int FirstCommandIndex => 0;
 
-        public virtual TreeNode MoveUp() => this;
-
-        public virtual TreeNode MoveDown() => this;
-
-        public new abstract void Remove();
 
         //public void SetVisibility(bool isToolpathVisible)
         //{

@@ -229,10 +229,10 @@ namespace CAM
 
         private void bMoveUpTechOperation_Click(object sender, EventArgs e)
         {
-            treeView.SelectedNode = SelectedDocumentNode.MoveUp();
+            SelectedDocumentNode.MoveUp();
         }
 
-        private void bMoveDownTechOperation_Click(object sender, EventArgs e) => treeView.SelectedNode = SelectedDocumentNode.MoveDown();
+        private void bMoveDownTechOperation_Click(object sender, EventArgs e) => SelectedDocumentNode.MoveDown();
 
         private void bBuildProcessing_ButtonClick(object sender, EventArgs e)
         {

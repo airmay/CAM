@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement;
+﻿using System.Drawing;
 
 namespace CAM.Core.UI
 {
@@ -20,11 +13,15 @@ namespace CAM.Core.UI
         public override void RefreshColor()
         {
             ForeColor = Checked ? Color.Black : Color.Gray;
-            foreach (OperationNodeBase node in Nodes)
-            {
+            foreach (OperationNodeBase node in Nodes) 
                 node.RefreshColor();
-            }
         }
+
+        public override void MoveUp() => Move(TreeView.Nodes, Index - 1);
+
+        public override void MoveDown() => Move(TreeView.Nodes, Index + 1);
+
+        public override void Remove() => TreeView.Nodes.Remove(this);
 
         public override void ShowToolpath()
         {
@@ -41,19 +38,5 @@ namespace CAM.Core.UI
         }
 
         public override int FirstCommandIndex => 0; //TechOperation.FirstCommandIndex.GetValueOrDefault();
-
-        public override TreeNode MoveUp() => Move(-1);
-
-        public override TreeNode MoveDown() => Move(1);
-
-        private TreeNode Move(int shift)
-        {
-            var treeView = TreeView;
-            treeView.Nodes.Remove(this);
-            treeView.Nodes.Insert(Index + shift, this);
-            return this;
-        }
-
-        public override void Remove() => TreeView.Nodes.Remove(this);
     }
 }
