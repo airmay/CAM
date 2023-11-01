@@ -3,18 +3,8 @@ using System;
 
 namespace CAM
 {
-    public abstract class Operation
+    public abstract class Operation : OperationBase
     {
-        /// <summary>
-        /// Наименование
-        /// </summary>
-        public string Caption { get; set; }
-
-        public bool Enabled { get; set; }
-
-        /// <summary>
-        /// Обрабатываемая область
-        /// </summary>
         public AcadObject ProcessingArea { get; set; }
 
         [NonSerialized]
@@ -28,5 +18,12 @@ namespace CAM
         
         public abstract void Execute(Processor processor);
 
+    }
+
+    public abstract class OperationBase
+    {
+        public string Caption { get; set; }
+
+        public bool Enabled { get; set; } = true;
     }
 }

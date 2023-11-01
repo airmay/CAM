@@ -1,25 +1,18 @@
 ﻿using System.Collections.Generic;
+using System.Drawing;
 using System.Windows.Forms;
 
 namespace CAM
 {
-    public abstract partial class OperationNodeBase : TreeNode
+    public abstract class OperationNodeBase : TreeNode
     {
-        public ITechProcess TechProcess;
-
-        public static TreeNode Create(ITechProcess techProcess)
+        protected OperationNodeBase(OperationBase operation, string caption, int imageIndex) : base(caption, imageIndex, imageIndex)
         {
-            var node = new TechProcessNode(techProcess);
-            node.CreateTechOperationNodes();
-            return node;
+            Tag = operation;
+            Checked = operation.Enabled;
         }
 
-        public static TreeNode Create(ITechProcess techProcess, TechOperation techOperation) => new TechOperationNode(techProcess, techOperation);
-
-        public OperationNodeBase(object data, string text, int imageIndex) : base(text, imageIndex, imageIndex)
-        {
-            Tag = data;
-        }
+        public abstract void RefreshColor();
 
         public virtual void SelectAcadObject() { }
 
@@ -35,12 +28,13 @@ namespace CAM
 
         public new abstract void Remove();
 
-        public void SetVisibility(bool isToolpathVisible)
-        {
-            TechProcess.GetToolpathObjectsGroup()?.SetGroupVisibility(isToolpathVisible);
-            TechProcess.GetExtraObjectsGroup()?.SetGroupVisibility(isToolpathVisible);
-        }
+        //public void SetVisibility(bool isToolpathVisible)
+        //{
+        //    TechProcess.GetToolpathObjectsGroup()?.SetGroupVisibility(isToolpathVisible);
+        //    TechProcess.GetExtraObjectsGroup()?.SetGroupVisibility(isToolpathVisible);
+        //}
 
-        public void SendProgram() => Acad.CamDocument.SendProgram(TechProcess);
+        //public void SendProgram() => Acad.CamDocument.SendProgram(TechProcess);
+
     }
 }

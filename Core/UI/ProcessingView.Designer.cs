@@ -36,15 +36,13 @@
             this.tabPageParams = new System.Windows.Forms.TabPage();
             this.tabPageCommands = new System.Windows.Forms.TabPage();
             this.dataGridViewCommand = new System.Windows.Forms.DataGridView();
-            this.numberDataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.nameDataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.textDataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.U = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.V = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.A = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.processCommandBindingSource = new System.Windows.Forms.BindingSource(this.components);
             this.panel1 = new System.Windows.Forms.Panel();
             this.toolStrip = new System.Windows.Forms.ToolStrip();
+            this.bCreateProsessing = new System.Windows.Forms.ToolStripButton();
             this.bRemove = new System.Windows.Forms.ToolStripButton();
             this.bCreateTechOperation = new System.Windows.Forms.ToolStripDropDownButton();
             this.bMoveUpTechOperation = new System.Windows.Forms.ToolStripButton();
@@ -58,7 +56,6 @@
             this.bSendProgramm = new System.Windows.Forms.ToolStripButton();
             this.bClose = new System.Windows.Forms.ToolStripButton();
             this.panel2 = new System.Windows.Forms.Panel();
-            this.bCreateProsessing = new System.Windows.Forms.ToolStripButton();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
@@ -76,7 +73,6 @@
             // 
             this.splitContainer1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.splitContainer1.Location = new System.Drawing.Point(0, 0);
-            this.splitContainer1.Margin = new System.Windows.Forms.Padding(8, 7, 8, 7);
             this.splitContainer1.Name = "splitContainer1";
             this.splitContainer1.Orientation = System.Windows.Forms.Orientation.Horizontal;
             // 
@@ -87,9 +83,8 @@
             // splitContainer1.Panel2
             // 
             this.splitContainer1.Panel2.Controls.Add(this.tabControl);
-            this.splitContainer1.Size = new System.Drawing.Size(899, 1607);
-            this.splitContainer1.SplitterDistance = 369;
-            this.splitContainer1.SplitterWidth = 10;
+            this.splitContainer1.Size = new System.Drawing.Size(332, 673);
+            this.splitContainer1.SplitterDistance = 153;
             this.splitContainer1.TabIndex = 0;
             // 
             // treeView
@@ -100,13 +95,11 @@
             this.treeView.ImageIndex = 0;
             this.treeView.ImageList = this.imageList;
             this.treeView.Location = new System.Drawing.Point(0, 0);
-            this.treeView.Margin = new System.Windows.Forms.Padding(8, 7, 8, 7);
             this.treeView.Name = "treeView";
             this.treeView.SelectedImageIndex = 0;
-            this.treeView.Size = new System.Drawing.Size(899, 369);
+            this.treeView.Size = new System.Drawing.Size(332, 153);
             this.treeView.TabIndex = 0;
             this.treeView.AfterLabelEdit += new System.Windows.Forms.NodeLabelEditEventHandler(this.treeView_AfterLabelEdit);
-            this.treeView.BeforeCheck += new System.Windows.Forms.TreeViewCancelEventHandler(this.treeView_BeforeCheck);
             this.treeView.AfterCheck += new System.Windows.Forms.TreeViewEventHandler(this.treeView_AfterCheck);
             this.treeView.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.treeView_AfterSelect);
             this.treeView.NodeMouseDoubleClick += new System.Windows.Forms.TreeNodeMouseClickEventHandler(this.treeView_NodeMouseDoubleClick);
@@ -124,20 +117,18 @@
             this.tabControl.Controls.Add(this.tabPageCommands);
             this.tabControl.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tabControl.Location = new System.Drawing.Point(0, 0);
-            this.tabControl.Margin = new System.Windows.Forms.Padding(8, 7, 8, 7);
             this.tabControl.Name = "tabControl";
             this.tabControl.SelectedIndex = 0;
-            this.tabControl.Size = new System.Drawing.Size(899, 1228);
+            this.tabControl.Size = new System.Drawing.Size(332, 516);
             this.tabControl.TabIndex = 0;
             // 
             // tabPageParams
             // 
             this.tabPageParams.AutoScroll = true;
-            this.tabPageParams.Location = new System.Drawing.Point(10, 48);
-            this.tabPageParams.Margin = new System.Windows.Forms.Padding(8, 7, 8, 7);
+            this.tabPageParams.Location = new System.Drawing.Point(4, 22);
             this.tabPageParams.Name = "tabPageParams";
-            this.tabPageParams.Padding = new System.Windows.Forms.Padding(8, 7, 8, 7);
-            this.tabPageParams.Size = new System.Drawing.Size(879, 1170);
+            this.tabPageParams.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPageParams.Size = new System.Drawing.Size(324, 490);
             this.tabPageParams.TabIndex = 0;
             this.tabPageParams.Text = "Параметры";
             this.tabPageParams.UseVisualStyleBackColor = true;
@@ -145,11 +136,10 @@
             // tabPageCommands
             // 
             this.tabPageCommands.Controls.Add(this.dataGridViewCommand);
-            this.tabPageCommands.Location = new System.Drawing.Point(10, 48);
-            this.tabPageCommands.Margin = new System.Windows.Forms.Padding(8, 7, 8, 7);
+            this.tabPageCommands.Location = new System.Drawing.Point(4, 22);
             this.tabPageCommands.Name = "tabPageCommands";
-            this.tabPageCommands.Padding = new System.Windows.Forms.Padding(8, 7, 8, 7);
-            this.tabPageCommands.Size = new System.Drawing.Size(879, 1172);
+            this.tabPageCommands.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPageCommands.Size = new System.Drawing.Size(329, 474);
             this.tabPageCommands.TabIndex = 1;
             this.tabPageCommands.Text = "Программа";
             this.tabPageCommands.UseVisualStyleBackColor = true;
@@ -165,50 +155,19 @@
             this.dataGridViewCommand.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dataGridViewCommand.ColumnHeadersVisible = false;
             this.dataGridViewCommand.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
-            this.numberDataGridViewTextBoxColumn,
-            this.nameDataGridViewTextBoxColumn,
-            this.textDataGridViewTextBoxColumn,
             this.U,
             this.V,
             this.A});
             this.dataGridViewCommand.DataSource = this.processCommandBindingSource;
             this.dataGridViewCommand.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.dataGridViewCommand.Location = new System.Drawing.Point(8, 7);
-            this.dataGridViewCommand.Margin = new System.Windows.Forms.Padding(8, 7, 8, 7);
+            this.dataGridViewCommand.Location = new System.Drawing.Point(3, 3);
             this.dataGridViewCommand.MultiSelect = false;
             this.dataGridViewCommand.Name = "dataGridViewCommand";
             this.dataGridViewCommand.RowHeadersVisible = false;
             this.dataGridViewCommand.RowHeadersWidth = 102;
             this.dataGridViewCommand.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-            this.dataGridViewCommand.Size = new System.Drawing.Size(863, 1158);
+            this.dataGridViewCommand.Size = new System.Drawing.Size(323, 468);
             this.dataGridViewCommand.TabIndex = 0;
-            // 
-            // numberDataGridViewTextBoxColumn
-            // 
-            this.numberDataGridViewTextBoxColumn.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCellsExceptHeader;
-            this.numberDataGridViewTextBoxColumn.DataPropertyName = "Number";
-            this.numberDataGridViewTextBoxColumn.HeaderText = "Number";
-            this.numberDataGridViewTextBoxColumn.MinimumWidth = 12;
-            this.numberDataGridViewTextBoxColumn.Name = "numberDataGridViewTextBoxColumn";
-            this.numberDataGridViewTextBoxColumn.Width = 12;
-            // 
-            // nameDataGridViewTextBoxColumn
-            // 
-            this.nameDataGridViewTextBoxColumn.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCellsExceptHeader;
-            this.nameDataGridViewTextBoxColumn.DataPropertyName = "Name";
-            this.nameDataGridViewTextBoxColumn.HeaderText = "Name";
-            this.nameDataGridViewTextBoxColumn.MinimumWidth = 12;
-            this.nameDataGridViewTextBoxColumn.Name = "nameDataGridViewTextBoxColumn";
-            this.nameDataGridViewTextBoxColumn.Width = 12;
-            // 
-            // textDataGridViewTextBoxColumn
-            // 
-            this.textDataGridViewTextBoxColumn.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCellsExceptHeader;
-            this.textDataGridViewTextBoxColumn.DataPropertyName = "Text";
-            this.textDataGridViewTextBoxColumn.HeaderText = "Text";
-            this.textDataGridViewTextBoxColumn.MinimumWidth = 12;
-            this.textDataGridViewTextBoxColumn.Name = "textDataGridViewTextBoxColumn";
-            this.textDataGridViewTextBoxColumn.Width = 12;
             // 
             // U
             // 
@@ -244,9 +203,8 @@
             this.panel1.Controls.Add(this.toolStrip);
             this.panel1.Dock = System.Windows.Forms.DockStyle.Top;
             this.panel1.Location = new System.Drawing.Point(0, 0);
-            this.panel1.Margin = new System.Windows.Forms.Padding(8, 7, 8, 7);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(899, 62);
+            this.panel1.Size = new System.Drawing.Size(332, 25);
             this.panel1.TabIndex = 2;
             // 
             // toolStrip
@@ -267,18 +225,30 @@
             this.bClose});
             this.toolStrip.Location = new System.Drawing.Point(0, 0);
             this.toolStrip.Name = "toolStrip";
-            this.toolStrip.Padding = new System.Windows.Forms.Padding(0, 0, 5, 0);
-            this.toolStrip.Size = new System.Drawing.Size(899, 51);
+            this.toolStrip.Padding = new System.Windows.Forms.Padding(0, 0, 2, 0);
+            this.toolStrip.Size = new System.Drawing.Size(332, 25);
             this.toolStrip.TabIndex = 0;
             this.toolStrip.Text = "toolStrip1";
+            // 
+            // bCreateProsessing
+            // 
+            this.bCreateProsessing.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.bCreateProsessing.Image = global::CAM.Properties.Resources.drive__plus;
+            this.bCreateProsessing.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None;
+            this.bCreateProsessing.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.bCreateProsessing.Name = "bCreateProsessing";
+            this.bCreateProsessing.Size = new System.Drawing.Size(23, 22);
+            this.bCreateProsessing.Text = "toolStripButton1";
+            this.bCreateProsessing.Click += new System.EventHandler(this.bCreateProsessing_Click);
             // 
             // bRemove
             // 
             this.bRemove.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
             this.bRemove.Image = global::CAM.Properties.Resources.cross;
+            this.bRemove.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None;
             this.bRemove.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.bRemove.Name = "bRemove";
-            this.bRemove.Size = new System.Drawing.Size(58, 44);
+            this.bRemove.Size = new System.Drawing.Size(23, 22);
             this.bRemove.Text = "Удалить";
             this.bRemove.Click += new System.EventHandler(this.bRemove_Click);
             // 
@@ -286,17 +256,19 @@
             // 
             this.bCreateTechOperation.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
             this.bCreateTechOperation.Image = global::CAM.Properties.Resources.plus;
+            this.bCreateTechOperation.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None;
             this.bCreateTechOperation.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.bCreateTechOperation.Name = "bCreateTechOperation";
-            this.bCreateTechOperation.Size = new System.Drawing.Size(66, 44);
+            this.bCreateTechOperation.Size = new System.Drawing.Size(29, 22);
             // 
             // bMoveUpTechOperation
             // 
             this.bMoveUpTechOperation.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
             this.bMoveUpTechOperation.Image = global::CAM.Properties.Resources.arrow_up;
+            this.bMoveUpTechOperation.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None;
             this.bMoveUpTechOperation.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.bMoveUpTechOperation.Name = "bMoveUpTechOperation";
-            this.bMoveUpTechOperation.Size = new System.Drawing.Size(58, 44);
+            this.bMoveUpTechOperation.Size = new System.Drawing.Size(23, 22);
             this.bMoveUpTechOperation.Text = "Пререместить выше";
             this.bMoveUpTechOperation.Click += new System.EventHandler(this.bMoveUpTechOperation_Click);
             // 
@@ -304,16 +276,17 @@
             // 
             this.bMoveDownTechOperation.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
             this.bMoveDownTechOperation.Image = global::CAM.Properties.Resources.arrow_down;
+            this.bMoveDownTechOperation.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None;
             this.bMoveDownTechOperation.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.bMoveDownTechOperation.Name = "bMoveDownTechOperation";
-            this.bMoveDownTechOperation.Size = new System.Drawing.Size(58, 44);
+            this.bMoveDownTechOperation.Size = new System.Drawing.Size(23, 22);
             this.bMoveDownTechOperation.Text = "Переместить ниже";
             this.bMoveDownTechOperation.Click += new System.EventHandler(this.bMoveDownTechOperation_Click);
             // 
             // toolStripSeparator1
             // 
             this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(6, 51);
+            this.toolStripSeparator1.Size = new System.Drawing.Size(6, 25);
             // 
             // bBuildProcessing
             // 
@@ -321,16 +294,17 @@
             this.bBuildProcessing.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.bPartialProcessing});
             this.bBuildProcessing.Image = global::CAM.Properties.Resources.gear;
+            this.bBuildProcessing.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None;
             this.bBuildProcessing.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.bBuildProcessing.Name = "bBuildProcessing";
-            this.bBuildProcessing.Size = new System.Drawing.Size(73, 44);
+            this.bBuildProcessing.Size = new System.Drawing.Size(32, 22);
             this.bBuildProcessing.Text = "Рассчитать обработку";
             this.bBuildProcessing.ButtonClick += new System.EventHandler(this.bBuildProcessing_ButtonClick);
             // 
             // bPartialProcessing
             // 
             this.bPartialProcessing.Name = "bPartialProcessing";
-            this.bPartialProcessing.Size = new System.Drawing.Size(479, 54);
+            this.bPartialProcessing.Size = new System.Drawing.Size(193, 22);
             this.bPartialProcessing.Text = "Частичная обработка";
             this.bPartialProcessing.ToolTipText = "Формирование программы обработки с текущей команды";
             this.bPartialProcessing.Click += new System.EventHandler(this.bBuildProcessing_ButtonClick);
@@ -340,9 +314,10 @@
             this.bVisibility.CheckOnClick = true;
             this.bVisibility.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
             this.bVisibility.Image = global::CAM.Properties.Resources.eraser;
+            this.bVisibility.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None;
             this.bVisibility.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.bVisibility.Name = "bVisibility";
-            this.bVisibility.Size = new System.Drawing.Size(58, 44);
+            this.bVisibility.Size = new System.Drawing.Size(23, 22);
             this.bVisibility.Text = "Удалить доп. объекты";
             this.bVisibility.Click += new System.EventHandler(this.bVisibility_Click);
             // 
@@ -350,9 +325,10 @@
             // 
             this.bPlay.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
             this.bPlay.Image = global::CAM.Properties.Resources.icons8_cinema_16;
+            this.bPlay.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None;
             this.bPlay.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.bPlay.Name = "bPlay";
-            this.bPlay.Size = new System.Drawing.Size(58, 44);
+            this.bPlay.Size = new System.Drawing.Size(23, 22);
             this.bPlay.Text = "Проиграть обработку";
             this.bPlay.ToolTipText = "Проигрывавание обработки";
             this.bPlay.Click += new System.EventHandler(this.bPlay_Click);
@@ -360,15 +336,16 @@
             // toolStripSeparator2
             // 
             this.toolStripSeparator2.Name = "toolStripSeparator2";
-            this.toolStripSeparator2.Size = new System.Drawing.Size(6, 51);
+            this.toolStripSeparator2.Size = new System.Drawing.Size(6, 25);
             // 
             // bSendProgramm
             // 
             this.bSendProgramm.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
             this.bSendProgramm.Image = global::CAM.Properties.Resources.disk__arrow;
+            this.bSendProgramm.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None;
             this.bSendProgramm.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.bSendProgramm.Name = "bSendProgramm";
-            this.bSendProgramm.Size = new System.Drawing.Size(58, 44);
+            this.bSendProgramm.Size = new System.Drawing.Size(23, 22);
             this.bSendProgramm.Text = "Записать файл с программой";
             this.bSendProgramm.Click += new System.EventHandler(this.bSend_Click);
             // 
@@ -376,9 +353,10 @@
             // 
             this.bClose.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
             this.bClose.Image = global::CAM.Properties.Resources.cross;
+            this.bClose.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None;
             this.bClose.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.bClose.Name = "bClose";
-            this.bClose.Size = new System.Drawing.Size(58, 44);
+            this.bClose.Size = new System.Drawing.Size(23, 22);
             this.bClose.Text = "Закрыть Автокад";
             this.bClose.Visible = false;
             this.bClose.Click += new System.EventHandler(this.bClose_Click);
@@ -387,31 +365,19 @@
             // 
             this.panel2.Controls.Add(this.splitContainer1);
             this.panel2.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.panel2.Location = new System.Drawing.Point(0, 62);
-            this.panel2.Margin = new System.Windows.Forms.Padding(8, 7, 8, 7);
+            this.panel2.Location = new System.Drawing.Point(0, 25);
             this.panel2.Name = "panel2";
-            this.panel2.Size = new System.Drawing.Size(899, 1607);
+            this.panel2.Size = new System.Drawing.Size(332, 673);
             this.panel2.TabIndex = 3;
-            // 
-            // bCreateProsessing
-            // 
-            this.bCreateProsessing.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.bCreateProsessing.Image = global::CAM.Properties.Resources.drive__plus;
-            this.bCreateProsessing.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.bCreateProsessing.Name = "bCreateProsessing";
-            this.bCreateProsessing.Size = new System.Drawing.Size(58, 44);
-            this.bCreateProsessing.Text = "toolStripButton1";
-            this.bCreateProsessing.Click += new System.EventHandler(this.bCreateProsessing_Click);
             // 
             // ProcessingView
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(16F, 31F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.Controls.Add(this.panel2);
             this.Controls.Add(this.panel1);
-            this.Margin = new System.Windows.Forms.Padding(8, 7, 8, 7);
             this.Name = "ProcessingView";
-            this.Size = new System.Drawing.Size(899, 1669);
+            this.Size = new System.Drawing.Size(332, 698);
             this.splitContainer1.Panel1.ResumeLayout(false);
             this.splitContainer1.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).EndInit();

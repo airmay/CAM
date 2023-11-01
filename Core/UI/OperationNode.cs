@@ -1,5 +1,7 @@
-﻿using System.Drawing;
+﻿using Autodesk.AutoCAD.BoundaryRepresentation;
+using System.Drawing;
 using System.Windows.Forms;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
 namespace CAM
 {
@@ -7,12 +9,13 @@ namespace CAM
     {
         public readonly TechOperation TechOperation;
 
-        public OperationNode() : base(new GeneralOperation(), "Обработка", 1)
+        public OperationNode(OperationBase operation, string caption) : base(operation, caption, 1)
         {
-            //Checked = techOperation.Enabled;
-            //ForeColor = techOperation.Enabled ? Color.Black : Color.Gray;
+        }
 
-            //Tag = techOperation;
+        public override void RefreshColor()
+        {
+            ForeColor = Checked && Parent.Checked ? Color.Black : Color.Gray;
         }
 
         public override void ShowToolpath()
@@ -33,26 +36,34 @@ namespace CAM
 
         public override TreeNode MoveUp()
         {
-            TreeView.Nodes.SwapPrev(Index);
-            //if (TechOperation.TryMoveBackward())
-            //    Move(-1);
+            var prev = PrevNode;
+            var parent = Parent;
+            parent.Nodes.Remove(this);
+
+            if (prev != null)
+                parent.Nodes.Insert(Index - 1, this);
+            else if (parent.PrevNode != null) 
+                parent.PrevNode.Nodes.Insert(parent.PrevNode.Nodes.Count, this);
+            else
+                parent.Nodes.Insert(0, this);
+
             return this;
         }
 
         public override TreeNode MoveDown()
         {
-            if (TechOperation.TryMoveBackward())
-            if (TechOperation.TryMoveForward())
-                Move(1);
-            return this;
-        }
+            var next = NextNode;
+            var parent = Parent;
+            parent.Nodes.Remove(this);
 
-        private void Move(int shift)
-        {
-            // if (NextNode())
-            // var parent = Parent;
-            // parent.Nodes.Remove(this);
-            // parent.Nodes.Insert(Index + shift, this);
+            if (next != null)
+                parent.Nodes.Insert(Index + 1, this);
+            else if (parent.NextNode != null)
+                parent.NextNode.Nodes.Insert(0, this);
+            else
+                parent.Nodes.Add(this);
+
+            return this;
         }
 
         public override void Remove() => TechOperation.Remove();

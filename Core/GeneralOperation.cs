@@ -9,10 +9,8 @@ using CAM.TechProcesses.Sawing;
 
 namespace CAM
 {
-    public class GeneralOperation
+    public class GeneralOperation : OperationBase
     {
-        public string Caption { get; set; }
-        public bool Enabled { get; set; }
         public List<Operation> Operations { get; set; }
         public MachineType? MachineType { get; set; }
 
