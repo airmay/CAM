@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Windows.Forms;
+using System.Drawing;
 
 namespace CAM
 {
@@ -9,9 +10,12 @@ namespace CAM
         {
             Tag = operation;
             Checked = operation.Enabled;
+            SetNodeColor();
         }
 
         public abstract void RefreshColor();
+
+        protected void SetNodeColor() => ForeColor = Checked ? Color.Black : Color.Gray;
 
         public abstract void MoveUp();
 
@@ -42,7 +46,7 @@ namespace CAM
         //    TechProcess.GetExtraObjectsGroup()?.SetGroupVisibility(isToolpathVisible);
         //}
 
-        //public void SendProgram() => Acad.CamDocument.SendProgram(TechProcess);
+        //public void SendProgram() => Acad.Processing.SendProgram(TechProcess);
 
     }
 }

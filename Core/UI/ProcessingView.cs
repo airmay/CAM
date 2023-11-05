@@ -27,35 +27,20 @@ namespace CAM
 #if DEBUG
             bClose.Visible = true;
 #endif
-        }
+            bCreateTechOperation.DropDownItems.Add(new ToolStripMenuItem("Распиловка", null,
+                new EventHandler(bCreateTechOperation_Click11)));
 
-        private Dictionary<Type, ToolStripMenuItem[]> _techOperationItems;
+        }
 
         public void RefreshView()
         {
             ClearParamsViews();
-            treeView.Nodes.Clear();
-
-
-
-            if (Acad.CamDocument?.TechProcessList.Any() == true)
-            {
-                var nodes = Acad.CamDocument.TechProcessList.Select(p => DocumentTreeNode.Create(p)).ToArray();
-                treeView.Nodes.AddRange(nodes);
-            }
-            else
-            {
-                treeView.Nodes.Add(new GeneralOperationNode());
-            }
-            treeView.SelectedNode = treeView.Nodes[0];
+            treeView.Nodes.Clear(); 
+            treeView.Nodes.AddRange(CamManager.GetNodes());
+            treeView.ExpandAll();
 
             RefreshToolButtonsState();
-            toolStrip.Enabled = Acad.CamDocument != null;
-
-            bCreateTechOperation.DropDownItems.Add(new ToolStripMenuItem("Распиловка", null,
-                new EventHandler(bCreateTechOperation_Click11)));
-
-
+            toolStrip.Enabled = CamManager.Processing != null;
         }
 
         private TreeNode GeneralOperationNode => treeView.SelectedNode.Parent ?? treeView.SelectedNode;
@@ -66,7 +51,7 @@ namespace CAM
             GeneralOperationNode.Nodes.Add(node);
             //GeneralOperationNode.ExpandAll();
             treeView.SelectedNode = node;
-            //var techOperations = Acad.CamDocument.CreateTechOperation(SelectedDocumentNode.TechProcess, ((ToolStripMenuItem)sender).Text);
+            //var techOperations = Acad.Processing.CreateTechOperation(SelectedDocumentNode.TechProcess, ((ToolStripMenuItem)sender).Text);
             //if (techOperations.Any())
             //{
             //    var techProcessNode = treeView.SelectedNode.Parent ?? treeView.SelectedNode;
@@ -204,18 +189,18 @@ namespace CAM
             // bVisibility.Enabled = bSendProgramm.Enabled = bPartialProcessing.Enabled = bPlay.Enabled = SelectedDocumentNode?.ProcessCommands != null;
         }
 
-        private void createTechProcessItem_Click(object sender, EventArgs e)
-        {
-            var techProcess = Acad.CamDocument.CreateTechProcess(((ToolStripMenuItem)sender).Text);
-            var techProcessNode = DocumentTreeNode.Create(techProcess);
-            treeView.Nodes.Add(techProcessNode);
-            treeView.SelectedNode = techProcessNode;
-            RefreshToolButtonsState();
-        }
+        //private void createTechProcessItem_Click(object sender, EventArgs e)
+        //{
+        //    var techProcess = Acad.Processing.CreateTechProcess(((ToolStripMenuItem)sender).Text);
+        //    var techProcessNode = DocumentTreeNode.Create(techProcess);
+        //    treeView.Nodes.Add(techProcessNode);
+        //    treeView.SelectedNode = techProcessNode;
+        //    RefreshToolButtonsState();
+        //}
 
         private void bCreateTechOperation_Click(object sender, EventArgs e)
         {
-            //var techOperations = Acad.CamDocument.CreateTechOperation(SelectedDocumentNode.TechProcess, ((ToolStripMenuItem)sender).Text);
+            //var techOperations = Acad.Processing.CreateTechOperation(SelectedDocumentNode.TechProcess, ((ToolStripMenuItem)sender).Text);
             //if (techOperations.Any())
             //{
             //    var techProcessNode = treeView.SelectedNode.Parent ?? treeView.SelectedNode;

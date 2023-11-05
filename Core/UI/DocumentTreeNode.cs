@@ -40,9 +40,9 @@ namespace CAM
         public void BuildProcessing(ProcessCommand processCommand)
         {
             if (processCommand is null)
-                Acad.CamDocument.BuildProcessing(TechProcess);
+                Acad.Processing.BuildProcessing(TechProcess);
             else
-                Acad.CamDocument.PartialProcessing(TechProcess, processCommand);
+                Acad.Processing.PartialProcessing(TechProcess, processCommand);
 
             var techProcessNode = Parent ?? this;
             if (techProcessNode.Nodes.Count == 0)
@@ -59,6 +59,6 @@ namespace CAM
             TechProcess.GetExtraObjectsGroup()?.SetGroupVisibility(isToolpathVisible);
         }
 
-        public void SendProgram() => Acad.CamDocument.SendProgram(TechProcess);
+        public void SendProgram() => Acad.Processing.SendProgram(TechProcess);
     }
 }

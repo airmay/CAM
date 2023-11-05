@@ -3,6 +3,7 @@ using System;
 
 namespace CAM
 {
+    [Serializable]
     public abstract class Operation : OperationBase
     {
         public AcadObject ProcessingArea { get; set; }
@@ -18,8 +19,13 @@ namespace CAM
         
         public abstract void Execute(Processor processor);
 
+        public void Remove()
+        {
+            throw new NotImplementedException();
+        }
     }
 
+    [Serializable]
     public abstract class OperationBase
     {
         public string Caption { get; set; }

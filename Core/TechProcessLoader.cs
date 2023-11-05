@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
+using System.Windows.Forms;
 
 namespace CAM
 {
@@ -22,7 +23,7 @@ namespace CAM
         /// <summary>
         /// Загрузить технологические процессы из файла чертежа
         /// </summary>
-        public static void LoadTechProsess(CamDocument camDocument)
+        public static void LoadTechProsess(Processing processing)
         {
             try
             {
@@ -33,7 +34,7 @@ namespace CAM
                         using (ResultBuffer resultBuffer = xRecord.Data)
                         using (MemoryStream stream = new MemoryStream())
                         {
-                            camDocument.Hash = resultBuffer.ToString().GetHashCode();
+                            processing.Hash = resultBuffer.ToString().GetHashCode();
                             foreach (var typedValue in resultBuffer)
                             {
                                 var datachunk = Convert.FromBase64String((string)typedValue.Value);
@@ -41,13 +42,13 @@ namespace CAM
                             }
                             stream.Position = 0;
                             var formatter = new BinaryFormatter { Binder = new MyBinder() };
-                            camDocument.TechProcessList = (List<ITechProcess>)formatter.Deserialize(stream);
+                            processing.TechProcessList = (GeneralOperation[])formatter.Deserialize(stream);
                         }
 
-                if (camDocument.TechProcessList?.Any() == true)
+                if (processing.TechProcessList?.Any() == true)
                 {
-                    camDocument.TechProcessList.ForEach(p => p.SerializeInit());
-                    Acad.Write($"Загружены техпроцессы: {string.Join(", ", camDocument.TechProcessList.Select(p => p.Caption))}");
+                    // processing.TechProcessList.ForEach(p => p.SerializeInit());
+                    Acad.Write($"Загружены техпроцессы: {string.Join(", ", processing.TechProcessList.Select(p => p.Caption))}");
                 }
             }
             catch (Exception e)
@@ -56,9 +57,11 @@ namespace CAM
             }
         }
 
-        public static void SaveTechProsess(CamDocument camDocument)
+        public static void SaveTechProsess(GeneralOperation[] operations, int hash)
         {
-            if (camDocument.Hash == 0 && !camDocument.TechProcessList.Any()) return;
+            if (hash == 0 && operations.Length == 0) 
+                return;
+
             try
             {
                 const int kMaxChunkSize = 127;
@@ -67,7 +70,7 @@ namespace CAM
                     using (MemoryStream stream = new MemoryStream())
                     {
                         BinaryFormatter formatter = new BinaryFormatter();
-                        formatter.Serialize(stream, camDocument.TechProcessList);
+                        formatter.Serialize(stream, operations);
                         stream.Position = 0;
                         for (int i = 0; i < stream.Length; i += kMaxChunkSize)
                         {
@@ -78,7 +81,7 @@ namespace CAM
                         }
                     }
                     var newHash = resultBuffer.ToString().GetHashCode();
-                    if (newHash == camDocument.Hash)
+                    if (newHash == hash)
                         return;
 
                     using (DocumentLock acLckDoc = Acad.ActiveDocument.LockDocument())

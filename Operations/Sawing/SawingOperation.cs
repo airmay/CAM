@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 
 namespace CAM.Operations.Sawing
 {
+    [Serializable]
     public class SawingOperation : Operation
     {
         public bool IsExactlyBegin { get; set; }

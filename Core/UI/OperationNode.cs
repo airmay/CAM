@@ -1,22 +1,17 @@
-﻿using Autodesk.AutoCAD.BoundaryRepresentation;
-using System.Drawing;
-using System.Windows.Forms;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement;
-
-namespace CAM
+﻿namespace CAM
 {
     public class OperationNode : OperationNodeBase
     {
-        public readonly TechOperation TechOperation;
+        public Operation Operation => (Operation)Tag;
 
+        public OperationNode(OperationBase operation) : base(operation, operation.Caption, 1)
+        {
+        }
         public OperationNode(OperationBase operation, string caption) : base(operation, caption, 1)
         {
         }
 
-        public override void RefreshColor()
-        {
-            ForeColor = Checked && Parent.Checked ? Color.Black : Color.Gray;
-        }
+        public override void RefreshColor() => SetNodeColor();
 
         public override void MoveUp()
         {
@@ -34,7 +29,7 @@ namespace CAM
                 Move(Parent.NextNode.Nodes, 0);
         }
 
-        public override void Remove() => TechOperation.Remove();
+        public override void Remove() => Operation.Remove();
 
         public override void ShowToolpath()
         {

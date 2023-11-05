@@ -1,18 +1,19 @@
-﻿using System.Drawing;
-
-namespace CAM.Core.UI
+﻿namespace CAM.Core.UI
 {
     public class GeneralOperationNode : OperationNodeBase
     {
-        public readonly TechOperation TechOperation;
+        public GeneralOperation GeneralOperation => (GeneralOperation)Tag;
 
         public GeneralOperationNode() : base(new GeneralOperation(), "Обработка", 0)
+        {
+        }
+        public GeneralOperationNode(GeneralOperation generalOperation) : base(generalOperation, generalOperation.Caption, 0)
         {
         }
 
         public override void RefreshColor()
         {
-            ForeColor = Checked ? Color.Black : Color.Gray;
+            SetNodeColor();
             foreach (OperationNodeBase node in Nodes) 
                 node.RefreshColor();
         }

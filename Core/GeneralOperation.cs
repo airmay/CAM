@@ -9,9 +9,10 @@ using CAM.TechProcesses.Sawing;
 
 namespace CAM
 {
+    [Serializable]
     public class GeneralOperation : OperationBase
     {
-        public List<Operation> Operations { get; set; }
+        public Operation[] Operations { get; set; }
         public MachineType? MachineType { get; set; }
 
 
@@ -52,12 +53,12 @@ namespace CAM
             if (OriginX != 0 || OriginY != 0)
                 OriginObject = Acad.CreateOriginObject(new Point3d(OriginX, OriginY, 0));
 
-            Operations.ForEach(p =>
-            {
-                AcadObject.LoadAcadProps(p);
-                //p.TechProcessBase = this;
-                p.SerializeInit();
-            });
+            //Operations.ForEach(p =>
+            //{
+            //    AcadObject.LoadAcadProps(p);
+            //    //p.TechProcessBase = this;
+            //    p.SerializeInit();
+            //});
         }
 
         public static void ConfigureParamsView(ParamsView view)

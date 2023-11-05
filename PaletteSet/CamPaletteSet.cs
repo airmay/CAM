@@ -32,10 +32,10 @@ namespace CAM
             //};
         }
 
-        //public void SetCamDocument(CamDocument camDocument = null)
+        //public void SetCamDocument(Processing processing = null)
         //{
-        //    Acad.ProcessingView.SetCamDocument(camDocument);
-        //    //_programView.SetCamDocument(camDocument);
+        //    Acad.ProcessingView.SetCamDocument(processing);
+        //    //_programView.SetCamDocument(processing);
         //}
 
         //internal void ClearCommands()

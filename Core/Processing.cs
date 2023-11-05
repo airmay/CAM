@@ -1,80 +1,147 @@
-﻿using Autodesk.AutoCAD.DatabaseServices;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Autodesk.AutoCAD.Geometry;
+using CAM.Core.UI;
 
 namespace CAM
 {
     public class Processing
     {
-        public List<GeneralOperation> GeneralOperations { get; set; }
+        public int Hash;
+        public GeneralOperation[] TechProcessList { get; set; } 
+        public GeneralOperationNode[] GeneralOperationNodes { get; set; }
 
+        public void CreateGeneralOperations()
+        {
+            TechProcessList = Acad.ProcessingView.treeView.Nodes.Cast<GeneralOperationNode>().Select(p =>
+                {
+                    p.GeneralOperation.Caption = p.Text;
+                    p.GeneralOperation.Enabled = p.Checked;
+                    p.GeneralOperation.Operations = p.Nodes.Cast<OperationNode>().Select(c =>
+                        {
+                            c.Operation.Caption = p.Text;
+                            c.Operation.Enabled = p.Checked;
+                            return c.Operation;
+                        })
+                        .ToArray();
+                    return p.GeneralOperation;
+                }
+            ).ToArray();
+        }
 
-        //public virtual void BuildProcessing()
+        public void CreateGeneralOperationNodes()
+        {
+            GeneralOperationNodes = null;
+
+        }
+
+        //public ITechProcess CreateTechProcess(string techProcessName)
         //{
-        //    var processor = new Processor(this);
-        //    processor.Start();
-        //    Operations.FindAll(p => p.Enabled)
-        //        .ForEach(p =>
-        //        {
-        //            processor.SetOperarion(p);
-        //            p.Execute(processor);
-        //        });
-        //    processor.Finish();
-        //    _processCommands = processor.ProcessCommands;
-
-        //    UpdateFromCommands();
+        //    var techProcess = _techProcessFactory.CreateTechProcess(techProcessName);
+        //    TechProcessList.Add(techProcess);
+        //    return techProcess;
         //}
 
-        //private void UpdateFromCommands()
+        //public void DeleteTechProcess(ITechProcess techProcess)
         //{
-        //    ToolpathObjectIds = ProcessCommands.Select((command, index) => new { command, index })
-        //        .Where(p => p.command.ToolpathObjectId.HasValue)
-        //        .GroupBy(p => p.command.ToolpathObjectId.Value)
-        //        .ToDictionary(p => p.Key, p => p.Min(k => k.index));
-        //    ToolpathObjectsGroup = ProcessCommands.Select(p => p.ToolpathObjectId).CreateGroup();
-        //    Caption = GetCaption(Caption, ProcessCommands.Sum(p => p.Duration));
-        //    foreach (var group in ProcessCommands.GroupBy(p => p.Owner))
-        //        if (group.Key is TechOperation techOperation)
-        //        {
-        //            techOperation.ToolpathObjectsGroup = group.Select(p => p.ToolpathObjectId).CreateGroup();
-        //            techOperation.Caption = GetCaption(techOperation.Caption, group.Sum(p => p.Duration));
-        //        }
-
-        //    string GetCaption(string caption, double duration)
-        //    {
-        //        var ind = caption.IndexOf('(');
-        //        return $"{(ind > 0 ? caption.Substring(0, ind).Trim() : caption)} ({new TimeSpan(0, 0, 0, (int)duration)})";
-        //    }
+        //    techProcess.DeleteProcessing();
+        //    techProcess.Teardown();
+        //    TechProcessList.Remove(techProcess);
         //}
 
-        //public void DeleteProcessing()
-        //{
-        //    ToolpathObjectsGroup?.DeleteGroup();
-        //    ToolpathObjectsGroup = null;
+        public void BuildProcessing(ITechProcess techProcess)
+        {
+            if (!techProcess.TechOperations.Any())
+                techProcess.CreateTechOperations();
 
-        //    Operations.Select(p => p.ToolpathObjectsGroup).Delete();
-        //    Operations.ForEach(p =>
-        //    {
-        //        p.ToolpathObjectsGroup = null;
-        //        p.FirstCommandIndex = null;
-        //    });
-        //    ExtraObjectsGroup?.DeleteGroup();
-        //    ExtraObjectsGroup = null;
+            if (!techProcess.Validate() || techProcess.TechOperations.Any(p => p.Enabled && p.CanProcess && !p.Validate()))
+                return;
 
-        //    ToolpathObjectIds = null;
-        //    _processCommands = null;
-        //}
+            try
+            {
+                Acad.DeleteToolObject();
+                Acad.Write($"Выполняется расчет обработки по техпроцессу {techProcess.Caption} ...");
+                var stopwatch = Stopwatch.StartNew();
+                Acad.CreateProgressor($"Расчет обработки по техпроцессу \"{techProcess.Caption}\"");
+                techProcess.DeleteProcessing();
+                Acad.Editor.UpdateScreen();
 
-        //public virtual bool Validate() => true;
+                techProcess.BuildProcessing();
 
-        //public virtual void Teardown()
-        //{
-        //    Acad.DeleteObjects(OriginObject);
-        //    Operations.ForEach(to => to.Teardown());
-        //}
+                stopwatch.Stop();
+                Acad.Write($"Расчет обработки завершен {stopwatch.Elapsed}");
+            }
+            catch (Autodesk.AutoCAD.Runtime.Exception ex)
+            {
+                if (ex.ErrorStatus == Autodesk.AutoCAD.Runtime.ErrorStatus.UserBreak)
+                    Acad.Write("Расчет прерван");
+                else
+                    Acad.Alert("Ошибка при выполнении расчета", ex);
+            }
+            catch (Exception ex)
+            {
+                Acad.Alert("Ошибка при выполнении расчета", ex);
+            }
+            Acad.CloseProgressor();
+        }
+
+        public void PartialProcessing(ITechProcess techProcess, ProcessCommand processCommand)
+        {
+            Acad.Write($"Выполняется формирование программы обработки по техпроцессу {techProcess.Caption} с команды номер {processCommand.Number}");
+            techProcess.SkipProcessing(processCommand);
+            Acad.Editor.UpdateScreen();
+        }
+
+        public void SendProgram(ITechProcess techProcess)
+        {
+            if (techProcess.ProcessCommands == null)
+            {
+                Acad.Alert("Программа не сформирована");
+                return;
+            }
+            var fileName = Acad.SaveFileDialog(techProcess.Caption, Settings.GetMachineSettings(techProcess.MachineType.Value).ProgramFileExtension, techProcess.MachineType.ToString());
+            if (fileName != null)
+                try
+                {
+                    var contents = techProcess.ProcessCommands.Select(p => p.GetProgrammLine(Settings.GetMachineSettings(techProcess.MachineType.Value).ProgramLineNumberFormat)).ToArray();
+                    File.WriteAllLines(fileName, contents);
+                    Acad.Write($"Создан файл {fileName}");
+                    if (techProcess.MachineType == MachineType.CableSawing)
+                        CreateImitationProgramm(contents, fileName);
+                }
+                catch (Exception ex)
+                {
+                    Acad.Alert($"Ошибка при записи файла {fileName}", ex);
+                }
+        }
+
+        private void CreateImitationProgramm(string[] contents, string fileName)
+        {
+            List<string> result = new List<string>(contents.Length * 2);
+            foreach (var item in contents)
+            {
+                if (item.StartsWith("M03"))
+                    continue;
+
+                var line = item.Replace("G01", "G00");
+                var vi = line.IndexOf('V');
+                if (vi > 0)
+                    line = line.Substring(0, vi) + "V0";
+
+                if (line == "G00 U0 V0")
+                    continue;
+
+                result.Add(line);
+
+                if (line.StartsWith("G00"))
+                    result.Add("M00");
+            }
+            var parts = fileName.Split('.');
+            fileName = parts[0] + "_i." + parts[1];
+            File.WriteAllLines(fileName, result);
+            Acad.Write($"Создан файл с имитацией {fileName}");
+        }
     }
 }

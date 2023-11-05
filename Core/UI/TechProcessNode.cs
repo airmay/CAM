@@ -26,7 +26,9 @@ namespace CAM
             TechProcess.GetToolpathObjectsGroup()?.SetGroupVisibility(true);
         }
 
-        public override void Remove() => Acad.CamDocument.DeleteTechProcess(TechProcess);
+        public override void Remove()
+        {
+        } //CamManager.Processing.Remove(TechProcess);
 
     }
 }
