@@ -42,7 +42,6 @@
             this.processCommandBindingSource = new System.Windows.Forms.BindingSource(this.components);
             this.panel1 = new System.Windows.Forms.Panel();
             this.toolStrip = new System.Windows.Forms.ToolStrip();
-            this.bCreateProsessing = new System.Windows.Forms.ToolStripButton();
             this.bRemove = new System.Windows.Forms.ToolStripButton();
             this.bCreateTechOperation = new System.Windows.Forms.ToolStripDropDownButton();
             this.bMoveUpTechOperation = new System.Windows.Forms.ToolStripButton();
@@ -55,6 +54,7 @@
             this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
             this.bSendProgramm = new System.Windows.Forms.ToolStripButton();
             this.bClose = new System.Windows.Forms.ToolStripButton();
+            this.bCreateGeneralOperation = new System.Windows.Forms.ToolStripButton();
             this.panel2 = new System.Windows.Forms.Panel();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
@@ -84,8 +84,8 @@
             // splitContainer1.Panel2
             // 
             this.splitContainer1.Panel2.Controls.Add(this.tabControl);
-            this.splitContainer1.Size = new System.Drawing.Size(885, 1602);
-            this.splitContainer1.SplitterDistance = 364;
+            this.splitContainer1.Size = new System.Drawing.Size(885, 1613);
+            this.splitContainer1.SplitterDistance = 365;
             this.splitContainer1.SplitterWidth = 10;
             this.splitContainer1.TabIndex = 0;
             // 
@@ -100,7 +100,7 @@
             this.treeView.Margin = new System.Windows.Forms.Padding(8, 7, 8, 7);
             this.treeView.Name = "treeView";
             this.treeView.SelectedImageIndex = 0;
-            this.treeView.Size = new System.Drawing.Size(885, 364);
+            this.treeView.Size = new System.Drawing.Size(885, 365);
             this.treeView.TabIndex = 0;
             this.treeView.AfterLabelEdit += new System.Windows.Forms.NodeLabelEditEventHandler(this.treeView_AfterLabelEdit);
             this.treeView.AfterCheck += new System.Windows.Forms.TreeViewEventHandler(this.treeView_AfterCheck);
@@ -123,7 +123,7 @@
             this.tabControl.Margin = new System.Windows.Forms.Padding(8, 7, 8, 7);
             this.tabControl.Name = "tabControl";
             this.tabControl.SelectedIndex = 0;
-            this.tabControl.Size = new System.Drawing.Size(885, 1228);
+            this.tabControl.Size = new System.Drawing.Size(885, 1238);
             this.tabControl.TabIndex = 0;
             // 
             // tabPageParams
@@ -133,7 +133,7 @@
             this.tabPageParams.Margin = new System.Windows.Forms.Padding(8, 7, 8, 7);
             this.tabPageParams.Name = "tabPageParams";
             this.tabPageParams.Padding = new System.Windows.Forms.Padding(8, 7, 8, 7);
-            this.tabPageParams.Size = new System.Drawing.Size(865, 1170);
+            this.tabPageParams.Size = new System.Drawing.Size(865, 1180);
             this.tabPageParams.TabIndex = 0;
             this.tabPageParams.Text = "Параметры";
             this.tabPageParams.UseVisualStyleBackColor = true;
@@ -145,7 +145,7 @@
             this.tabPageCommands.Margin = new System.Windows.Forms.Padding(8, 7, 8, 7);
             this.tabPageCommands.Name = "tabPageCommands";
             this.tabPageCommands.Padding = new System.Windows.Forms.Padding(8, 7, 8, 7);
-            this.tabPageCommands.Size = new System.Drawing.Size(865, 1172);
+            this.tabPageCommands.Size = new System.Drawing.Size(865, 1171);
             this.tabPageCommands.TabIndex = 1;
             this.tabPageCommands.Text = "Программа";
             this.tabPageCommands.UseVisualStyleBackColor = true;
@@ -173,7 +173,7 @@
             this.dataGridViewCommand.RowHeadersVisible = false;
             this.dataGridViewCommand.RowHeadersWidth = 102;
             this.dataGridViewCommand.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-            this.dataGridViewCommand.Size = new System.Drawing.Size(849, 1158);
+            this.dataGridViewCommand.Size = new System.Drawing.Size(849, 1157);
             this.dataGridViewCommand.TabIndex = 0;
             // 
             // U
@@ -212,16 +212,16 @@
             this.panel1.Location = new System.Drawing.Point(0, 0);
             this.panel1.Margin = new System.Windows.Forms.Padding(8, 7, 8, 7);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(885, 62);
+            this.panel1.Size = new System.Drawing.Size(885, 51);
             this.panel1.TabIndex = 2;
             // 
             // toolStrip
             // 
             this.toolStrip.ImageScalingSize = new System.Drawing.Size(40, 40);
             this.toolStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.bCreateProsessing,
-            this.bRemove,
             this.bCreateTechOperation,
+            this.bCreateGeneralOperation,
+            this.bRemove,
             this.bMoveUpTechOperation,
             this.bMoveDownTechOperation,
             this.toolStripSeparator1,
@@ -234,19 +234,9 @@
             this.toolStrip.Location = new System.Drawing.Point(0, 0);
             this.toolStrip.Name = "toolStrip";
             this.toolStrip.Padding = new System.Windows.Forms.Padding(0, 0, 5, 0);
-            this.toolStrip.Size = new System.Drawing.Size(885, 62);
+            this.toolStrip.Size = new System.Drawing.Size(885, 51);
             this.toolStrip.TabIndex = 0;
             this.toolStrip.Text = "toolStrip1";
-            // 
-            // bCreateProsessing
-            // 
-            this.bCreateProsessing.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.bCreateProsessing.Image = global::CAM.Properties.Resources.drive__plus;
-            this.bCreateProsessing.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.bCreateProsessing.Name = "bCreateProsessing";
-            this.bCreateProsessing.Size = new System.Drawing.Size(58, 55);
-            this.bCreateProsessing.Text = "toolStripButton1";
-            this.bCreateProsessing.Click += new System.EventHandler(this.bCreateProsessing_Click);
             // 
             // bRemove
             // 
@@ -254,7 +244,7 @@
             this.bRemove.Image = global::CAM.Properties.Resources.cross;
             this.bRemove.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.bRemove.Name = "bRemove";
-            this.bRemove.Size = new System.Drawing.Size(58, 55);
+            this.bRemove.Size = new System.Drawing.Size(58, 44);
             this.bRemove.Text = "Удалить";
             this.bRemove.Click += new System.EventHandler(this.bRemove_Click);
             // 
@@ -264,7 +254,7 @@
             this.bCreateTechOperation.Image = global::CAM.Properties.Resources.plus;
             this.bCreateTechOperation.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.bCreateTechOperation.Name = "bCreateTechOperation";
-            this.bCreateTechOperation.Size = new System.Drawing.Size(66, 55);
+            this.bCreateTechOperation.Size = new System.Drawing.Size(66, 44);
             // 
             // bMoveUpTechOperation
             // 
@@ -272,7 +262,7 @@
             this.bMoveUpTechOperation.Image = global::CAM.Properties.Resources.arrow_up;
             this.bMoveUpTechOperation.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.bMoveUpTechOperation.Name = "bMoveUpTechOperation";
-            this.bMoveUpTechOperation.Size = new System.Drawing.Size(58, 55);
+            this.bMoveUpTechOperation.Size = new System.Drawing.Size(58, 44);
             this.bMoveUpTechOperation.Text = "Пререместить выше";
             this.bMoveUpTechOperation.Click += new System.EventHandler(this.bMoveUpTechOperation_Click);
             // 
@@ -282,14 +272,14 @@
             this.bMoveDownTechOperation.Image = global::CAM.Properties.Resources.arrow_down;
             this.bMoveDownTechOperation.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.bMoveDownTechOperation.Name = "bMoveDownTechOperation";
-            this.bMoveDownTechOperation.Size = new System.Drawing.Size(58, 55);
+            this.bMoveDownTechOperation.Size = new System.Drawing.Size(58, 44);
             this.bMoveDownTechOperation.Text = "Переместить ниже";
             this.bMoveDownTechOperation.Click += new System.EventHandler(this.bMoveDownTechOperation_Click);
             // 
             // toolStripSeparator1
             // 
             this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(6, 62);
+            this.toolStripSeparator1.Size = new System.Drawing.Size(6, 51);
             // 
             // bBuildProcessing
             // 
@@ -299,7 +289,7 @@
             this.bBuildProcessing.Image = global::CAM.Properties.Resources.gear;
             this.bBuildProcessing.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.bBuildProcessing.Name = "bBuildProcessing";
-            this.bBuildProcessing.Size = new System.Drawing.Size(73, 55);
+            this.bBuildProcessing.Size = new System.Drawing.Size(73, 44);
             this.bBuildProcessing.Text = "Рассчитать обработку";
             this.bBuildProcessing.ButtonClick += new System.EventHandler(this.bBuildProcessing_ButtonClick);
             // 
@@ -318,7 +308,7 @@
             this.bVisibility.Image = global::CAM.Properties.Resources.eraser;
             this.bVisibility.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.bVisibility.Name = "bVisibility";
-            this.bVisibility.Size = new System.Drawing.Size(58, 55);
+            this.bVisibility.Size = new System.Drawing.Size(58, 44);
             this.bVisibility.Text = "Удалить доп. объекты";
             this.bVisibility.Click += new System.EventHandler(this.bVisibility_Click);
             // 
@@ -328,7 +318,7 @@
             this.bPlay.Image = global::CAM.Properties.Resources.icons8_cinema_16;
             this.bPlay.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.bPlay.Name = "bPlay";
-            this.bPlay.Size = new System.Drawing.Size(58, 55);
+            this.bPlay.Size = new System.Drawing.Size(58, 44);
             this.bPlay.Text = "Проиграть обработку";
             this.bPlay.ToolTipText = "Проигрывавание обработки";
             this.bPlay.Click += new System.EventHandler(this.bPlay_Click);
@@ -336,7 +326,7 @@
             // toolStripSeparator2
             // 
             this.toolStripSeparator2.Name = "toolStripSeparator2";
-            this.toolStripSeparator2.Size = new System.Drawing.Size(6, 62);
+            this.toolStripSeparator2.Size = new System.Drawing.Size(6, 51);
             // 
             // bSendProgramm
             // 
@@ -344,7 +334,7 @@
             this.bSendProgramm.Image = global::CAM.Properties.Resources.disk__arrow;
             this.bSendProgramm.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.bSendProgramm.Name = "bSendProgramm";
-            this.bSendProgramm.Size = new System.Drawing.Size(58, 55);
+            this.bSendProgramm.Size = new System.Drawing.Size(58, 44);
             this.bSendProgramm.Text = "Записать файл с программой";
             this.bSendProgramm.Click += new System.EventHandler(this.bSend_Click);
             // 
@@ -354,19 +344,29 @@
             this.bClose.Image = global::CAM.Properties.Resources.cross;
             this.bClose.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.bClose.Name = "bClose";
-            this.bClose.Size = new System.Drawing.Size(58, 55);
+            this.bClose.Size = new System.Drawing.Size(58, 44);
             this.bClose.Text = "Закрыть Автокад";
             this.bClose.Visible = false;
             this.bClose.Click += new System.EventHandler(this.bClose_Click);
+            // 
+            // bCreateGeneralOperation
+            // 
+            this.bCreateGeneralOperation.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.bCreateGeneralOperation.Image = global::CAM.Properties.Resources.folder__plus;
+            this.bCreateGeneralOperation.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.bCreateGeneralOperation.Name = "bCreateGeneralOperation";
+            this.bCreateGeneralOperation.Size = new System.Drawing.Size(58, 44);
+            this.bCreateGeneralOperation.Text = "bCreateGeneralOperation";
+            this.bCreateGeneralOperation.Click += new System.EventHandler(this.bCreateGeneralOperation_Click);
             // 
             // panel2
             // 
             this.panel2.Controls.Add(this.splitContainer1);
             this.panel2.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.panel2.Location = new System.Drawing.Point(0, 62);
+            this.panel2.Location = new System.Drawing.Point(0, 51);
             this.panel2.Margin = new System.Windows.Forms.Padding(8, 7, 8, 7);
             this.panel2.Name = "panel2";
-            this.panel2.Size = new System.Drawing.Size(885, 1602);
+            this.panel2.Size = new System.Drawing.Size(885, 1613);
             this.panel2.TabIndex = 3;
             // 
             // ProcessingView
@@ -433,6 +433,6 @@
         private System.Windows.Forms.DataGridViewTextBoxColumn U;
         private System.Windows.Forms.DataGridViewTextBoxColumn V;
         private System.Windows.Forms.DataGridViewTextBoxColumn A;
-        private System.Windows.Forms.ToolStripButton bCreateProsessing;
+        private System.Windows.Forms.ToolStripButton bCreateGeneralOperation;
     }
 }

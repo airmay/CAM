@@ -10,7 +10,8 @@ namespace CAM
     public class Processing
     {
         public int Hash;
-        public GeneralOperation[] GeneralOperations { get; set; } 
+        public GeneralOperation[] GeneralOperations { get; set; }
+        public ProcessCommand[] Commands { get; set; }
 
         //public ITechProcess CreateTechProcess(string techProcessName)
         //{

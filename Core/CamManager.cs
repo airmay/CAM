@@ -13,6 +13,7 @@ namespace CAM
         public static readonly Dictionary<Document, Processing> Documents = new Dictionary<Document, Processing>();
         public static ProcessingView ProcessingView = Acad.ProcessingView;
         public static Processing Processing;
+        public static ProcessCommand[] ProcessingCommands => Processing.Commands;
 
         public static void AddDocument(Document document)
         {
@@ -31,7 +32,7 @@ namespace CAM
                     processing.Hash = hash;
                     // processing.GeneralOperations.ForEach(p => p.SerializeInit());
                 }
-                else
+                else if (value != null)
                 {
                     Acad.Alert("Ошибка при загрузке данных обработки");
                 }
@@ -87,6 +88,7 @@ namespace CAM
         private static void UpdateProcessing()
         {
             Processing.GeneralOperations = ProcessingView.Nodes
+                .Cast<GeneralOperationNode>()
                 .Select(p => p.UpdateGeneralOperation())
                 .ToArray();
         }
@@ -95,6 +97,11 @@ namespace CAM
         {
             if (Acad.GetToolpathObjectId() is ObjectId id)
                 ProcessingView.SelectProcessCommand(id);
+        }
+
+        public static void ExecuteProcessing()
+        {
+            
         }
     }
 }

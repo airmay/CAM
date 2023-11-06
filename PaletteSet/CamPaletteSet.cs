@@ -43,7 +43,5 @@ namespace CAM
         //    //Acad.ProcessingView.ClearCommandsView();
         //    //_programView.SetNodes();
         //}
-
-        public void SelectProcessCommand(ObjectId id) => Acad.ProcessingView.SelectProcessCommand(id);
     }
 }
