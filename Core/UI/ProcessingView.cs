@@ -12,6 +12,8 @@ namespace CAM
 {
     public partial class ProcessingView : UserControl
     {
+        public List<GeneralOperationNode> Nodes => treeView.Nodes.Cast<GeneralOperationNode>().ToList();
+
         private Type _currentTechProcessType;
         private ITechProcess CurrentTechProcess => (treeView.SelectedNode?.Parent ?? treeView.SelectedNode)?.Tag as ITechProcess;
         private ProcessCommand CurrentProcessCommand => processCommandBindingSource.Current as ProcessCommand;
@@ -32,15 +34,22 @@ namespace CAM
 
         }
 
-        public void RefreshView()
+        public void SetNodes(TreeNode[] nodes)
         {
             ClearParamsViews();
-            treeView.Nodes.Clear(); 
-            treeView.Nodes.AddRange(CamManager.GetNodes());
+            treeView.Nodes.Clear();
+            treeView.Nodes.AddRange(nodes);
             treeView.ExpandAll();
 
             RefreshToolButtonsState();
             toolStrip.Enabled = CamManager.Processing != null;
+        }
+
+        public void ClearView()
+        {
+            ClearParamsViews();
+            treeView.Nodes.Clear();
+            toolStrip.Enabled = false;
         }
 
         private TreeNode GeneralOperationNode => treeView.SelectedNode.Parent ?? treeView.SelectedNode;

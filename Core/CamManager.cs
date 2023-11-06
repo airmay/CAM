@@ -17,27 +17,45 @@ namespace CAM
         public static void AddDocument(Document document)
         {
             var processing = new Processing();
-            TechProcessLoader.LoadTechProsess(processing);
+            Load();
             Documents.Add(document, processing);
-            //document.UserData
+            return;
+            // TODO document.UserData
+
+            void Load()
+            {
+                var (value, hash) = DataLoader.Load();
+                if (value is GeneralOperation[] operations)
+                {
+                    processing.GeneralOperations = operations;
+                    processing.Hash = hash;
+                    // processing.GeneralOperations.ForEach(p => p.SerializeInit());
+                }
+                else
+                {
+                    Acad.Alert("Ошибка при загрузке данных обработки");
+                }
+            }
         }
 
         public static void OnActivateDocument(Document document)
         {
+            if (Processing != null)
+                UpdateProcessing();
             Processing = Documents[document];
-            ProcessingView.RefreshView();
-            Acad.ClearHighlighted();
-        }
+            ProcessingView.SetNodes(GetNodes());
+            //Acad.ClearHighlighted();
+            return;
 
-        public static TreeNode[] GetNodes()
-        {
-            return Processing?.TechProcessList.Select(p =>
-                {
-                    var generalOperationNode = new GeneralOperationNode(p);
-                    generalOperationNode.Nodes.AddRange(p.Operations.Select(c => new OperationNode(c)).ToArray());
-                    return generalOperationNode;
-                })
-                .ToArray()
+            TreeNode[] GetNodes() =>
+                Processing?.GeneralOperations?.Select(p =>
+                    {
+                        var generalOperationNode = new GeneralOperationNode(p);
+                        generalOperationNode.Nodes.AddRange(p.Operations.Select(c => new OperationNode(c))
+                            .ToArray());
+                        return generalOperationNode;
+                    })
+                    .ToArray()
                 ?? Array.Empty<TreeNode>();
         }
 
@@ -47,31 +65,30 @@ namespace CAM
             if (!Documents.Any())
             {
                 Processing = null;
-                ProcessingView.RefreshView(); //TODO ClearView
+                ProcessingView.ClearView();
             }
         }
 
         public static void SaveDocument(Document document)
         {
-            var operations = ProcessingView.treeView.Nodes.Cast<GeneralOperationNode>().Select(p =>
-                {
-                    p.GeneralOperation.Caption = p.Text;
-                    p.GeneralOperation.Enabled = p.Checked;
-                    p.GeneralOperation.Operations = p.Nodes.Cast<OperationNode>().Select(c =>
-                        {
-                            c.Operation.Caption = c.Text;
-                            c.Operation.Enabled = c.Checked;
-                            return c.Operation;
-                        })
-                        .ToArray();
-                    return p.GeneralOperation;
-                }
-            ).ToArray();
+            UpdateProcessing();
 
-            //Acad.Documents[sender as Document].TechProcessList.ForEach(p => p.DeleteProcessing());
-            TechProcessLoader.SaveTechProsess(operations, Processing.Hash);
+            //Acad.Documents[sender as Document].GeneralOperations.ForEach(p => p.DeleteProcessing());
+
+            if (Processing.GeneralOperations.Length > 0 || Processing.Hash != 0)
+                DataLoader.Save(Processing.GeneralOperations, Processing.Hash);
+
             //ProcessingView.ClearCommandsView();
             //Acad.DeleteAll();
+
+
+        }
+
+        private static void UpdateProcessing()
+        {
+            Processing.GeneralOperations = ProcessingView.Nodes
+                .Select(p => p.UpdateGeneralOperation())
+                .ToArray();
         }
 
         public static void OnSelectAcadObject()

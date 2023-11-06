@@ -41,7 +41,7 @@ namespace CAM
         //internal void ClearCommands()
         //{
         //    //Acad.ProcessingView.ClearCommandsView();
-        //    //_programView.RefreshView();
+        //    //_programView.SetNodes();
         //}
 
         public void SelectProcessCommand(ObjectId id) => Acad.ProcessingView.SelectProcessCommand(id);

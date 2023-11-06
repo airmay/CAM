@@ -1,4 +1,6 @@
-﻿namespace CAM.Core.UI
+﻿using System.Linq;
+
+namespace CAM.Core.UI
 {
     public class GeneralOperationNode : OperationNodeBase
     {
@@ -9,6 +11,15 @@
         }
         public GeneralOperationNode(GeneralOperation generalOperation) : base(generalOperation, generalOperation.Caption, 0)
         {
+        }
+
+        public GeneralOperation UpdateGeneralOperation()
+        {
+            UpdateOperation();
+            GeneralOperation.Operations = Nodes.Cast<OperationNode>()
+                .Select(c => (Operation)c.UpdateOperation())
+                .ToArray();
+            return GeneralOperation;
         }
 
         public override void RefreshColor()

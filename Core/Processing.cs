@@ -10,37 +10,12 @@ namespace CAM
     public class Processing
     {
         public int Hash;
-        public GeneralOperation[] TechProcessList { get; set; } 
-        public GeneralOperationNode[] GeneralOperationNodes { get; set; }
-
-        public void CreateGeneralOperations()
-        {
-            TechProcessList = Acad.ProcessingView.treeView.Nodes.Cast<GeneralOperationNode>().Select(p =>
-                {
-                    p.GeneralOperation.Caption = p.Text;
-                    p.GeneralOperation.Enabled = p.Checked;
-                    p.GeneralOperation.Operations = p.Nodes.Cast<OperationNode>().Select(c =>
-                        {
-                            c.Operation.Caption = p.Text;
-                            c.Operation.Enabled = p.Checked;
-                            return c.Operation;
-                        })
-                        .ToArray();
-                    return p.GeneralOperation;
-                }
-            ).ToArray();
-        }
-
-        public void CreateGeneralOperationNodes()
-        {
-            GeneralOperationNodes = null;
-
-        }
+        public GeneralOperation[] GeneralOperations { get; set; } 
 
         //public ITechProcess CreateTechProcess(string techProcessName)
         //{
         //    var techProcess = _techProcessFactory.CreateTechProcess(techProcessName);
-        //    TechProcessList.Add(techProcess);
+        //    GeneralOperations.Add(techProcess);
         //    return techProcess;
         //}
 
@@ -48,7 +23,7 @@ namespace CAM
         //{
         //    techProcess.DeleteProcessing();
         //    techProcess.Teardown();
-        //    TechProcessList.Remove(techProcess);
+        //    GeneralOperations.Remove(techProcess);
         //}
 
         public void BuildProcessing(ITechProcess techProcess)

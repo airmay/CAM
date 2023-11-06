@@ -13,6 +13,14 @@ namespace CAM
             SetNodeColor();
         }
 
+        public OperationBase UpdateOperation()
+        {
+            var operation = (OperationBase)Tag;
+            operation.Caption = Text;
+            operation.Enabled = Checked;
+            return operation;
+        }
+
         public abstract void RefreshColor();
 
         protected void SetNodeColor() => ForeColor = Checked ? Color.Black : Color.Gray;
@@ -29,7 +37,6 @@ namespace CAM
         }
 
         public new abstract void Remove();
-
 
         public virtual void SelectAcadObject() { }
 

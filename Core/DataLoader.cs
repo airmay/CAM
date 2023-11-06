@@ -1,18 +1,15 @@
 ﻿using Autodesk.AutoCAD.ApplicationServices;
 using Autodesk.AutoCAD.DatabaseServices;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
-using System.Windows.Forms;
 
 namespace CAM
 {
-    static class TechProcessLoader
+    static class DataLoader
     {
-        private const string DataKey = "TechProcessList";
+        private const string DataKey = "GeneralOperations";
 
         // https://adn-cis.org/serilizacziya-klassa-.net-v-bazu-chertezha-autocad.html или  https://www.rsdn.org/forum/dotnet/2900485.all
         public sealed class MyBinder : SerializationBinder
@@ -21,72 +18,65 @@ namespace CAM
         }
 
         /// <summary>
-        /// Загрузить технологические процессы из файла чертежа
+        /// Загрузить данные из файла чертежа
         /// </summary>
-        public static void LoadTechProsess(Processing processing)
+        public static (object, int) Load()
         {
             try
             {
-                using (Transaction tr = Acad.Database.TransactionManager.StartTransaction())
-                using (DBDictionary dict = tr.GetObject(Acad.Database.NamedObjectsDictionaryId, OpenMode.ForRead) as DBDictionary)
+                using (var tr = Acad.Database.TransactionManager.StartTransaction())
+                using (var dict = tr.GetObject(Acad.Database.NamedObjectsDictionaryId, OpenMode.ForRead) as DBDictionary)
                     if (dict.Contains(DataKey))
-                        using (Xrecord xRecord = tr.GetObject(dict.GetAt(DataKey), OpenMode.ForRead) as Xrecord)
-                        using (ResultBuffer resultBuffer = xRecord.Data)
-                        using (MemoryStream stream = new MemoryStream())
+                        using (var xRecord = tr.GetObject(dict.GetAt(DataKey), OpenMode.ForRead) as Xrecord)
+                        using (var resultBuffer = xRecord.Data)
+                        using (var stream = new MemoryStream())
                         {
-                            processing.Hash = resultBuffer.ToString().GetHashCode();
                             foreach (var typedValue in resultBuffer)
                             {
                                 var datachunk = Convert.FromBase64String((string)typedValue.Value);
                                 stream.Write(datachunk, 0, datachunk.Length);
                             }
+
                             stream.Position = 0;
                             var formatter = new BinaryFormatter { Binder = new MyBinder() };
-                            processing.TechProcessList = (GeneralOperation[])formatter.Deserialize(stream);
+                            return (formatter.Deserialize(stream), resultBuffer.ToString().GetHashCode());
                         }
-
-                if (processing.TechProcessList?.Any() == true)
-                {
-                    // processing.TechProcessList.ForEach(p => p.SerializeInit());
-                    Acad.Write($"Загружены техпроцессы: {string.Join(", ", processing.TechProcessList.Select(p => p.Caption))}");
-                }
             }
             catch (Exception e)
             {
-                Acad.Alert($"Ошибка при загрузке техпроцессов", e);
+                Acad.Alert("Ошибка при загрузке данных обработки", e);
             }
+
+            return (null, 0);
         }
 
-        public static void SaveTechProsess(GeneralOperation[] operations, int hash)
+        public static void Save(object value, int savedHash)
         {
-            if (hash == 0 && operations.Length == 0) 
-                return;
-
             try
             {
                 const int kMaxChunkSize = 127;
                 using (var resultBuffer = new ResultBuffer())
                 {
-                    using (MemoryStream stream = new MemoryStream())
+                    using (var stream = new MemoryStream())
                     {
-                        BinaryFormatter formatter = new BinaryFormatter();
-                        formatter.Serialize(stream, operations);
+                        var formatter = new BinaryFormatter();
+                        formatter.Serialize(stream, value);
                         stream.Position = 0;
-                        for (int i = 0; i < stream.Length; i += kMaxChunkSize)
+                        for (var i = 0; i < stream.Length; i += kMaxChunkSize)
                         {
-                            int length = (int)Math.Min(stream.Length - i, kMaxChunkSize);
-                            byte[] datachunk = new byte[length];
+                            var length = (int)Math.Min(stream.Length - i, kMaxChunkSize);
+                            var datachunk = new byte[length];
                             stream.Read(datachunk, 0, length);
                             resultBuffer.Add(new TypedValue((int)DxfCode.Text, Convert.ToBase64String(datachunk)));
                         }
                     }
-                    var newHash = resultBuffer.ToString().GetHashCode();
-                    if (newHash == hash)
+                    var hash = resultBuffer.ToString().GetHashCode();
+                    if (hash == savedHash)
                         return;
 
-                    using (DocumentLock acLckDoc = Acad.ActiveDocument.LockDocument())
-                    using (Transaction tr = Acad.Database.TransactionManager.StartTransaction())
-                    using (DBDictionary dict = tr.GetObject(Acad.Database.NamedObjectsDictionaryId, OpenMode.ForWrite) as DBDictionary)
+                    using (var acLckDoc = Acad.ActiveDocument.LockDocument())
+                    using (var tr = Acad.Database.TransactionManager.StartTransaction())
+                    using (var dict = tr.GetObject(Acad.Database.NamedObjectsDictionaryId, OpenMode.ForWrite) as DBDictionary)
                     {
                         if (dict.Contains(DataKey))
                             using (var xrec = tr.GetObject(dict.GetAt(DataKey), OpenMode.ForWrite) as Xrecord)
@@ -104,7 +94,7 @@ namespace CAM
             }
             catch (Exception e)
             {
-                Acad.Alert($"Ошибка при сохранении техпроцессов", e);
+                Acad.Alert($"Ошибка при сохранении данных обработки", e);
             }
         }
     }

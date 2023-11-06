@@ -52,9 +52,9 @@ namespace CAM
             //    .ToArray());
             //}
 
-            //if (Acad.Processing?.TechProcessList.Any() == true)
+            //if (Acad.Processing?.GeneralOperations.Any() == true)
             //{
-            //    var nodes = Acad.Processing.TechProcessList.Select(p => DocumentTreeNode.Create(p)).ToArray();
+            //    var nodes = Acad.Processing.GeneralOperations.Select(p => DocumentTreeNode.Create(p)).ToArray();
             //    treeView.Nodes.AddRange(nodes);
             //    treeView.SelectedNode = treeView.Nodes[0];
             //}

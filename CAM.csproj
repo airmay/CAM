@@ -215,7 +215,7 @@
     <Compile Include="TechProcesses\Tactile\TactileTechProcess.cs" />
     <Compile Include="TechProcesses\Tactile\TactileTechProcessParams.cs" />
     <Compile Include="Core\TechProcessFactory.cs" />
-    <Compile Include="Core\TechProcessLoader.cs" />
+    <Compile Include="Core\DataLoader.cs" />
     <Compile Include="PaletteSet\CamPaletteSet.cs" />
     <Compile Include="Program\CommandNames.cs" />
     <Compile Include="Core\Enums\Corner.cs" />
