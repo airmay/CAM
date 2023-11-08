@@ -27,8 +27,20 @@ namespace CAM
 #if DEBUG
             bClose.Visible = true;
 #endif
-            bCreateTechOperation.DropDownItems.Add(new ToolStripMenuItem("Распиловка", null,
-                new EventHandler(bCreateTechOperation_Click11)));
+            CreateOperationMenuItems();
+            // bCreateTechOperation.DropDownItems.AddRange(OperationFactory.GetOperations());
+            //bCreateTechOperation.DropDownItems.Add(new ToolStripMenuItem("Распиловка", null,
+            //    j11)));
+        }
+
+        private void CreateOperationMenuItems()
+        {
+            var toolStripMenuItems = OperationItemsContainer.OperationItems.Select(p =>
+            {
+                //if (p.Type != null)
+                return new ToolStripMenuItem(p.Caption, null, new EventHandler(bCreateTechOperation_Click11));
+            }).ToArray();
+            bCreateTechOperation.DropDownItems.AddRange(toolStripMenuItems);
         }
 
         private void bCreateTechOperation_Click11(object sender, EventArgs e)

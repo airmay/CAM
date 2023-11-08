@@ -113,6 +113,8 @@
     <Compile Include="Core\Tool\ToolPosition.cs" />
     <Compile Include="Core\Tool\ToolTypeAttribute.cs" />
     <Compile Include="Core\UI\GeneralOperationNode.cs" />
+    <Compile Include="Core\UI\OperationItem.cs" />
+    <Compile Include="Core\UI\OperationItemsContainer.cs" />
     <Compile Include="Core\UI\OperationNodeBase.cs" />
     <Compile Include="Core\UI\ProcessingView.cs">
       <SubType>UserControl</SubType>
