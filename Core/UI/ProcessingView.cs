@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Windows.Forms;
 using CAM.Core.UI;
-using CAM.Operations.Sawing;
 
 namespace CAM
 {
@@ -23,37 +21,24 @@ namespace CAM
 
             imageList.Images.AddRange(new System.Drawing.Image[]
                 { Properties.Resources.folder, Properties.Resources.drive_download });
+            bCreateTechOperation.DropDownItems.AddRange(OperationItemsContainer.GetMenuItems(bCreateTechOperationClick));
             //RefreshToolButtonsState();
 #if DEBUG
             bClose.Visible = true;
 #endif
-            CreateOperationMenuItems();
-            // bCreateTechOperation.DropDownItems.AddRange(OperationFactory.GetOperations());
-            //bCreateTechOperation.DropDownItems.Add(new ToolStripMenuItem("Распиловка", null,
-            //    j11)));
-        }
-
-        private void CreateOperationMenuItems()
-        {
-            var toolStripMenuItems = OperationItemsContainer.OperationItems.Select(p =>
-            {
-                //if (p.Type != null)
-                return new ToolStripMenuItem(p.Caption, null, new EventHandler(bCreateTechOperation_Click11));
-            }).ToArray();
-            bCreateTechOperation.DropDownItems.AddRange(toolStripMenuItems);
-        }
-
-        private void bCreateTechOperation_Click11(object sender, EventArgs e)
-        {
-            if (Nodes.Count == 0)
-                bCreateGeneralOperation_Click(sender, e);
-            var node = new OperationNode(new SawingOperation(), "Распиловка");
-            GeneralOperationNode.Nodes.Add(node);
-            //GeneralOperationNode.ExpandAll();
-            treeView.SelectedNode = node;
         }
 
         #region ToolButtons
+
+        private void bCreateTechOperationClick(string caption, Type type)
+        {
+            if (Nodes.Count == 0)
+                bCreateGeneralOperation_Click(null, null);
+            var node = new OperationNode((OperationBase)Activator.CreateInstance(type), caption);
+            GeneralOperationNode.Nodes.Add(node);
+            GeneralOperationNode.ExpandAll();
+            treeView.SelectedNode = node;
+        }
 
         private void RefreshToolButtonsState()
         {

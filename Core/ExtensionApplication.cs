@@ -12,15 +12,11 @@ namespace CAM
 {
     public class ExtensionApplication : IExtensionApplication
     {
-        private TechProcessFactory _techProcessFactory;
-        private CamPaletteSet _camPaletteSet;
-
         public void Initialize()
         {
             Acad.Write($"Инициализация плагина. Версия сборки от {File.GetLastWriteTime(Assembly.GetExecutingAssembly().Location)}");
 
-            _techProcessFactory = new TechProcessFactory();
-            _camPaletteSet = new CamPaletteSet();
+            var camPaletteSet = new CamPaletteSet();
 
             //var manager = new CamManager();
 
