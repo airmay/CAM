@@ -14,13 +14,11 @@ namespace CAM
         private object SelectedOperation => SelectedNode.Tag;
         private ProcessCommand CurrentProcessCommand => processCommandBindingSource.Current as ProcessCommand;
 
-
         public ProcessingView()
         {
             InitializeComponent();
 
-            imageList.Images.AddRange(new System.Drawing.Image[]
-                { Properties.Resources.folder, Properties.Resources.drive_download });
+            imageList.Images.AddRange(new System.Drawing.Image[] { Properties.Resources.folder, Properties.Resources.drive_download });
             bCreateTechOperation.DropDownItems.AddRange(OperationItemsContainer.GetMenuItems(bCreateTechOperationClick));
             //RefreshToolButtonsState();
 #if DEBUG
@@ -99,13 +97,7 @@ namespace CAM
             //SelectedNode.SendProgram();
         }
 
-        private void bClose_Click(object sender, EventArgs e)
-        {
-            Autodesk.AutoCAD.ApplicationServices.DocumentExtension.CloseAndDiscard(Autodesk.AutoCAD.ApplicationServices
-                .Core.Application.DocumentManager.CurrentDocument);
-            //Autodesk.AutoCAD.ApplicationServices.DocumentCollectionExtension.CloseAll(Autodesk.AutoCAD.ApplicationServices.Application.DocumentManager);
-            Autodesk.AutoCAD.ApplicationServices.Core.Application.Quit();
-        }
+        private void bClose_Click(object sender, EventArgs e) => Acad.CloseAndDiscard();
 
         #endregion
 
@@ -189,37 +181,6 @@ namespace CAM
 
         #region Views
 
-        private void ClearParamsViews()
-        {
-            foreach (Control control in tabPageParams.Controls)
-                control.Hide();
-            ClearCommandsView();
-        }
-
-        public void ClearCommandsView() => processCommandBindingSource.DataSource = null;
-
-        private void processCommandBindingSource_CurrentChanged(object sender, EventArgs e)
-        {
-            if (CurrentProcessCommand != null)
-            {
-                if (CurrentProcessCommand.ToolpathObjectId.HasValue)
-                {
-                    Acad.Show(CurrentProcessCommand.ToolpathObjectId.Value);
-                    Acad.SelectObjectIds(CurrentProcessCommand.ToolpathObjectId.Value);
-                }
-
-                Acad.RegenToolObject(GeneralOperation.Tool, CurrentProcessCommand.HasTool,
-                    CurrentProcessCommand.ToolLocation,
-                    GeneralOperation.MachineType.Value); //Settongs.IsFrontPlaneZero
-            }
-        }
-
-        public void SelectProcessCommand(Autodesk.AutoCAD.DatabaseServices.ObjectId id)
-        {
-            //if (CurrentTechProcess.GetToolpathObjectIds().TryGetValue(id, out var index))
-            //    processCommandBindingSource.Position = index;
-        }
-
         private readonly Dictionary<Type, ParamsView> _paramsViews = new Dictionary<Type, ParamsView>();
 
         public void RefreshParamsView()
@@ -238,7 +199,37 @@ namespace CAM
             paramsView.BringToFront();
         }
 
-        #endregion
+        private void ClearParamsViews()
+        {
+            foreach (Control control in tabPageParams.Controls)
+                control.Hide();
+            ClearCommandsView();
+        }
 
+        public void ClearCommandsView() => processCommandBindingSource.DataSource = null;
+
+        private void processCommandBindingSource_CurrentChanged(object sender, EventArgs e)
+        {
+            if (CurrentProcessCommand == null) 
+                return;
+            
+            if (CurrentProcessCommand.ToolpathObjectId.HasValue)
+            {
+                Acad.Show(CurrentProcessCommand.ToolpathObjectId.Value);
+                Acad.SelectObjectIds(CurrentProcessCommand.ToolpathObjectId.Value);
+            }
+
+            Acad.RegenToolObject(GeneralOperation.Tool, CurrentProcessCommand.HasTool,
+                CurrentProcessCommand.ToolLocation,
+                GeneralOperation.MachineType.Value); //Settongs.IsFrontPlaneZero
+        }
+
+        public void SelectProcessCommand(Autodesk.AutoCAD.DatabaseServices.ObjectId id)
+        {
+            //if (CurrentTechProcess.GetToolpathObjectIds().TryGetValue(id, out var index))
+            //    processCommandBindingSource.Position = index;
+        }
+
+        #endregion
     }
 }

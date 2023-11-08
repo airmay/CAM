@@ -41,6 +41,11 @@ namespace CAM
             ex?.WriteToFile(message);
 #endif
         }
+        public static void CloseAndDiscard()
+        {
+            DocumentExtension.CloseAndDiscard(Application.DocumentManager.CurrentDocument);
+            Application.Quit();
+        }
 
         public static void Write(Exception ex) => Write("Ошибка", ex);
 

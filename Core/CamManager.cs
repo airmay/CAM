@@ -20,6 +20,7 @@ namespace CAM
             var processing = new Processing();
             Load();
             Documents.Add(document, processing);
+            //document.UserData.Add("Processing", processing);
             return;
             // TODO document.UserData
 
