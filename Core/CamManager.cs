@@ -1,6 +1,4 @@
 ﻿using System;
-using Autodesk.AutoCAD.ApplicationServices;
-using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
 using Autodesk.AutoCAD.DatabaseServices;
@@ -10,19 +8,15 @@ namespace CAM
 {
     public static class CamManager
     {
-        public static readonly Dictionary<Document, Processing> Documents = new Dictionary<Document, Processing>();
-        public static ProcessingView ProcessingView = Acad.ProcessingView;
+        public static readonly ProcessingView ProcessingView = Acad.ProcessingView;
         public static Processing Processing;
         public static ProcessCommand[] ProcessingCommands => Processing.Commands;
 
-        public static void AddDocument(Document document)
+        public static Processing CreateProcessing()
         {
             var processing = new Processing();
             Load();
-            Documents.Add(document, processing);
-            //document.UserData.Add("Processing", processing);
-            return;
-            // TODO document.UserData
+            return processing;
 
             void Load()
             {
@@ -40,11 +34,11 @@ namespace CAM
             }
         }
 
-        public static void OnActivateDocument(Document document)
+        public static void SetProcessing(Processing processing)
         {
             if (Processing != null)
                 UpdateProcessing();
-            Processing = Documents[document];
+            Processing = processing;
             ProcessingView.SetNodes(GetNodes());
             //Acad.ClearHighlighted();
             return;
@@ -61,17 +55,13 @@ namespace CAM
                 ?? Array.Empty<TreeNode>();
         }
 
-        public static void RemoveDocument(Document document)
+        public static void RemoveProcessing()
         {
-            Documents.Remove(document);
-            if (!Documents.Any())
-            {
-                Processing = null;
-                ProcessingView.ClearView();
-            }
+            Processing = null;
+            ProcessingView.ClearView();
         }
 
-        public static void SaveDocument(Document document)
+        public static void SaveProcessing()
         {
             UpdateProcessing();
 
@@ -82,8 +72,6 @@ namespace CAM
 
             //ProcessingView.ClearCommandsView();
             //Acad.DeleteAll();
-
-
         }
 
         private static void UpdateProcessing()

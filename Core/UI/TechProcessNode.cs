@@ -28,7 +28,7 @@ namespace CAM
 
         public override void Remove()
         {
-        } //CamManager.Processing.Remove(TechProcess);
+        } //CamManager.Processing.RemoveOperation(TechProcess);
 
     }
 }

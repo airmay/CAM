@@ -33,7 +33,7 @@ namespace CAM.Core.UI
 
         public override void MoveDown() => Move(TreeView.Nodes, Index + 1);
 
-        public override void Remove() => TreeView.Nodes.Remove(this);
+        public override void RemoveOperation() => TreeView.Nodes.Remove(this);
 
         public override void ShowToolpath()
         {

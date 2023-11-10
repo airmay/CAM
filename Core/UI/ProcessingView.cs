@@ -12,7 +12,7 @@ namespace CAM
         private GeneralOperation GeneralOperation => GeneralOperationNode.GeneralOperation;
         private OperationNodeBase SelectedNode => (OperationNodeBase)treeView.SelectedNode;
         private object SelectedOperation => SelectedNode.Tag;
-        private ProcessCommand CurrentProcessCommand => processCommandBindingSource.Current as ProcessCommand;
+        private ProcessCommand SelectedCommand => processCommandBindingSource.Current as ProcessCommand;
 
         public ProcessingView()
         {
@@ -109,8 +109,6 @@ namespace CAM
 
             treeView.Nodes.AddRange(nodes);
             treeView.ExpandAll();
-            treeView.Focus();
-
             //RefreshToolButtonsState();
             toolStrip.Enabled = true;
         }
@@ -150,10 +148,7 @@ namespace CAM
                 e.CancelEdit = true;
         }
 
-        private void treeView_AfterCheck(object sender, TreeViewEventArgs e)
-        {
-            ((OperationNodeBase)e.Node).RefreshColor();
-        }
+        private void treeView_AfterCheck(object sender, TreeViewEventArgs e) => ((OperationNodeBase)e.Node).RefreshColor();
 
         private void treeView_KeyDown(object sender, KeyEventArgs e)
         {
@@ -163,15 +158,14 @@ namespace CAM
 
         private void Delete()
         {
-            if (treeView.SelectedNode != null && MessageBox.Show($"Вы хотите удалить {treeView.SelectedNode.Text}?",
-                    "Подтверждение", MessageBoxButtons.YesNo, MessageBoxIcon.Question,
-                    MessageBoxDefaultButton.Button1) == DialogResult.Yes)
+            if (SelectedNode != null && MessageBox.Show($"Вы хотите удалить {SelectedNode.Text}?",
+                    "Подтверждение", MessageBoxButtons.YesNo, MessageBoxIcon.Question, MessageBoxDefaultButton.Button1) == DialogResult.Yes)
             {
-                SelectedNode.Remove();
+                SelectedNode.RemoveOperation();
 
                 //Acad.UnhighlightAll();
                 ClearParamsViews();
-                //treeView.SelectedNode.Remove();
+                treeView.SelectedNode.Remove();
                 //treeView.Focus();
                 //RefreshToolButtonsState();
             }
@@ -210,17 +204,17 @@ namespace CAM
 
         private void processCommandBindingSource_CurrentChanged(object sender, EventArgs e)
         {
-            if (CurrentProcessCommand == null) 
+            if (SelectedCommand == null) 
                 return;
             
-            if (CurrentProcessCommand.ToolpathObjectId.HasValue)
+            if (SelectedCommand.ToolpathObjectId.HasValue)
             {
-                Acad.Show(CurrentProcessCommand.ToolpathObjectId.Value);
-                Acad.SelectObjectIds(CurrentProcessCommand.ToolpathObjectId.Value);
+                Acad.Show(SelectedCommand.ToolpathObjectId.Value);
+                Acad.SelectObjectIds(SelectedCommand.ToolpathObjectId.Value);
             }
 
-            Acad.RegenToolObject(GeneralOperation.Tool, CurrentProcessCommand.HasTool,
-                CurrentProcessCommand.ToolLocation,
+            Acad.RegenToolObject(GeneralOperation.Tool, SelectedCommand.HasTool,
+                SelectedCommand.ToolLocation,
                 GeneralOperation.MachineType.Value); //Settongs.IsFrontPlaneZero
         }
 

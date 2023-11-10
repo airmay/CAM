@@ -12,6 +12,8 @@ namespace CAM
 {
     public class ExtensionApplication : IExtensionApplication
     {
+        public const string ProcessingKey = "Processing";
+
         public void Initialize()
         {
             Acad.Write($"Инициализация плагина. Версия сборки от {File.GetLastWriteTime(Assembly.GetExecutingAssembly().Location)}");
@@ -46,35 +48,35 @@ namespace CAM
 
         }
 
-        public void SetActiveDocument(Document document)
+        private void SetActiveDocument(Document document)
         {
             if (document == null)
                 return;
 
-            if (!CamManager.Documents.ContainsKey(document))
+            if (!document.UserData.ContainsKey(ProcessingKey))
             {
                 document.CommandWillStart += Document_CommandWillStart;
                 document.BeginDocumentClose += Document_BeginDocumentClose;
                 document.ImpliedSelectionChanged += (sender, args) => CamManager.OnSelectAcadObject();
-                CamManager.AddDocument(document);
+
+                document.UserData[ProcessingKey] = CamManager.CreateProcessing();
             }
-            CamManager.OnActivateDocument(document);
+            CamManager.SetProcessing((Processing)document.UserData[ProcessingKey]);
         }
 
         private void Document_CommandWillStart(object sender, CommandEventArgs e)
         {
             if (e.GlobalCommandName == "CLOSE" || e.GlobalCommandName == "QUIT" || e.GlobalCommandName == "QSAVE" || e.GlobalCommandName == "SAVEAS")
             {
-                CamManager.SaveDocument(sender as Document);
+                CamManager.SaveProcessing();
             }
         }
 
         private void Document_BeginDocumentClose(object sender, DocumentBeginCloseEventArgs e)
         {
-            var document = sender as Document;
-            document.CommandWillStart -= Document_CommandWillStart;
-            document.BeginDocumentClose -= Document_BeginDocumentClose;
-            CamManager.RemoveDocument(document);
+            ((Document)sender).CommandWillStart -= Document_CommandWillStart;
+            ((Document)sender).BeginDocumentClose -= Document_BeginDocumentClose;
+            CamManager.RemoveProcessing();
         }
 
         public void Terminate()

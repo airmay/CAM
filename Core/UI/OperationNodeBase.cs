@@ -36,7 +36,7 @@ namespace CAM
             TreeView.SelectedNode = this;
         }
 
-        public new abstract void Remove();
+        public new abstract void RemoveOperation();
 
         public virtual void SelectAcadObject() { }
 

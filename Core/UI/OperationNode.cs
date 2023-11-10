@@ -29,7 +29,7 @@
                 Move(Parent.NextNode.Nodes, 0);
         }
 
-        public override void Remove() => Operation.Remove();
+        public override void RemoveOperation() => Operation.Remove();
 
         public override void ShowToolpath()
         {
