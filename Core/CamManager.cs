@@ -84,13 +84,16 @@ namespace CAM
 
         public static void OnSelectAcadObject()
         {
-            if (Acad.GetToolpathObjectId() is ObjectId id)
-                ProcessingView.SelectProcessCommand(id);
+            //if (Acad.GetToolpathObjectId() is ObjectId id && Processing.)
+            //    ProcessingView.SelectProcessCommand(id);
         }
 
         public static void ExecuteProcessing()
         {
-            
+            UpdateProcessing();
+            Processing.Execute();
         }
+
+        public static void SendProgram() => Processing.SendProgram();
     }
 }

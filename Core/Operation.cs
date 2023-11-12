@@ -1,5 +1,6 @@
 ﻿using Autodesk.AutoCAD.DatabaseServices;
 using System;
+using System.Collections.Generic;
 
 namespace CAM
 {
@@ -9,7 +10,11 @@ namespace CAM
         public AcadObject ProcessingArea { get; set; }
 
         [NonSerialized]
+        public Dictionary<ObjectId, int> ToolpathCommandDictionary;
+        [NonSerialized]
         public ObjectId? ToolpathObjectsGroup;
+        [NonSerialized]
+        public ObjectId? ExtraObjectsGroup;
 
         [NonSerialized]
         public int? FirstCommandIndex;

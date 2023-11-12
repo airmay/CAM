@@ -37,28 +37,10 @@ namespace CAM
 
         public new abstract void Remove();
 
-        public void BuildProcessing(ProcessCommand processCommand)
-        {
-            if (processCommand is null)
-                Acad.Processing.BuildProcessing(TechProcess);
-            else
-                Acad.Processing.PartialProcessing(TechProcess, processCommand);
-
-            var techProcessNode = Parent ?? this;
-            if (techProcessNode.Nodes.Count == 0)
-                ((TechProcessNode)techProcessNode).CreateTechOperationNodes();
-
-            techProcessNode.Text = TechProcess.Caption;
-            foreach (TechOperationNode techOperationNode in techProcessNode.Nodes)
-                techOperationNode.Text = techOperationNode.TechOperation.Caption;
-        }
-
         public void SetVisibility(bool isToolpathVisible)
         {
             TechProcess.GetToolpathObjectsGroup()?.SetGroupVisibility(isToolpathVisible);
             TechProcess.GetExtraObjectsGroup()?.SetGroupVisibility(isToolpathVisible);
         }
-
-        public void SendProgram() => Acad.Processing.SendProgram(TechProcess);
     }
 }

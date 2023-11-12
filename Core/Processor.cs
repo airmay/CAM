@@ -6,38 +6,13 @@ namespace CAM
 {
     public class Processor
     {
-        private readonly Processing _processing;
         private readonly IPostProcessor _postProcessor;
-        public List<ProcessCommand> ProcessCommands { get; } = new List<ProcessCommand>();
+        public List<Command> ProcessCommands { get; } = new List<Command>();
 
-        public Processor(Processing processing)
+        public Processor(IPostProcessor postProcessor)
         {
-            _processing = processing;
-            // switch (_processing.MachineType)
-            // {
-            //     case MachineType.ScemaLogic:
-            //         _postProcessor = new DonatoniPostProcessor();
-            //         break;
-            //     case MachineType.Donatoni:
-            //         _postProcessor = new DonatoniPostProcessor();
-            //         break;
-            //     case MachineType.Krea:
-            //         _postProcessor = new DonatoniPostProcessor();
-            //         break;
-            //     case MachineType.CableSawing:
-            //         _postProcessor = new DonatoniPostProcessor();
-            //         break;
-            //     case MachineType.Forma:
-            //         _postProcessor = new DonatoniPostProcessor();
-            //         break;
-            //     case MachineType.Champion:
-            //         _postProcessor = new DonatoniPostProcessor();
-            //         break;
-            //     case null:
-            //         break;
-            //     default:
-            //         throw new ArgumentOutOfRangeException();
-            // }
+            _postProcessor = postProcessor;
+
         }
 
         public void Start()

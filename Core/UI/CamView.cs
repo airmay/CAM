@@ -224,7 +224,7 @@ namespace CAM
             SelectNextControl(ActiveControl, true, true, true, true);
 
             toolStrip.Enabled = false;
-            SelectedDocumentNode.BuildProcessing(sender == bPartialProcessing ? CurrentProcessCommand : null);
+            CamManager.ExecuteProcessing();
             toolStrip.Enabled = true;
 
             RefreshToolButtonsState();

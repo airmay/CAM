@@ -100,12 +100,15 @@
     <Compile Include="Acad\AutoCADCommands\QuickSelection.cs" />
     <Compile Include="Acad\AutoCADCommands\SymbolPack.cs" />
     <Compile Include="Core\CableTechProcess.cs" />
+    <Compile Include="Core\MillingProcessor.cs" />
+    <Compile Include="Core\PostProcessor.cs" />
     <Compile Include="Core\Processing.cs" />
     <Compile Include="Core\CamManager.cs" />
     <Compile Include="Core\GeneralOperation.cs" />
     <Compile Include="Core\MillingTechProcess.cs" />
     <Compile Include="Core\Operation.cs" />
     <Compile Include="Core\Processor.cs" />
+    <Compile Include="Core\ProcessorFactory.cs" />
     <Compile Include="Core\TechProcessBase.cs" />
     <Compile Include="Core\Tool\MillToolPosition.cs" />
     <Compile Include="Core\Tool\CableToolPosition.cs" />
@@ -172,6 +175,7 @@
     <Compile Include="Core\Enums\Material.cs" />
     <Compile Include="Program\Generator\PostProcessorBase.cs" />
     <Compile Include="Program\OperationProcessor.cs" />
+    <Compile Include="Program\Command.cs" />
     <Compile Include="Program\ProcessCommand.cs" />
     <Compile Include="TechProcesses\9_Stolb\SawingTechOperation.cs" />
     <Compile Include="TechProcesses\CableSawing\ArcSawingTechOperation.cs" />

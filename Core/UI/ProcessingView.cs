@@ -93,8 +93,8 @@ namespace CAM
 
         private void bSend_Click(object sender, EventArgs e)
         {
-            //dataGridViewCommand.EndEdit();
-            //SelectedNode.SendProgram();
+            dataGridViewCommand.EndEdit();
+            CamManager.SendProgram();
         }
 
         private void bClose_Click(object sender, EventArgs e) => Acad.CloseAndDiscard();
@@ -220,8 +220,8 @@ namespace CAM
 
         public void SelectProcessCommand(Autodesk.AutoCAD.DatabaseServices.ObjectId id)
         {
-            //if (CurrentTechProcess.GetToolpathObjectIds().TryGetValue(id, out var index))
-            //    processCommandBindingSource.Position = index;
+            if (CamManager..GetToolpathObjectIds().TryGetValue(id, out var index))
+                processCommandBindingSource.Position = index;
         }
 
         #endregion

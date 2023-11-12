@@ -1,9 +1,11 @@
-﻿using System;
+﻿using Autodesk.AutoCAD.DatabaseServices;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using CAM.Core.UI;
+using Autodesk.AutoCAD.Windows.Data;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.Window;
 
 namespace CAM
 {
@@ -11,56 +13,95 @@ namespace CAM
     {
         public int Hash;
         public GeneralOperation[] GeneralOperations { get; set; }
-        public ProcessCommand[] Commands { get; set; }
+        public Command[] Commands { get; set; }
+        public Dictionary<ObjectId, int> ToolpathCommandDictionary;
+        public ObjectId? ToolpathGroup;
 
-        //public ITechProcess CreateTechProcess(string techProcessName)
-        //{
-        //    var techProcess = _techProcessFactory.CreateTechProcess(techProcessName);
-        //    GeneralOperations.Add(techProcess);
-        //    return techProcess;
-        //}
-
-        //public void DeleteTechProcess(ITechProcess techProcess)
-        //{
-        //    techProcess.DeleteProcessing();
-        //    techProcess.Teardown();
-        //    GeneralOperations.Remove(techProcess);
-        //}
-
-        public void BuildProcessing(ITechProcess techProcess)
+        public void Execute()
         {
-            if (!techProcess.TechOperations.Any())
-                techProcess.CreateTechOperations();
-
-            if (!techProcess.Validate() || techProcess.TechOperations.Any(p => p.Enabled && p.CanProcess && !p.Validate()))
+            if (!GeneralOperations.Any(p => p.Operations.Any()))
                 return;
 
             try
             {
-                Acad.DeleteToolObject();
-                Acad.Write($"Выполняется расчет обработки по техпроцессу {techProcess.Caption} ...");
+                Acad.Write("Выполняется расчет обработки ...");
+                Acad.CreateProgressor("Расчет обработки");
                 var stopwatch = Stopwatch.StartNew();
-                Acad.CreateProgressor($"Расчет обработки по техпроцессу \"{techProcess.Caption}\"");
-                techProcess.DeleteProcessing();
+                Acad.DeleteToolObject();
+                DeleteProcessing();
                 Acad.Editor.UpdateScreen();
 
-                techProcess.BuildProcessing();
+                BuildProcessing();
 
                 stopwatch.Stop();
                 Acad.Write($"Расчет обработки завершен {stopwatch.Elapsed}");
             }
-            catch (Autodesk.AutoCAD.Runtime.Exception ex)
+            catch (Autodesk.AutoCAD.Runtime.Exception ex) 
+                when (ex.ErrorStatus == Autodesk.AutoCAD.Runtime.ErrorStatus.UserBreak)
             {
-                if (ex.ErrorStatus == Autodesk.AutoCAD.Runtime.ErrorStatus.UserBreak)
-                    Acad.Write("Расчет прерван");
-                else
-                    Acad.Alert("Ошибка при выполнении расчета", ex);
+                Acad.Write("Расчет прерван");
             }
             catch (Exception ex)
             {
                 Acad.Alert("Ошибка при выполнении расчета", ex);
             }
+
             Acad.CloseProgressor();
+        }
+
+        private void DeleteProcessing()
+        {
+            
+        }
+
+        private void BuildProcessing()
+        {
+            var machineType = GeneralOperations.First(p => p.Enabled).MachineType.Value;
+            var processor = ProcessorFactory.Create(machineType);
+            processor.Start();
+
+            foreach (var generalOperation in GeneralOperations.Where(p => p.Enabled))
+            foreach (var operation in generalOperation.Operations.Where(p => p.Enabled))
+            {
+                Acad.Write($"расчет операции {operation.Caption}");
+
+                processor.SetOperarion(operation);
+                operation.Execute(processor);
+
+                //    if (!generator.IsUpperTool)
+                //        generator.Uplifting();
+            }
+
+            processor.Finish();
+            Commands = processor.ProcessCommands.ToArray();
+            UpdateFromCommands();
+        }
+
+        private void UpdateFromCommands()
+        {
+            ToolpathCommandDictionary = Commands.Select((command, index) => new { command, index })
+                .Where(p => p.command.ToolpathObjectId.HasValue)
+                .GroupBy(p => p.command.ToolpathObjectId.Value)
+                .ToDictionary(p => p.Key, p => p.Min(k => k.index));
+            
+            ToolpathGroup = Commands.Select(p => p.ToolpathObjectId).CreateGroup();
+
+            var operationGroups = Commands.GroupBy(p => p.Operation).ToList();
+            foreach (var operationGroup in operationGroups)
+            {
+                var operation = operationGroup.Key;
+                operation.ToolpathObjectsGroup = operationGroup.Select(p => p.ToolpathObjectId).CreateGroup();
+                operation.Caption = GetCaption(operation.Caption, operationGroup.Sum(p => p.Duration));
+            }
+
+            return;
+
+            string GetCaption(string caption, double duration)
+            {
+                var ind = caption.IndexOf('(');
+                var timeSpan = new TimeSpan(0, 0, 0, (int)duration);
+                return $"{(ind > 0 ? caption.Substring(0, ind).Trim() : caption)} ({timeSpan})";
+            }
         }
 
         public void PartialProcessing(ITechProcess techProcess, ProcessCommand processCommand)
@@ -70,21 +111,23 @@ namespace CAM
             Acad.Editor.UpdateScreen();
         }
 
-        public void SendProgram(ITechProcess techProcess)
+        public void SendProgram()
         {
-            if (techProcess.ProcessCommands == null)
+            if (Commands == null)
             {
                 Acad.Alert("Программа не сформирована");
                 return;
             }
-            var fileName = Acad.SaveFileDialog(techProcess.Caption, Settings.GetMachineSettings(techProcess.MachineType.Value).ProgramFileExtension, techProcess.MachineType.ToString());
+
+            var machineType = GeneralOperations.First(p => p.Enabled).MachineType;
+            var fileName = Acad.SaveFileDialog("Программа", Settings.GetMachineSettings(machineType.Value).ProgramFileExtension, machineType.ToString());
             if (fileName != null)
                 try
                 {
-                    var contents = techProcess.ProcessCommands.Select(p => p.GetProgrammLine(Settings.GetMachineSettings(techProcess.MachineType.Value).ProgramLineNumberFormat)).ToArray();
+                    var contents = Commands.Select(p => p.GetProgrammLine(Settings.GetMachineSettings(machineType.Value).ProgramLineNumberFormat)).ToArray();
                     File.WriteAllLines(fileName, contents);
                     Acad.Write($"Создан файл {fileName}");
-                    if (techProcess.MachineType == MachineType.CableSawing)
+                    if (machineType == MachineType.CableSawing)
                         CreateImitationProgramm(contents, fileName);
                 }
                 catch (Exception ex)
