@@ -7,12 +7,13 @@ namespace CAM
     [Serializable]
     public abstract class Operation : OperationBase
     {
+        public GeneralOperation GeneralOperation { get; set; }
         public AcadObject ProcessingArea { get; set; }
 
         [NonSerialized]
         public Dictionary<ObjectId, int> ToolpathCommandDictionary;
         [NonSerialized]
-        public ObjectId? ToolpathObjectsGroup;
+        public ObjectId? ToolpathId;
         [NonSerialized]
         public ObjectId? ExtraObjectsGroup;
 

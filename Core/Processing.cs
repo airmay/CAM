@@ -80,19 +80,20 @@ namespace CAM
         private void UpdateFromCommands()
         {
             ToolpathCommandDictionary = Commands.Select((command, index) => new { command, index })
-                .Where(p => p.command.ToolpathObjectId.HasValue)
-                .GroupBy(p => p.command.ToolpathObjectId.Value)
+                .Where(p => p.command.ToolpathId.HasValue)
+                .GroupBy(p => p.command.ToolpathId.Value)
                 .ToDictionary(p => p.Key, p => p.Min(k => k.index));
-            
-            ToolpathGroup = Commands.Select(p => p.ToolpathObjectId).CreateGroup();
 
             var operationGroups = Commands.GroupBy(p => p.Operation).ToList();
             foreach (var operationGroup in operationGroups)
             {
                 var operation = operationGroup.Key;
-                operation.ToolpathObjectsGroup = operationGroup.Select(p => p.ToolpathObjectId).CreateGroup();
+                operation.ToolpathId = operationGroup.Select(p => p.ToolpathId).CreateGroup();
                 operation.Caption = GetCaption(operation.Caption, operationGroup.Sum(p => p.Duration));
             }
+
+            foreach (var generalOperationGroup in Commands.GroupBy(p => p.Operation.GeneralOperation))
+                generalOperationGroup.Key.Caption = GetCaption(generalOperationGroup.Key.Caption, generalOperationGroup.Sum(p => p.Duration));
 
             return;
 

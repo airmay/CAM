@@ -10,7 +10,7 @@ namespace CAM
     {
         public static readonly ProcessingView ProcessingView = Acad.ProcessingView;
         public static Processing Processing;
-        public static ProcessCommand[] ProcessingCommands => Processing.Commands;
+        public static Command[] ProcessingCommands => Processing.Commands;
 
         public static Processing CreateProcessing()
         {
@@ -84,8 +84,9 @@ namespace CAM
 
         public static void OnSelectAcadObject()
         {
-            //if (Acad.GetToolpathObjectId() is ObjectId id && Processing.)
-            //    ProcessingView.SelectProcessCommand(id);
+            if (Acad.GetToolpathId() is ObjectId id &&
+                Processing.ToolpathCommandDictionary.TryGetValue(id, out var indexValue))
+                ProcessingView.SelectProcessCommand(indexValue);
         }
 
         public static void ExecuteProcessing()

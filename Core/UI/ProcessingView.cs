@@ -218,11 +218,7 @@ namespace CAM
                 GeneralOperation.MachineType.Value); //Settongs.IsFrontPlaneZero
         }
 
-        public void SelectProcessCommand(Autodesk.AutoCAD.DatabaseServices.ObjectId id)
-        {
-            if (CamManager..GetToolpathObjectIds().TryGetValue(id, out var index))
-                processCommandBindingSource.Position = index;
-        }
+        public void SelectProcessCommand(int index) => processCommandBindingSource.Position = index;
 
         #endregion
     }

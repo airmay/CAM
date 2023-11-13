@@ -14,7 +14,7 @@ namespace CAM
 
         public ToolPosition ToolLocation;
 
-        public ObjectId? ToolpathObjectId { get; set; }
+        public ObjectId? ToolpathId { get; set; }
 
         public double Duration { get; set; }
 

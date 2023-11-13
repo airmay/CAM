@@ -34,7 +34,7 @@
         public override void ShowToolpath()
         {
             //TechProcess.GetToolpathObjectsGroup()?.SetGroupVisibility(false);
-            //TechOperation.ToolpathObjectsGroup?.SetGroupVisibility(true);
+            //TechOperation.ToolpathId?.SetGroupVisibility(true);
             //Acad.Editor.UpdateScreen();
 
         }

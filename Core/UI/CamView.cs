@@ -254,7 +254,7 @@ namespace CAM
         private void bSend_Click(object sender, EventArgs e)
         {
             dataGridViewCommand.EndEdit();
-            SelectedDocumentNode.SendProgram();
+            CamManager.SendProgram();
         }
 
         private void bClose_Click(object sender, EventArgs e)
