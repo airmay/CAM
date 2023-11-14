@@ -7,7 +7,7 @@ namespace CAM
     [Serializable]
     public abstract class Operation : OperationBase
     {
-        public GeneralOperation GeneralOperation { get; set; }
+        public int Duration { get; set; }
         public AcadObject ProcessingArea { get; set; }
 
         [NonSerialized]
@@ -23,7 +23,7 @@ namespace CAM
         public virtual void SerializeInit() { }
         public virtual void Teardown() { }
         
-        public abstract void Execute(Processor processor);
+        public abstract void Execute(GeneralOperation generalOperation, Processor processor);
 
         public void Remove()
         {

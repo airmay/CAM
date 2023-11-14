@@ -48,7 +48,7 @@ namespace CAM.Operations.Sawing
             view.AddControl(sawingModesView, 6);
         }
 
-        public override void Execute(Processor processor)
+        public override void Execute(GeneralOperation generalOperation, Processor processor)
         {
             
         }

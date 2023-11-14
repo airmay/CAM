@@ -63,10 +63,8 @@ namespace CAM
             SelectNextControl(ActiveControl, true, true, true, true);
 
             toolStrip.Enabled = false;
-            CamManager.ExecuteProcessing();
+            processCommandBindingSource.DataSource = CamManager.ExecuteProcessing();
             toolStrip.Enabled = true;
-
-            processCommandBindingSource.DataSource = CamManager.ProcessingCommands;
         }
 
         private void bVisibility_Click(object sender, EventArgs e)
@@ -218,7 +216,7 @@ namespace CAM
                 GeneralOperation.MachineType.Value); //Settongs.IsFrontPlaneZero
         }
 
-        public void SelectProcessCommand(int index) => processCommandBindingSource.Position = index;
+        public void SelectProcessCommand(int commandIndex) => processCommandBindingSource.Position = commandIndex;
 
         #endregion
     }

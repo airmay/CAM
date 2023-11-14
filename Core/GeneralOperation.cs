@@ -25,10 +25,6 @@ namespace CAM
         public CAM.Tool Tool { get; set; }
         public double ZSafety { get; set; } = 20;
 
-        [NonSerialized] private List<ProcessCommand> _processCommands = new List<ProcessCommand>();
-
-        public List<ProcessCommand> ProcessCommands => _processCommands;
-
         public double OriginX { get; set; }
 
         public double OriginY { get; set; }

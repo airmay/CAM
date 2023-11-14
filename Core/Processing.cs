@@ -4,8 +4,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using Autodesk.AutoCAD.Windows.Data;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement.Window;
 
 namespace CAM
 {
@@ -14,7 +12,8 @@ namespace CAM
         public int Hash;
         public GeneralOperation[] GeneralOperations { get; set; }
         public Command[] Commands { get; set; }
-        public Dictionary<ObjectId, int> ToolpathCommandDictionary;
+
+        private Dictionary<ObjectId, int> _toolpathCommandDictionary;
 
         public void Execute()
         {
@@ -66,7 +65,7 @@ namespace CAM
                 Acad.Write($"расчет операции {operation.Caption}");
 
                 processor.SetOperarion(operation);
-                operation.Execute(processor);
+                operation.Execute(generalOperation, processor);
 
                 //    if (!generator.IsUpperTool)
                 //        generator.Uplifting();
@@ -78,64 +77,28 @@ namespace CAM
 
         private void UpdateFromCommands()
         {
-            ToolpathCommandDictionary = Commands.Select((command, index) => new { command, index })
+            _toolpathCommandDictionary = Commands.Select((command, index) => new { command, index })
                 .Where(p => p.command.ToolpathId.HasValue)
                 .GroupBy(p => p.command.ToolpathId.Value)
                 .ToDictionary(p => p.Key, p => p.Min(k => k.index));
 
-            var operationGroups = Commands.GroupBy(p => p.Operation).ToList();
-            foreach (var operationGroup in operationGroups)
-            {
-                var operation = operationGroup.Key;
-                operation.ToolpathId = operationGroup.Select(p => p.ToolpathId).CreateGroup();
-                operation.Caption = GetCaption(operation.Caption, operationGroup.Sum(p => p.Duration));
-            }
-
-            foreach (var generalOperationGroup in Commands.GroupBy(p => p.Operation.GeneralOperation))
-                generalOperationGroup.Key.Caption = GetCaption(generalOperationGroup.Key.Caption, generalOperationGroup.Sum(p => p.Duration));
-
-            return;
-
-            string GetCaption(string caption, double duration)
-            {
-                var ind = caption.IndexOf('(');
-                var timeSpan = new TimeSpan(0, 0, 0, (int)duration);
-                return $"{(ind > 0 ? caption.Substring(0, ind).Trim() : caption)} ({timeSpan})";
-            }
+            foreach (var operationGroup in Commands.GroupBy(p => p.Operation))
+                operationGroup.Key.ToolpathId = operationGroup.Select(p => p.ToolpathId).CreateGroup();
         }
 
-        public void PartialProcessing(ITechProcess techProcess, ProcessCommand processCommand)
+        public int? GetCommandIndex(ObjectId id)
         {
-            Acad.Write($"Выполняется формирование программы обработки по техпроцессу {techProcess.Caption} с команды номер {processCommand.Number}");
-            techProcess.SkipProcessing(processCommand);
-            Acad.Editor.UpdateScreen();
+            return _toolpathCommandDictionary.TryGetValue(id, out var value) ? (int?)value : null;
         }
 
-        public void SendProgram()
-        {
-            if (Commands == null)
-            {
-                Acad.Alert("Программа не сформирована");
-                return;
-            }
+        //public void PartialProcessing(ITechProcess techProcess, ProcessCommand processCommand)
+        //{
+        //    Acad.Write($"Выполняется формирование программы обработки по техпроцессу {techProcess.Caption} с команды номер {processCommand.Number}");
+        //    techProcess.SkipProcessing(processCommand);
+        //    Acad.Editor.UpdateScreen();
+        //}
 
-            var machineType = GeneralOperations.First(p => p.Enabled).MachineType;
-            var fileName = Acad.SaveFileDialog("Программа", Settings.GetMachineSettings(machineType.Value).ProgramFileExtension, machineType.ToString());
-            if (fileName != null)
-                try
-                {
-                    var contents = Commands.Select(p => p.GetProgrammLine(Settings.GetMachineSettings(machineType.Value).ProgramLineNumberFormat)).ToArray();
-                    File.WriteAllLines(fileName, contents);
-                    Acad.Write($"Создан файл {fileName}");
-                    if (machineType == MachineType.CableSawing)
-                        CreateImitationProgramm(contents, fileName);
-                }
-                catch (Exception ex)
-                {
-                    Acad.Alert($"Ошибка при записи файла {fileName}", ex);
-                }
-        }
-
+        /*
         private void CreateImitationProgramm(string[] contents, string fileName)
         {
             List<string> result = new List<string>(contents.Length * 2);
@@ -162,5 +125,6 @@ namespace CAM
             File.WriteAllLines(fileName, result);
             Acad.Write($"Создан файл с имитацией {fileName}");
         }
+    */
     }
 }
