@@ -185,7 +185,7 @@ namespace CAM
                 paramsView = new ParamsView(type);
                 paramsView.Dock = DockStyle.Fill;
                 tabPageParams.Controls.Add(paramsView);
-                _paramsViews[type] = paramsView;
+                //_paramsViews[type] = paramsView;
             }
 
             paramsView.BindingSource.DataSource = SelectedNode.Tag;

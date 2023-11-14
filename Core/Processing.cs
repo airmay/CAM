@@ -15,7 +15,6 @@ namespace CAM
         public GeneralOperation[] GeneralOperations { get; set; }
         public Command[] Commands { get; set; }
         public Dictionary<ObjectId, int> ToolpathCommandDictionary;
-        public ObjectId? ToolpathGroup;
 
         public void Execute()
         {
@@ -32,6 +31,7 @@ namespace CAM
                 Acad.Editor.UpdateScreen();
 
                 BuildProcessing();
+                UpdateFromCommands();
 
                 stopwatch.Stop();
                 Acad.Write($"Расчет обработки завершен {stopwatch.Elapsed}");
@@ -74,7 +74,6 @@ namespace CAM
 
             processor.Finish();
             Commands = processor.ProcessCommands.ToArray();
-            UpdateFromCommands();
         }
 
         private void UpdateFromCommands()

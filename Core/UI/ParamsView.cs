@@ -52,6 +52,7 @@ namespace CAM
         public ParamsView(Type type)
         {
             InitializeComponent();
+            //tablePanel.CellBorderStyle = TableLayoutPanelCellBorderStyle.Single;
             _type = type;
             BindingSource.DataSource = type;
 
@@ -63,7 +64,7 @@ namespace CAM
         private void AddRow(int height = 1)
         {
             tablePanel.RowStyles.Add(new RowStyle(SizeType.Absolute, RowHeight * height));
-            tablePanel.Height += RowHeight * height;
+            tablePanel.Height += RowHeight * height / 2;
         }
         
         private void AddRowH(int height)
@@ -93,10 +94,12 @@ namespace CAM
             {
                 Text = displayName,
                 Dock = DockStyle.Top,
-                Height = (int)(Font.Height * 1.8),
+                //Height = RowHeight / 2,
                 Padding = new Padding(0, (int)(Font.Height * 0.1), 0, 0),
                 TextAlign = ContentAlignment.TopLeft,
                 AutoEllipsis = true,
+                Margin = new Padding(3, 3, 3, 3),
+                //BorderStyle = BorderStyle.FixedSingle
             };
             tablePanel.Controls.Add(label);
 
@@ -127,7 +130,7 @@ namespace CAM
 
             var control = new CheckBox
             {
-                Height = (int)(Font.Height * 1.4)
+                //Height = (int)(Font.Height * 1.4)
             };
             control.DataBindings.Add(new Binding("Checked", BindingSource, paramName, true));
             tablePanel.Controls.Add(control);
@@ -186,8 +189,8 @@ namespace CAM
             var comboBox = new ComboBox
             {
                 DropDownStyle = ComboBoxStyle.DropDownList,
-                Dock = DockStyle.Top,
-                Margin = new Padding(3, 3, 3, Font.Height / 2),
+                Dock = DockStyle.Fill,
+                //Margin = new Padding(3, 3, 3, Font.Height / 2),
             };
             tablePanel.Controls.Add(comboBox);
 
@@ -215,6 +218,7 @@ namespace CAM
             var textBox = new TextBox
             {
                 Dock = DockStyle.Fill,
+                //Height = RowHeight * 2,
                 ReadOnly = true
             };
             userControl.Controls.Add(textBox);
@@ -222,6 +226,7 @@ namespace CAM
             var button = new Button
             {
                 Dock = DockStyle.Right,
+                //Height = RowHeight * 2,
                 Width = (int)(textBox.Height * 1.5),
                 TabStop = false,
                 Text = buttonText,
