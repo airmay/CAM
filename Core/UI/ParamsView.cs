@@ -40,7 +40,7 @@ namespace CAM
             ["ZEntry"] = "Z входа",
             ["AngleA"] = "Угол вертикальный",
         };
-        private int RowHeight => (int)(Font.Height * 1.8); //24;
+        private int RowHeight => (int)(Font.Height * 1.22); //24;
         private readonly Type _type;
 
         public object ParamsObject => BindingSource.DataSource;
@@ -94,13 +94,14 @@ namespace CAM
             {
                 Text = displayName,
                 Dock = DockStyle.Top,
-                //Height = RowHeight / 2,
+                Height = RowHeight,
                 Padding = new Padding(0, (int)(Font.Height * 0.1), 0, 0),
                 TextAlign = ContentAlignment.TopLeft,
                 AutoEllipsis = true,
                 Margin = new Padding(3, 3, 3, 3),
                 //BorderStyle = BorderStyle.FixedSingle
             };
+            
             tablePanel.Controls.Add(label);
 
             return label;
@@ -130,7 +131,7 @@ namespace CAM
 
             var control = new CheckBox
             {
-                //Height = (int)(Font.Height * 1.4)
+                Dock = DockStyle.Fill
             };
             control.DataBindings.Add(new Binding("Checked", BindingSource, paramName, true));
             tablePanel.Controls.Add(control);

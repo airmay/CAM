@@ -51,8 +51,8 @@
             // 
             // ParamsView
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(240F, 240F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
+            this.AutoScaleDimensions = new System.Drawing.SizeF(16F, 31F);
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoScroll = true;
             this.Controls.Add(this.tablePanel);
             this.Margin = new System.Windows.Forms.Padding(8);

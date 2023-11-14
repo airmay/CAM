@@ -45,7 +45,7 @@
             this.gvSawingModes.BackgroundColor = System.Drawing.SystemColors.Window;
             this.gvSawingModes.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.gvSawingModes.ColumnHeadersBorderStyle = System.Windows.Forms.DataGridViewHeaderBorderStyle.Single;
-            this.gvSawingModes.ColumnHeadersHeight = 58;
+            this.gvSawingModes.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.gvSawingModes.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.depthDataGridViewTextBoxColumn,
             this.depthStepDataGridViewTextBoxColumn,
