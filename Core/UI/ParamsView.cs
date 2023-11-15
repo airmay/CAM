@@ -94,14 +94,14 @@ namespace CAM
             {
                 Text = displayName,
                 Dock = DockStyle.Top,
-                Height = RowHeight,
+                //Height = RowHeight,
                 Padding = new Padding(0, (int)(Font.Height * 0.1), 0, 0),
                 TextAlign = ContentAlignment.TopLeft,
                 AutoEllipsis = true,
                 Margin = new Padding(3, 3, 3, 3),
                 //BorderStyle = BorderStyle.FixedSingle
             };
-            
+            label.Height = (int)(label.DeviceDpi / 6.5);
             tablePanel.Controls.Add(label);
 
             return label;
