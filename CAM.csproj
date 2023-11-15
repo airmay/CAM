@@ -256,7 +256,9 @@
     <Compile Include="Core\UI\CamView.Designer.cs">
       <DependentUpon>CamView.cs</DependentUpon>
     </Compile>
+    <Compile Include="Utils\Pass.cs" />
     <Compile Include="Utils\ObjectExtensions.cs" />
+    <Compile Include="Utils\PassIterator.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
