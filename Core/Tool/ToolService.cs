@@ -80,8 +80,8 @@ namespace CAM
                     Thickness = p[1].value
                 });
             var tools = Settings.GetTools(MachineType.ScemaLogic);
-            tools.Clear();
-            tools.AddRange(lines);
+            //tools.Clear();
+            //tools.AddRange(lines);
             _toolsForm.ToolBindingSource.DataSource = tools;
             _toolsForm.ToolBindingSource.ResetBindings(false);
         }

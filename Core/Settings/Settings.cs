@@ -7,16 +7,106 @@ using System.Xml.Serialization;
 
 namespace CAM
 {
-    /// <summary>
-    /// Настройки
-    /// </summary>
     public class Settings
     {
-        //TODO remove Settings
+        public static Dictionary<MachineType, Machine> Machines = new Dictionary<MachineType, Machine>
+        {
+            [MachineType.ScemaLogic] = new Machine
+            {
+                MaxFrequency = 3000,
+                ProgramFileExtension = "csv",
+                ProgramLineNumberFormat = "{0}"
+            },
+            [MachineType.Donatoni] = new Machine
+            {
+                MaxFrequency = 5000,
+                ProgramFileExtension = "pgm",
+                ProgramLineNumberFormat = "N{0}"
+            },
+            [MachineType.Forma] = new Machine
+            {
+                MaxFrequency = 1200,
+                ProgramFileExtension = "pgm",
+                ProgramLineNumberFormat = "N{0}"
+            },
+            [MachineType.Champion] = new Machine
+            {
+                MaxFrequency = 1200,
+                ProgramFileExtension = "pim",
+                ProgramLineNumberFormat = "N{0}"
+            },
+            [MachineType.Krea] = new Machine
+            {
+                MaxFrequency = 10000,
+                ProgramFileExtension = "txt",
+                ProgramLineNumberFormat = "N{0}"
+            },
+            [MachineType.CableSawing] = new Machine
+            {
+                MaxFrequency = 10000,
+                ProgramFileExtension = "txt",
+                ProgramLineNumberFormat = "{ 0}"
+            },
+        };
+        private const string ToolsFilePath =
+#if DEBUG
+        @"C:\Catalina\Tools";
+#else
+        @"\\Catalina\Tools";
+#endif
+        private static readonly Dictionary<MachineType, Tool[]> Tools = new Dictionary<MachineType, Tool[]>();
 
-        #region static
+        public static Tool[] GetTools(MachineType machineType)
+        {
+            if (Tools.TryGetValue(machineType, out var tools)) 
+                return tools;
 
-        private static Lazy<Settings> _instance = new Lazy<Settings>(Load);
+            var file = Path.Combine(ToolsFilePath, $"{machineType}.csv");
+            if (File.Exists(file))
+            {
+                tools = File.ReadAllLines(file)
+                    .Select(p => p.Split(';'))
+                    .Select(p => new Tool
+                    {
+                        Number = ToInt(p[0]),
+                        Name = p[1],
+                        Type = (ToolType)ToInt(p[2]),
+                        Diameter = ToDouble(p[3]),
+                        Thickness = ToDouble(p[4]),
+                    })
+                    .ToArray();
+                Tools.Add(machineType, tools);
+            }
+            else
+            {
+                Acad.Alert($"Не найден файл инструментов: {file}");
+            }
+
+            return tools;
+        }
+
+        static int ToInt(string s)
+            {
+                if (!int.TryParse(s, out var val))
+                    WriteErrorParsing(s);
+                return val;
+            }
+        static double ToDouble(string s)
+            {
+                if (!double.TryParse(s, out var val))
+                    WriteErrorParsing(s);
+                return val;
+            }
+            static void WriteErrorParsing(string par) => Acad.Write($"Ошибка преобразования числового параметра {par}");
+
+
+
+
+    //TODO remove Settings
+
+    #region static
+
+    private static Lazy<Settings> _instance = new Lazy<Settings>(Load);
 
         public static Settings Instance => _instance.Value;
 
@@ -24,7 +114,7 @@ namespace CAM
 
         public static MachineSettings GetMachineSettings(MachineType machineType) => Instance.MachineSettings.Single(p => p.MachineType == machineType);
 
-        public static List<Tool> GetTools(MachineType machineType)
+        public static List<Tool> GetTools1(MachineType machineType)
         { 
             switch (machineType)
             {
