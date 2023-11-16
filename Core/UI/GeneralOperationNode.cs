@@ -38,7 +38,7 @@ namespace CAM.Core.UI
         public override void ShowToolpath()
         {
             //TechProcess.GetToolpathObjectsGroup()?.SetGroupVisibility(false);
-            //TechOperation.ToolpathId?.SetGroupVisibility(true);
+            //TechOperation.Toolpath?.SetGroupVisibility(true);
             //Acad.Editor.UpdateScreen();
 
         }

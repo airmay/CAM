@@ -335,7 +335,7 @@ namespace CAM
 
         public ParamsView AddControl(Control control, int height = 1)
         {
-            control.Height = height * Font.Height;
+            control.Height = height * RowHeight;
             tablePanel.SetColumnSpan(control, 2);
             tablePanel.Controls.Add(control);
 

@@ -29,12 +29,12 @@
                 Move(Parent.NextNode.Nodes, 0);
         }
 
-        public override void RemoveOperation() => Operation.Remove();
+        public override void RemoveOperation() => Operation.Teardown();
 
         public override void ShowToolpath()
         {
             //TechProcess.GetToolpathObjectsGroup()?.SetGroupVisibility(false);
-            //TechOperation.ToolpathId?.SetGroupVisibility(true);
+            //TechOperation.Toolpath?.SetGroupVisibility(true);
             //Acad.Editor.UpdateScreen();
 
         }

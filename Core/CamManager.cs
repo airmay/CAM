@@ -25,7 +25,8 @@ namespace CAM
                 {
                     processing.GeneralOperations = operations;
                     processing.Hash = hash;
-                    // processing.GeneralOperations.ForEach(p => p.SerializeInit());
+                    foreach (var operation in operations)
+                        operation.Init();
                 }
                 else if (value != null)
                 {

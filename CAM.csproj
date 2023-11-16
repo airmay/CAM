@@ -103,7 +103,7 @@
     <Compile Include="Core\MillingProcessor.cs" />
     <Compile Include="Core\Processing.cs" />
     <Compile Include="Core\CamManager.cs" />
-    <Compile Include="Core\GeneralOperation.cs" />
+    <Compile Include="Operations\GeneralOperation.cs" />
     <Compile Include="Core\MillingTechProcess.cs" />
     <Compile Include="Core\Operation.cs" />
     <Compile Include="Core\Processor.cs" />

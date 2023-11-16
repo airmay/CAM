@@ -77,12 +77,12 @@ namespace CAM
         private void UpdateFromCommands()
         {
             _toolpathCommandDictionary = Commands.Select((command, index) => new { command, index })
-                .Where(p => p.command.ToolpathId.HasValue)
-                .GroupBy(p => p.command.ToolpathId.Value)
+                .Where(p => p.command.Toolpath.HasValue)
+                .GroupBy(p => p.command.Toolpath.Value)
                 .ToDictionary(p => p.Key, p => p.Min(k => k.index));
 
             foreach (var operationGroup in Commands.GroupBy(p => p.Operation))
-                operationGroup.Key.ToolpathId = operationGroup.Select(p => p.ToolpathId).CreateGroup();
+                operationGroup.Key.Toolpath = operationGroup.Select(p => p.Toolpath).CreateGroup();
         }
 
         public int? GetCommandIndex(ObjectId id)
