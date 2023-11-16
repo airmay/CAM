@@ -9,6 +9,8 @@ namespace CAM
 {
     public partial class ParamsView : UserControl
     {
+        private const int ControsMargin = 1;
+
         private readonly Dictionary<string, string> _displayNames = new Dictionary<string, string>
         {
             ["Frequency"] = "Шпиндель",
@@ -40,7 +42,7 @@ namespace CAM
             ["ZEntry"] = "Z входа",
             ["AngleA"] = "Угол вертикальный",
         };
-        private int RowHeight => (int)(Font.Height * 1.22); //24;
+        private int RowHeight => (int)(Font.Height * 1.6); //24;
         private readonly Type _type;
 
         public object ParamsObject => BindingSource.DataSource;
@@ -60,6 +62,12 @@ namespace CAM
         }
 
         public void ResetControls() => BindingSource.ResetBindings(false);
+
+        private void AddControl(Control control)
+        {
+            control.Margin = new Padding(ControsMargin);
+            tablePanel.Controls.Add(control);
+        }
 
         private void AddRow(int height = 1)
         {
@@ -94,16 +102,14 @@ namespace CAM
             {
                 Text = displayName,
                 Dock = DockStyle.Top,
-                //Height = RowHeight,
+                Height = RowHeight,
                 Padding = new Padding(0, (int)(Font.Height * 0.1), 0, 0),
                 TextAlign = ContentAlignment.TopLeft,
                 AutoEllipsis = true,
-                Margin = new Padding(3, 3, 3, 3),
                 //BorderStyle = BorderStyle.FixedSingle
             };
-            label.Height = (int)(label.DeviceDpi / 6.5);
-            tablePanel.Controls.Add(label);
-
+            AddControl(label);
+            
             return label;
         }
 
@@ -120,7 +126,7 @@ namespace CAM
             };
             control.DataBindings.Add(new Binding("Text", BindingSource, paramName, true,
                 DataSourceUpdateMode.OnPropertyChanged, string.Empty));
-            tablePanel.Controls.Add(control);
+            AddControl(control);
 
             return control;
         }
@@ -131,10 +137,11 @@ namespace CAM
 
             var control = new CheckBox
             {
-                Dock = DockStyle.Fill
+                Height = RowHeight,
+                // Dock = DockStyle.Fill
             };
             control.DataBindings.Add(new Binding("Checked", BindingSource, paramName, true));
-            tablePanel.Controls.Add(control);
+            AddControl(control);
 
             return control;
         }
@@ -193,7 +200,7 @@ namespace CAM
                 Dock = DockStyle.Fill,
                 //Margin = new Padding(3, 3, 3, Font.Height / 2),
             };
-            tablePanel.Controls.Add(comboBox);
+            AddControl(comboBox);
 
             return comboBox;
         }
@@ -213,13 +220,14 @@ namespace CAM
             var userControl = new UserControl
             {
                 Dock = DockStyle.Fill,
+                Margin = new Padding(ControsMargin),
+                //BorderStyle = BorderStyle.FixedSingle,
                 Height = 0
             };
 
             var textBox = new TextBox
             {
                 Dock = DockStyle.Fill,
-                //Height = RowHeight * 2,
                 ReadOnly = true
             };
             userControl.Controls.Add(textBox);
@@ -227,7 +235,6 @@ namespace CAM
             var button = new Button
             {
                 Dock = DockStyle.Right,
-                //Height = RowHeight * 2,
                 Width = (int)(textBox.Height * 1.5),
                 TabStop = false,
                 Text = buttonText,
