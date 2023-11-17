@@ -7,6 +7,8 @@ using System.Reflection;
 using System.Windows.Forms;
 using System.IO;
 using System.Text;
+using System.Runtime.Serialization.Formatters.Binary;
+using static CAM.DataLoader;
 
 namespace CAM
 {
@@ -117,6 +119,38 @@ namespace CAM
             {
                 action(feature);
             }
+        }
+
+        #region Clone
+
+        public static IList<T> DeepClone<T>(this IEnumerable<T> listToClone) where T : ICloneable
+        {
+            return listToClone.Select(item => (T)item.Clone()).ToList();
+        }
+
+        public static List<T> Clone<T>(this List<T> source)
+        {
+            return source.GetRange(0, source.Count);
+        }
+
+        public static object DeepClone(this object obj)
+        {
+            var formatter = new BinaryFormatter { Binder = new MyBinder() };
+
+            using (var stream = new MemoryStream())
+            {
+                formatter.Serialize(stream, obj);
+                stream.Position = 0;
+                return formatter.Deserialize(stream);
+            }
+        }
+
+        #endregion
+
+        public static bool IsSimpleType(this Type type)
+        {
+            return type.IsPrimitive || type.IsValueType || type == typeof(string) || type == typeof(DateTime) ||
+                   type == typeof(DateTimeOffset) || type == typeof(TimeSpan);
         }
     }
 }

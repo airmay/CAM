@@ -9,7 +9,7 @@ namespace CAM.Operations.Sawing
     {
         public Side OuterSide { get; set; }
 
-        //public double? Thickness { get; set; }
+        public double? Thickness { get; set; }
         public bool IsExactlyBegin { get; set; }
         public bool IsExactlyEnd { get; set; }
         public double AngleA { get; set; }
@@ -17,13 +17,14 @@ namespace CAM.Operations.Sawing
 
         public double Depth { get; set; }
         public double? Penetration { get; set; }
-        public List<SawingMode> SawingModes { get; set; }
+        public List<SawingMode> SawingModes { get; set; } = new List<SawingMode>();
 
         public static void ConfigureParamsView(ParamsView view)
         {
             var sawingModesView = new SawingModesView();
-            //view.BindingSource.DataSourceChanged += (s, e) => sawingModesView.sawingModesBindingSource.DataSource = view.GetParams<SawingTechOperation>().SawingModes;
-            //view.AddTextBox(nameof(Thickness));
+            view.BindingSource.DataSourceChanged += (s, e) => sawingModesView.sawingModesBindingSource.DataSource = view.GetParams<SawingOperation>().SawingModes;
+
+            view.AddTextBox(nameof(Thickness));
             view.AddCheckBox(nameof(IsExactlyBegin), "Начало точно");
             view.AddCheckBox(nameof(IsExactlyEnd), "Конец точно");
             view.AddTextBox(nameof(AngleA));

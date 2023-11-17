@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Windows.Forms;
+using CAM.Core;
 using CAM.Core.UI;
 
 namespace CAM
@@ -10,8 +11,8 @@ namespace CAM
         public TreeNodeCollection Nodes => treeView.Nodes;
         private GeneralOperationNode GeneralOperationNode => (GeneralOperationNode)(treeView.SelectedNode.Parent ?? treeView.SelectedNode);
         private GeneralOperation GeneralOperation => GeneralOperationNode.GeneralOperation;
-        private OperationNodeBase SelectedNode => (OperationNodeBase)treeView.SelectedNode;
-        private object SelectedOperation => SelectedNode.Tag;
+        private OperationNodeBase SelectedNode => treeView.SelectedNode as OperationNodeBase;
+        private Operation SelectedOperation => SelectedNode?.Tag as Operation;
         private ProcessCommand SelectedCommand => processCommandBindingSource.Current as ProcessCommand;
 
         public ProcessingView()
@@ -30,11 +31,17 @@ namespace CAM
 
         private void bCreateTechOperationClick(string caption, Type type)
         {
+            var node = new OperationNode(OperationFactory.Create(type, SelectedOperation), caption);
+
             if (Nodes.Count == 0)
                 bCreateGeneralOperation_Click(null, null);
-            var node = new OperationNode((OperationBase)Activator.CreateInstance(type), caption);
-            GeneralOperationNode.Nodes.Add(node);
-            GeneralOperationNode.ExpandAll();
+
+            var generalOperationNode = SelectedNode is null
+                ? treeView.Nodes[treeView.Nodes.Count - 1]
+                : treeView.SelectedNode.Parent ?? treeView.SelectedNode;
+
+            generalOperationNode.Nodes.Add(node);
+            generalOperationNode.ExpandAll();
             treeView.SelectedNode = node;
         }
 
@@ -183,7 +190,7 @@ namespace CAM
                 paramsView = new ParamsView(type);
                 paramsView.Dock = DockStyle.Fill;
                 tabPageParams.Controls.Add(paramsView);
-                //_paramsViews[type] = paramsView;
+                _paramsViews[type] = paramsView;
             }
 
             paramsView.BindingSource.DataSource = SelectedNode.Tag;

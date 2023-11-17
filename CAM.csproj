@@ -101,6 +101,7 @@
     <Compile Include="Acad\AutoCADCommands\SymbolPack.cs" />
     <Compile Include="Core\CableTechProcess.cs" />
     <Compile Include="Core\MillingProcessor.cs" />
+    <Compile Include="Core\OperationFactory.cs" />
     <Compile Include="Core\Processing.cs" />
     <Compile Include="Core\CamManager.cs" />
     <Compile Include="Core\Settings\Machine.cs" />

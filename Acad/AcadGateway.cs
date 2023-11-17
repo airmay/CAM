@@ -177,6 +177,12 @@ namespace CAM
             return Array.ConvertAll(curves, p => p.ObjectId);
         }
 
+        public static ObjectId[] GetSelectedObjectIds()
+        {
+            var res = Acad.Editor.SelectImplied();
+            return res.Value?.GetObjectIds();
+        }
+
         public static ObjectId? GetToolpathId()
         {
             var res = Acad.Editor.SelectImplied();
