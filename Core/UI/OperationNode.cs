@@ -39,12 +39,8 @@
 
         }
 
-        public override void SelectAcadObject()
-        {
-            //if (TechOperation.ProcessingArea != null)
-            //    Acad.SelectObjectIds(TechOperation.ProcessingArea.ObjectId);
-        }
+        public override void SelectAcadObject() => Acad.SelectObjectIds(Operation.ProcessingArea.ObjectIds);
 
-        public override int FirstCommandIndex => 0; //TechOperation.FirstCommandIndex.GetValueOrDefault();
+        public override int FirstCommandIndex => Operation.FirstCommandIndex;
     }
 }

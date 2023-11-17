@@ -1,5 +1,4 @@
-﻿using CAM.TechProcesses.Sawing;
-using System;
+﻿using System;
 using System.Collections.Generic;
 
 namespace CAM.Operations.Sawing
@@ -17,7 +16,7 @@ namespace CAM.Operations.Sawing
 
         public double Depth { get; set; }
         public double? Penetration { get; set; }
-        public List<SawingMode> SawingModes { get; set; } = new List<SawingMode>();
+        public List<CuttingMode> SawingModes { get; set; } = new List<CuttingMode>();
 
         public static void ConfigureParamsView(ParamsView view)
         {

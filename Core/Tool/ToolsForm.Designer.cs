@@ -30,6 +30,7 @@
         {
             this.components = new System.ComponentModel.Container();
             this.pButtons = new System.Windows.Forms.Panel();
+            this.bLoad = new System.Windows.Forms.Button();
             this.bClose = new System.Windows.Forms.Button();
             this.bSelect = new System.Windows.Forms.Button();
             this.dataGridView = new System.Windows.Forms.DataGridView();
@@ -40,7 +41,7 @@
             this.Column1 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.ToolBindingSource = new System.Windows.Forms.BindingSource(this.components);
             this.dataGridViewComboBoxColumn1 = new System.Windows.Forms.DataGridViewComboBoxColumn();
-            this.bLoad = new System.Windows.Forms.Button();
+            this.bSave = new System.Windows.Forms.Button();
             this.pButtons.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.ToolBindingSource)).BeginInit();
@@ -50,6 +51,7 @@
             // 
             this.pButtons.AutoSize = true;
             this.pButtons.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+            this.pButtons.Controls.Add(this.bSave);
             this.pButtons.Controls.Add(this.bLoad);
             this.pButtons.Controls.Add(this.bClose);
             this.pButtons.Controls.Add(this.bSelect);
@@ -58,6 +60,16 @@
             this.pButtons.Name = "pButtons";
             this.pButtons.Size = new System.Drawing.Size(562, 29);
             this.pButtons.TabIndex = 0;
+            // 
+            // bLoad
+            // 
+            this.bLoad.Location = new System.Drawing.Point(3, 3);
+            this.bLoad.Name = "bLoad";
+            this.bLoad.Size = new System.Drawing.Size(75, 23);
+            this.bLoad.TabIndex = 2;
+            this.bLoad.Text = "Загрузить";
+            this.bLoad.UseVisualStyleBackColor = true;
+            this.bLoad.Click += new System.EventHandler(this.bLoad_Click);
             // 
             // bClose
             // 
@@ -145,15 +157,15 @@
             this.dataGridViewComboBoxColumn1.Name = "dataGridViewComboBoxColumn1";
             this.dataGridViewComboBoxColumn1.Width = 260;
             // 
-            // bLoad
+            // bSave
             // 
-            this.bLoad.Location = new System.Drawing.Point(3, 3);
-            this.bLoad.Name = "bLoad";
-            this.bLoad.Size = new System.Drawing.Size(75, 23);
-            this.bLoad.TabIndex = 2;
-            this.bLoad.Text = "Загрузить";
-            this.bLoad.UseVisualStyleBackColor = true;
-            this.bLoad.Click += new System.EventHandler(this.bLoad_Click);
+            this.bSave.Location = new System.Drawing.Point(84, 3);
+            this.bSave.Name = "bSave";
+            this.bSave.Size = new System.Drawing.Size(75, 23);
+            this.bSave.TabIndex = 3;
+            this.bSave.Text = "Сохранить";
+            this.bSave.UseVisualStyleBackColor = true;
+            this.bSave.Click += new System.EventHandler(this.bSave_Click);
             // 
             // ToolsForm
             // 
@@ -188,5 +200,6 @@
         private System.Windows.Forms.DataGridViewTextBoxColumn Column1;
         public System.Windows.Forms.BindingSource ToolBindingSource;
         public System.Windows.Forms.Button bLoad;
+        public System.Windows.Forms.Button bSave;
     }
 }

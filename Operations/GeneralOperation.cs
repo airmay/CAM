@@ -38,7 +38,7 @@ namespace CAM
             view.AddTextBox(nameof(ZSafety));
         }
 
-        public virtual void Init()
+        public void Init()
         {
             if (OriginX != 0 || OriginY != 0)
                 Origin = Acad.CreateOriginObject(new Point3d(OriginX, OriginY, 0));
@@ -48,6 +48,12 @@ namespace CAM
                 AcadObject.LoadAcadProps(operation);
                 operation.Init();
             }
+        }
+
+        public void Teardown()
+        {
+            foreach (var operation in Operations)
+                operation.Teardown();
         }
     }
 }

@@ -104,7 +104,6 @@
     <Compile Include="Core\OperationFactory.cs" />
     <Compile Include="Core\Processing.cs" />
     <Compile Include="Core\CamManager.cs" />
-    <Compile Include="Core\Settings\Machine.cs" />
     <Compile Include="Operations\GeneralOperation.cs" />
     <Compile Include="Core\MillingTechProcess.cs" />
     <Compile Include="Core\Operation.cs" />
@@ -140,6 +139,12 @@
     <Compile Include="Core\UI\OperationNode.cs" />
     <Compile Include="Core\UI\TechOperationNode.cs" />
     <Compile Include="Core\UI\TechProcessNode.cs" />
+    <Compile Include="Operations\Sawing\SawingModesView.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Operations\Sawing\SawingModesView.Designer.cs">
+      <DependentUpon>SawingModesView.cs</DependentUpon>
+    </Compile>
     <Compile Include="Operations\Sawing\SawingOperation.cs" />
     <Compile Include="Operations\Tactile\TactileBandsOperation.cs" />
     <Compile Include="Operations\Tactile\TactileChamfersOperation.cs" />
@@ -189,7 +194,6 @@
     <Compile Include="TechProcesses\Disk3D\LongCleaningTechOperation.cs" />
     <Compile Include="TechProcesses\Drilling\DrillingTechProcess.cs" />
     <Compile Include="Core\Settings\CuttingMode.cs" />
-    <Compile Include="Core\Settings\MachineSettings.cs" />
     <Compile Include="TechProcesses\Polishing\PolishingTechProcess.cs" />
     <Compile Include="TechProcesses\RotationProfileBody\RotationProfileBodyTechProcess.cs" />
     <Compile Include="TechProcesses\Sawing\Border.cs" />
@@ -227,7 +231,7 @@
     <Compile Include="PaletteSet\CamPaletteSet.cs" />
     <Compile Include="Program\CommandNames.cs" />
     <Compile Include="Core\Enums\Corner.cs" />
-    <Compile Include="Core\Settings\Settings.cs" />
+    <Compile Include="Core\Settings\MachineService.cs" />
     <Compile Include="Core\Tool\Tool.cs" />
     <Compile Include="Core\Tool\ToolService.cs" />
     <Compile Include="Core\Tool\ToolsForm.cs">
@@ -236,7 +240,7 @@
     <Compile Include="Core\Tool\ToolsForm.Designer.cs">
       <DependentUpon>ToolsForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="Core\Enums\ToolType.cs" />
+    <Compile Include="Core\Tool\ToolType.cs" />
     <Compile Include="Acad\Graph.cs" />
     <Compile Include="Utils\Extensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -272,6 +276,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Core\UI\ParamsView.resx">
       <DependentUpon>ParamsView.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Operations\Sawing\SawingModesView.resx">
+      <DependentUpon>SawingModesView.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="PaletteSet\TrimmingView.resx">
       <DependentUpon>TrimmingView.cs</DependentUpon>
@@ -350,9 +357,6 @@
     <None Include="Resources\icons8-play-16.png" />
     <None Include="Resources\icons8-play.png" />
     <None Include="Resources\icons8-cinema-16.png" />
-    <Content Include="settings.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\application-dock.png" />

@@ -125,7 +125,7 @@ namespace CAM
             ClearParamsViews();
         }
 
-        public bool IsToolpathVisible => !bVisibility.Checked;
+        private bool IsToolpathVisible => !bVisibility.Checked;
 
         private void treeView_AfterSelect(object sender, TreeViewEventArgs e)
         {
@@ -171,7 +171,7 @@ namespace CAM
                 //Acad.UnhighlightAll();
                 ClearParamsViews();
                 treeView.SelectedNode.Remove();
-                //treeView.Focus();
+                treeView.Focus();
                 //RefreshToolButtonsState();
             }
         }

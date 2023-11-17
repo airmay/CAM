@@ -125,15 +125,14 @@ namespace CAM
                 return;
             }
 
-            var machineType = _processing.GeneralOperations.First(p => p.Enabled).MachineType;
-            var fileName = Acad.SaveFileDialog("Программа",
-                Settings.GetMachineSettings(machineType.Value).ProgramFileExtension, machineType.ToString());
+            var machine = MachineService.Machines[_processing.MachineType];
+            var fileName = Acad.SaveFileDialog("Программа", machine.ProgramFileExtension, _processing.MachineType.ToString());
             if (fileName == null)
                 return;
             try
             {
                 var contents = _processing.Commands
-                    .Select(p => p.GetProgrammLine(Settings.GetMachineSettings(machineType.Value).ProgramLineNumberFormat))
+                    .Select(p => p.GetProgrammLine(machine.ProgramLineNumberFormat))
                     .ToArray();
                 File.WriteAllLines(fileName, contents);
                 Acad.Write($"Создан файл {fileName}");

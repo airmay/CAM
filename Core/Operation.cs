@@ -18,7 +18,7 @@ namespace CAM
 
         [NonSerialized] public ObjectId? Toolpath;
         [NonSerialized] public ObjectId? ExtraObjectsGroup;
-        [NonSerialized] public int? FirstCommandIndex;
+        [NonSerialized] public int FirstCommandIndex;
 
         public virtual void Init() { }
         public virtual void Teardown() { }

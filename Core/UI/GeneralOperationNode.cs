@@ -5,6 +5,7 @@ namespace CAM.Core.UI
     public class GeneralOperationNode : OperationNodeBase
     {
         public GeneralOperation GeneralOperation => (GeneralOperation)Tag;
+        private OperationNode FirstOperationNode => Nodes.Count > 0 ? (OperationNode) Nodes[0] : null;
 
         public GeneralOperationNode() : base(new GeneralOperation(), "Обработка", 0)
         {
@@ -33,7 +34,7 @@ namespace CAM.Core.UI
 
         public override void MoveDown() => Move(TreeView.Nodes, Index + 1);
 
-        public override void RemoveOperation() => TreeView.Nodes.Remove(this);
+        public override void RemoveOperation() => GeneralOperation.Teardown();
 
         public override void ShowToolpath()
         {
@@ -43,12 +44,8 @@ namespace CAM.Core.UI
 
         }
 
-        public override void SelectAcadObject()
-        {
-            //if (TechOperation.ProcessingArea != null)
-            //    Acad.SelectObjectIds(TechOperation.ProcessingArea.ObjectId);
-        }
+        public override void SelectAcadObject() => FirstOperationNode?.SelectAcadObject();
 
-        public override int FirstCommandIndex => 0; //TechOperation.FirstCommandIndex.GetValueOrDefault();
+        public override int FirstCommandIndex => FirstOperationNode?.FirstCommandIndex ?? 0;
     }
 }

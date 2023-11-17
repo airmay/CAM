@@ -7,6 +7,7 @@ namespace CAM
     public partial class ToolsForm : Form
     {
         public event EventHandler LoadTools;
+        public event EventHandler SaveTools;
 
         public ToolsForm()
         {
@@ -35,6 +36,11 @@ namespace CAM
         private void bLoad_Click(object sender, EventArgs e)
         {
             LoadTools?.Invoke(this, EventArgs.Empty);
+        }
+
+        private void bSave_Click(object sender, EventArgs e)
+        {
+            SaveTools?.Invoke(this, EventArgs.Empty);
         }
     }
 }

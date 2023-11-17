@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Windows.Forms;
+﻿using System.Windows.Forms;
 using System.Drawing;
 
 namespace CAM
@@ -36,24 +35,18 @@ namespace CAM
             TreeView.SelectedNode = this;
         }
 
-        public new abstract void RemoveOperation();
+        public abstract void RemoveOperation();
 
         public virtual void SelectAcadObject() { }
 
         public abstract void ShowToolpath();
 
-        public List<ProcessCommand> ProcessCommands => null; // TechProcess.ProcessCommands;
-
         public virtual int FirstCommandIndex => 0;
-
 
         //public void SetVisibility(bool isToolpathVisible)
         //{
         //    TechProcess.GetToolpathObjectsGroup()?.SetGroupVisibility(isToolpathVisible);
         //    TechProcess.GetExtraObjectsGroup()?.SetGroupVisibility(isToolpathVisible);
         //}
-
-        //public void SendProgram() => Acad.Processing.SendProgram(TechProcess);
-
     }
 }

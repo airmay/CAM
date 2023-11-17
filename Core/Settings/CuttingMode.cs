@@ -1,5 +1,8 @@
-﻿namespace CAM
+﻿using System;
+
+namespace CAM
 {
+    [Serializable]
     public class CuttingMode
     {
         /// <summary>

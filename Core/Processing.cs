@@ -11,6 +11,7 @@ namespace CAM
         public int Hash;
         public GeneralOperation[] GeneralOperations { get; set; }
         public Command[] Commands { get; set; }
+        public MachineType MachineType { get; set; }
 
         private Dictionary<ObjectId, int> _toolpathCommandDictionary;
 
