@@ -39,7 +39,7 @@
 
         }
 
-        public override void SelectAcadObject() => Acad.SelectObjectIds(Operation.ProcessingArea.ObjectIds);
+        public override void SelectAcadObject() => Acad.SelectObjectIds(Operation.ProcessingArea?.ObjectIds);
 
         public override int FirstCommandIndex => Operation.FirstCommandIndex;
     }

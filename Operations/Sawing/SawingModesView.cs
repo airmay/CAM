@@ -9,6 +9,12 @@ namespace CAM.Operations.Sawing
             InitializeComponent();
         }
 
+        public object DataSource
+        {
+            get => sawingModesBindingSource.DataSource;
+            set => sawingModesBindingSource.DataSource = value;
+        }
+
         private void gvSawingModes_DataError(object sender, DataGridViewDataErrorEventArgs e)
         {
             MessageBox.Show("Введите корректное числовое значение", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);

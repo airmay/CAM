@@ -53,12 +53,11 @@
             this.gvSawingModes.DataSource = this.sawingModesBindingSource;
             this.gvSawingModes.Dock = System.Windows.Forms.DockStyle.Fill;
             this.gvSawingModes.Location = new System.Drawing.Point(0, 0);
-            this.gvSawingModes.Margin = new System.Windows.Forms.Padding(8, 7, 8, 7);
             this.gvSawingModes.MultiSelect = false;
             this.gvSawingModes.Name = "gvSawingModes";
             this.gvSawingModes.RowHeadersVisible = false;
             this.gvSawingModes.RowHeadersWidth = 102;
-            this.gvSawingModes.Size = new System.Drawing.Size(704, 672);
+            this.gvSawingModes.Size = new System.Drawing.Size(264, 282);
             this.gvSawingModes.TabIndex = 1;
             this.gvSawingModes.DataError += new System.Windows.Forms.DataGridViewDataErrorEventHandler(this.gvSawingModes_DataError);
             // 
@@ -68,7 +67,7 @@
             this.depthDataGridViewTextBoxColumn.HeaderText = "Глубина";
             this.depthDataGridViewTextBoxColumn.MinimumWidth = 12;
             this.depthDataGridViewTextBoxColumn.Name = "depthDataGridViewTextBoxColumn";
-            this.depthDataGridViewTextBoxColumn.Width = 178;
+            this.depthDataGridViewTextBoxColumn.Width = 73;
             // 
             // depthStepDataGridViewTextBoxColumn
             // 
@@ -77,7 +76,7 @@
             this.depthStepDataGridViewTextBoxColumn.MinimumWidth = 12;
             this.depthStepDataGridViewTextBoxColumn.Name = "depthStepDataGridViewTextBoxColumn";
             this.depthStepDataGridViewTextBoxColumn.ToolTipText = "Шаг по глубине";
-            this.depthStepDataGridViewTextBoxColumn.Width = 119;
+            this.depthStepDataGridViewTextBoxColumn.Width = 52;
             // 
             // feedDataGridViewTextBoxColumn
             // 
@@ -93,12 +92,11 @@
             // 
             // SawingModesView
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(16F, 31F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.Controls.Add(this.gvSawingModes);
-            this.Margin = new System.Windows.Forms.Padding(8, 7, 8, 7);
             this.Name = "SawingModesView";
-            this.Size = new System.Drawing.Size(704, 672);
+            this.Size = new System.Drawing.Size(264, 282);
             ((System.ComponentModel.ISupportInitialize)(this.gvSawingModes)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.sawingModesBindingSource)).EndInit();
             this.ResumeLayout(false);
@@ -108,9 +106,9 @@
         #endregion
 
         private System.Windows.Forms.DataGridView gvSawingModes;
-        public System.Windows.Forms.BindingSource sawingModesBindingSource;
         private System.Windows.Forms.DataGridViewTextBoxColumn depthDataGridViewTextBoxColumn;
         private System.Windows.Forms.DataGridViewTextBoxColumn depthStepDataGridViewTextBoxColumn;
         private System.Windows.Forms.DataGridViewTextBoxColumn feedDataGridViewTextBoxColumn;
+        private System.Windows.Forms.BindingSource sawingModesBindingSource;
     }
 }

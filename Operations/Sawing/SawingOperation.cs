@@ -20,9 +20,6 @@ namespace CAM.Operations.Sawing
 
         public static void ConfigureParamsView(ParamsView view)
         {
-            var sawingModesView = new SawingModesView();
-            view.BindingSource.DataSourceChanged += (s, e) => sawingModesView.sawingModesBindingSource.DataSource = view.GetParams<SawingOperation>().SawingModes;
-
             view.AddTextBox(nameof(Thickness));
             view.AddCheckBox(nameof(IsExactlyBegin), "Начало точно");
             view.AddCheckBox(nameof(IsExactlyEnd), "Конец точно");
@@ -33,7 +30,7 @@ namespace CAM.Operations.Sawing
             view.AddTextBox(nameof(Depth));
             view.AddTextBox(nameof(Penetration));
             view.AddText("Режимы для криволинейных траекторий");
-            view.AddControl(sawingModesView, 6);
+            view.AddControl(new SawingModesView(), 6, nameof(SawingModesView.DataSource), nameof(SawingModes));
         }
 
         public override void Execute(GeneralOperation generalOperation, Processor processor)

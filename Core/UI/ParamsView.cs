@@ -333,16 +333,15 @@ namespace CAM
         }
         #endregion
 
-        public ParamsView AddControl(Control control, int height = 1)
+        public ParamsView AddControl(Control control, int rows = 1, string propertyName = null, string dataMember = null)
         {
-            control.Height = height * RowHeight;
+            control.Height = rows * RowHeight;
             tablePanel.SetColumnSpan(control, 2);
             tablePanel.Controls.Add(control);
 
-            //AddRow(height);
-            //tablePanel.Controls.Add(control, 0, tablePanel.RowStyles.Count - 1);
-            //tablePanel.SetColumnSpan(control, 2);
             control.Dock = DockStyle.Fill;
+            if (propertyName != null)
+                control.DataBindings.Add(new Binding(propertyName, BindingSource, dataMember));
 
             return this;
         }
