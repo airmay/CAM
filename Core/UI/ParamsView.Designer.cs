@@ -31,6 +31,7 @@
             this.components = new System.ComponentModel.Container();
             this.tablePanel = new System.Windows.Forms.TableLayoutPanel();
             this.BindingSource = new System.Windows.Forms.BindingSource(this.components);
+            this.toolTip = new System.Windows.Forms.ToolTip(this.components);
             ((System.ComponentModel.ISupportInitialize)(this.BindingSource)).BeginInit();
             this.SuspendLayout();
             // 
@@ -42,22 +43,20 @@
             this.tablePanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
             this.tablePanel.Dock = System.Windows.Forms.DockStyle.Top;
             this.tablePanel.Location = new System.Drawing.Point(0, 0);
-            this.tablePanel.Margin = new System.Windows.Forms.Padding(8);
             this.tablePanel.Name = "tablePanel";
             this.tablePanel.RowCount = 1;
             this.tablePanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tablePanel.Size = new System.Drawing.Size(672, 0);
+            this.tablePanel.Size = new System.Drawing.Size(252, 0);
             this.tablePanel.TabIndex = 0;
             // 
             // ParamsView
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(16F, 31F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoScroll = true;
             this.Controls.Add(this.tablePanel);
-            this.Margin = new System.Windows.Forms.Padding(8);
             this.Name = "ParamsView";
-            this.Size = new System.Drawing.Size(672, 972);
+            this.Size = new System.Drawing.Size(252, 408);
             ((System.ComponentModel.ISupportInitialize)(this.BindingSource)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
@@ -68,5 +67,6 @@
 
         private System.Windows.Forms.TableLayoutPanel tablePanel;
         public System.Windows.Forms.BindingSource BindingSource;
+        private System.Windows.Forms.ToolTip toolTip;
     }
 }

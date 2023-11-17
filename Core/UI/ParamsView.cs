@@ -94,9 +94,10 @@ namespace CAM
             return panel;
         }
 
-        private Label AddLabel(string paramName, string displayName) => AddLabel(displayName ?? GetDisplayName(paramName));
+        private Label AddLabelToParam(string paramName, string displayName, string toolTipText = null) => 
+            AddLabel(displayName ?? GetDisplayName(paramName), toolTipText);
 
-        private Label AddLabel(string displayName)
+        private Label AddLabel(string displayName, string toolTipText = null)
         {
             var label = new Label
             {
@@ -108,6 +109,8 @@ namespace CAM
                 AutoEllipsis = true,
                 //BorderStyle = BorderStyle.FixedSingle
             };
+            if (toolTipText != null)
+                toolTip.SetToolTip(label, toolTipText);
             AddControl(label);
             
             return label;
@@ -115,9 +118,9 @@ namespace CAM
 
         #region AddParam
 
-        public TextBox AddTextBox(string paramName, string displayName = null, bool readOnly = false)
+        public TextBox AddTextBox(string paramName, string displayName = null, bool readOnly = false, string toolTipText = null)
         {
-            AddLabel(paramName, displayName);
+            AddLabelToParam(paramName, displayName, toolTipText);
 
             var control = new TextBox
             {
@@ -131,9 +134,9 @@ namespace CAM
             return control;
         }
 
-        public CheckBox AddCheckBox(string paramName, string displayName = null)
+        public CheckBox AddCheckBox(string paramName, string displayName = null, string toolTipText = null)
         {
-            AddLabel(paramName, displayName);
+            AddLabelToParam(paramName, displayName, toolTipText);
 
             var control = new CheckBox
             {
@@ -146,17 +149,17 @@ namespace CAM
             return control;
         }
 
-        public Label AddLabelText(string label, string text = "")
+        public Label AddLabelText(string label, string text = "", string toolTipText = null)
         {
-            AddLabel(label);
+            AddLabel(label, toolTipText);
             var control = AddLabel(text);
 
             return control;
         }
 
-        public Label AddText(string text)
+        public Label AddText(string text, string toolTipText = null)
         {
-            var label = AddLabel(text);
+            var label = AddLabel(text, toolTipText);
             tablePanel.SetColumnSpan(label, 2);
 
             return label;
@@ -175,9 +178,9 @@ namespace CAM
             return comboBox;
         }
 
-        public ComboBox AddComboBox(string displayName, object[] items, Action<int> selectedIndexChanged)
+        public ComboBox AddComboBox(string displayName, object[] items, Action<int> selectedIndexChanged, string toolTipText = null)
         {
-            var comboBox = AddComboBox(displayName);
+            var comboBox = AddComboBox(displayName, toolTipText);
 
             comboBox.Items.AddRange(items);
             comboBox.SelectedIndexChanged += new EventHandler((s, e) => selectedIndexChanged(comboBox.SelectedIndex));
@@ -192,7 +195,7 @@ namespace CAM
 
         private ComboBox AddComboBox(string paramName, string displayName = null)
         {
-            AddLabel(paramName, displayName);
+            AddLabelToParam(paramName, displayName);
 
             var comboBox = new ComboBox
             {
@@ -213,9 +216,9 @@ namespace CAM
 
         #region AddSelectorParam
 
-        public (TextBox, Button) CreateSelector(string displayName, string buttonText = "Ξ")
+        public (TextBox, Button) CreateSelector(string displayName, string buttonText = "Ξ", string toolTipText = null)
         {
-            AddLabel(displayName);
+            AddLabel(displayName, toolTipText);
 
             var userControl = new UserControl
             {

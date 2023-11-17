@@ -28,8 +28,8 @@ namespace CAM.Operations.Sawing
             view.AddIndent();
             view.AddAcadObject(allowedTypes: $"{AcadObjectNames.Line},{AcadObjectNames.Arc},{AcadObjectNames.Lwpolyline}");
             view.AddTextBox(nameof(Depth));
-            view.AddTextBox(nameof(Penetration));
-            view.AddText("Режимы для криволинейных траекторий");
+            view.AddTextBox(nameof(Penetration), toolTipText: "Шаг заглубления для прямой и если не заданы Режимы для криволинейных траекторий то для всех кривых");
+            view.AddText("Режимы для криволинейных траекторий", "Режимы применяются для дуги и полилинии");
             view.AddControl(new SawingModesView(), 6, nameof(SawingModesView.DataSource), nameof(SawingModes));
         }
 
