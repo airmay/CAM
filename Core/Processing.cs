@@ -55,8 +55,8 @@ namespace CAM
 
         private void BuildProcessing()
         {
-            var machineType = GeneralOperations.First(p => p.Enabled).MachineType.Value;
-            var processor = ProcessorFactory.Create(machineType);
+            MachineType = GeneralOperations.First(p => p.Enabled).MachineType.Value;
+            var processor = ProcessorFactory.Create(MachineType);
             processor.Start();
 
             foreach (var generalOperation in GeneralOperations.Where(p => p.Enabled))
@@ -66,9 +66,6 @@ namespace CAM
 
                 processor.SetOperarion(operation);
                 operation.Execute(generalOperation, processor);
-
-                //    if (!generator.IsUpperTool)
-                //        generator.Uplifting();
             }
 
             processor.Finish();

@@ -48,6 +48,7 @@ namespace CAM
         public ObjectId ObjectId => ObjectIds[0];
 
         public Curve GetCurve() => Acad.OpenForRead(ObjectId);
+        public Curve[] GetCurves() => Acad.OpenForRead(ObjectIds);
 
         public override string ToString() => ObjectIds.GetDesc();
     }
