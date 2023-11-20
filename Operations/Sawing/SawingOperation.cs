@@ -3,6 +3,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Autodesk.AutoCAD.Geometry;
+using System.Drawing;
+using System.Security.Cryptography;
+using System.Windows.Forms;
 
 namespace CAM.Operations.Sawing
 {
@@ -53,9 +56,17 @@ namespace CAM.Operations.Sawing
             public bool IsExactlyEnd { get; set; }
         }
 
+        private class ProcessingСurve
+        {
+            public Curve Curve { get; set; }
+            public int Side { get; set; }
+            public bool IsExactlyBegin { get; set; }
+            public bool IsExactlyEnd { get; set; }
+        }
+
         public override void Execute(GeneralOperation generalOperation, Processor processor)
         {
-            var curves = new List<Curve>(ProcessingArea.GetCurves());
+            var curves = ProcessingArea.GetCurves();
             var curveParams = CalcСurveProcessingParams(curves);
             foreach (var curve in curves)
             {
@@ -63,46 +74,50 @@ namespace CAM.Operations.Sawing
             }
         }
 
-        private Dictionary<Curve, СurveProcessingParams> CalcСurveProcessingParams(List<Curve> curves)
+        private Dictionary<Curve, СurveProcessingParams> CalcСurveProcessingParams(IEnumerable<Curve> curves)
         {
-            var curveParams = new Dictionary<Curve, СurveProcessingParams>();
-            var startObject = ObjectId.Null;
-            Point3d? point = null;
             var curvesToCalc = new List<Curve>(curves);
+            var curvesParams = new Dictionary<Curve, СurveProcessingParams>();
+            var side = ChangeSide ? -1 : 1;
 
             while (curvesToCalc.Any())
             {
-                var curvesChain = new List<Curve>();
-                var side = ChangeSide ? -1 : 1;
-                var curve = curves[0];
-                curvesToCalc.Remove(curve);
-                var chainForward = CalcChain(curvesToCalc, curve, curve.EndPoint, side);
-                var chainBackward = CalcChain(curvesToCalc, curve, curve.StartPoint, -side);
-                
-                Graph.CreateHatch(chainBackward.r)
+                var curveParamsChain = CalcChain(curvesToCalc, side);
+                curveParamsChain.ForEach(p => curvesParams.Add(p.Item1, p.Item2));
+                Graph.CreateHatch(curveParamsChain.ConvertAll(p => p.Item1), side);
+            }
 
+            return curvesParams;
+        }
 
-
-                if (startObject == ObjectId.Null)
-                    startObject = curves[0];
-
-                var nextCurve = FindCurve(curves, point.Value);
-                side = CalcSide(curve, side, point.Value);
+        private List<(Curve, СurveProcessingParams)> CalcChain(List<Curve> curvesToCalc, int side)
+        {
+            var queue = new Queue<ProcessingСurve>();
+            var group = curvesToCalc
+                .SelectMany(p => p.GetStartEndPoints(), (cv, pt) => (cv, pt))
+                .GroupBy(p => p.pt)
+                .FirstOrDefault(p => p.Count() == 1);
+            var (curve, point) = group != null
+                ? (group.Single().cv, group.Key) 
+                : (curvesToCalc[0], curvesToCalc[0].StartPoint);
+            curvesToCalc.Remove(curve);
+            var processingСurve = new ProcessingСurve
+            {
+                Curve = curve
+            };
+            queue.Enqueue(processingСurve);
+            while (curvesToCalc.Any())
+            {
+                var nextPoint = curve.NextPoint(point);
+                var nextCurve = curvesToCalc.SelectMany(p => p.GetStartEndPoints(), (cv, pt) => (cv, pt))
+                    .SingleOrDefault(p => p.pt == nextPoint);
+                p = CalcParams(curve, side, nextPoint);
                 curve = nextCurve;
 
 
                 point = curve.NextPoint(point.Value);
                 curves.Remove(curve);
             }
-        }
-
-        private List<Curve> CalcChain(List<Curve> curvesToCalc, Curve curve, Point3d point, int side)
-        {
-            
-        }
-
-        private Curve FindCurve(List<Curve> curves, Point3d point)
-        {
 
         }
 
