@@ -47,21 +47,6 @@ namespace CAM.Operations.Sawing
             };
         }
 
-        private class СurveProcessingParams
-        {
-            public int Side { get; set; }
-            public bool IsExactlyBegin { get; set; }
-            public bool IsExactlyEnd { get; set; }
-        }
-
-        private class ProcessingСurve
-        {
-            public Curve Curve { get; set; }
-            public int Side { get; set; }
-            public bool IsExactlyBegin { get; set; }
-            public bool IsExactlyEnd { get; set; }
-        }
-
         public override void Execute(GeneralOperation generalOperation, Processor processor)
         {
             var curvesSides = new Dictionary<Curve, int>();
@@ -86,7 +71,7 @@ namespace CAM.Operations.Sawing
                     var chain = CalcChain(curvesToCalc, side);
                     var hatchId = Graph.CreateHatch(chain, side);
                     if (hatchId.HasValue)
-                        ExtraObjectsGroup = ExtraObjectsGroup.AppendToGroup(hatchId.Value);
+                        Support = Support.AppendToGroup(hatchId.Value);
                     curvesToCalc.RemoveAll(p => chain.Contains(p));
                 }
             }

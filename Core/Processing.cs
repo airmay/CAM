@@ -51,7 +51,16 @@ namespace CAM
 
         private void DeleteProcessing()
         {
-            
+            foreach (var generalOperation in GeneralOperations)
+            foreach (var operation in generalOperation.Operations)
+            {
+                operation.Toolpath?.DeleteGroup();
+                operation.Toolpath = null;
+                operation.Support?.DeleteGroup();
+                operation.Support = null;
+            }
+
+            Commands = null;
         }
 
         private void BuildProcessing()

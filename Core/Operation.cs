@@ -17,7 +17,7 @@ namespace CAM
         public AcadObject ProcessingArea { get; set; }
 
         [NonSerialized] public ObjectId? Toolpath;
-        [NonSerialized] public ObjectId? ExtraObjectsGroup;
+        [NonSerialized] public ObjectId? Support;
         [NonSerialized] public int FirstCommandIndex;
 
         public virtual void Init() { }
