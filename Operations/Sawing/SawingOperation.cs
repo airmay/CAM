@@ -3,9 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Autodesk.AutoCAD.Geometry;
-using System.Drawing;
-using System.Security.Cryptography;
-using System.Windows.Forms;
+using Dreambuild.AutoCAD;
 
 namespace CAM.Operations.Sawing
 {
@@ -66,62 +64,80 @@ namespace CAM.Operations.Sawing
 
         public override void Execute(GeneralOperation generalOperation, Processor processor)
         {
+            var curvesSides = new Dictionary<Curve, int>();
+            var pointsIsExactly = new Dictionary<Point3d, bool>();
+
             var curves = ProcessingArea.GetCurves();
-            var curveParams = CalcСurveProcessingParams(curves);
+            CalcСurveProcessing(curves);
             foreach (var curve in curves)
             {
-                ProcessCurve(processor, curve, curveParams[curve]);
+                ProcessCurve(processor, curve, curvesSides[curve], pointsIsExactly[curve.StartPoint], pointsIsExactly[curve.EndPoint]);
+            }
+
+            return;
+
+            void CalcСurveProcessing(IEnumerable<Curve> curvesArray)
+            {
+                var side = ChangeSide ? -1 : 1;
+                var curvesToCalc = new List<Curve>(curvesArray);
+
+                while (curvesToCalc.Any())
+                {
+                    var chain = CalcChain(curvesToCalc, side);
+                    var hatchId = Graph.CreateHatch(chain, side);
+                    if (hatchId.HasValue)
+                        ExtraObjectsGroup = ExtraObjectsGroup.AppendToGroup(hatchId.Value);
+                    curvesToCalc.RemoveAll(p => chain.Contains(p));
+                }
+            }
+
+            List<Curve> CalcChain(List<Curve> curvesToCalc, int side)
+            {
+                var chain = new List<Curve>();
+                var pointCurveDict = curvesToCalc
+                    .SelectMany(p => p.GetStartEndPoints(), (cv, pt) => (cv, pt))
+                    .ToLookup(p => p.pt, p => p.cv);
+                var corner = pointCurveDict.FirstOrDefault(p => p.Count() == 1);
+                var (curve, point) = corner != null
+                    ? (corner.Single(), corner.Key)
+                    : (curvesToCalc.First(), curvesToCalc.First().StartPoint);
+                if (corner != null)
+                {
+                    pointsIsExactly[point] = IsExactlyBegin;
+                }
+
+                var startPoint = point;
+                do
+                {
+                    var sd = point == curve.StartPoint ? side : -side;
+                    curvesSides[curve] = sd;
+                    chain.Add(curve);
+
+                    point = curve.NextPoint(point);
+                    var endTangent = curve.GetTangent(point);
+                    if (point == curve.StartPoint)
+                        endTangent *= -1;
+
+                        curve = pointCurveDict[point].SingleOrDefault(p => p != curve);
+                    if (curve == null)
+                    {
+                        pointsIsExactly[point] = IsExactlyEnd;
+                        break;
+                    }
+
+                    var startTangent = curve.GetTangent(point);
+                    if (point == curve.EndPoint)
+                        startTangent *= -1;
+                    var angle = endTangent.MinusPiToPiAngleTo(startTangent);
+                    pointsIsExactly[point] = side == 1 ^ angle < 0;
+                } 
+                while (point != startPoint);
+
+                return chain;
             }
         }
 
-        private Dictionary<Curve, СurveProcessingParams> CalcСurveProcessingParams(IEnumerable<Curve> curves)
-        {
-            var curvesToCalc = new List<Curve>(curves);
-            var curvesParams = new Dictionary<Curve, СurveProcessingParams>();
-            var side = ChangeSide ? -1 : 1;
-
-            while (curvesToCalc.Any())
-            {
-                var curveParamsChain = CalcChain(curvesToCalc, side);
-                curveParamsChain.ForEach(p => curvesParams.Add(p.Item1, p.Item2));
-                Graph.CreateHatch(curveParamsChain.ConvertAll(p => p.Item1), side);
-            }
-
-            return curvesParams;
-        }
-
-        private List<(Curve, СurveProcessingParams)> CalcChain(List<Curve> curvesToCalc, int side)
-        {
-            var queue = new Queue<ProcessingСurve>();
-            var group = curvesToCalc
-                .SelectMany(p => p.GetStartEndPoints(), (cv, pt) => (cv, pt))
-                .GroupBy(p => p.pt)
-                .FirstOrDefault(p => p.Count() == 1);
-            var (curve, point) = group != null
-                ? (group.Single().cv, group.Key) 
-                : (curvesToCalc[0], curvesToCalc[0].StartPoint);
-            curvesToCalc.Remove(curve);
-            var processingСurve = new ProcessingСurve
-            {
-                Curve = curve
-            };
-            queue.Enqueue(processingСurve);
-            while (curvesToCalc.Any())
-            {
-                var nextPoint = curve.NextPoint(point);
-                var nextCurve = curvesToCalc.SelectMany(p => p.GetStartEndPoints(), (cv, pt) => (cv, pt))
-                    .SingleOrDefault(p => p.pt == nextPoint);
-                p = CalcParams(curve, side, nextPoint);
-                curve = nextCurve;
-
-
-                point = curve.NextPoint(point.Value);
-                curves.Remove(curve);
-            }
-
-        }
-
-        private void ProcessCurve(Processor processor, Curve curve, СurveProcessingParams @params)
+        private void ProcessCurve(Processor processor, Curve curve, int side, bool isExactlyBegin, bool isExactlyEnd)
         {
 
         }

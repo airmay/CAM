@@ -17,12 +17,10 @@ namespace CAM
 
         public void Start()
         {
-            throw new System.NotImplementedException();
         }
 
         public void SetOperarion(Operation operation)
         {
-            throw new System.NotImplementedException();
         }
 
         public void Finish()

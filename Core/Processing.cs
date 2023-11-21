@@ -30,7 +30,8 @@ namespace CAM
                 Acad.Editor.UpdateScreen();
 
                 BuildProcessing();
-                UpdateFromCommands();
+                if (Commands != null)
+                    UpdateFromCommands();
 
                 stopwatch.Stop();
                 Acad.Write($"Расчет обработки завершен {stopwatch.Elapsed}");
@@ -55,7 +56,10 @@ namespace CAM
 
         private void BuildProcessing()
         {
-            MachineType = GeneralOperations.First(p => p.Enabled).MachineType.Value;
+            var machineType = GeneralOperations.First(p => p.Enabled).MachineType;
+            if (!machineType.CheckNotNull("Станок"))
+                return;
+            MachineType = machineType.Value;
             var processor = ProcessorFactory.Create(MachineType);
             processor.Start();
 
