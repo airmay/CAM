@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Autodesk.AutoCAD.Geometry;
 using Dreambuild.AutoCAD;
+using System.Drawing;
 
 namespace CAM.Operations.Sawing
 {
@@ -51,7 +52,7 @@ namespace CAM.Operations.Sawing
         {
             var curvesSides = new Dictionary<Curve, int>();
             var pointsIsExactly = new Dictionary<Point3d, bool>();
-
+            ProcessingArea.RoundPoints();
             var curves = ProcessingArea.GetCurves();
             CalcСurveProcessing(curves);
             foreach (var curve in curves)
@@ -78,10 +79,12 @@ namespace CAM.Operations.Sawing
 
             List<Curve> CalcChain(List<Curve> curvesToCalc, int side)
             {
+                Tolerance.Global = new Tolerance(0.001, 0.001);
+
                 var chain = new List<Curve>();
                 var pointCurveDict = curvesToCalc
                     .SelectMany(p => p.GetStartEndPoints(), (cv, pt) => (cv, pt))
-                    .ToLookup(p => p.pt, p => p.cv);
+                    .ToLookup(p => p.pt, p => p.cv, Graph.Point3dComparer);
                 var corner = pointCurveDict.FirstOrDefault(p => p.Count() == 1);
                 var (curve, point) = corner != null
                     ? (corner.Single(), corner.Key)
@@ -90,7 +93,6 @@ namespace CAM.Operations.Sawing
                 {
                     pointsIsExactly[point] = IsExactlyBegin;
                 }
-
                 var startPoint = point;
                 do
                 {

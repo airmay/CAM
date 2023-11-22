@@ -8,11 +8,25 @@ using System.Linq;
 
 namespace CAM
 {
+    public class Point3dComparer : IEqualityComparer<Point3d>
+    {
+        public bool Equals(Point3d point1, Point3d point2) => point1.IsEqualTo(point2);
+
+        public int GetHashCode(Point3d point)
+        {
+            var epsilon = Tolerance.Global.EqualVector;
+            return (Math.Round(point.X / epsilon), Math.Round(point.X / epsilon), Math.Round(point.X / epsilon)).GetHashCode();
+        }
+    }
+
     /// <summary>
     /// Методы для работы с графикой
     /// </summary>
     public static class Graph
     {
+
+        public static readonly IEqualityComparer<Point3d> Point3dComparer = new Point3dComparer();
+
         public static string GetDesc(this ObjectId id)
         {
             if (id.IsErased)
@@ -37,7 +51,10 @@ namespace CAM
 
         public static double Length(this Curve curve) => curve.GetDistanceAtParameter(curve.EndParam) - curve.GetDistanceAtParameter(curve.StartParam);
 
-        public static Vector2d GetTangent(this Curve curve, Point3d point) => curve.GetFirstDerivative(point).ToVector2d();
+        public static Vector2d GetTangent(this Curve curve, Point3d point)
+        {
+            return curve.GetFirstDerivative(point).ToVector2d();
+        }
 
         public static Vector2d GetTangent(this Curve curve, double param) => curve.GetFirstDerivative(param).ToVector2d();
 
@@ -333,4 +350,4 @@ namespace CAM
         }
         #endregion
     }
- }
+}

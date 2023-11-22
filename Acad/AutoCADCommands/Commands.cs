@@ -1528,10 +1528,9 @@ namespace Dreambuild.AutoCAD
         /// <param name="groupId">The group ID.</param>
         public static void EraseGroup(this ObjectId groupId)
         {
-            DbHelper
-                .GetEntityIdsInGroup(groupId)
-                .Cast<ObjectId>()
-                .QForEach(entity => entity.Erase());
+            var ids = DbHelper.GetEntityIdsInGroup(groupId);
+            if (ids.Any())
+                ids.QForEach(entity => entity.Erase());
 
             groupId.QOpenForWrite(group => group.Erase());
         }
