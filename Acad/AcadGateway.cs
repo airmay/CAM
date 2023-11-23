@@ -57,6 +57,9 @@ namespace CAM
 
         public static void Alert(Exception ex) => Alert("Ошибка", ex);
 
+        public static void Add(this Curve curve) => App.LockAndExecute(() => curve.AddToCurrentSpace());
+
+
         //public static void QForEach(this IEnumerable<ObjectId> ids, Action<DBObject> action)
         //{
         //    if (ids.Any())

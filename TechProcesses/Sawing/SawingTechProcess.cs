@@ -83,9 +83,9 @@ namespace CAM.TechProcesses.Sawing
                 }
                 var sign = startBorder.OuterSide == Side.Left ? 1 : -1;
 
-                var hatchId = Graph.CreateHatch(contour, sign);
-                if (hatchId.HasValue)
-                    ExtraObjectsGroup = ExtraObjectsGroup.AppendToGroup(hatchId.Value);
+                //var hatchId = Graph.CreateHatch(contour, sign);
+                //if (hatchId.HasValue)
+                //    ExtraObjectsGroup = ExtraObjectsGroup.AppendToGroup(hatchId.Value);
             }
             return _borders;
 

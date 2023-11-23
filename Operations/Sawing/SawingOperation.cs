@@ -51,8 +51,7 @@ namespace CAM.Operations.Sawing
         public override void Execute(GeneralOperation generalOperation, Processor processor)
         {
             var curvesSides = new Dictionary<Curve, int>();
-            var pointsIsExactly = new Dictionary<Point3d, bool>();
-            ProcessingArea.RoundPoints();
+            var pointsIsExactly = new Dictionary<Point3d, bool>(Graph.Point3dComparer);
             var curves = ProcessingArea.GetCurves();
             CalcСurveProcessing(curves);
             foreach (var curve in curves)
@@ -70,7 +69,7 @@ namespace CAM.Operations.Sawing
                 while (curvesToCalc.Any())
                 {
                     var chain = CalcChain(curvesToCalc, side);
-                    var hatchId = Graph.CreateHatch(chain, side);
+                    var hatchId = Graph.CreateHatch(chain.ToPolyline(), side);
                     if (hatchId.HasValue)
                         Support = Support.AppendToGroup(hatchId.Value);
                     curvesToCalc.RemoveAll(p => chain.Contains(p));
@@ -105,7 +104,7 @@ namespace CAM.Operations.Sawing
                     if (point == curve.StartPoint)
                         endTangent *= -1;
 
-                        curve = pointCurveDict[point].SingleOrDefault(p => p != curve);
+                    curve = pointCurveDict[point].SingleOrDefault(p => p != curve);
                     if (curve == null)
                     {
                         pointsIsExactly[point] = IsExactlyEnd;

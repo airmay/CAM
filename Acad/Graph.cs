@@ -51,10 +51,7 @@ namespace CAM
 
         public static double Length(this Curve curve) => curve.GetDistanceAtParameter(curve.EndParam) - curve.GetDistanceAtParameter(curve.StartParam);
 
-        public static Vector2d GetTangent(this Curve curve, Point3d point)
-        {
-            return curve.GetFirstDerivative(point).ToVector2d();
-        }
+        public static Vector2d GetTangent(this Curve curve, Point3d point) => curve.GetFirstDerivative(point.IsEqualTo(curve.StartPoint) ? curve.StartPoint : curve.EndPoint).ToVector2d();
 
         public static Vector2d GetTangent(this Curve curve, double param) => curve.GetFirstDerivative(param).ToVector2d();
 
@@ -165,39 +162,47 @@ namespace CAM
             return poly;
         }
 
-        public static ObjectId? CreateHatch(List<Curve> contour, int sign)
+        public static Polyline ToPolyline(this List<Curve> contour)
         {
+            var startPoint = contour.Count > 1
+                ? contour[1].HasPoint(contour[0].EndPoint) ? contour[0].StartPoint : contour[0].EndPoint
+                : contour[0].StartPoint;
+
+            var polyline = new Polyline();
+            var point = startPoint;
+            var index = 0;
+            foreach (var curve in contour)
+            {
+                if (curve is Polyline pcurve)
+                {
+                    polyline.JoinPolyline(pcurve);
+                    index = polyline.NumberOfVertices - 1;
+                    polyline.RemoveVertexAt(index);
+                }
+                else
+                {
+                    var bulge = curve is Arc arc ? arc.GetArcBulge(point) : 0;
+                    polyline.AddVertexAt(index++, point.ToPoint2d(), bulge, 0, 0);
+                }
+
+                point = curve.NextPoint(point);
+            }
+            if (point != startPoint)
+                polyline.AddVertexAt(index, point.ToPoint2d(), 0, 0, 0);
+            else
+                polyline.Closed = point == startPoint;
+
+            return polyline;
+        }
+
+        public static ObjectId? CreateHatch(Polyline polyline, int sign)
+        {
+            const int hatchSize = 40;
             try
             {
-                var start = contour.Count > 1
-                    ? contour[1].HasPoint(contour[0].EndPoint) ? contour[0].StartPoint : contour[0].EndPoint
-                    : contour[0].StartPoint;
-
-                var polyline = new Polyline();
-                var next = start;
-                var i = 0;
-                foreach (var curve in contour)
-                {
-                    if (curve is Polyline pcurve)
-                    {
-                        polyline.JoinPolyline(pcurve);
-                        i = polyline.NumberOfVertices - 1;
-                        polyline.RemoveVertexAt(i);
-                    }
-                    else
-                    {
-                        var bulge = curve is Arc ? Algorithms.GetArcBulge(curve as Arc, next) : 0;
-                        polyline.AddVertexAt(i++, next.ToPoint2d(), bulge, 0, 0);
-                    }
-                    next = curve.NextPoint(next);
-                }
-                polyline.Closed = next == start;
-                Polyline offsetPolyline = null;
-                var offset = sign * 40;
+                var offsetPolyline = polyline.GetOffsetCurves(hatchSize * sign)[0] as Polyline;
                 if (!polyline.Closed)
                 {
-                    polyline.AddVertexAt(i, next.ToPoint2d(), 0, 0, 0);
-                    offsetPolyline = polyline.GetOffsetCurves(offset)[0] as Polyline;
                     offsetPolyline.ReverseCurve();
                     polyline.JoinPolyline(offsetPolyline);
                     polyline.SetBulgeAt(polyline.NumberOfVertices - 1, 0);
@@ -205,10 +210,8 @@ namespace CAM
                     offsetPolyline.Dispose();
                     offsetPolyline = null;
                 }
-                else
-                    offsetPolyline = polyline.GetOffsetCurves(offset)[0] as Polyline;
 
-                using (var doclock = Acad.ActiveDocument.LockDocument())
+                using (Acad.ActiveDocument.LockDocument())
                 using (var trans = Acad.Database.TransactionManager.StartTransaction())
                 {
                     var space = (BlockTableRecord)trans.GetObject(Acad.Database.CurrentSpaceId, OpenMode.ForWrite, false);
