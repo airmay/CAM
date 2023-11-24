@@ -48,7 +48,7 @@ namespace CAM.Operations.Sawing
             };
         }
 
-        public override void Execute(GeneralOperation generalOperation, Processor processor)
+        public override void Execute(Processor processor)
         {
             var curvesSides = new Dictionary<Curve, int>();
             var pointsIsExactly = new Dictionary<Point3d, bool>(Graph.Point3dComparer);

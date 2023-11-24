@@ -20,9 +20,17 @@ namespace CAM
         [NonSerialized] public ObjectId? Support;
         [NonSerialized] public int FirstCommandIndex;
 
+        public Tool Tool { get; set; }
+
+        public void SetGeneralParams(GeneralOperation generalOperation)
+        {
+            Tool = generalOperation.Tool;
+        }
+
         public virtual void Init() { }
+
         public virtual void Teardown() { }
-        
-        public abstract void Execute(GeneralOperation generalOperation, Processor processor);
+
+        public abstract void Execute(Processor processor);
     }
 }

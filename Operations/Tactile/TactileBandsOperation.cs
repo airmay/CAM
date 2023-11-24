@@ -165,7 +165,7 @@ namespace CAM.Operations.Tactile
         //    }
         //}
 
-        public override void Execute(GeneralOperation generalOperation, Processor processor)
+        public override void Execute(Processor processor)
         {
             throw new NotImplementedException();
         }

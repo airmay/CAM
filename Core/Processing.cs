@@ -78,7 +78,8 @@ namespace CAM
                 Acad.Write($"расчет операции {operation.Caption}");
 
                 processor.SetOperarion(operation);
-                operation.Execute(generalOperation, processor);
+                operation.SetGeneralParams(generalOperation);
+                operation.Execute(processor);
             }
 
             processor.Finish();

@@ -35,8 +35,7 @@ namespace CAM
 #else
         @"\\Catalina\Tools";
 #endif
-        private static string GetToolFileName(MachineType machineType) =>
-            Path.Combine(ToolsFilePath, $"{machineType}.csv");
+        private static string GetToolFileName(MachineType machineType) => Path.Combine(ToolsFilePath, $"{machineType}.csv");
 
         private static readonly Dictionary<MachineType, List<Tool>> Tools = new Dictionary<MachineType, List<Tool>>();
 
@@ -45,8 +44,7 @@ namespace CAM
             var file = GetToolFileName(machineType);
             try
             {
-                var lines = Tools[machineType]
-                    .Select(p => $"{p.Number};{p.Name};{(int)p.Type};{p.Diameter};{p.Thickness}");
+                var lines = Tools[machineType].Select(p => $"{p.Number};{p.Name};{(int)p.Type};{p.Diameter};{p.Thickness}");
                 File.WriteAllLines(file, lines);
                 Acad.Alert($"Сохранен файл инструментов {file}");
             }
