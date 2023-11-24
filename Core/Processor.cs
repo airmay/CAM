@@ -8,6 +8,7 @@ namespace CAM
     {
         private readonly IPostProcessor _postProcessor;
         public List<Command> ProcessCommands { get; } = new List<Command>();
+        private Operation _operation;
 
         public Processor(IPostProcessor postProcessor)
         {
@@ -15,12 +16,16 @@ namespace CAM
 
         }
 
-        public void Start()
+        public void Start(Tool tool)
         {
+            _postProcessor.StartMachine();
+            _postProcessor.SetTool(tool.Number, 0, 0, 0);
         }
 
         public void SetOperarion(Operation operation)
         {
+            _operation = operation;
+            _operation.FirstCommandIndex = ProcessCommands.Count;
         }
 
         public void Finish()

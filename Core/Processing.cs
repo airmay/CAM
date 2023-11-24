@@ -65,12 +65,17 @@ namespace CAM
 
         private void BuildProcessing()
         {
-            var machineType = GeneralOperations.First(p => p.Enabled).MachineType;
+            var generalParams = GeneralOperations.First(p => p.Enabled);
+            var machineType = generalParams.MachineType;
             if (!machineType.CheckNotNull("Станок"))
                 return;
             MachineType = machineType.Value;
+            var tool = generalParams.Tool;
+            if (!tool.CheckNotNull("Инструмент"))
+                return;
+
             var processor = ProcessorFactory.Create(MachineType);
-            processor.Start();
+            processor.Start(tool);
 
             foreach (var generalOperation in GeneralOperations.Where(p => p.Enabled))
             foreach (var operation in generalOperation.Operations.Where(p => p.Enabled))

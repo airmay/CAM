@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Linq;
 using Autodesk.AutoCAD.Geometry;
 using Dreambuild.AutoCAD;
-using System.Drawing;
 
 namespace CAM.Operations.Sawing
 {
@@ -125,7 +124,6 @@ namespace CAM.Operations.Sawing
 
         private void ProcessCurve(Processor processor, Curve curve, int side, bool isExactlyBegin, bool isExactlyEnd)
         {
-
         }
     }
 }
