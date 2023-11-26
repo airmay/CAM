@@ -78,13 +78,16 @@ namespace CAM
             processor.Start(tool);
 
             foreach (var generalOperation in GeneralOperations.Where(p => p.Enabled))
-            foreach (var operation in generalOperation.Operations.Where(p => p.Enabled))
             {
-                Acad.Write($"расчет операции {operation.Caption}");
+                processor.SetGeneralOperarion(generalOperation);
+                foreach (var operation in generalOperation.Operations.Where(p => p.Enabled))
+                {
+                    Acad.Write($"расчет операции {operation.Caption}");
 
-                processor.SetOperarion(operation);
-                operation.SetGeneralParams(generalOperation);
-                operation.Execute(processor);
+                    processor.SetOperarion(operation);
+                    operation.SetGeneralParams(generalOperation);
+                    operation.Execute(processor);
+                }
             }
 
             processor.Finish();

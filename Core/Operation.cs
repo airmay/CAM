@@ -20,10 +20,12 @@ namespace CAM
         [NonSerialized] public ObjectId? Support;
         [NonSerialized] public int FirstCommandIndex;
 
+        public MachineType MachineType { get; set; }
         public Tool Tool { get; set; }
 
         public void SetGeneralParams(GeneralOperation generalOperation)
         {
+            MachineType = generalOperation.MachineType.Value;
             Tool = generalOperation.Tool;
         }
 

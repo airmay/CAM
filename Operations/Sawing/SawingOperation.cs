@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using System.Linq;
 using Autodesk.AutoCAD.Geometry;
 using Dreambuild.AutoCAD;
+using CAM;
+using CAM.Utils;
 
 namespace CAM.Operations.Sawing
 {
@@ -124,6 +126,228 @@ namespace CAM.Operations.Sawing
 
         private void ProcessCurve(Processor processor, Curve curve, int side, bool isExactlyBegin, bool isExactlyEnd)
         {
+            //    var pt = curve.StartPoint;
+            //    foreach (var pass in PassIterator.Create(pt, curve.NextPoint(pt)))
+            //    {
+
+            //    }
+
+
+            //    var point = ToolPosition.IsDefined ? curve.GetClosestPoint(ToolPosition.Point) : curve.StartPoint;
+            //    var calcAngleC = angleC == null;
+
+            //    if (IsUpperTool) // && (angleA ?? AngleA).GetValueOrDefault() == 0)
+            //    {
+            //        if (IsChangeStart)
+            //            point = curve.NextPoint(point);
+            //        //var upperPoint = new Point3d(point.X, point.Y, ZSafety);
+            //        //if (!ToolPosition.Point.IsEqualTo(upperPoint))
+            //        //{
+            //        if (!angleC.HasValue)
+            //            angleC = BuilderUtils.CalcToolAngle(curve, point, engineSide);
+
+            //        Move(point.X, point.Y, angleC: angleC, angleA: angleA);
+            //        //}
+            //    }
+            //    else if (!(curve is Line) && calcAngleC)
+            //        angleC = BuilderUtils.CalcToolAngle(curve, point, engineSide);
+
+            //    if (!point.IsEqual(ToolPosition.Point))
+            //        GCommand(point.Z != ToolPosition.Point.Z ? CommandNames.Penetration : CommandNames.Transition, 1, point: point, angleC: angleC, angleA: angleA, feed: smallFeed);
+
+            //    if (curve is Polyline polyline)
+            //    {
+            //        if (point == polyline.EndPoint)
+            //        {
+            //            polyline.ReverseCurve();
+            //            engineSide = engineSide.Opposite();
+            //        }
+            //        for (int i = 1; i < polyline.NumberOfVertices; i++)
+            //        {
+            //            point = polyline.GetPoint3dAt(i);
+            //            if (calcAngleC)
+            //                angleC = BuilderUtils.CalcToolAngle(polyline, point, engineSide);
+            //            if (polyline.GetSegmentType(i - 1) == SegmentType.Arc)
+            //            {
+            //                var arcSeg = polyline.GetArcSegment2dAt(i - 1);
+            //                GCommand(CommandNames.Cutting, arcSeg.IsClockWise ? 2 : 3, point: point, angleC: angleC, curve: polyline, feed: cuttingFeed, center: arcSeg.Center);
+            //            }
+            //            else
+            //                GCommand(CommandNames.Cutting, 1, point: point, angleC: angleC, curve: polyline, feed: cuttingFeed);
+            //        }
+            //    }
+            //    else
+            //    {
+            //        var arc = curve as Arc;
+            //        if (arc != null && calcAngleC)
+            //            angleC += arc.TotalAngle.ToDeg() * (point == curve.StartPoint ? -1 : 1);
+            //        var gCode = curve is Line ? 1 : point == curve.StartPoint ? 3 : 2;
+            //        GCommand(CommandNames.Cutting, gCode, point: curve.NextPoint(point), angleC: angleC, curve: curve, feed: cuttingFeed, center: arc?.Center.ToPoint2d());
+            //    }
+            //}
+
+            var engineSide = EngineSideCalculator.Calculate(curve, MachineType);
+            const int CornerIndentIncrease = 5;
+            double compensation = 0;
+
+            if (curve is Arc arc && OuterSide == Side.Left) // внутренний рез дуги
+            {
+                if (MachineType == MachineType.Donatoni && 
+                    !(Math.Cos(arc.StartAngle.Round(3)) > 0 && Math.Cos(arc.EndAngle.Round(3)) < 0)) //  дуга пересекает угол 90 градусов
+                {
+                    // подворот диска при вн. резе дуги
+                    engineSide = Side.Right;
+                    var R = arc.Radius;
+                    var t = Thickness;
+                    var d = Tool.Diameter;
+                    var comp = (2 * R * t * t - Math.Sqrt(-d * d * d * d * t * t + 4 * d * d * R * R * t * t +
+                                                          d * d * t * t * t * t)) / (d * d - 4 * R * R);
+                    AngleA = -Math.Atan2(comp, Thickness).ToDeg();
+                }
+                else
+                    compensation = arc.Radius - Math.Sqrt(arc.Radius * arc.Radius - Thickness * (Tool.Diameter - Thickness));
+            }
+
+            var isFrontPlaneZero = MachineService.Machines[MachineType].IsFrontPlaneZero;
+            if (engineSide == OuterSide ^ isFrontPlaneZero)
+                compensation += Tool.Thickness.Value;
+            var compensationSign = OuterSide == Side.Left ^ curve is Line ? -1 : 1;
+
+            var sumIndent = CalcIndent(Thickness) * (Convert.ToInt32(IsExactlyBegin) + Convert.ToInt32(IsExactlyEnd));
+            if (sumIndent >= curve.Length())
+            {
+                if (AngleA != 0)
+                    throw new InvalidOperationException(
+                        "Расчет намечания выполняется только при нулевом вертикальном угле.");
+                var point = Scheduling();
+                var angle = BuilderUtils.CalcToolAngle((curve.EndPoint - curve.StartPoint).ToVector2d().Angle,
+                    engineSide);
+                generator.Move(point.X, point.Y, angleC: angle);
+                generator.Cutting(point.X, point.Y, point.Z, TechProcess.PenetrationFeed);
+                generator.Uplifting();
+
+                return;
+            }
+
+            var modes = SawingModes.ConvertAll(p => new CuttingMode
+                { Depth = p.Depth, DepthStep = p.DepthStep, Feed = p.Feed });
+            var passList = BuilderUtils.GetPassList(modes, thickness, !ProcessingArea.ObjectId.IsLine()).ToList();
+
+            Curve toolpathCurve = null;
+            foreach (var item in passList)
+            {
+                CreateToolpath(item.Key, compensation + shift + item.Key * offsetCoeff);
+                if (generator.IsUpperTool)
+                {
+                    var point = engineSide == Side.Right ^ (passList.Count() % 2 == 1)
+                        ? toolpathCurve.EndPoint
+                        : toolpathCurve.StartPoint;
+                    var vector = Vector3d.ZAxis * (item.Key + generator.ZSafety);
+                    if (angleA != 0)
+                        vector = vector.RotateBy(outerSideSign * angleA, ((Line)toolpathCurve).Delta) * depthCoeff;
+                    var p0 = point + vector;
+                    var angleC = BuilderUtils.CalcToolAngle(toolpathCurve, point, engineSide);
+                    generator.Move(p0.X, p0.Y, angleC: angleC, angleA: Math.Abs(AngleA));
+                    if (TechProcess.MachineType == MachineType.ScemaLogic)
+                        generator.Command("28;;XYCZ;;;;;;", "Цикл");
+                }
+
+                generator.Cutting(toolpathCurve, item.Value, TechProcess.PenetrationFeed, engineSide);
+            }
+
+            if ((!IsExactlyBegin || !IsExactlyEnd) && Departure == 0)
+            {
+                var gashCurve = curve.GetOffsetCurves(shift)[0] as Curve;
+                var gashList = new List<ObjectId>();
+                if (!IsExactlyBegin)
+                    gashList.Add(Acad.CreateGash(gashCurve, gashCurve.StartPoint, OuterSide, thickness * depthCoeff,
+                        toolDiameter, toolThickness));
+                if (!IsExactlyEnd)
+                    gashList.Add(Acad.CreateGash(gashCurve, gashCurve.EndPoint, OuterSide, thickness * depthCoeff,
+                        toolDiameter, toolThickness));
+                if (gashList.Count > 0)
+                    Modify.AppendToGroup(base.TechProcess.ExtraObjectsGroup.Value, gashList.ToArray());
+                gashCurve.Dispose();
+            }
+
+            generator.Uplifting(
+                Vector3d.ZAxis.RotateBy(outerSideSign * angleA, toolpathCurve.EndPoint - toolpathCurve.StartPoint) *
+                (thickness + generator.ZSafety) * depthCoeff);
+
+            return;
+
+
+        }
+
+        void CreateToolpath(double depth, double offset)
+{
+    toolpathCurve = curve.GetOffsetCurves(offset)[0] as Curve;
+    toolpathCurve.TransformBy(Matrix3d.Displacement(-Vector3d.ZAxis * depth));
+
+    if (Departure > 0 && toolpathCurve is Line line)
+    {
+        if (!IsExactlyBegin)
+            toolpathCurve.StartPoint = line.ExpandStart(Departure);
+        if (!IsExactlyEnd)
+            toolpathCurve.EndPoint = line.ExpandEnd(Departure);
+    }
+
+    if (!IsExactlyBegin && !IsExactlyEnd)
+        return;
+    var indent = CalcIndent(depth * depthCoeff);
+
+    switch (toolpathCurve)
+    {
+        case Line l:
+            if (IsExactlyBegin)
+                l.StartPoint = l.GetPointAtDist(indent);
+            if (IsExactlyEnd)
+                l.EndPoint = l.GetPointAtDist(l.Length - indent);
+            break;
+
+        case Arc a:
+            var indentAngle = indent / ((Arc)curve).Radius;
+            if (IsExactlyBegin)
+                a.StartAngle = a.StartAngle + indentAngle;
+            if (IsExactlyEnd)
+                a.EndAngle = a.EndAngle - indentAngle;
+            break;
+
+        case Polyline p:
+            if (IsExactlyBegin)
+                p.SetPointAt(0, p.GetPointAtDist(indent).ToPoint2d());
+            //p.StartPoint = p.GetPointAtDist(indent);
+            if (IsExactlyEnd)
+                //p.EndPoint = p.GetPointAtDist(p.Length - indent);
+                p.SetPointAt(p.NumberOfVertices - 1, p.GetPointAtDist(p.Length - indent).ToPoint2d());
+            break;
+    };
+}
+
+double CalcIndent(double depth) => Math.Sqrt(depth * (Tool.Diameter - depth)) + CornerIndentIncrease;
+
+/// <summary>
+/// Расчет точки намечания
+/// </summary>
+Point3d Scheduling()
+{
+    var vector = curve.EndPoint - curve.StartPoint;
+    var depth = thickness;
+    var point = Point3d.Origin;
+    if (IsExactlyBegin && IsExactlyEnd)
+    {
+        var l = vector.Length - 2 * CornerIndentIncrease;
+        depth = (toolDiameter - Math.Sqrt(toolDiameter * toolDiameter - l * l)) / 2;
+        point = curve.StartPoint + vector / 2;
+    }
+    else
+    {
+        var indentVector = vector.GetNormal() * (Math.Sqrt(depth * (toolDiameter - depth)) + CornerIndentIncrease);
+        point = IsExactlyBegin ? curve.StartPoint + indentVector : curve.EndPoint - indentVector;
+        Acad.CreateGash(curve, IsExactlyBegin ? curve.EndPoint : curve.StartPoint, OuterSide, depth, toolDiameter, toolThickness, point);
+    }
+    return point + vector.GetPerpendicularVector().GetNormal() * compensation - Vector3d.ZAxis * depth;
+}
         }
     }
 }

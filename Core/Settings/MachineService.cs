@@ -7,6 +7,7 @@ namespace CAM
         public int MaxFrequency { get; set; }
         public string ProgramFileExtension { get; set; }
         public string ProgramLineNumberFormat { get; set; }
+        public bool IsFrontPlaneZero { get; set; }
     }
 
     public static class MachineService
@@ -17,13 +18,15 @@ namespace CAM
             {
                 MaxFrequency = 3000,
                 ProgramFileExtension = "csv",
-                ProgramLineNumberFormat = "{0}"
+                ProgramLineNumberFormat = "{0}",
+                IsFrontPlaneZero = false
             },
             [MachineType.Donatoni] = new Machine
             {
                 MaxFrequency = 5000,
                 ProgramFileExtension = "pgm",
-                ProgramLineNumberFormat = "N{0}"
+                ProgramLineNumberFormat = "N{0}",
+                IsFrontPlaneZero = true
             },
             [MachineType.Forma] = new Machine
             {
