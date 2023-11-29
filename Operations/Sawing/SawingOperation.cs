@@ -4,8 +4,8 @@ using System.Collections.Generic;
 using System.Linq;
 using Autodesk.AutoCAD.Geometry;
 using Dreambuild.AutoCAD;
-using CAM;
 using CAM.Utils;
+using System.Drawing;
 
 namespace CAM.Operations.Sawing
 {
@@ -211,21 +211,35 @@ namespace CAM.Operations.Sawing
             if (engineSide == OuterSide ^ isFrontPlaneZero)
                 compensation += Tool.Thickness.Value;
             var offsetSign = OuterSide == Side.Left ^ curve is Line ? -1 : 1;
-            var toolpath = curve.GetOffsetCurves(compensation * offsetSign)[0] as Curve;
-
-            var sumIndent = CalcIndent(Thickness) * (Convert.ToInt32(IsExactlyBegin) + Convert.ToInt32(IsExactlyEnd));
-            if (sumIndent >= curve.Length())
+            var baseCurve = curve.GetOffsetCurves(compensation * offsetSign)[0] as Curve;
+            var gash = CalcGash(Depth);
+            var indent = gash + CornerIndentIncrease;
+            var sumIndent = indent * (Convert.ToInt32(IsExactlyBegin) + Convert.ToInt32(IsExactlyEnd));
+            if (sumIndent >= baseCurve.Length())
             {
-                Scheduling(curve);
+                Scheduling(baseCurve);
                 return;
             }
 
-            var modes = SawingModes.ConvertAll(p => new CuttingMode
-                { Depth = p.Depth, DepthStep = p.DepthStep, Feed = p.Feed });
-            var passList = BuilderUtils.GetPassList(modes, thickness, !ProcessingArea.ObjectId.IsLine()).ToList();
+            var passList = GetPassList(curve);
+            var toolpath = CreateToolpath(baseCurve, passList[0].Item1);
+            var startPoint = engineSide == Side.Right ^ (passList.Count % 2 == 1)
+                ? toolpath.EndPoint
+                : toolpath.StartPoint;
+            var angleC = BuilderUtils.CalcToolAngle(toolpath, startPoint, engineSide);
+            processor.Move(startPoint.X, startPoint.Y, angleC);
+            processor.Cycle();
 
-            Curve toolpathCurve = null;
-            foreach (var item in passList)
+            foreach (var (depth, feed) in passList)
+            {
+                toolpath = CreateToolpath(baseCurve, depth);
+
+                processor.PenetrationFeed = feed;
+                processor.Cutting(toolpath, toolpath.StartPoint);
+            }
+            //processor.u
+
+                foreach (var item in passList)
             {
                 CreateToolpath(item.Key, compensation + shift + item.Key * offsetCoeff);
                 if (generator.IsUpperTool)
@@ -270,37 +284,64 @@ namespace CAM.Operations.Sawing
 
         }
 
+        private List<(double, int)> GetPassList(Curve curve)
+        {
+            var baseMode = new CuttingMode
+            {
+                DepthStep = Penetration.Value,
+                Feed = PenetrationFeed,
+            };
+            var modes = curve is Arc && SawingModes.Any()
+                ? new List<CuttingMode>(SawingModes.OrderByDescending(p => p.Depth.HasValue).ThenBy(p => p.Depth))
+                : new List<CuttingMode> { baseMode };
+            var index = 0;
+            var mode = modes[index];
+            var depth = curve is Arc ? -mode.DepthStep : 0;
+            var passList = new List<(double, int)>();
+            do
+            {
+                depth += mode.DepthStep;
+                if (depth >= mode.Depth && index < modes.Count - 1)
+                    mode = modes[++index];
+                if (depth > Depth)
+                    depth = Depth;
+                passList.Add((depth, mode.Feed));
+            } 
+            while (depth < Depth);
+
+            return passList;
+        }
+
         private const int CornerIndentIncrease = 5;
 
+        private double CalcGash(double depth) => Math.Sqrt(depth * (Tool.Diameter - depth));
         private double CalcIndent(double depth) => Math.Sqrt(depth * (Tool.Diameter - depth)) + CornerIndentIncrease;
 
-        private Curve CreateToolpath(Curve curve, double depth, double offset)
+        private Curve CreateToolpath(Curve curve, double depth)
         {
-            var toolpath = curve.GetOffsetCurves(offset)[0] as Curve;
-            toolpath.TransformBy(Matrix3d.Displacement(-Vector3d.ZAxis * depth));
             var indent = CalcIndent(depth);
+            var toolpath = curve.GetTransformedCopy(Matrix3d.Displacement(-Vector3d.ZAxis * depth));
 
             switch (toolpath)
             {
-                case Line l:
-                    if (IsExactlyBegin) l.StartPoint = l.GetPointAtDist(indent);
-                    if (IsExactlyEnd) l.EndPoint = l.GetPointAtDist(l.Length - indent);
-                    break;
+                case Line line:
+                    if (IsExactlyBegin) line.StartPoint = line.GetPointAtDist(indent);
+                    if (IsExactlyEnd) line.EndPoint = line.GetPointAtDist(line.Length - indent);
+                    return line;
 
                 case Arc arc:
                     var indentAngle = indent / arc.Radius;
                     if (IsExactlyBegin) arc.StartAngle += indentAngle;
                     if (IsExactlyEnd) arc.EndAngle -= indentAngle;
-                    break;
+                    return arc;
 
-                case Polyline p:
-                    if (IsExactlyBegin) p.SetPointAt(0, p.GetPointAtDist(indent).ToPoint2d());
-                    if (IsExactlyEnd)
-                        p.SetPointAt(p.NumberOfVertices - 1, p.GetPointAtDist(p.Length - indent).ToPoint2d());
-                    break;
+                case Polyline polyline:
+                    if (IsExactlyBegin) polyline.SetPointAt(0, polyline.GetPointAtDist(indent).ToPoint2d());
+                    if (IsExactlyEnd) polyline.SetPointAt(polyline.NumberOfVertices - 1, polyline.GetPointAtDist(polyline.Length - indent).ToPoint2d());
+                    return polyline;
+
+                default: throw new Exception();
             }
-
-            return toolpath;
         }
 
         /// <summary>
