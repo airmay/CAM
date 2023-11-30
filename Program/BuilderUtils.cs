@@ -39,15 +39,13 @@ namespace CAM
         {
             var deg = angle.ToDeg().Round();
             if (deg % 180 == 0)
-                return (deg % 360 == 0) ? Side.Left : Side.Right;
+                return deg % 360 == 0 ? Side.Left : Side.Right;
 
-            angle = angle.Round(6);
-            var upDownSign = Math.Sign(Math.Sin(angle)); // переделать
-            return upDownSign > 0 ? Side.Right : upDownSign < 0 ? Side.Left : Math.Cos(angle) > 0 ? Side.Left : Side.Right;
+            return deg < 180 ? Side.Right : Side.Left;
         }
 
         public static double CalcToolAngle(Curve curve, Point3d point, Side engineSide = Side.None)
-            => CalcToolAngle(curve.GetFirstDerivative(point).ToVector2d().Angle, engineSide);
+            => CalcToolAngle(curve.GetTangent(point).Angle, engineSide);
 
         public static double CalcToolAngle(double angle, Side engineSide = Side.None)
         {

@@ -51,7 +51,7 @@ namespace CAM
 
         public static double Length(this Curve curve) => curve.GetDistanceAtParameter(curve.EndParam) - curve.GetDistanceAtParameter(curve.StartParam);
 
-        public static Vector2d GetTangent(this Curve curve, Point3d point) => curve.GetFirstDerivative(point.IsEqualTo(curve.StartPoint) ? curve.StartPoint : curve.EndPoint).ToVector2d();
+        public static Vector2d GetTangent(this Curve curve, Point3d point) => curve.GetFirstDerivative(point).ToVector2d();
 
         public static Vector2d GetTangent(this Curve curve, double param) => curve.GetFirstDerivative(param).ToVector2d();
 
@@ -62,6 +62,10 @@ namespace CAM
             yield return curve.StartPoint;
             yield return curve.EndPoint;
         }
+
+        public static Point3d GetPoint(this Curve curve, CurveTip tip) => tip == CurveTip.Start ? curve.StartPoint : curve.EndPoint;
+
+        public static CurveTip Swap(this CurveTip tip) => (CurveTip)(1 - (int)tip);
 
         public static Point3d GetPoint(this Curve curve, Corner corner) => corner == Corner.Start ? curve.StartPoint : curve.EndPoint;
 
@@ -352,5 +356,11 @@ namespace CAM
             }
         }
         #endregion
+    }
+
+    public enum CurveTip
+    {
+        Start,
+        End
     }
 }

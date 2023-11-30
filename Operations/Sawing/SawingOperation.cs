@@ -112,7 +112,7 @@ namespace CAM.Operations.Sawing
                         break;
                     }
 
-                    var startTangent = curve.GetTangent(point);
+                    var startTangent = curve.GetTangent(point.IsEqualTo(curve.StartPoint) ? curve.StartPoint : curve.EndPoint);
                     if (point == curve.EndPoint)
                         startTangent *= -1;
                     var angle = endTangent.MinusPiToPiAngleTo(startTangent);
@@ -222,10 +222,11 @@ namespace CAM.Operations.Sawing
             }
 
             var passList = GetPassList(curve);
+            var tip = engineSide == Side.Right ^ (passList.Count % 2 == 1)
+                ? CurveTip.End
+                : CurveTip.Start;
             var toolpath = CreateToolpath(baseCurve, passList[0].Item1);
-            var startPoint = engineSide == Side.Right ^ (passList.Count % 2 == 1)
-                ? toolpath.EndPoint
-                : toolpath.StartPoint;
+            var startPoint = toolpath.GetPoint(tip);
             var angleC = BuilderUtils.CalcToolAngle(toolpath, startPoint, engineSide);
             processor.Move(startPoint.X, startPoint.Y, angleC);
             processor.Cycle();
@@ -234,12 +235,13 @@ namespace CAM.Operations.Sawing
             {
                 toolpath = CreateToolpath(baseCurve, depth);
 
-                processor.PenetrationFeed = feed;
-                processor.Cutting(toolpath, toolpath.StartPoint);
+                processor.Penetration(toolpath.GetPoint(tip));
+                tip = tip.Swap();
+                processor.Cutting(toolpath, toolpath.GetPoint(tip), feed);
             }
-            //processor.u
+            processor.Uplifting();
 
-                foreach (var item in passList)
+            foreach (var item in passList)
             {
                 CreateToolpath(item.Key, compensation + shift + item.Key * offsetCoeff);
                 if (generator.IsUpperTool)
