@@ -181,6 +181,7 @@
     <Compile Include="Core\Enums\MachineType.cs" />
     <Compile Include="Core\Enums\Material.cs" />
     <Compile Include="Program\Generator\PostProcessorBase.cs" />
+    <Compile Include="Program\Generator\ScemaLogicPostProcessor.cs" />
     <Compile Include="Program\OperationProcessor.cs" />
     <Compile Include="Program\Command.cs" />
     <Compile Include="Program\ProcessCommand.cs" />

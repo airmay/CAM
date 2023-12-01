@@ -15,5 +15,7 @@ namespace CAM.Program.Generator
         string[] StopEngine();
         string Pause(double duration);
         void SetParams(MillToolPosition toolPosition);
+        string Cycle();
+        string[] Finish();
     }
 }

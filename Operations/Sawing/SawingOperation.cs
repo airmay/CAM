@@ -241,26 +241,6 @@ namespace CAM.Operations.Sawing
             }
             processor.Uplifting();
 
-            foreach (var item in passList)
-            {
-                CreateToolpath(item.Key, compensation + shift + item.Key * offsetCoeff);
-                if (generator.IsUpperTool)
-                {
-                    var point = engineSide == Side.Right ^ (passList.Count() % 2 == 1)
-                        ? toolpathCurve.EndPoint
-                        : toolpathCurve.StartPoint;
-                    var vector = Vector3d.ZAxis * (item.Key + generator.ZSafety);
-                    if (angleA != 0)
-                        vector = vector.RotateBy(outerSideSign * angleA, ((Line)toolpathCurve).Delta) * depthCoeff;
-                    var p0 = point + vector;
-                    var angleC = BuilderUtils.CalcToolAngle(toolpathCurve, point, engineSide);
-                    generator.Move(p0.X, p0.Y, angleC: angleC, angleA: Math.Abs(AngleA));
-                    if (TechProcess.MachineType == MachineType.ScemaLogic)
-                        generator.Command("28;;XYCZ;;;;;;", "Цикл");
-                }
-
-                generator.Cutting(toolpathCurve, item.Value, TechProcess.PenetrationFeed, engineSide);
-            }
 
             if ((!IsExactlyBegin || !IsExactlyEnd) && Departure == 0)
             {
