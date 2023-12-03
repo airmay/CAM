@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Autodesk.AutoCAD.Colors;
+using System.Xml.Linq;
 
 namespace CAM
 {
@@ -31,7 +32,16 @@ namespace CAM
             _currentSpace = (BlockTableRecord)_transaction.GetObject(Acad.Database.CurrentSpaceId, OpenMode.ForWrite, false);
         }
 
-        
+        public ObjectId AddToolpath(Curve curve, string name)
+        {
+            if (Colors.TryGetValue(name, out var color))
+                curve.Color = color;
+            curve.LayerId = _layerId;
+            curve.Visible = false;
+            _currentSpace.AppendEntity(curve);
+            _transaction.AddNewlyCreatedDBObject(curve, true);
+            return curve.ObjectId;
+        }
 
         public void Dispose()
         {

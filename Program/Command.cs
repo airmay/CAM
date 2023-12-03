@@ -1,4 +1,5 @@
 ﻿using Autodesk.AutoCAD.DatabaseServices;
+using Autodesk.AutoCAD.Geometry;
 
 namespace CAM
 {
@@ -26,6 +27,9 @@ namespace CAM
         public double? U { get; set; }
         public double? V { get; set; }
         public double? A { get; set; }
+        public Point3d Point { get; set; }
+        public double AngleC { get; set; }
+        public double AngleA { get; set; }
 
     }
 }

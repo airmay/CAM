@@ -9,85 +9,109 @@ namespace CAM.Program.Generator
     public abstract class PostProcessorBase : IPostProcessor
     {
         protected string CommandDelimiter = " ";
-        protected string ParamTypes = "GXYZCAIJF";
+        protected virtual string ParamCodes => "GXYZCAIJF";
 
         public Point2d Origin { get; set; }
-        public Dictionary<char, string> Params { get; set; }
+        public CommandParams CommandParams { get; set; }
         public bool WithThick { get; set; }
 
         protected PostProcessorBase()
         {
-            Params = ParamTypes.ToCharArray().ToDictionary(p => p, p => string.Empty);
+            CommandParams = new CommandParams(ParamCodes);
         }
 
-        public string GCommand(int gCode, MillToolPosition position, int? feed = null, Point2d? arcCenter = null)
+        public string GCommand(int gCode, Point3d position, double angleA, double angleC, int feed, Point2d? arcCenter)
         {
-            var newParams = CreateParams(gCode, position, feed, arcCenter);
-            var changedParams = GetChangedParams(newParams);
-            var command = CreateCommand(changedParams);
-            ApplyParams(newParams);
-
-            return command;
+            var @params = GetParams(gCode, position, angleA, angleC, feed, arcCenter);
+            var changedParams = CommandParams.Apply(@params);
+            return CreateCommand(changedParams);
         }
 
-        private void ApplyParams(CommandParams newParams)
+        //public string GCommand(int gCode, MillToolPosition position, int? feed, Point2d? arcCenter = null)
+        //{
+        //    var newParams = CreateParams(gCode, position, feed, arcCenter);
+        //    var changedParams = GetChangedParams(newParams);
+        //    var command = CreateCommand(changedParams);
+        //    ApplyParams(newParams);
+
+        //    return command;
+        //}
+
+        //private void ApplyParams(CommandParams newParams)
+        //{
+        //    ApplyParams(newParams.Params);
+        //}
+
+        //public string CreateParams(int gCode, MillToolPosition position, int feed, Point2d? arcCenter)
+        //{
+        //    return null;
+        //}
+
+        public Dictionary<char, string> GetParams(int gCode, Point3d position, double angleA, double angleC, int feed, Point2d? arcCenter)
         {
-            ApplyParams(newParams.Params);
-        }
-
-        public CommandParams CreateParams(int gCode, MillToolPosition position, int? feed, Point2d? arcCenter = null)
-        {
-            var commandParams = CreateParams(position);
-
-            commandParams.Set('G', gCode);
-            if (feed.HasValue)
-                commandParams.Set('F', feed);
-            if (arcCenter.HasValue)
-            {
-                commandParams.Set('I', arcCenter.Value.X);
-                commandParams.Set('J', arcCenter.Value.Y);
-            }
-
-            return commandParams;
-        }
-
-        private CommandParams CreateParams(MillToolPosition position)
-        {
-            var commandParams = new CommandParams();
-            commandParams.Set('X', position.X, Origin.X);
-            commandParams.Set('Y', position.Y, Origin.Y);
+            var @params = new Dictionary<char, double?>
+                {
+                    ['G'] = gCode,
+                    ['F'] = feed,
+                    ['X'] = position.X - Origin.X,
+                    ['Y'] = position.Y - Origin.Y,
+                    ['Z'] = position.Z,
+                    ['A'] = angleA,
+                    ['C'] = angleC,
+                    ['I'] = arcCenter?.X,
+                    ['J'] = arcCenter?.Y
+                }
+                .ToDictionary(p => p.Key, p => p.Value.ToParam());
             if (WithThick)
-                commandParams.Set('Z', position.Z, "({0} + THICK)");
-            else
-                commandParams.Set('Z', position.Z);
-            commandParams.Set('C', position.AngleC);
-            commandParams.Set('A', position.AngleA);
+                @params['Z'] = $"({@params['Z']} + THICK)";
 
-            return commandParams;
+            return @params;
         }
 
-        public IEnumerable<KeyValuePair<char, string>> GetChangedParams(CommandParams newParams)
+        //private CommandParams CreateParams(MillToolPosition position)
+        //{
+        //    var commandParams = new CommandParams();
+        //    commandParams.Set('X', position.X, Origin.X);
+        //    commandParams.Set('Y', position.Y, Origin.Y);
+        //    if (WithThick)
+        //        commandParams.Set('Z', position.Z, "({0} + THICK)");
+        //    else
+        //        commandParams.Set('Z', position.Z);
+        //    commandParams.Set('C', position.AngleC);
+        //    commandParams.Set('A', position.AngleA);
+
+        //    return commandParams;
+        //}
+
+        //public IEnumerable<KeyValuePair<char, string>> GetChangedParams(CommandParams newParams)
+        //{
+        //    return newParams.Params.Where(p => !Params.TryGetValue(p.Key, out var value) || p.Value != value);
+        //}
+
+        public string CreateCommand(List<CommandParam> @params)
         {
-            return newParams.Params.Where(p => !Params.TryGetValue(p.Key, out var value) || p.Value != value);
+            return string.Join(CommandDelimiter, @params.Select(p => $"{p.Code}{p.Value}"));
         }
 
-        public string CreateCommand(IEnumerable<KeyValuePair<char, string>> par)
-        {
-            return string.Join(CommandDelimiter, par.Select(p => $"{p.Key}{p.Value}"));
-        }
+        //public string CreateCommand(IEnumerable<KeyValuePair<char, string>> par)
+        //{
+        //    return string.Join(CommandDelimiter, par.Select(p => $"{p.Key}{p.Value}"));
+        //}
 
-        private void ApplyParams(Dictionary<char, string> newParams)
-        {
-            newParams.ForEach(p => Params[p.Key] = p.Value);
-        }
+        //private void ApplyParams(Dictionary<char, string> newParams)
+        //{
+        //    newParams.ForEach(p => Params[p.Key] = p.Value);
+        //}
 
-        public void SetParams(MillToolPosition position)
-        {
-            var @params = CreateParams(position);
-            ApplyParams(@params);
-        }
+        //public void SetParams(MillToolPosition position)
+        //{
+        //    var @params = CreateParams(position);
+        //    ApplyParams(@params);
+        //}
 
         public virtual string Cycle() => null;
+
+        public abstract string[] Finish();
 
         public abstract string[] StartMachine();
 

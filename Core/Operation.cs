@@ -13,7 +13,7 @@ namespace CAM
     [Serializable]
     public abstract class Operation : OperationBase
     {
-        public int Duration { get; set; }
+        public double Duration { get; set; }
         public AcadObject ProcessingArea { get; set; }
 
         [NonSerialized] public ObjectId? Toolpath;

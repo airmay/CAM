@@ -3,32 +3,49 @@ using System.Linq;
 
 namespace CAM.Program.Generator
 {
+    public class CommandParam
+    {
+        public char Code { get; set; }
+        public string Value { get; set; }
+
+        public CommandParam(char code, string value)
+        {
+            Code = code;
+            Value = value;
+        }
+    }
+
     public class CommandParams
     {
-        public Dictionary<char, string> Params { get; set; }
+        public Dictionary<char, CommandParam> Params { get; set; }
 
-        public CommandParams(Dictionary<char, string> @params) => Params = @params;
+        public CommandParams(IEnumerable<CommandParam> @params) => Params = @params.ToDictionary(p => p.Code);
 
-        public CommandParams() : this(new Dictionary<char, string>()) { }
+        public CommandParams(string codes)
+        {
+            Params = codes.ToCharArray().ToDictionary(p => p, p => new CommandParam(p, string.Empty));
+        }
 
         public void Set(char code, double? value, double? origin = null)
         {
             if (value != null)
-                Params[code] = (value.Value - origin.GetValueOrDefault()).ToStringParam();
+                Params[code] = new CommandParam(code, (value.Value - origin.GetValueOrDefault()).ToStringParam());
         }
 
         public void Set(char code, double? value, string format)
         {
             if (value != null)
-                Params[code] = string.Format(format, value.Value.ToStringParam());
+                Params[code] = new CommandParam(code, string.Format(format, value.Value.ToStringParam()));
         }
 
-        public CommandParams CreateChangedParams(CommandParams commandParams)
+        public List<CommandParam> Apply(Dictionary<char, string> @params)
         {
-            var changed = commandParams.Params
-                .Where(p => Params.TryGetValue(p.Key, out var value) && p.Value != value)
-                .ToDictionary(p => p.Key, p => p.Value);
-            return new CommandParams(changed);
+            var changed = @params
+                .Where(p => p.Value != null && p.Value != Params[p.Key].Value)
+                .Select(p => new CommandParam(p.Key, p.Value))
+                .ToList();
+            changed.ForEach(p => Params[p.Code].Value = p.Value);
+            return changed;
         }
     }
 }

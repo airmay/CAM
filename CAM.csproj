@@ -147,6 +147,7 @@
       <DependentUpon>SawingModesView.cs</DependentUpon>
     </Compile>
     <Compile Include="Operations\Sawing\SawingOperation.cs" />
+    <Compile Include="Operations\Sawing\SawingProcessorExt.cs" />
     <Compile Include="Operations\Tactile\TactileBandsOperation.cs" />
     <Compile Include="Operations\Tactile\TactileChamfersOperation.cs" />
     <Compile Include="Program\BuilderUtils.cs" />
