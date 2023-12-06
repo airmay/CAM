@@ -212,16 +212,15 @@ namespace CAM.Operations.Sawing
                 compensation += Tool.Thickness.Value;
             var offsetSign = OuterSide == Side.Left ^ curve is Line ? -1 : 1;
             var baseCurve = curve.GetOffsetCurves(compensation * offsetSign)[0] as Curve;
-            var gash = CalcGash(Depth);
-            var indent = gash + CornerIndentIncrease;
-            var sumIndent = indent * (Convert.ToInt32(IsExactlyBegin) + Convert.ToInt32(IsExactlyEnd));
+
+            var sumIndent = CalcIndent(Depth) * (Convert.ToInt32(IsExactlyBegin) + Convert.ToInt32(IsExactlyEnd));
             if (sumIndent >= baseCurve.Length())
             {
                 Scheduling(baseCurve);
                 return;
             }
 
-            var passList = GetPassList(curve);
+            var passList = GetPassList(curve is Arc);
             var tip = engineSide == Side.Right ^ (passList.Count % 2 == 1)
                 ? CurveTip.End
                 : CurveTip.Start;
@@ -233,11 +232,9 @@ namespace CAM.Operations.Sawing
 
             foreach (var (depth, feed) in passList)
             {
-                toolpath = CreateToolpath(baseCurve, depth);
-
-                processor.Penetration(toolpath.GetPoint(tip));
+                var indent = isExactlyBegin || isExactlyEnd ? CalcIndent(depth) : 0;
+                processor.Cutting(baseCurve, tip, depth, isExactlyBegin, isExactlyEnd, indent, feed);
                 tip = tip.Swap();
-                processor.Cutting(toolpath, toolpath.GetPoint(tip), feed);
             }
             processor.Uplifting();
 
@@ -266,19 +263,19 @@ namespace CAM.Operations.Sawing
 
         }
 
-        private List<(double, int)> GetPassList(Curve curve)
+        private List<(double, int)> GetPassList(bool isArc)
         {
             var baseMode = new CuttingMode
             {
                 DepthStep = Penetration.Value,
                 Feed = PenetrationFeed,
             };
-            var modes = curve is Arc && SawingModes.Any()
+            var modes = isArc && SawingModes.Any()
                 ? new List<CuttingMode>(SawingModes.OrderByDescending(p => p.Depth.HasValue).ThenBy(p => p.Depth))
                 : new List<CuttingMode> { baseMode };
             var index = 0;
             var mode = modes[index];
-            var depth = curve is Arc ? -mode.DepthStep : 0;
+            var depth = isArc ? -mode.DepthStep : 0;
             var passList = new List<(double, int)>();
             do
             {
@@ -295,9 +292,10 @@ namespace CAM.Operations.Sawing
         }
 
         private const int CornerIndentIncrease = 5;
-
+        // запил
         private double CalcGash(double depth) => Math.Sqrt(depth * (Tool.Diameter - depth));
-        private double CalcIndent(double depth) => Math.Sqrt(depth * (Tool.Diameter - depth)) + CornerIndentIncrease;
+        // отступ
+        private double CalcIndent(double depth) => CalcGash(depth) + CornerIndentIncrease;
 
         private Curve CreateToolpath(Curve curve, double depth)
         {

@@ -7,8 +7,8 @@ namespace CAM.Operations.Sawing
 {
     public static class SawingProcessorExt
     {
-        public static void Cutting(this MillingProcessor processor, Curve curve, Point3d point, double depth,
-            bool isExactlyBegin, bool isExactlyEnd, double indent)
+        public static void Cutting(this Processor processor, Curve curve, CurveTip tip, double depth,
+            bool isExactlyBegin, bool isExactlyEnd, double indent, int feed)
         {
             var toolpath = curve.GetTransformedCopy(Matrix3d.Displacement(-Vector3d.ZAxis * depth));
 
@@ -36,7 +36,7 @@ namespace CAM.Operations.Sawing
                 if (isExactlyBegin) line.StartPoint = line.GetPointAtDist(indent);
                 if (isExactlyEnd) line.EndPoint = line.GetPointAtDist(line.Length - indent);
 
-                processor.Cutting(line, point);
+                processor.Cutting(line, tip, feed);
 
             }
 
@@ -46,9 +46,9 @@ namespace CAM.Operations.Sawing
                 if (isExactlyBegin) arc.StartAngle += indentAngle;
                 if (isExactlyEnd) arc.EndAngle -= indentAngle;
 
-                var angleC = processor.AngleC + arc.TotalAngle.ToDeg() * (point == curve.StartPoint ? -1 : 1);
-                var gCode = point == arc.StartPoint ? 3 : 2;
-                processor.GCommand(CommandNames.Cutting, gCode, point: curve.NextPoint(point), angleC: angleC, curve: curve, feed: cuttingFeed, center: arc?.Center.ToPoint2d());
+                var angleC = processor.AngleC + arc.TotalAngle.ToDeg() * (tip == curve.StartPoint ? -1 : 1);
+                var gCode = tip == arc.StartPoint ? 3 : 2;
+                processor.GCommand(CommandNames.Cutting, gCode, point: curve.NextPoint(tip), angleC: angleC, curve: curve, feed: cuttingFeed, center: arc?.Center.ToPoint2d());
 
             }
 
