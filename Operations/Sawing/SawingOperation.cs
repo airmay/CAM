@@ -224,11 +224,6 @@ namespace CAM.Operations.Sawing
             var tip = engineSide == Side.Right ^ (passList.Count % 2 == 1)
                 ? CurveTip.End
                 : CurveTip.Start;
-            var toolpath = CreateToolpath(baseCurve, passList[0].Item1);
-            var startPoint = toolpath.GetPoint(tip);
-            var angleC = BuilderUtils.CalcToolAngle(toolpath, startPoint, engineSide);
-            processor.Move(startPoint.X, startPoint.Y, angleC);
-            processor.Cycle();
 
             foreach (var (depth, feed) in passList)
             {

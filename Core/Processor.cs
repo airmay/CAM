@@ -69,9 +69,9 @@ namespace CAM
         public void Uplifting() => GCommand(CommandNames.Uplifting, 0, z: UpperZ);
 
 
-        public void Move(double? x = null, double? y = null, double? z = null, double? angleC = null, double? angleA = null)
+        public void Move(Point2d point, double? angleC = null, double? angleA = null)
         {
-            GCommand(CommandNames.Fast, 0, x: x, y: y, z: UpperZ + ZSafety * 3);
+            GCommand(CommandNames.Fast, 0, x: point.X, y: point.Y, z: UpperZ + ZSafety * 3);
             GCommand(CommandNames.Fast, 0, angleC: angleC);
             if (!IsEngineStarted)
                 GCommand(CommandNames.InitialMove, 0, z: UpperZ);
@@ -243,15 +243,40 @@ namespace CAM
 
         public void GCommand(string name, int gCode, Point3d point, int? feed = null)
         {
+            var point = line.GetPoint(tip);
+            if (IsUpperTool)
+            {
+                var angleC = BuilderUtils.CalcToolAngle(line.Angle, engineSide);
+                Move(point.ToPoint2d(), angleC);
+                Cycle();
+            }
+            Penetration(point);
+            point = line.GetPoint(tip.Swap());
 
+            var command = new Command
+            {
+                Name = CommandNames.Cutting,
+                Point = point,
+                AngleA = AngleA,
+                AngleC = AngleC
+            };
+            command.Toolpath = _toolpathBuilder.AddToolpath(line, command.Name);
+
+            var length = line.Length();
+            _operation.Duration += length / feed * 60;
+
+            command.Text = _postProcessor.GCommand(1, point, AngleC, AngleA, feed);
+            AddCommand(command);
         }
 
-        public void Cutting(Line line, CurveTip tip, int feed)
+        public void Cutting(Line line, CurveTip tip, int feed, Side engineSide)
         {
             var point = line.GetPoint(tip);
             if (IsUpperTool)
             {
-
+                var angleC = BuilderUtils.CalcToolAngle(line.Angle, engineSide);
+                Move(point.ToPoint2d(), angleC);
+                Cycle();
             }
             Penetration(point);
             point = line.GetPoint(tip.Swap());
@@ -281,6 +306,5 @@ namespace CAM
             if (_operation.FirstCommandIndex == 0)
                 _operation.FirstCommandIndex = ProcessCommands.Count - 1;
         }
-
     }
 }

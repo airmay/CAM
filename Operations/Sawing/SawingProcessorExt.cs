@@ -10,6 +10,15 @@ namespace CAM.Operations.Sawing
         public static void Cutting(this Processor processor, Curve curve, CurveTip tip, double depth,
             bool isExactlyBegin, bool isExactlyEnd, double indent, int feed)
         {
+            if (processor.IsUpperTool)
+            {
+                var toolpath = CreateToolpath(baseCurve, passList[0].Item1);
+                var startPoint = toolpath.GetPoint(tip);
+                var angleC = BuilderUtils.CalcToolAngle(toolpath, startPoint, engineSide);
+                processor.Move(startPoint.X, startPoint.Y, angleC);
+                processor.Cycle();
+
+            }
             var toolpath = curve.GetTransformedCopy(Matrix3d.Displacement(-Vector3d.ZAxis * depth));
 
             switch (toolpath)
