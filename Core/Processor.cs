@@ -68,19 +68,16 @@ namespace CAM
 
         public void Uplifting() => GCommand(CommandNames.Uplifting, 0, z: UpperZ);
 
-
         public void Move(Point2d point, double? angleC = null, double? angleA = null)
         {
             GCommand(CommandNames.Fast, 0, x: point.X, y: point.Y, z: UpperZ + ZSafety * 3);
             GCommand(CommandNames.Fast, 0, angleC: angleC);
-            if (!IsEngineStarted)
-                GCommand(CommandNames.InitialMove, 0, z: UpperZ);
-
             if (angleA.HasValue && angleA.Value != AngleA)
                 GCommand("Наклон", 1, angleA: angleA, feed: 500);
 
             if (!IsEngineStarted)
             {
+                GCommand(CommandNames.InitialMove, 0, z: UpperZ);
                 _postProcessor.StartEngine(_frequency, true);
                 IsEngineStarted = true;
             }
@@ -241,32 +238,24 @@ namespace CAM
         //    }
 
 
-        public void GCommand(string name, int gCode, Point3d point, int? feed = null)
+        public void GCommand(string name, int gCode, Curve curve, Point3d point, int feed)
         {
-            var point = line.GetPoint(tip);
-            if (IsUpperTool)
-            {
-                var angleC = BuilderUtils.CalcToolAngle(line.Angle, engineSide);
-                Move(point.ToPoint2d(), angleC);
-                Cycle();
-            }
-            Penetration(point);
-            point = line.GetPoint(tip.Swap());
+            GCommand(name, gCode, curve, point, AngleC, AngleA, feed);
+        }
 
+        public void GCommand(string name, int gCode, Curve curve, Point3d point, double angleC, double angleA, int feed)
+        {
             var command = new Command
             {
-                Name = CommandNames.Cutting,
+                Name = name,
+                Text = _postProcessor.GCommand(gCode, point, angleC, angleA, feed),
+                Toolpath = _toolpathBuilder.AddToolpath(curve, name),
                 Point = point,
-                AngleA = AngleA,
-                AngleC = AngleC
+                AngleA = angleA,
+                AngleC = angleC,
             };
-            command.Toolpath = _toolpathBuilder.AddToolpath(line, command.Name);
-
-            var length = line.Length();
-            _operation.Duration += length / feed * 60;
-
-            command.Text = _postProcessor.GCommand(1, point, AngleC, AngleA, feed);
             AddCommand(command);
+            _operation.Duration += curve.Length() / feed * 60;
         }
 
         public void Cutting(Line line, CurveTip tip, int feed, Side engineSide)
