@@ -85,7 +85,7 @@ namespace CAM
 
         public void Penetration(Point3d point)
         {
-            GCommand(CommandNames.Penetration, 1, point: point, feed: PenetrationFeed);
+            Cutting(CommandNames.Penetration, 1, point: point, feed: PenetrationFeed);
         }
 
         //public void Cutting(Line line, Point3d point) => GCommand(CommandNames.Cutting, 1, point: point, curve: line, feed: CuttingFeed);
@@ -238,9 +238,19 @@ namespace CAM
         //    }
 
 
-        public void GCommand(string name, int gCode, Curve curve, Point3d point, int feed)
+        public void Cutting(Curve curve)
+        {
+            GCommand(CommandNames.Cutting, 0, curve, feed);
+        }
+
+        public void Cutting(string name, int gCode, Curve curve, Point3d point, int feed)
         {
             GCommand(name, gCode, curve, point, AngleC, AngleA, feed);
+        }
+
+        public void TurnC(string name, int gCode, Curve curve, Point3d point, int feed)
+        {
+            GCommand("Поворот", gCode, curve, point, AngleC, AngleA, feed);
         }
 
         public void GCommand(string name, int gCode, Curve curve, Point3d point, double angleC, double angleA, int feed)
