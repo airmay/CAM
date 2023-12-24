@@ -20,7 +20,7 @@ namespace CAM.Program.Generator
             CommandParams = new CommandParams(ParamCodes);
         }
 
-        public string GCommand(int gCode, Point3d position, double angleA, double angleC, int feed, Point2d? arcCenter)
+        public string GCommand(int gCode, Point3d position, double angleA, double angleC, int? feed, Point2d? arcCenter)
         {
             var @params = GetParams(gCode, position, angleA, angleC, feed, arcCenter);
             var changedParams = CommandParams.Apply(@params);

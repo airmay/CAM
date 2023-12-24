@@ -24,6 +24,8 @@ namespace CAM
     /// </summary>
     public static class Graph
     {
+        public static Point3d WithPoint2d(this Point3d point, Point2d point2d) => new Point3d(point2d.X, point2d.Y, point.Z);
+        public static Point3d WithXY(this Point3d point, double x, double y) => new Point3d(x, y, point.Z);
         public static Point3d WithZ(this Point3d point, double z) => new Point3d(point.X, point.Y, z);
 
         public static readonly IEqualityComparer<Point3d> Point3dComparer = new Point3dComparer();

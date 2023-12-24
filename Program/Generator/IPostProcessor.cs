@@ -17,6 +17,6 @@ namespace CAM.Program.Generator
         // void SetParams(MillToolPosition toolPosition);
         string Cycle();
         string[] Finish();
-        string GCommand(int gCode, Point3d position, double angleA, double angleC, int feed, Point2d? arcCenter = null);
+        string GCommand(int gCode, Point3d position, double angleA, double angleC, int? feed, Point2d? arcCenter = null);
     }
 }

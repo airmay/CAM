@@ -228,7 +228,8 @@ namespace CAM.Operations.Sawing
             foreach (var (depth, feed) in passList)
             {
                 var indent = isExactlyBegin || isExactlyEnd ? CalcIndent(depth) : 0;
-                processor.Cutting(baseCurve, tip, depth, isExactlyBegin, isExactlyEnd, indent, feed);
+                processor.CuttingFeed = feed;
+                processor.Cutting(baseCurve, tip, engineSide, depth, isExactlyBegin, isExactlyEnd, indent);
                 tip = tip.Swap();
             }
             processor.Uplifting();
@@ -260,14 +261,9 @@ namespace CAM.Operations.Sawing
 
         private List<(double, int)> GetPassList(bool isArc)
         {
-            var baseMode = new CuttingMode
-            {
-                DepthStep = Penetration.Value,
-                Feed = PenetrationFeed,
-            };
             var modes = isArc && SawingModes.Any()
-                ? new List<CuttingMode>(SawingModes.OrderByDescending(p => p.Depth.HasValue).ThenBy(p => p.Depth))
-                : new List<CuttingMode> { baseMode };
+                ? SawingModes.OrderByDescending(p => p.Depth.HasValue).ThenBy(p => p.Depth).ToList()
+                : new List<CuttingMode> { new CuttingMode { DepthStep = Penetration.Value, Feed = CuttingFeed } };
             var index = 0;
             var mode = modes[index];
             var depth = isArc ? -mode.DepthStep : 0;

@@ -7,8 +7,8 @@ namespace CAM.Operations.Sawing
 {
     public static class SawingProcessorExt
     {
-        public static void Cutting(this Processor processor, Curve curve, CurveTip tip, double depth,
-            bool isExactlyBegin, bool isExactlyEnd, double indent, int feed)
+        public static void Cutting(this Processor processor, Curve curve, CurveTip tip, Side side, double depth,
+            bool isExactlyBegin, bool isExactlyEnd, double indent)
         {
             if (processor.IsUpperTool)
             {
@@ -20,7 +20,6 @@ namespace CAM.Operations.Sawing
 
             }
             var toolpath = curve.GetTransformedCopy(Matrix3d.Displacement(-Vector3d.ZAxis * depth));
-
             switch (toolpath)
             {
                 case Line line:
@@ -45,7 +44,7 @@ namespace CAM.Operations.Sawing
                 if (isExactlyBegin) line.StartPoint = line.GetPointAtDist(indent);
                 if (isExactlyEnd) line.EndPoint = line.GetPointAtDist(line.Length - indent);
 
-                processor.Cutting(line, tip, feed);
+                processor.Cutting(line, tip, side);
 
             }
 
