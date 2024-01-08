@@ -2,6 +2,7 @@
 using Autodesk.AutoCAD.Geometry;
 using Autodesk.AutoCAD.Runtime;
 using Dreambuild.AutoCAD;
+using System.Security.Cryptography;
 
 namespace CAM.Operations.Sawing
 {
@@ -47,6 +48,8 @@ namespace CAM.Operations.Sawing
                 processor.Cutting(arc, tip);
             }
 
+            }
+
             void CuttingPolyline(Polyline polyline)
             {
                 if (isExactlyBegin) polyline.SetPointAt(0, polyline.GetPointAtDist(indent).ToPoint2d());
@@ -54,6 +57,15 @@ namespace CAM.Operations.Sawing
                     polyline.SetPointAt(polyline.NumberOfVertices - 1,
                         polyline.GetPointAtDist(polyline.Length - indent).ToPoint2d());
             }
+        }
+
+        private static void Cutting(Arc arc, Point3d point)
+        {
+            if (arc != null && calcAngleC)
+                angleC += arc.TotalAngle.ToDeg() * (point == curve.StartPoint ? -1 : 1);
+            var gCode = curve is Line ? 1 : point == curve.StartPoint ? 3 : 2;
+            GCommand(CommandNames.Cutting, gCode, point: curve.NextPoint(point), angleC: angleC, curve: curve, feed: cuttingFeed, center: arc?.Center.ToPoint2d());
+
         }
     }
 }
