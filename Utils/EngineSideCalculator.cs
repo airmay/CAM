@@ -22,8 +22,8 @@ namespace CAM.Utils
 
         private static Side CalcArc(Arc arc, MachineType machineType)
         {
-            var startSide = Math.Sign(Math.Cos(arc.StartAngle.Round(3)));
-            var endSide = Math.Sign(Math.Cos(arc.EndAngle.Round(3)));
+            var startSide = arc.StartAngle.CosSign();
+            var endSide = arc.EndAngle.CosSign();
             var cornersOneSide = Math.Sign(startSide * endSide);
 
             if (arc.TotalAngle.Round(3) > Math.PI && cornersOneSide > 0)
@@ -36,6 +36,8 @@ namespace CAM.Utils
 
                 return startSide > 0 ? Side.Left : Side.Right;
             }
+            if (startSide == 0 && endSide == 0)
+                return arc.StartAngle < Math.PI ? Side.Left : Side.Right;
 
             return (startSide + endSide) > 0 ? Side.Right : Side.Left;
         }

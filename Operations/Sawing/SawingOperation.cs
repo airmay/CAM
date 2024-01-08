@@ -124,8 +124,10 @@ namespace CAM.Operations.Sawing
             }
         }
 
-        private void ProcessCurve(Processor processor, Curve curve, int side, bool isExactlyBegin, bool isExactlyEnd)
+        private void ProcessCurve(Processor processor, Curve curve, int sideSign, bool isExactlyBegin, bool isExactlyEnd)
         {
+            var side = sideSign == 1 ? Side.Left : Side.Right;
+
             //    var pt = curve.StartPoint;
             //    foreach (var pass in PassIterator.Create(pt, curve.NextPoint(pt)))
             //    {
@@ -186,13 +188,24 @@ namespace CAM.Operations.Sawing
             //    }
             //}
 
+            var gashLength = GetGashLength(Depth);
+            var sumIndent = (gashLength + CornerIndentIncrease) * (Convert.ToInt32(isExactlyBegin) + Convert.ToInt32(isExactlyEnd));
+            if (sumIndent >= curve.Length())
+            {
+                Scheduling(curve);
+                return;
+            }
+
+            AddGash(curve, isExactlyBegin, isExactlyEnd, side, gashLength, Tool.Thickness.Value);
+
             var engineSide = EngineSideCalculator.Calculate(curve, MachineType);
             double compensation = 0;
 
-            if (curve is Arc arc && OuterSide == Side.Left) // внутренний рез дуги
+            if (curve is Arc arc && side == Side.Left) // внутренний рез дуги
             {
-                if (MachineType == MachineType.Donatoni && 
-                    !(Math.Cos(arc.StartAngle.Round(3)) > 0 && Math.Cos(arc.EndAngle.Round(3)) < 0)) //  дуга не пересекает угол 90 градусов
+                if (MachineType == MachineType.Donatoni &&
+                    !(arc.StartAngle.CosSign() == 1 &&
+                      arc.EndAngle.CosSign() == -1)) //  дуга не пересекает угол 90 градусов
                 {
                     // подворот диска при вн. резе дуги
                     engineSide = Side.Right;
@@ -204,59 +217,54 @@ namespace CAM.Operations.Sawing
                     AngleA = -Math.Atan2(comp, Thickness).ToDeg();
                 }
                 else
-                    compensation = arc.Radius - Math.Sqrt(arc.Radius * arc.Radius - Thickness * (Tool.Diameter - Thickness));
+                    compensation = arc.Radius -
+                                   Math.Sqrt(arc.Radius * arc.Radius - Thickness * (Tool.Diameter - Thickness));
             }
 
             var isFrontPlaneZero = MachineService.Machines[MachineType].IsFrontPlaneZero;
-            if (engineSide == OuterSide ^ isFrontPlaneZero)
+            if (engineSide == side ^ isFrontPlaneZero)
                 compensation += Tool.Thickness.Value;
-            var offsetSign = OuterSide == Side.Left ^ curve is Line ? -1 : 1;
+            var offsetSign = side == Side.Left ^ curve is Line ? -1 : 1;
             var baseCurve = curve.GetOffsetCurves(compensation * offsetSign)[0] as Curve;
-
-            var sumIndent = CalcIndent(Depth) * (Convert.ToInt32(IsExactlyBegin) + Convert.ToInt32(IsExactlyEnd));
-            if (sumIndent >= baseCurve.Length())
-            {
-                Scheduling(baseCurve);
-                return;
-            }
 
             var passList = GetPassList(curve is Arc);
             var tip = engineSide == Side.Right ^ (passList.Count % 2 == 1)
                 ? CurveTip.End
                 : CurveTip.Start;
-
+            processor.EngineSide = engineSide;
             foreach (var (depth, feed) in passList)
             {
-                var indent = isExactlyBegin || isExactlyEnd ? CalcIndent(depth) : 0;
+                var indent = isExactlyBegin || isExactlyEnd ? GetGashLength(depth) + CornerIndentIncrease : 0;
                 processor.CuttingFeed = feed;
-                processor.Cutting(baseCurve, tip, engineSide, depth, isExactlyBegin, isExactlyEnd, indent);
+                processor.Cutting(baseCurve, tip, depth, isExactlyBegin, isExactlyEnd, indent);
                 tip = tip.Swap();
             }
+
             processor.Uplifting();
+        }
 
-
-            if ((!IsExactlyBegin || !IsExactlyEnd) && Departure == 0)
-            {
-                var gashCurve = curve.GetOffsetCurves(shift)[0] as Curve;
-                var gashList = new List<ObjectId>();
-                if (!IsExactlyBegin)
-                    gashList.Add(Acad.CreateGash(gashCurve, gashCurve.StartPoint, OuterSide, thickness * depthCoeff,
-                        toolDiameter, toolThickness));
-                if (!IsExactlyEnd)
-                    gashList.Add(Acad.CreateGash(gashCurve, gashCurve.EndPoint, OuterSide, thickness * depthCoeff,
-                        toolDiameter, toolThickness));
-                if (gashList.Count > 0)
-                    Modify.AppendToGroup(base.TechProcess.ExtraObjectsGroup.Value, gashList.ToArray());
-                gashCurve.Dispose();
-            }
-
-            generator.Uplifting(
-                Vector3d.ZAxis.RotateBy(outerSideSign * angleA, toolpathCurve.EndPoint - toolpathCurve.StartPoint) *
-                (thickness + generator.ZSafety) * depthCoeff);
-
+        public void AddGash(Curve curve, bool isExactlyBegin, bool isExactlyEnd, Side side, double gashLength, double thickness, Point3d? pointС = null)
+        {
+            if (Departure == 0)
+                return;
+            if (!isExactlyBegin)
+                Support.AppendToGroup(CreateCurve(curve.StartPoint, -gashLength));
+            if (!isExactlyEnd)
+                Support.AppendToGroup(CreateCurve(curve.EndPoint, gashLength));
             return;
 
-
+            ObjectId CreateCurve(Point3d point, double length)
+            {
+                var normal = curve.GetFirstDerivative(point).GetNormal();
+                var point2 = point + normal * length;
+                if (pointС.HasValue)
+                    point2 += pointС.Value - point;
+                var offsetVector = normal.GetPerpendicularVector() * thickness * (side == Side.Left ? 1 : -1);
+                var gash = NoDraw.Pline(point, point2, point2 + offsetVector, point + offsetVector);
+                gash.LayerId = Acad.GetGashLayerId();
+                gash.Add();
+                return gash.ObjectId;
+            }
         }
 
         private List<(double, int)> GetPassList(bool isArc)
@@ -284,9 +292,9 @@ namespace CAM.Operations.Sawing
 
         private const int CornerIndentIncrease = 5;
         // запил
-        private double CalcGash(double depth) => Math.Sqrt(depth * (Tool.Diameter - depth));
+        private double GetGashLength(double depth) => Math.Sqrt(depth * (Tool.Diameter - depth));
         // отступ
-        private double CalcIndent(double depth) => CalcGash(depth) + CornerIndentIncrease;
+        private double CalcIndent(double depth) => GetGashLength(depth) + CornerIndentIncrease;
 
         private Curve CreateToolpath(Curve curve, double depth)
         {

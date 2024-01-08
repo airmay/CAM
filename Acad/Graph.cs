@@ -51,6 +51,14 @@ namespace CAM
         internal static double ToDeg(this double angle) => angle * 180 / Math.PI;
 
         internal static double ToDeg(this double angle, int digits) => angle.ToDeg().Round(digits) % 360;
+        internal static double ToRoundDeg(this double angle) => angle.ToDeg(3);
+        internal static int CosSign(this double angle)
+        {
+            var deg = angle.ToDeg(3);
+            return deg < 90 || deg > 270 
+                ? 1
+                : (deg > 90 && deg < 270) ? -1 : 0;
+        }
 
         public static double Length(this Curve curve) => curve.GetDistanceAtParameter(curve.EndParam) - curve.GetDistanceAtParameter(curve.StartParam);
 

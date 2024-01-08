@@ -26,6 +26,7 @@ namespace CAM
         public double ZMax { get; set; }
         public double OriginX { get; set; }
         public double OriginY { get; set; }
+        public Side EngineSide { get; set; }
 
 
         public Processor(IPostProcessor postProcessor)
@@ -63,17 +64,32 @@ namespace CAM
 
         public void Cycle() => _postProcessor.Cycle();
 
-        public void Cutting(Line line, CurveTip tip, Side engineSide)
+        public void Cutting(Line line, CurveTip tip)
         {
             var point = line.GetPoint(tip);
             if (IsUpperTool)
             {
-                var angleC = BuilderUtils.CalcToolAngle(line.Angle, engineSide);
+                var angleC = BuilderUtils.CalcToolAngle(line.Angle, EngineSide);
                 Move(point.ToPoint2d(), angleC);
                 Cycle();
             }
             Penetration(point);
             Cutting(line, line.NextPoint(point));
+        }
+
+        public void Cutting(Arc arc, CurveTip tip)
+        {
+            var point = arc.GetPoint(tip);
+            if (IsUpperTool)
+            {
+                var moveAngleC = BuilderUtils.CalcToolAngle(arc, point, EngineSide);
+                Move(point.ToPoint2d(), moveAngleC);
+                Cycle();
+            }
+            Penetration(point);
+            point = arc.NextPoint(point);
+            var angleC = BuilderUtils.CalcToolAngle(arc, point, EngineSide);
+            Cutting(arc, point, angleC);
         }
 
         public void Move(Point2d point, double? angleC = null, double? angleA = null)
@@ -110,10 +126,13 @@ namespace CAM
             GCommand(CommandNames.Cutting, 1, line, point, AngleC, AngleA, CuttingFeed);
         }
 
-        public void Cutting(Arc arc, Point3d point)
+        public void Cutting(Arc arc, Point3d point, double angleC)
         {
-            var gcode = 2;
-            GCommand(CommandNames.Cutting, gcode, arc, point, AngleC, AngleA, CuttingFeed);
+            var gCode = point == arc.StartPoint ? 3 : 2;
+            var commandText = _postProcessor.GCommand(gCode, point, angleC, AngleA, CuttingFeed, arc.Center.ToPoint2d());
+            ToolPosition = point;
+            AngleC = angleC;
+            AddCommand(CommandNames.Cutting, commandText, arc, CuttingFeed);
         }
 
         public void GCommandTo(string name, int gCode, Point3d point, int? feed = null)
@@ -141,31 +160,31 @@ namespace CAM
 
         private void GCommand(string name, int gCode, Curve curve, Point3d point, double angleC, double angleA, int? feed)
         {
+            var commandText = _postProcessor.GCommand(gCode, point, angleC, angleA, feed);
+            ToolPosition = point;
+            AngleC = angleC;
+            AngleA = angleA;
+            AddCommand(name, commandText, curve, feed);
+        }
+
+        public void AddCommand(string name, string text, Curve curve = null, int? feed = null)
+        {
             var command = new Command
             {
                 Name = name,
-                Text = _postProcessor.GCommand(gCode, point, angleC, angleA, feed),
-                Point = point,
-                AngleA = angleA,
-                AngleC = angleC,
+                Text = text,
+                Point = ToolPosition,
+                AngleA = AngleA,
+                AngleC = AngleC,
+                Operation = _operation,
+                Number = ProcessCommands.Count + 1
             };
             if (curve != null)
             {
                 command.Toolpath = _toolpathBuilder.AddToolpath(curve, name);
                 _operation.Duration += curve.Length() / feed.GetValueOrDefault(10000) * 60;
             }
-
-            AddCommand(command);
-            ToolPosition = point;
-            AngleC = angleC;
-            AngleA = angleA;
-        }
-
-        public void AddCommand(Command command)
-        {
             ProcessCommands.Add(command);
-            command.Operation = _operation;
-            command.Number = ProcessCommands.Count;
         }
     }
 }

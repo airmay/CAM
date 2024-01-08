@@ -37,11 +37,10 @@ namespace CAM
 
         public static Side CalcEngineSide(double angle)
         {
-            var deg = angle.ToDeg().Round();
-            if (deg % 180 == 0)
-                return deg % 360 == 0 ? Side.Left : Side.Right;
-
-            return deg < 180 ? Side.Right : Side.Left;
+            var deg = angle.ToRoundDeg();
+            return deg > 0 && deg <= 180
+                ? Side.Right
+                : Side.Left;
         }
 
         public static double CalcToolAngle(Curve curve, Point3d point, Side engineSide = Side.None)
@@ -51,7 +50,7 @@ namespace CAM
         {
             if (engineSide == Side.None)
                 engineSide = CalcEngineSide(angle);
-            return ((engineSide == Side.Right ? 180 : 360) + 360 - angle.ToDeg().Round()) % 360;
+            return ((engineSide == Side.Right ? 180 : 360) + 360 - angle.ToRoundDeg()) % 360;
         }
 
         public static List<Point2d> GetProcessPoints1(Curve profile, int index, double step, double shift, bool isMinToolCoord, double? begin, double? end, bool isProfileStep = false) //, bool isExactlyBegin, bool isExactlyEnd)
