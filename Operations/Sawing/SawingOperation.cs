@@ -248,12 +248,12 @@ namespace CAM.Operations.Sawing
             if (Departure == 0)
                 return;
             if (!isExactlyBegin)
-                Support.AppendToGroup(CreateCurve(curve.StartPoint, -gashLength));
+                CreateCurve(curve.StartPoint, -gashLength);
             if (!isExactlyEnd)
-                Support.AppendToGroup(CreateCurve(curve.EndPoint, gashLength));
+                CreateCurve(curve.EndPoint, gashLength);
             return;
 
-            ObjectId CreateCurve(Point3d point, double length)
+            void CreateCurve(Point3d point, double length)
             {
                 var normal = curve.GetFirstDerivative(point).GetNormal();
                 var point2 = point + normal * length;
@@ -262,8 +262,7 @@ namespace CAM.Operations.Sawing
                 var offsetVector = normal.GetPerpendicularVector() * thickness * (side == Side.Left ? 1 : -1);
                 var gash = NoDraw.Pline(point, point2, point2 + offsetVector, point + offsetVector);
                 gash.LayerId = Acad.GetGashLayerId();
-                gash.Add();
-                return gash.ObjectId;
+                Support.AppendToGroup(gash.Add());
             }
         }
 
