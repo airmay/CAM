@@ -99,7 +99,7 @@ namespace CAM
                 GCommandTo(CommandNames.InitialMove, 0, ToolPosition.WithZ(UpperZ));
             if (angleC.HasValue)
                 TurnC(angleC.Value);
-            if (angleA.HasValue && angleA.Value != AngleA)
+            if (angleA.HasValue)
                 TurnA(angleA.Value);
 
             if (!IsEngineStarted)
@@ -111,20 +111,11 @@ namespace CAM
 
         public void Uplifting() => GCommandTo(CommandNames.Uplifting, 0, ToolPosition.WithZ(UpperZ));
 
-        public void Penetration(Point3d point)
-        {
-            GCommandTo(CommandNames.Penetration, 1, point, PenetrationFeed);
-        }
+        public void Penetration(Point3d point) => GCommandTo(CommandNames.Penetration, 1, point, PenetrationFeed);
 
-        public void Cutting(Point3d point)
-        {
-            GCommandTo(CommandNames.Cutting, 1, point, CuttingFeed);
-        }
+        public void Cutting(Point3d point) => GCommandTo(CommandNames.Cutting, 1, point, CuttingFeed);
 
-        public void Cutting(Line line, Point3d point)
-        {
-            GCommand(CommandNames.Cutting, 1, line, point, AngleC, AngleA, CuttingFeed);
-        }
+        public void Cutting(Line line, Point3d point) => GCommand(CommandNames.Cutting, 1, line, point, feed: CuttingFeed);
 
         public void Cutting(Arc arc, Point3d point, double angleC)
         {
@@ -145,46 +136,42 @@ namespace CAM
                 line = NoDraw.Line(ToolPosition, point);
             }
 
-            GCommand( name, gCode, line, point, AngleC, AngleA, feed);
+            GCommand( name, gCode, line, point, feed: feed);
         }
 
-        public void TurnC(double angleC)
+        public void TurnC(double angleC) => GCommand("Поворот", 0, angleC: angleC);
+
+        public void TurnA(double angleA) => GCommand("Наклон", 1, angleA: angleA, feed: 500);
+
+        private void GCommand(string name, int gCode, Curve curve = null, Point3d? point = null, double? angleC = null, double? angleA = null, int? feed = null, Point3d? arcCenter = null)
         {
-            GCommand("Поворот", 0, null, ToolPosition, angleC, AngleA, null);
+            ToolPosition = point ?? ToolPosition;
+            AngleC = angleC ?? AngleC;
+            AngleA = angleA ?? AngleA;
+            var commandText = _postProcessor.GCommand(gCode, ToolPosition, AngleC, AngleA, feed, arcCenter?.ToPoint2d());
+            ObjectId? toolpath = null;
+            if (curve != null)
+            {
+                if (curve.Length() > 1)
+                    toolpath = _toolpathBuilder.AddToolpath(curve, name);
+                _operation.Duration += curve.Length() / feed.GetValueOrDefault(10000) * 60;
+            }
+            AddCommand(name, commandText, toolpath);
         }
 
-        public void TurnA(double angleA)
+        public void AddCommand(string name, string text, ObjectId? toolpath = null)
         {
-            GCommand("Наклон", 1, null, ToolPosition, AngleC, angleA, 500);
-        }
-
-        private void GCommand(string name, int gCode, Curve curve, Point3d point, double angleC, double angleA, int? feed)
-        {
-            var commandText = _postProcessor.GCommand(gCode, point, angleC, angleA, feed);
-            ToolPosition = point;
-            AngleC = angleC;
-            AngleA = angleA;
-            AddCommand(name, commandText, curve, feed);
-        }
-
-        public void AddCommand(string name, string text, Curve curve = null, int? feed = null)
-        {
-            var command = new Command
+            ProcessCommands.Add(new Command
             {
                 Name = name,
                 Text = text,
                 Point = ToolPosition,
                 AngleA = AngleA,
                 AngleC = AngleC,
+                Toolpath = toolpath,
                 Operation = _operation,
                 Number = ProcessCommands.Count + 1
-            };
-            if (curve != null)
-            {
-                command.Toolpath = _toolpathBuilder.AddToolpath(curve, name);
-                _operation.Duration += curve.Length() / feed.GetValueOrDefault(10000) * 60;
-            }
-            ProcessCommands.Add(command);
+            });
         }
     }
 }

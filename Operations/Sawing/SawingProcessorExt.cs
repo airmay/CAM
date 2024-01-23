@@ -2,7 +2,6 @@
 using Autodesk.AutoCAD.Geometry;
 using Autodesk.AutoCAD.Runtime;
 using Dreambuild.AutoCAD;
-using System.Security.Cryptography;
 
 namespace CAM.Operations.Sawing
 {

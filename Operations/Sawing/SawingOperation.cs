@@ -195,37 +195,33 @@ namespace CAM.Operations.Sawing
             //}
 
             var gashLength = GetGashLength(Depth);
-            AddGash(curve, isExactlyBegin, isExactlyEnd, side, gashLength, Tool.Thickness.Value);
+            var indent = gashLength + CornerIndentIncrease;
+            AddGash(curve, isExactlyBegin, isExactlyEnd, side, gashLength, indent);
 
-            var sumIndent = (gashLength + CornerIndentIncrease) *
-                            (Convert.ToInt32(isExactlyBegin) + Convert.ToInt32(isExactlyEnd));
+            var sumIndent = indent * (Convert.ToInt32(isExactlyBegin) + Convert.ToInt32(isExactlyEnd));
             if (sumIndent >= curve.Length())
             {
-                Scheduling(curve);
+                Scheduling(processor, curve, isExactlyBegin, isExactlyEnd, indent);
                 return;
             }
 
             var engineSide = EngineSideCalculator.Calculate(curve, MachineType);
-            double compensation = 0;
+            var compensation = 0D;
 
             if (curve is Arc arc && side == Side.Left) // внутренний рез дуги
             {
-                if (MachineType == MachineType.Donatoni &&
-                    !(arc.StartAngle.CosSign() == 1 &&
-                      arc.EndAngle.CosSign() == -1)) //  дуга не пересекает угол 90 градусов
+                if (MachineType == MachineType.Donatoni && !(arc.StartAngle.CosSign() == 1 && arc.EndAngle.CosSign() == -1)) //  дуга не пересекает угол 90 градусов
                 {
                     // подворот диска при вн. резе дуги
                     engineSide = Side.Right;
                     var R = arc.Radius;
                     var t = Thickness;
                     var d = Tool.Diameter;
-                    var comp = (2 * R * t * t - Math.Sqrt(-d * d * d * d * t * t + 4 * d * d * R * R * t * t +
-                                                          d * d * t * t * t * t)) / (d * d - 4 * R * R);
+                    var comp = (2 * R * t * t - Math.Sqrt(-d * d * d * d * t * t + 4 * d * d * R * R * t * t + d * d * t * t * t * t)) / (d * d - 4 * R * R);
                     AngleA = -Math.Atan2(comp, Thickness).ToDeg();
                 }
                 else
-                    compensation = arc.Radius -
-                                   Math.Sqrt(arc.Radius * arc.Radius - Thickness * (Tool.Diameter - Thickness));
+                    compensation = arc.Radius - Math.Sqrt(arc.Radius * arc.Radius - Thickness * (Tool.Diameter - Thickness));
             }
 
             var isFrontPlaneZero = MachineService.Machines[MachineType].IsFrontPlaneZero;
@@ -241,40 +237,13 @@ namespace CAM.Operations.Sawing
             processor.EngineSide = engineSide;
             foreach (var (depth, feed) in passList)
             {
-                var indent = isExactlyBegin || isExactlyEnd ? GetGashLength(depth) + CornerIndentIncrease : 0;
+                var passIndent = isExactlyBegin || isExactlyEnd ? GetGashLength(depth) + CornerIndentIncrease : 0;
                 processor.CuttingFeed = feed;
-                processor.Cutting(baseCurve, tip, depth, isExactlyBegin, isExactlyEnd, indent);
+                processor.Cutting(baseCurve, tip, depth, isExactlyBegin, isExactlyEnd, passIndent);
                 tip = tip.Swap();
             }
 
             processor.Uplifting();
-        }
-
-        public void AddGash(Curve curve, bool isExactlyBegin, bool isExactlyEnd, Side side, double gashLength1,
-            double thickness, Point3d? pointС = null)
-        {
-            var gashLength = GetGashLength(Thickness);
-            var indent = gashLength + CornerIndentIncrease;
-            var vector = curve.EndPoint - curve.StartPoint;
-            if (isExactlyBegin ^ isExactlyEnd && indent > vector.Length)
-                gashLength += indent - vector.Length;
-            if (!isExactlyBegin)
-                CreateCurve(curve.StartPoint, -gashLength);
-            if (!isExactlyEnd)
-                CreateCurve(curve.EndPoint, gashLength);
-            return;
-
-            void CreateCurve(Point3d point, double length)
-            {
-                var normal = curve.GetFirstDerivative(point).GetNormal();
-                var point2 = point + normal * length;
-                if (pointС.HasValue)
-                    point2 += pointС.Value - point;
-                var offsetVector = normal.GetPerpendicularVector() * thickness * (side == Side.Left ? 1 : -1);
-                var gash = NoDraw.Pline(point, point2, point2 + offsetVector, point + offsetVector);
-                gash.LayerId = Acad.GetGashLayerId();
-                Support.AppendToGroup(gash.Add());
-            }
         }
 
         private List<(double, int)> GetPassList(bool isArc)
@@ -298,14 +267,6 @@ namespace CAM.Operations.Sawing
 
             return passList;
         }
-
-        private const int CornerIndentIncrease = 5;
-
-        // запил
-        private double GetGashLength(double depth) => Math.Sqrt(depth * (Tool.Diameter - depth));
-
-        // отступ
-        private double CalcIndent(double depth) => GetGashLength(depth) + CornerIndentIncrease;
 
         private Curve CreateToolpath(Curve curve, double depth)
         {
@@ -336,92 +297,57 @@ namespace CAM.Operations.Sawing
             }
         }
 
-        /// <summary>
-        /// Расчет точки намечания
-        /// </summary>
-        /// <param name="curve"></param>
-        Point3d Scheduling(Curve curve)
+        private const int CornerIndentIncrease = 5;
+        private double GetGashLength(double depth) => Math.Sqrt(depth * (Tool.Diameter - depth));
+        private double CalcIndent(double depth) => GetGashLength(depth) + CornerIndentIncrease;
+
+        public void AddGash(Curve curve, bool isExactlyBegin, bool isExactlyEnd, Side side, double gashLength, double indent)
         {
             var vector = curve.EndPoint - curve.StartPoint;
-            var depth = Thickness;
-            var point = Point3d.Origin;
-            if (IsExactlyBegin && IsExactlyEnd)
-            {
-                var l = vector.Length - 2 * CornerIndentIncrease;
-                depth = (Tool.Diameter - Math.Sqrt(Tool.Diameter * Tool.Diameter - l * l)) / 2;
-                point = curve.StartPoint + vector / 2;
-            }
-            else
-            {
-                var indentVector = vector.GetNormal() * CalcIndent(depth);
-                point = IsExactlyBegin ? curve.StartPoint + indentVector : curve.EndPoint - indentVector;
-                Acad.CreateGash(curve, IsExactlyBegin ? curve.EndPoint : curve.StartPoint, OuterSide, depth,
-                    Tool.Diameter, ToolThickness, point);
-            }
+            if (isExactlyBegin ^ isExactlyEnd && indent > vector.Length)
+                gashLength += indent - vector.Length;
+            if (!isExactlyBegin)
+                CreateCurve(curve.StartPoint, -gashLength);
+            if (!isExactlyEnd)
+                CreateCurve(curve.EndPoint, gashLength);
+            return;
 
-            var angle = BuilderUtils.CalcToolAngle((curve.EndPoint - curve.StartPoint).ToVector2d().Angle, engineSide);
-            generator.Move(point.X, point.Y, angleC: angle);
-            generator.Cutting(point.X, point.Y, point.Z, TechProcess.PenetrationFeed);
-            generator.Uplifting();
-
-            return point + vector.GetPerpendicularVector().GetNormal() * compensation - Vector3d.ZAxis * depth;
+            void CreateCurve(Point3d point, double length)
+            {
+                var normal = curve.GetFirstDerivative(point).GetNormal();
+                var point2 = point + normal * length;
+                var offsetVector = normal.GetPerpendicularVector() * Tool.Thickness.Value * (side == Side.Left ? 1 : -1);
+                var gash = NoDraw.Pline(point, point2, point2 + offsetVector, point + offsetVector);
+                gash.LayerId = Acad.GetGashLayerId();
+                Support.AppendToGroup(gash.Add());
+            }
         }
 
-        //public bool CalcScheduling(Processor processor, Curve curve, bool isExactlyBegin, bool isExactlyEnd, Side side, double toolThickness)
-        //{
-        //    var gashLength = GetGashLength(Thickness);
-        //    var indent = gashLength + CornerIndentIncrease;
-        //    var sumIndent = indent * (Convert.ToInt32(isExactlyBegin) + Convert.ToInt32(isExactlyEnd));
-        //    var vector = curve.EndPoint - curve.StartPoint;
-        //    if (sumIndent >= vector.Length)
-        //    {
-        //        Scheduling();
-        //        return true;
-        //    }
-
-        //    if (!isExactlyBegin)
-        //        CreateGashCurve(curve.StartPoint, -gashLength);
-        //    if (!isExactlyEnd)
-        //        CreateGashCurve(curve.EndPoint, gashLength);
-
-        //    return false;
-
-        //    void CreateGashCurve(Point3d point, double length)
-        //    {
-        //        var normal = curve.GetFirstDerivative(point).GetNormal();
-        //        var point2 = point + normal * length;
-        //        var offsetVector = normal.GetPerpendicularVector() * toolThickness * (side == Side.Left ? 1 : -1);
-        //        var gash = NoDraw.Pline(point, point2, point2 + offsetVector, point + offsetVector);
-        //        gash.LayerId = Acad.GetGashLayerId();
-        //        Support.AppendToGroup(gash.Add());
-        //    }
-
-        void Scheduling(Curve curve, bool isExactlyBegin, bool isExactlyEnd, Side side, double gashLength)
+        private void Scheduling(Processor processor, Curve curve, bool isExactlyBegin, bool isExactlyEnd, double indent)
         {
-            var point = CalcSchedulingPoint();
-            var angle = BuilderUtils.CalcToolAngle((curve.EndPoint - curve.StartPoint).ToVector2d().Angle,
-                side);
-            processor.Move(point.X, point.Y, angleC: angle);
-            processor.Cutting(point.X, point.Y, point.Z, TechProcess.PenetrationFeed);
+            var vector = curve.EndPoint - curve.StartPoint;
+            var (point, depth) = CalcSchedulingPoint();
+            var angle = BuilderUtils.CalcToolAngle(vector.ToVector2d().Angle);
+            processor.Move(point.ToPoint2d(), angle);
+            processor.Penetration(point.WithZ(-depth));
             processor.Uplifting();
+            return;
 
-            Point3d CalcSchedulingPoint()
+            (Point3d, double) CalcSchedulingPoint()
             {
-                var vector = curve.EndPoint - curve.StartPoint;
                 if (isExactlyBegin && isExactlyEnd)
                 {
                     var l = vector.Length - 2 * CornerIndentIncrease;
-                    var depth = (Tool.Diameter - Math.Sqrt(Tool.Diameter * Tool.Diameter - l * l)) / 2;
-                    return (curve.StartPoint + vector / 2).WithZ(-depth);
+                    var d = (Tool.Diameter - Math.Sqrt(Tool.Diameter * Tool.Diameter - l * l)) / 2;
+                    return (curve.StartPoint + vector / 2, d);
                 }
 
-                var indent = gashLength + CornerIndentIncrease;
                 var indentVector = vector.GetNormal() * indent;
                 var pt = isExactlyBegin
                     ? curve.StartPoint + indentVector
                     : curve.EndPoint - indentVector;
 
-                return pt.WithZ(-Thickness);
+                return (pt, Thickness);
             }
         }
     }
