@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
 using Dreambuild.AutoCAD;
+using System;
 
 namespace CAM
 {
-    public class Processor
+    public class Processor : IDisposable
     {
         private readonly IPostProcessor _postProcessor;
         private ToolpathBuilder _toolpathBuilder;
@@ -39,8 +40,8 @@ namespace CAM
             ToolPosition = Algorithms.NullPoint3d.WithZ(ZMax + ZSafety * 3);
             _postProcessor.GCommand(-1, ToolPosition, 0, 0, null);
 
-            _postProcessor.StartMachine();
-            _postProcessor.SetTool(tool.Number, 0, 0, 0);
+            AddCommands(_postProcessor.StartMachine());
+            AddCommands(_postProcessor.SetTool(tool.Number, 0, 0, 0));
             _toolpathBuilder = new ToolpathBuilder();
         }
 
@@ -60,9 +61,9 @@ namespace CAM
             _operation.FirstCommandIndex = ProcessCommands.Count;
         }
 
-        public void Finish() => _postProcessor.Finish();
+        public void Finish() => AddCommands(_postProcessor.Finish());
 
-        public void Cycle() => _postProcessor.Cycle();
+        public void Cycle() => AddCommand(_postProcessor.Cycle());
 
         public void Cutting(Line line, CurveTip tip)
         {
@@ -77,21 +78,6 @@ namespace CAM
             Cutting(line, line.NextPoint(point));
         }
 
-        public void Cutting(Arc arc, CurveTip tip)
-        {
-            var point = arc.GetPoint(tip);
-            if (IsUpperTool)
-            {
-                var moveAngleC = BuilderUtils.CalcToolAngle(arc, point, EngineSide);
-                Move(point.ToPoint2d(), moveAngleC);
-                Cycle();
-            }
-            Penetration(point);
-            point = arc.NextPoint(point);
-            var angleC = BuilderUtils.CalcToolAngle(arc, point, EngineSide);
-            Cutting(arc, point, angleC);
-        }
-
         public void Move(Point2d point, double? angleC = null, double? angleA = null)
         {
             GCommandTo(CommandNames.Fast, 0, ToolPosition.WithPoint2d(point));
@@ -104,10 +90,14 @@ namespace CAM
 
             if (!IsEngineStarted)
             {
-                _postProcessor.StartEngine(_frequency, true);
+                AddCommands(_postProcessor.StartEngine(_frequency, true));
                 IsEngineStarted = true;
             }
         }
+
+        public void TurnC(double angleC) => GCommand("Поворот", 0, angleC: angleC);
+
+        public void TurnA(double angleA) => GCommand("Наклон", 1, angleA: angleA, feed: 500);
 
         public void Uplifting() => GCommandTo(CommandNames.Uplifting, 0, ToolPosition.WithZ(UpperZ));
 
@@ -116,15 +106,6 @@ namespace CAM
         public void Cutting(Point3d point) => GCommandTo(CommandNames.Cutting, 1, point, CuttingFeed);
 
         public void Cutting(Line line, Point3d point) => GCommand(CommandNames.Cutting, 1, line, point, feed: CuttingFeed);
-
-        public void Cutting(Arc arc, Point3d point, double angleC)
-        {
-            var gCode = point == arc.StartPoint ? 3 : 2;
-            var commandText = _postProcessor.GCommand(gCode, point, angleC, AngleA, CuttingFeed, arc.Center.ToPoint2d());
-            ToolPosition = point;
-            AngleC = angleC;
-            AddCommand(CommandNames.Cutting, commandText, arc, CuttingFeed);
-        }
 
         public void GCommandTo(string name, int gCode, Point3d point, int? feed = null)
         {
@@ -139,11 +120,7 @@ namespace CAM
             GCommand( name, gCode, line, point, feed: feed);
         }
 
-        public void TurnC(double angleC) => GCommand("Поворот", 0, angleC: angleC);
-
-        public void TurnA(double angleA) => GCommand("Наклон", 1, angleA: angleA, feed: 500);
-
-        private void GCommand(string name, int gCode, Curve curve = null, Point3d? point = null, double? angleC = null, double? angleA = null, int? feed = null, Point3d? arcCenter = null)
+        public void GCommand(string name, int gCode, Curve curve = null, Point3d? point = null, double? angleC = null, double? angleA = null, int? feed = null, Point3d? arcCenter = null)
         {
             ToolPosition = point ?? ToolPosition;
             AngleC = angleC ?? AngleC;
@@ -159,7 +136,7 @@ namespace CAM
             AddCommand(name, commandText, toolpath);
         }
 
-        public void AddCommand(string name, string text, ObjectId? toolpath = null)
+        public void AddCommand(string text, string name = null, ObjectId? toolpath = null)
         {
             ProcessCommands.Add(new Command
             {
@@ -172,6 +149,16 @@ namespace CAM
                 Operation = _operation,
                 Number = ProcessCommands.Count + 1
             });
+        }
+
+        private void AddCommands(string[] commands)
+        {
+            Array.ForEach(commands, p => AddCommand(p));
+        }
+
+        public void Dispose()
+        {
+            _toolpathBuilder.Dispose();
         }
     }
 }
