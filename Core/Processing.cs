@@ -73,24 +73,26 @@ namespace CAM
             if (!tool.CheckNotNull("Инструмент"))
                 return;
 
-            var processor = ProcessorFactory.Create(MachineType);
-            processor.Start(tool);
-
-            foreach (var generalOperation in GeneralOperations.Where(p => p.Enabled))
+            using (var processor = ProcessorFactory.Create(MachineType))
             {
-                processor.SetGeneralOperarion(generalOperation);
-                foreach (var operation in generalOperation.Operations.Where(p => p.Enabled))
+                processor.Start(tool);
+
+                foreach (var generalOperation in GeneralOperations.Where(p => p.Enabled))
                 {
-                    Acad.Write($"расчет операции {operation.Caption}");
+                    processor.SetGeneralOperarion(generalOperation);
+                    foreach (var operation in generalOperation.Operations.Where(p => p.Enabled))
+                    {
+                        Acad.Write($"расчет операции {operation.Caption}");
 
-                    processor.SetOperarion(operation);
-                    operation.SetGeneralParams(generalOperation);
-                    operation.Execute(processor);
+                        processor.SetOperarion(operation);
+                        operation.SetGeneralParams(generalOperation);
+                        operation.Execute(processor);
+                    }
                 }
-            }
 
-            processor.Finish();
-            Commands = processor.ProcessCommands.ToArray();
+                processor.Finish();
+                Commands = processor.ProcessCommands.ToArray();
+            }
         }
 
         private void UpdateFromCommands()

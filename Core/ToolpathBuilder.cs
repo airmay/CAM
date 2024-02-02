@@ -34,12 +34,16 @@ namespace CAM
 
         public ObjectId AddToolpath(Curve curve, string name)
         {
-            if (Colors.TryGetValue(name, out var color))
-                curve.Color = color;
-            curve.LayerId = _layerId;
-            curve.Visible = false;
-            _currentSpace.AppendEntity(curve);
-            _transaction.AddNewlyCreatedDBObject(curve, true);
+            if (curve.IsNewObject)
+            {
+                if (Colors.TryGetValue(name, out var color))
+                    curve.Color = color;
+                curve.LayerId = _layerId;
+                curve.Visible = false;
+                _currentSpace.AppendEntity(curve);
+                _transaction.AddNewlyCreatedDBObject(curve, true);
+            }
+
             return curve.ObjectId;
         }
 

@@ -12,7 +12,6 @@ namespace CAM
         private readonly IPostProcessor _postProcessor;
         private ToolpathBuilder _toolpathBuilder;
         public bool IsEngineStarted;
-        public bool IsUpperTool { get; set; }
         public List<Command> ProcessCommands { get; } = new List<Command>();
         public Point3d ToolPosition { get; set; }
         public double AngleA { get; set; }
@@ -22,9 +21,12 @@ namespace CAM
         protected int _frequency;
         public int CuttingFeed { get; set; }
         public int PenetrationFeed { get; set; }
+
         public double ZSafety { get; set; }
-        public double UpperZ => ZMax + ZSafety;
         public double ZMax { get; set; }
+        public double UpperZ => ZMax + ZSafety;
+        public bool IsUpperTool => ToolPosition.Z > ZMax;
+
         public double OriginX { get; set; }
         public double OriginY { get; set; }
         public Side EngineSide { get; set; }
@@ -71,17 +73,17 @@ namespace CAM
             if (IsUpperTool)
             {
                 var angleC = BuilderUtils.CalcToolAngle(line.Angle, EngineSide);
-                Move(point.ToPoint2d(), angleC);
+                Move(point, angleC);
                 Cycle();
             }
             Penetration(point);
             Cutting(line, line.NextPoint(point));
         }
 
-        public void Move(Point2d point, double? angleC = null, double? angleA = null)
+        public void Move(Point3d point, double? angleC = null, double? angleA = null)
         {
-            GCommandTo(CommandNames.Fast, 0, ToolPosition.WithPoint2d(point));
-            if (!IsEngineStarted)
+            GCommandTo(CommandNames.Fast, 0, point.WithZ(ToolPosition.Z));
+            if (ToolPosition.Z > UpperZ)
                 GCommandTo(CommandNames.InitialMove, 0, ToolPosition.WithZ(UpperZ));
             if (angleC.HasValue)
                 TurnC(angleC.Value);
@@ -97,7 +99,7 @@ namespace CAM
 
         public void TurnC(double angleC) => GCommand("Поворот", 0, angleC: angleC);
 
-        public void TurnA(double angleA) => GCommand("Наклон", 1, angleA: angleA, feed: 500);
+        public void TurnA(double angleA) => GCommand("Наклон", 1, feed: 500, angleA: angleA);
 
         public void Uplifting() => GCommandTo(CommandNames.Uplifting, 0, ToolPosition.WithZ(UpperZ));
 
@@ -105,7 +107,7 @@ namespace CAM
 
         public void Cutting(Point3d point) => GCommandTo(CommandNames.Cutting, 1, point, CuttingFeed);
 
-        public void Cutting(Line line, Point3d point) => GCommand(CommandNames.Cutting, 1, line, point, feed: CuttingFeed);
+        private void Cutting(Line line, Point3d point) => GCommand(CommandNames.Cutting, 1, CuttingFeed, line, point);
 
         public void GCommandTo(string name, int gCode, Point3d point, int? feed = null)
         {
@@ -117,15 +119,15 @@ namespace CAM
                 line = NoDraw.Line(ToolPosition, point);
             }
 
-            GCommand( name, gCode, line, point, feed: feed);
+            GCommand( name, gCode, feed, line, point);
         }
 
-        public void GCommand(string name, int gCode, Curve curve = null, Point3d? point = null, double? angleC = null, double? angleA = null, int? feed = null, Point3d? arcCenter = null)
+        public void GCommand(string name, int gCode, int? feed = null, Curve curve = null, Point3d? point = null, double? angleC = null, double? angleA = null, Point2d? arcCenter = null)
         {
             ToolPosition = point ?? ToolPosition;
             AngleC = angleC ?? AngleC;
             AngleA = angleA ?? AngleA;
-            var commandText = _postProcessor.GCommand(gCode, ToolPosition, AngleC, AngleA, feed, arcCenter?.ToPoint2d());
+            var commandText = _postProcessor.GCommand(gCode, ToolPosition, AngleC, AngleA, feed, arcCenter);
             ObjectId? toolpath = null;
             if (curve != null)
             {
