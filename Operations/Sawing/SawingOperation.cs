@@ -51,21 +51,20 @@ namespace CAM.Operations.Sawing
 
         public override void Execute(Processor processor)
         {
-            var curves = ProcessingArea.GetCurves();
-            var (curvesSides, pointsIsExactly) = CalcСurveProcessingInfo(curves);
+            var (curvesSides, pointsIsExactly) = CalcСurveProcessingInfo();
 
-            foreach (var curve in curves)
+            foreach (var item in curvesSides)
             {
-                ProcessCurve(processor, curve, curvesSides[curve], pointsIsExactly[curve.StartPoint], pointsIsExactly[curve.EndPoint]);
+                ProcessCurve(processor, item.Key, item.Value, pointsIsExactly[item.Key.StartPoint], pointsIsExactly[item.Key.EndPoint]);
             }
         }
 
-        private (Dictionary<Curve, int> CurvesSides, Dictionary<Point3d, bool> PointsIsExactly) CalcСurveProcessingInfo(IEnumerable<Curve> curvesArray)
+        private (Dictionary<Curve, Side> CurvesSides, Dictionary<Point3d, bool> PointsIsExactly) CalcСurveProcessingInfo()
         {
-            var curvesSides = new Dictionary<Curve, int>();
+            var curvesSides = new Dictionary<Curve, Side>();
             var pointsIsExactly = new Dictionary<Point3d, bool>(Graph.Point3dComparer);
             var side = ChangeSide ? -1 : 1;
-            var curvesToCalc = new List<Curve>(curvesArray);
+            var curvesToCalc = new List<Curve>(ProcessingArea.GetCurves());
 
             while (curvesToCalc.Any())
             {
@@ -126,9 +125,8 @@ namespace CAM.Operations.Sawing
             }
         }
 
-        private void ProcessCurve(Processor processor, Curve curve, int sideSign, bool isExactlyBegin, bool isExactlyEnd)
+        private void ProcessCurve(Processor processor, Curve curve, Side side, bool isExactlyBegin, bool isExactlyEnd)
         {
-            var side = sideSign == 1 ? Side.Left : Side.Right;
             var gashLength = GetGashLength(Depth);
             var indent = gashLength + CornerIndentIncrease;
             AddGash(curve, isExactlyBegin, isExactlyEnd, side, gashLength, indent);

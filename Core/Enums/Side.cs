@@ -2,24 +2,13 @@
 {
 	public enum Side
 	{
-		None,
-		Left,
-		Right
-	}
+        Left = -1,
+        None = 0,
+        Right = 1,
+    }
 
     public static class SideExt
     {
-        public static Side Opposite(this Side side)
-        {
-            switch (side)
-            {
-                case Side.Left:
-                    return Side.Right;
-                case Side.Right:
-                    return Side.Left;
-                default:
-                    return Side.None;
-            }
-        }
+        public static Side Opposite(this Side side) => (Side)(-1 * (int)side);
     }
 }
