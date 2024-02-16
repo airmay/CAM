@@ -51,78 +51,63 @@ namespace CAM.Operations.Sawing
 
         public override void Execute(Processor processor)
         {
-            var (curvesSides, pointsIsExactly) = CalcСurveProcessingInfo();
+            var (curves, points) = CalcСurveProcessingInfo();
 
-            foreach (var item in curvesSides)
+            foreach (var item in curves)
             {
-                ProcessCurve(processor, item.Key, item.Value, pointsIsExactly[item.Key.StartPoint], pointsIsExactly[item.Key.EndPoint]);
+                ProcessCurve(processor, item.Key, item.Value, points[item.Key.StartPoint], points[item.Key.EndPoint]);
             }
+
+            CreateHatch(curves);
         }
 
-        private (Dictionary<Curve, Side> CurvesSides, Dictionary<Point3d, bool> PointsIsExactly) CalcСurveProcessingInfo()
+        private (Dictionary<Curve, Side>, Dictionary<Point3d, bool>) CalcСurveProcessingInfo()
         {
-            var curvesSides = new Dictionary<Curve, Side>();
-            var pointsIsExactly = new Dictionary<Point3d, bool>(Graph.Point3dComparer);
-            var side = ChangeSide ? -1 : 1;
-            var curvesToCalc = new List<Curve>(ProcessingArea.GetCurves());
+            var curves = ProcessingArea.GetCurves().ToDictionary(p => p, p => Side.None);
+            var points = new Dictionary<Point3d, bool>(Graph.Point3dComparer);
+            var side = ChangeSide ? Side.Left : Side.Right;
 
-            while (curvesToCalc.Any())
+            var pointCurveDict = curves.Keys
+                .SelectMany(p => p.GetStartEndPoints(), (cv, pt) => (cv, pt))
+                .ToLookup(p => p.pt, p => p.cv, Graph.Point3dComparer);
+            var corner = pointCurveDict.FirstOrDefault(p => p.Count() == 1);
+            var (curve, point) = corner != null
+                ? (corner.Single(), corner.Key)
+                : (curves.First().Key, curves.First().Key.StartPoint);
+            if (corner != null)
+                points[point] = IsExactlyBegin;
+
+            var startPoint = point;
+            do
             {
-                var chain = CalcChain();
-                var hatchId = Graph.CreateHatch(chain.ToPolyline(), side);
-                if (hatchId.HasValue)
-                    Support = Support.AppendToGroup(hatchId.Value);
-                curvesToCalc.RemoveAll(p => chain.Contains(p));
-            }
-
-            return (curvesSides, pointsIsExactly);
-
-            List<Curve> CalcChain()
-            {
-                Tolerance.Global = new Tolerance(0.001, 0.001);
-
-                var chain = new List<Curve>();
-                var pointCurveDict = curvesToCalc
-                    .SelectMany(p => p.GetStartEndPoints(), (cv, pt) => (cv, pt))
-                    .ToLookup(p => p.pt, p => p.cv, Graph.Point3dComparer);
-                var corner = pointCurveDict.FirstOrDefault(p => p.Count() == 1);
-                var (curve, point) = corner != null
-                    ? (corner.Single(), corner.Key)
-                    : (curvesToCalc.First(), curvesToCalc.First().StartPoint);
-                if (corner != null)
+                var codirected = curve.IsStartPoint(point);
+                curves[curve] = codirected ? side : side.Opposite();
+                point = curve.NextPoint(point);
+                var endTangent = curve.GetTangent(point) * (codirected ? 1 : -1);
+                var curve1 = pointCurveDict[point].SingleOrDefault(p => p != curve);
+                if (curve1 == null)
                 {
-                    pointsIsExactly[point] = IsExactlyBegin;
+                    points[point] = IsExactlyEnd;
+                    break;
                 }
 
-                var startPoint = point;
-                do
-                {
-                    var sd = point == curve.StartPoint ? side : -side;
-                    curvesSides[curve] = sd;
-                    chain.Add(curve);
+                var startTangent = curve.GetTangent(point.IsEqualTo(curve.StartPoint) ? curve.StartPoint : curve.EndPoint);
+                if (point == curve.EndPoint)
+                    startTangent *= -1;
+                var angle = endTangent.MinusPiToPiAngleTo(startTangent);
+                points[point] = side.IsRight() ^ angle < 0;
+            } 
+            while (point != startPoint);
 
-                    point = curve.NextPoint(point);
-                    var endTangent = curve.GetTangent(point);
-                    if (point == curve.StartPoint)
-                        endTangent *= -1;
+            return (curves, points);
+        }
 
-                    curve = pointCurveDict[point].SingleOrDefault(p => p != curve);
-                    if (curve == null)
-                    {
-                        pointsIsExactly[point] = IsExactlyEnd;
-                        break;
-                    }
-
-                    var startTangent =
-                        curve.GetTangent(point.IsEqualTo(curve.StartPoint) ? curve.StartPoint : curve.EndPoint);
-                    if (point == curve.EndPoint)
-                        startTangent *= -1;
-                    var angle = endTangent.MinusPiToPiAngleTo(startTangent);
-                    pointsIsExactly[point] = side == 1 ^ angle < 0;
-                } while (point != startPoint);
-
-                return chain;
-            }
+        private void CreateHatch(Dictionary<Curve, Side> curves)
+        {
+            Side side;
+            var hatchId = Graph.CreateHatch(curves.Keys.ToList().ToPolyline(), side);
+            if (hatchId.HasValue)
+                Support = Support.AppendToGroup(hatchId.Value);
         }
 
         private void ProcessCurve(Processor processor, Curve curve, Side side, bool isExactlyBegin, bool isExactlyEnd)

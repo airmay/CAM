@@ -84,6 +84,7 @@ namespace CAM
             point == curve.StartPoint ? Corner.Start : (point == curve.EndPoint ? Corner.End : throw new ArgumentException($"Ошибка GetCorner: Точка {point} не принадлежит кривой {curve}"));
 
         public static bool HasPoint(this Curve curve, Point3d point) => point.IsEqualTo(curve.StartPoint) || point.IsEqualTo(curve.EndPoint);
+        public static bool IsStartPoint(this Curve curve, Point3d point) => point.IsEqualTo(curve.StartPoint);
 
         public static Point3d NextPoint(this Curve curve, Point3d point) =>
             point == curve.StartPoint ? curve.EndPoint : (point == curve.EndPoint ? curve.StartPoint : throw new ArgumentException($"Ошибка NextPoint: Точка {point} не принадлежит кривой {curve}"));
@@ -210,12 +211,12 @@ namespace CAM
             return polyline;
         }
 
-        public static ObjectId? CreateHatch(Polyline polyline, int sign)
+        public static ObjectId? CreateHatch(Polyline polyline, Side sign)
         {
             const int hatchSize = 40;
             try
             {
-                var offsetPolyline = polyline.GetOffsetCurves(hatchSize * sign)[0] as Polyline;
+                var offsetPolyline = polyline.GetOffsetCurves(hatchSize * (int)sign)[0] as Polyline;
                 if (!polyline.Closed)
                 {
                     offsetPolyline.ReverseCurve();

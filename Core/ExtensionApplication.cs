@@ -5,8 +5,11 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Reflection;
 using CAM.Core;
+using Autodesk.AutoCAD.Geometry;
+using Dreambuild.AutoCAD;
 
 namespace CAM
 {
@@ -16,6 +19,8 @@ namespace CAM
 
         public void Initialize()
         {
+            Tolerance.Global = new Tolerance( Consts.Epsilon, Consts.Epsilon);
+
             Acad.Write($"Инициализация плагина. Версия сборки от {File.GetLastWriteTime(Assembly.GetExecutingAssembly().Location)}");
 
             var camPaletteSet = new CamPaletteSet();
