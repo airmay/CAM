@@ -51,61 +51,69 @@ namespace CAM.Operations.Sawing
 
         public override void Execute(Processor processor)
         {
-            var (curves, points) = CalcСurveProcessingInfo();
+            var (curveSides, points, side) = CalcСurveProcessingInfo();
 
-            foreach (var item in curves)
+            foreach (var item in curveSides)
             {
                 ProcessCurve(processor, item.Key, item.Value, points[item.Key.StartPoint], points[item.Key.EndPoint]);
             }
 
-            CreateHatch(curves);
+            CreateHatch(curveSides, side);
         }
 
-        private (Dictionary<Curve, Side>, Dictionary<Point3d, bool>) CalcСurveProcessingInfo()
+        private (Dictionary<Curve, Side>, Dictionary<Point3d, bool>, Side) CalcСurveProcessingInfo()
         {
-            var curves = ProcessingArea.GetCurves().ToDictionary(p => p, p => Side.None);
+            var curves = ProcessingArea.GetCurves();
+            var curveSides = new Dictionary<Curve, Side>();
             var points = new Dictionary<Point3d, bool>(Graph.Point3dComparer);
-            var side = ChangeSide ? Side.Left : Side.Right;
+            var side = Side.None;
 
-            var pointCurveDict = curves.Keys
+            var pointCurveDict = curves
                 .SelectMany(p => p.GetStartEndPoints(), (cv, pt) => (cv, pt))
                 .ToLookup(p => p.pt, p => p.cv, Graph.Point3dComparer);
             var corner = pointCurveDict.FirstOrDefault(p => p.Count() == 1);
             var (curve, point) = corner != null
                 ? (corner.Single(), corner.Key)
-                : (curves.First().Key, curves.First().Key.StartPoint);
+                : (curves.First(), curves.First().StartPoint);
             if (corner != null)
                 points[point] = IsExactlyBegin;
-
-            var startPoint = point;
+            var startCodirected = curve.IsStartPoint(point);
+            var codirected = startCodirected;
+            var startСurve = curve;
             do
             {
-                var codirected = curve.IsStartPoint(point);
-                curves[curve] = codirected ? side : side.Opposite();
                 point = curve.NextPoint(point);
                 var endTangent = curve.GetTangent(point) * (codirected ? 1 : -1);
-                var curve1 = pointCurveDict[point].SingleOrDefault(p => p != curve);
-                if (curve1 == null)
+
+                curve = pointCurveDict[point].SingleOrDefault(p => p != curve);
+                if (curve == null)
                 {
                     points[point] = IsExactlyEnd;
                     break;
                 }
 
-                var startTangent = curve.GetTangent(point.IsEqualTo(curve.StartPoint) ? curve.StartPoint : curve.EndPoint);
-                if (point == curve.EndPoint)
-                    startTangent *= -1;
-                var angle = endTangent.MinusPiToPiAngleTo(startTangent);
-                points[point] = side.IsRight() ^ angle < 0;
-            } 
-            while (point != startPoint);
+                point = point.IsEqualTo(curve.StartPoint) ? curve.StartPoint : curve.EndPoint;
+                codirected = curve.IsStartPoint(point);
+                var startTangent = curve.GetTangent(point) * (codirected ? 1 : -1);
 
-            return (curves, points);
+                var angle = endTangent.MinusPiToPiAngleTo(startTangent);
+                if (side == Side.None)
+                    side = angle > 0 ^ ChangeSide ? Side.Left : Side.Right;
+
+                points[point] = side.IsRight() ^ angle < 0;
+                curveSides[curve] = codirected ? side : side.Opposite();
+            } 
+            while (curve != startСurve);
+
+            curveSides[startСurve] = startCodirected ? side : side.Opposite();
+
+            return (curveSides, points, side);
         }
 
-        private void CreateHatch(Dictionary<Curve, Side> curves)
+        private void CreateHatch(Dictionary<Curve, Side> curveSides, Side side)
         {
-            Side side;
-            var hatchId = Graph.CreateHatch(curves.Keys.ToList().ToPolyline(), side);
+            var poilyline = curveSides.Keys.ToList().ToPolyline();
+            var hatchId = Graph.CreateHatch(poilyline, side);
             if (hatchId.HasValue)
                 Support = Support.AppendToGroup(hatchId.Value);
         }

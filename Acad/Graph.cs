@@ -211,12 +211,12 @@ namespace CAM
             return polyline;
         }
 
-        public static ObjectId? CreateHatch(Polyline polyline, Side sign)
+        public static ObjectId? CreateHatch(Polyline polyline, Side side)
         {
             const int hatchSize = 40;
             try
             {
-                var offsetPolyline = polyline.GetOffsetCurves(hatchSize * (int)sign)[0] as Polyline;
+                var offsetPolyline = polyline.GetOffsetCurves(hatchSize * (int)side)[0] as Polyline;
                 if (!polyline.Closed)
                 {
                     offsetPolyline.ReverseCurve();
