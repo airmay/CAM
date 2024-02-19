@@ -32,13 +32,10 @@ namespace CAM.Operations.Sawing
             view.AddTextBox(nameof(AngleA));
             view.AddTextBox(nameof(Departure));
             view.AddIndent();
-            view.AddAcadObject(
-                allowedTypes: $"{AcadObjectNames.Line},{AcadObjectNames.Arc},{AcadObjectNames.Lwpolyline}");
-            view.AddCheckBox(nameof(ChangeSide), "Сменить сторону", "Поменять обрабатываемою сторону у объектов");
+            view.AddAcadObject(allowedTypes: $"{AcadObjectNames.Line},{AcadObjectNames.Arc},{AcadObjectNames.Lwpolyline}");
+            view.AddCheckBox(nameof(ChangeSide), "Сменить сторону", "Поменять обрабатываемою сторону");
             var depthTextBox = view.AddTextBox(nameof(Depth));
-            view.AddTextBox(nameof(Penetration),
-                toolTipText:
-                "Шаг заглубления для прямой и если не заданы Режимы для криволинейных траекторий то для всех кривых");
+            view.AddTextBox(nameof(Penetration), toolTipText: "Шаг заглубления для прямой и если не заданы Режимы для криволинейных траекторий то для всех кривых");
             view.AddText("Режимы для криволинейных траекторий", "Режимы применяются для дуги и полилинии");
             view.AddControl(new SawingModesView(), 6, nameof(SawingModesView.DataSource), nameof(SawingModes));
 
@@ -53,9 +50,10 @@ namespace CAM.Operations.Sawing
         {
             var (curveSides, points, side) = CalcСurveProcessingInfo();
 
-            foreach (var item in curveSides)
+            foreach (var curve in ProcessingArea.GetCurves())
             {
-                ProcessCurve(processor, item.Key, item.Value, points[item.Key.StartPoint], points[item.Key.EndPoint]);
+                if (curveSides.TryGetValue(curve, out var curveSide))
+                    ProcessCurve(processor, curve, curveSide, points[curve.StartPoint], points[curve.EndPoint]);
             }
 
             CreateHatch(curveSides, side);
@@ -150,7 +148,7 @@ namespace CAM.Operations.Sawing
                     compensation = arc.Radius - Math.Sqrt(arc.Radius * arc.Radius - Thickness * (Tool.Diameter - Thickness));
             }
 
-            var isFrontPlaneZero = MachineService.Machines[MachineType].IsFrontPlaneZero;
+            var isFrontPlaneZero = Settings.Machines[MachineType].IsFrontPlaneZero;
             if (engineSide == side ^ isFrontPlaneZero)
                 compensation += ToolThickness;
             var offsetSign = side == Side.Left ^ curve is Line ? -1 : 1;
@@ -225,9 +223,8 @@ namespace CAM.Operations.Sawing
 
         private const int CornerIndentIncrease = 5;
         private double GetGashLength(double depth) => Math.Sqrt(depth * (Tool.Diameter - depth));
-        private double CalcIndent(double depth) => GetGashLength(depth) + CornerIndentIncrease;
 
-        public void AddGash(Curve curve, bool isExactlyBegin, bool isExactlyEnd, Side side, double gashLength, double indent)
+        private void AddGash(Curve curve, bool isExactlyBegin, bool isExactlyEnd, Side side, double gashLength, double indent)
         {
             var vector = curve.EndPoint - curve.StartPoint;
             if (isExactlyBegin ^ isExactlyEnd && indent > vector.Length)
@@ -242,7 +239,7 @@ namespace CAM.Operations.Sawing
             {
                 var normal = curve.GetFirstDerivative(point).GetNormal();
                 var point2 = point + normal * length;
-                var offsetVector = normal.GetPerpendicularVector() * ToolThickness * (side == Side.Left ? 1 : -1);
+                var offsetVector = normal.GetPerpendicularVector() * ToolThickness * (int)side;
                 var gash = NoDraw.Pline(point, point2, point2 + offsetVector, point + offsetVector);
                 gash.LayerId = Acad.GetGashLayerId();
                 Support.AppendToGroup(gash.Add());
@@ -273,7 +270,7 @@ namespace CAM.Operations.Sawing
                     ? curve.StartPoint + indentVector
                     : curve.EndPoint - indentVector;
 
-                return (pt, Thickness);
+                return (pt, Depth);
             }
         }
     }

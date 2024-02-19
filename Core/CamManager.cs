@@ -125,7 +125,7 @@ namespace CAM
                 return;
             }
 
-            var machine = MachineService.Machines[_processing.MachineType];
+            var machine = Settings.Machines[_processing.MachineType];
             var fileName = Acad.SaveFileDialog("Программа", machine.ProgramFileExtension, _processing.MachineType.ToString());
             if (fileName == null)
                 return;

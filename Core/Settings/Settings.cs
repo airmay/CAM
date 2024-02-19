@@ -2,15 +2,7 @@
 
 namespace CAM
 {
-    public class Machine
-    {
-        public int MaxFrequency { get; set; }
-        public string ProgramFileExtension { get; set; }
-        public string ProgramLineNumberFormat { get; set; }
-        public bool IsFrontPlaneZero { get; set; }
-    }
-
-    public static class MachineService
+    public static class Settings
     {
         public static readonly Dictionary<MachineType, Machine> Machines = new Dictionary<MachineType, Machine>
         {

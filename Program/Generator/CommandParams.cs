@@ -7,6 +7,7 @@ namespace CAM.Program.Generator
     {
         public char Code { get; set; }
         public string Value { get; set; }
+        public bool IsChanged { get; set; }
 
         public CommandParam(char code, string value)
         {
@@ -26,10 +27,10 @@ namespace CAM.Program.Generator
             Params = codes.ToCharArray().ToDictionary(p => p, p => new CommandParam(p, string.Empty));
         }
 
-        public void Set(char code, double? value, double? origin = null)
+        public void Set(char code, double? value)
         {
             if (value != null)
-                Params[code] = new CommandParam(code, (value.Value - origin.GetValueOrDefault()).ToStringParam());
+                Params[code] = new CommandParam(code, value.Value.ToStringParam());
         }
 
         public void Set(char code, double? value, string format)
@@ -40,6 +41,15 @@ namespace CAM.Program.Generator
 
         public List<CommandParam> Apply(Dictionary<char, string> @params)
         {
+            foreach (var commandParam in Params)
+            {
+                if (@params.TryGetValue(commandParam.Key, out var value) && value != commandParam.Value.Value)
+                {
+                    commandParam.Value = 
+                }
+            }
+
+
             var changed = @params
                 .Where(p => p.Value != null && p.Value != Params[p.Key].Value)
                 .Select(p => new CommandParam(p.Key, p.Value))

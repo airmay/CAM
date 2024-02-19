@@ -11,26 +11,25 @@ namespace CAM
     {
         private readonly IPostProcessor _postProcessor;
         private ToolpathBuilder _toolpathBuilder;
-        public bool IsEngineStarted;
         public List<Command> ProcessCommands { get; } = new List<Command>();
+        private Operation _operation;
+        public bool IsEngineStarted;
+
         public Point3d ToolPosition { get; set; }
         public double AngleA { get; set; }
         public double AngleC { get; set; }
 
-        private Operation _operation;
         protected int _frequency;
         public int CuttingFeed { get; set; }
         public int PenetrationFeed { get; set; }
-
-        public double ZSafety { get; set; }
-        public double ZMax { get; set; }
-        public double UpperZ => ZMax + ZSafety;
-        public bool IsUpperTool => ToolPosition.Z > ZMax;
-
         public double OriginX { get; set; }
         public double OriginY { get; set; }
         public Side EngineSide { get; set; }
 
+        public double ZSafety { get; set; } = 20;
+        public double ZMax { get; set; } = 0;
+        public double UpperZ => ZMax + ZSafety;
+        public bool IsUpperTool => ToolPosition.Z > ZMax;
 
         public Processor(IPostProcessor postProcessor)
         {
@@ -44,6 +43,7 @@ namespace CAM
 
             AddCommands(_postProcessor.StartMachine());
             AddCommands(_postProcessor.SetTool(tool.Number, 0, 0, 0));
+
             _toolpathBuilder = new ToolpathBuilder();
         }
 
@@ -85,9 +85,9 @@ namespace CAM
             GCommandTo(CommandNames.Fast, 0, point.WithZ(ToolPosition.Z));
             if (ToolPosition.Z > UpperZ)
                 GCommandTo(CommandNames.InitialMove, 0, ToolPosition.WithZ(UpperZ));
-            if (angleC.HasValue)
+            if (angleC != null && angleC.Value != AngleC)
                 TurnC(angleC.Value);
-            if (angleA.HasValue)
+            if (angleA != null && angleA.Value != angleA)
                 TurnA(angleA.Value);
 
             if (!IsEngineStarted)

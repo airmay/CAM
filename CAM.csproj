@@ -104,6 +104,7 @@
     <Compile Include="Core\OperationFactory.cs" />
     <Compile Include="Core\Processing.cs" />
     <Compile Include="Core\CamManager.cs" />
+    <Compile Include="Core\Settings\Machine.cs" />
     <Compile Include="Core\ToolpathBuilder.cs" />
     <Compile Include="Operations\GeneralOperation.cs" />
     <Compile Include="Core\MillingTechProcess.cs" />
@@ -234,7 +235,7 @@
     <Compile Include="PaletteSet\CamPaletteSet.cs" />
     <Compile Include="Program\CommandNames.cs" />
     <Compile Include="Core\Enums\Corner.cs" />
-    <Compile Include="Core\Settings\MachineService.cs" />
+    <Compile Include="Core\Settings\Settings.cs" />
     <Compile Include="Core\Tool\Tool.cs" />
     <Compile Include="Core\Tool\ToolService.cs" />
     <Compile Include="Core\Tool\ToolsForm.cs">
