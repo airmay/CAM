@@ -113,7 +113,7 @@ namespace CAM.Operations.Sawing
             var poilyline = curveSides.Keys.ToList().ToPolyline();
             var hatchId = Graph.CreateHatch(poilyline, side);
             if (hatchId.HasValue)
-                Support = Support.AppendToGroup(hatchId.Value);
+                SupportGroup = SupportGroup.AppendToGroup(hatchId.Value);
         }
 
         private void ProcessCurve(Processor processor, Curve curve, Side side, bool isExactlyBegin, bool isExactlyEnd)
@@ -242,7 +242,7 @@ namespace CAM.Operations.Sawing
                 var offsetVector = normal.GetPerpendicularVector() * ToolThickness * (int)side;
                 var gash = NoDraw.Pline(point, point2, point2 + offsetVector, point + offsetVector);
                 gash.LayerId = Acad.GetGashLayerId();
-                Support.AppendToGroup(gash.Add());
+                SupportGroup.AppendToGroup(gash.Add());
             }
         }
 

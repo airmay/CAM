@@ -53,10 +53,10 @@ namespace CAM
             foreach (var generalOperation in GeneralOperations)
             foreach (var operation in generalOperation.Operations)
             {
-                operation.Toolpath?.DeleteGroup();
-                operation.Toolpath = null;
-                operation.Support?.DeleteGroup();
-                operation.Support = null;
+                operation.ToolpathGroup?.DeleteGroup();
+                operation.ToolpathGroup = null;
+                operation.SupportGroup?.DeleteGroup();
+                operation.SupportGroup = null;
             }
 
             Commands = null;
@@ -103,7 +103,7 @@ namespace CAM
                 .ToDictionary(p => p.Key, p => p.Min(k => k.index));
 
             foreach (var operationGroup in Commands.GroupBy(p => p.Operation))
-                operationGroup.Key.Toolpath = operationGroup.Select(p => p.Toolpath).CreateGroup();
+                operationGroup.Key.ToolpathGroup = operationGroup.Select(p => p.Toolpath).CreateGroup();
         }
 
         public int? GetCommandIndex(ObjectId id)

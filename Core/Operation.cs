@@ -16,8 +16,8 @@ namespace CAM
         public double Duration { get; set; }
         public AcadObject ProcessingArea { get; set; }
 
-        [NonSerialized] public ObjectId? Toolpath;
-        [NonSerialized] public ObjectId? Support;
+        [NonSerialized] public ObjectId? ToolpathGroup;
+        [NonSerialized] public ObjectId? SupportGroup;
         [NonSerialized] public int FirstCommandIndex;
 
         public MachineType MachineType { get; set; }

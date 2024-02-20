@@ -1,19 +1,13 @@
 ﻿using Autodesk.AutoCAD.ApplicationServices;
-using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Runtime;
-using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Linq.Expressions;
 using System.Reflection;
-using CAM.Core;
 using Autodesk.AutoCAD.Geometry;
 using Dreambuild.AutoCAD;
 
 namespace CAM
 {
-    public class ExtensionApplication : IExtensionApplication
+    public class Startup : IExtensionApplication
     {
         public const string ProcessingKey = "Processing";
 
@@ -73,7 +67,7 @@ namespace CAM
         {
             if (e.GlobalCommandName == "CLOSE" || e.GlobalCommandName == "QUIT" || e.GlobalCommandName == "QSAVE" || e.GlobalCommandName == "SAVEAS")
             {
-                CamManager.SaveProcessing();
+                CamManager.SaveProcessing(); // TODO сохранять все
             }
         }
 
