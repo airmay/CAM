@@ -63,7 +63,11 @@ namespace CAM
             _operation.FirstCommandIndex = ProcessCommands.Count;
         }
 
-        public void Finish() => AddCommands(_postProcessor.Finish());
+        public void Finish()
+        {
+            AddCommands(_postProcessor.StopEngine());
+            AddCommands(_postProcessor.StopMachine());
+        }
 
         public void Cycle() => AddCommand(_postProcessor.Cycle());
 

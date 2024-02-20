@@ -46,7 +46,7 @@ namespace CAM.Program.Generator
 
         public string GCommand(int gCode, MillToolPosition position, int feed, Point2d? arcCenter = null)
         {
-            return _postProcessor.GCommand(gCode, position, feed, arcCenter);
+            return null;// _postProcessor.GCommand(gCode, position, feed, arcCenter);
         }
 
         private void StopMachine() => AddCommands(_postProcessor.StopMachine());
@@ -131,14 +131,14 @@ namespace CAM.Program.Generator
                 AngleC = angleC,
                 AngleA = angleA
             };
-            _postProcessor.SetParams(ToolPosition);
+            // _postProcessor.SetParams(ToolPosition);
         }
 
         public void SetZMax(double zMax)
         {
             ZSafety += zMax;
             ToolPosition.Z = ZSafety + UpperZ;
-            _postProcessor.SetParams(ToolPosition);
+            // _postProcessor.SetParams(ToolPosition);
         }
 
         private void StopEngine()
@@ -328,7 +328,7 @@ namespace CAM.Program.Generator
                 command.ToolLocation = position;
 
             ToolPosition = position;
-            command.Text = _postProcessor.GCommand(gCode, position, feed, center);
+            // command.Text = _postProcessor.GCommand(gCode, position, feed, center);
             command.HasTool = _hasTool;
             AddCommand(command);
 

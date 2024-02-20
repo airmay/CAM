@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using Autodesk.AutoCAD.Geometry;
+﻿using Autodesk.AutoCAD.Geometry;
 
 namespace CAM.Program.Generator
 {
@@ -16,7 +15,6 @@ namespace CAM.Program.Generator
         string Pause(double duration);
         // void SetParams(MillToolPosition toolPosition);
         string Cycle();
-        string[] Finish();
         string GCommand(int gCode, Point3d position, double angleA, double angleC, int? feed, Point2d? arcCenter = null);
     }
 }
