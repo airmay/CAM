@@ -13,7 +13,7 @@ namespace CAM
         private GeneralOperation GeneralOperation => GeneralOperationNode.GeneralOperation;
         private OperationNodeBase SelectedNode => treeView.SelectedNode as OperationNodeBase;
         private Operation SelectedOperation => SelectedNode?.Tag as Operation;
-        private ProcessCommand SelectedCommand => processCommandBindingSource.Current as ProcessCommand;
+        private Command SelectedCommand => processCommandBindingSource.Current as Command;
 
         public ProcessingView()
         {
@@ -212,10 +212,10 @@ namespace CAM
             if (SelectedCommand == null) 
                 return;
             
-            if (SelectedCommand.ToolpathObjectId.HasValue)
+            if (SelectedCommand.Toolpath.HasValue)
             {
-                Acad.Show(SelectedCommand.ToolpathObjectId.Value);
-                Acad.SelectObjectIds(SelectedCommand.ToolpathObjectId.Value);
+                Acad.Show(SelectedCommand.Toolpath.Value);
+                Acad.SelectObjectIds(SelectedCommand.Toolpath.Value);
             }
 
             Acad.RegenToolObject(GeneralOperation.Tool, SelectedCommand.HasTool,

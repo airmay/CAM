@@ -106,6 +106,7 @@
     <Compile Include="Core\CamManager.cs" />
     <Compile Include="Core\Settings\Machine.cs" />
     <Compile Include="Core\ToolpathBuilder.cs" />
+    <Compile Include="Core\Tool\ToolObject.cs" />
     <Compile Include="Operations\GeneralOperation.cs" />
     <Compile Include="Core\MillingTechProcess.cs" />
     <Compile Include="Core\Operation.cs" />
