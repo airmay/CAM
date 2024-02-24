@@ -11,11 +11,10 @@ namespace CAM
     {
         private readonly IPostProcessor _postProcessor;
         private ToolpathBuilder _toolpathBuilder;
-        public List<Command> ProcessCommands { get; } = new List<Command>();
         private Operation _operation;
         public bool IsEngineStarted;
 
-        public Point3d ToolPosition { get; set; }
+        public Point3d Position { get; set; }
         public double AngleA { get; set; }
         public double AngleC { get; set; }
 
@@ -29,7 +28,7 @@ namespace CAM
         public double ZSafety { get; set; } = 20;
         public double ZMax { get; set; } = 0;
         public double UpperZ => ZMax + ZSafety;
-        public bool IsUpperTool => ToolPosition.Z > ZMax;
+        public bool IsUpperTool => Position.Z > ZMax;
 
         public Processor(IPostProcessor postProcessor)
         {
@@ -38,9 +37,10 @@ namespace CAM
 
         public void Start(Tool tool)
         {
-            ToolPosition = Algorithms.NullPoint3d.WithZ(ZMax + ZSafety * 3);
-            _postProcessor.GCommand(-1, ToolPosition, 0, 0, null);
+            Position = Algorithms.NullPoint3d.WithZ(ZMax + ZSafety * 3);
+            _postProcessor.GCommand(-1, Position, 0, 0, null);
 
+            CamManager.Commands.Clear();
             AddCommands(_postProcessor.StartMachine());
             AddCommands(_postProcessor.SetTool(tool.Number, 0, 0, 0));
 
@@ -60,7 +60,7 @@ namespace CAM
         public void SetOperarion(Operation operation)
         {
             _operation = operation;
-            _operation.FirstCommandIndex = ProcessCommands.Count;
+            _operation.FirstCommandIndex = CamManager.Commands.Count;
         }
 
         public void Finish()
@@ -86,9 +86,9 @@ namespace CAM
 
         public void Move(Point3d point, double? angleC = null, double? angleA = null)
         {
-            GCommandTo(CommandNames.Fast, 0, point.WithZ(ToolPosition.Z));
-            if (ToolPosition.Z > UpperZ)
-                GCommandTo(CommandNames.InitialMove, 0, ToolPosition.WithZ(UpperZ));
+            GCommandTo(CommandNames.Fast, 0, point.WithZ(Position.Z));
+            if (Position.Z > UpperZ)
+                GCommandTo(CommandNames.InitialMove, 0, Position.WithZ(UpperZ));
             if (angleC != null && angleC.Value != AngleC)
                 TurnC(angleC.Value);
             if (angleA != null && angleA.Value != angleA)
@@ -105,7 +105,7 @@ namespace CAM
 
         public void TurnA(double angleA) => GCommand("Наклон", 1, feed: 500, angleA: angleA);
 
-        public void Uplifting() => GCommandTo(CommandNames.Uplifting, 0, ToolPosition.WithZ(UpperZ));
+        public void Uplifting() => GCommandTo(CommandNames.Uplifting, 0, Position.WithZ(UpperZ));
 
         public void Penetration(Point3d point) => GCommandTo(CommandNames.Penetration, 1, point, PenetrationFeed);
 
@@ -116,11 +116,11 @@ namespace CAM
         public void GCommandTo(string name, int gCode, Point3d point, int? feed = null)
         {
             Line line = null;
-            if (!ToolPosition.IsNull())
+            if (!Position.IsNull())
             {
-                if (point.IsEqualTo(ToolPosition))
+                if (point.IsEqualTo(Position))
                     return;
-                line = NoDraw.Line(ToolPosition, point);
+                line = NoDraw.Line(Position, point);
             }
 
             GCommand( name, gCode, feed, line, point);
@@ -128,10 +128,10 @@ namespace CAM
 
         public void GCommand(string name, int gCode, int? feed = null, Curve curve = null, Point3d? point = null, double? angleC = null, double? angleA = null, Point2d? arcCenter = null)
         {
-            ToolPosition = point ?? ToolPosition;
+            Position = point ?? Position;
             AngleC = angleC ?? AngleC;
             AngleA = angleA ?? AngleA;
-            var commandText = _postProcessor.GCommand(gCode, ToolPosition, AngleC, AngleA, feed, arcCenter);
+            var commandText = _postProcessor.GCommand(gCode, Position, AngleC, AngleA, feed, arcCenter);
             ObjectId? toolpath = null;
             if (curve != null)
             {
@@ -144,16 +144,16 @@ namespace CAM
 
         public void AddCommand(string text, string name = null, ObjectId? toolpath = null)
         {
-            ProcessCommands.Add(new Command
+            CamManager.Commands.Add(new Command
             {
                 Name = name,
                 Text = text,
-                Point = ToolPosition,
+                Position = Position,
                 AngleA = AngleA,
                 AngleC = AngleC,
                 Toolpath = toolpath,
                 Operation = _operation,
-                Number = ProcessCommands.Count + 1
+                Number = CamManager.Commands.Count + 1
             });
         }
 

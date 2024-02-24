@@ -1,6 +1,6 @@
 ﻿namespace CAM
 {
-    public class Machine
+    public class MachineSettings
     {
         public int MaxFrequency { get; set; }
         public string ProgramFileExtension { get; set; }

@@ -10,10 +10,10 @@ namespace CAM
     {
         public int Hash;
         public GeneralOperation[] GeneralOperations { get; set; }
-        public Command[] Commands { get; set; }
         public MachineType MachineType { get; set; }
 
         private Dictionary<ObjectId, int> _toolpathCommandDictionary;
+        private ToolObject ToolObject { get; } = new ToolObject();
 
         public void Execute()
         {
@@ -25,12 +25,11 @@ namespace CAM
                 Acad.Write("Выполняется расчет обработки ...");
                 Acad.CreateProgressor("Расчет обработки");
                 var stopwatch = Stopwatch.StartNew();
-                Acad.DeleteToolObject();
                 DeleteProcessing();
                 Acad.Editor.UpdateScreen();
 
                 BuildProcessing();
-                if (Commands != null)
+                if (CamManager.Commands != null)
                     UpdateFromCommands();
 
                 stopwatch.Stop();
@@ -59,7 +58,8 @@ namespace CAM
                 operation.SupportGroup = null;
             }
 
-            Commands = null;
+            CamManager.Commands = null;
+            ToolObject.Hide();
         }
 
         private void BuildProcessing()
@@ -89,20 +89,18 @@ namespace CAM
                         operation.Execute(processor);
                     }
                 }
-
                 processor.Finish();
-                Commands = processor.ProcessCommands.ToArray();
             }
         }
 
         private void UpdateFromCommands()
         {
-            _toolpathCommandDictionary = Commands.Select((command, index) => new { command, index })
+            _toolpathCommandDictionary = CamManager.Commands.Select((command, index) => new { command, index })
                 .Where(p => p.command.Toolpath.HasValue)
                 .GroupBy(p => p.command.Toolpath.Value)
                 .ToDictionary(p => p.Key, p => p.Min(k => k.index));
 
-            foreach (var operationGroup in Commands.GroupBy(p => p.Operation))
+            foreach (var operationGroup in CamManager.Commands.GroupBy(p => p.Operation))
                 operationGroup.Key.ToolpathGroup = operationGroup.Select(p => p.Toolpath).CreateGroup();
         }
 
@@ -146,5 +144,12 @@ namespace CAM
             Acad.Write($"Создан файл с имитацией {fileName}");
         }
     */
+        public void ShowTool(Command command) 
+        {
+            ToolObject.Set(MachineType, command.Operation.Tool, command.Position, command.AngleC, command.AngleA);
+        }
+
+        public void HideTool() => ToolObject.Hide();
+
     }
 }

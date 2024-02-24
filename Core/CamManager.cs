@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Windows.Forms;
@@ -11,6 +12,7 @@ namespace CAM
     {
         private static Processing _processing;
         public static readonly ProcessingView ProcessingView = Acad.ProcessingView;
+        public static List<Command> Commands;
 
         public static Processing CreateProcessing()
         {
@@ -40,6 +42,7 @@ namespace CAM
             if (_processing != null)
                 UpdateProcessing();
             _processing = processing;
+            Commands.Clear();
             ProcessingView.SetNodes(GetNodes());
             //Acad.ClearHighlighted();
             return;
@@ -81,6 +84,7 @@ namespace CAM
                 .Cast<GeneralOperationNode>()
                 .Select(p => p.UpdateGeneralOperation())
                 .ToArray();
+            _processing.HideTool();
         }
 
         public static void OnSelectAcadObject()
@@ -89,13 +93,18 @@ namespace CAM
                 ProcessingView.SelectProcessCommand(commandIndex);
         }
 
-        public static Command[] ExecuteProcessing()
+        private const int CommandListCapacity = 10_000;
+
+        public static List<Command> ExecuteProcessing()
         {
+            if (Commands == null)
+                Commands = new List<Command>(CommandListCapacity);
+
             UpdateProcessing();
             _processing.Execute();
             UpdateNodeText();
 
-            return _processing.Commands;
+            return Commands;
         }
 
         private static void UpdateNodeText()
@@ -119,7 +128,7 @@ namespace CAM
 
         public static void SendProgram()
         {
-            if (_processing.Commands == null)
+            if (!Commands.Any())
             {
                 Acad.Alert("Программа не сформирована");
                 return;
@@ -131,8 +140,8 @@ namespace CAM
                 return;
             try
             {
-                var contents = _processing.Commands
-                    .Select(p => p.GetProgrammLine(machine.ProgramLineNumberFormat))
+                var contents = Commands
+                    .Select(p => $"{string.Format(machine.ProgramLineNumberFormat, p.Number)}{p.Text}")
                     .ToArray();
                 File.WriteAllLines(fileName, contents);
                 Acad.Write($"Создан файл {fileName}");
@@ -143,6 +152,11 @@ namespace CAM
             {
                 Acad.Alert($"Ошибка при записи файла {fileName}", ex);
             }
+        }
+
+        public static void ShowTool(Command command)
+        {
+            _processing.ShowTool(command);
         }
     }
 }

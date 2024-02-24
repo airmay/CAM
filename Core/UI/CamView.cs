@@ -82,7 +82,7 @@ namespace CAM
                     Acad.Show(CurrentProcessCommand.ToolpathObjectId.Value);
                     Acad.SelectObjectIds(CurrentProcessCommand.ToolpathObjectId.Value);
                 }
-                Acad.RegenToolObject(CurrentTechProcess.Tool, CurrentProcessCommand.HasTool, CurrentProcessCommand.ToolLocation, CurrentTechProcess.MachineType.Value);  //Settongs.IsFrontPlaneZero
+                //Acad.RegenToolObject(CurrentTechProcess.Tool, CurrentProcessCommand.HasTool, CurrentProcessCommand.ToolLocation, CurrentTechProcess.MachineType.Value);  //Settongs.IsFrontPlaneZero
             }
         }
 
@@ -224,7 +224,7 @@ namespace CAM
             SelectNextControl(ActiveControl, true, true, true, true);
 
             toolStrip.Enabled = false;
-            CamManager.ExecuteProcessing();
+            //CamManager.ExecuteProcessing();
             toolStrip.Enabled = true;
 
             RefreshToolButtonsState();

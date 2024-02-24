@@ -217,10 +217,7 @@ namespace CAM
                 Acad.Show(SelectedCommand.Toolpath.Value);
                 Acad.SelectObjectIds(SelectedCommand.Toolpath.Value);
             }
-
-            Acad.RegenToolObject(GeneralOperation.Tool, SelectedCommand.HasTool,
-                SelectedCommand.ToolLocation,
-                GeneralOperation.MachineType.Value); //Settongs.IsFrontPlaneZero
+            CamManager.ShowTool(SelectedCommand);
         }
 
         public void SelectProcessCommand(int commandIndex) => processCommandBindingSource.Position = commandIndex;

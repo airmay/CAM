@@ -194,56 +194,6 @@ namespace CAM
             return null;
         }
 
-        #region ToolObject
-
-        private static ToolModel ToolObject { get; } = new ToolModel();
-
-        public static void RegenToolObject(Tool tool, bool hasTool, ToolPosition location, MachineType machineType)
-        {
-            ToolObject.SetToolPosition(tool, location, machineType);
-            Editor.UpdateScreen();
-
-            //if (ToolObject != null && location.IsDefined)
-            //    DeleteToolObject();
-            //if (ToolObject == null && location.IsDefined)
-            //    ToolObject = ToolObject.CreateToolObject();
-            //if (ToolObject != null)
-            //    DrawToolObject(tool, location);
-        }
-
-        //private static void DrawToolObject(Tool tool, ToolPosition location)
-        //{
-        //    Matrix3d matrix;
-        //    if (tool.Type == ToolType.Cable)
-        //    {
-        //        var mat1 = Matrix3d.Rotation(-ToolObject.Location.AngleA.ToRad(), Vector3d.ZAxis, location.Center);
-        //        var mat2 = Matrix3d.Displacement(ToolObject.Location.Point.GetVectorTo(location.Point));
-        //        var mat3 = Matrix3d.Rotation(location.AngleA.ToRad(), Vector3d.ZAxis, location.Center);
-        //        matrix = mat3 * mat2 * mat1;
-        //    }
-        //    else
-        //    {
-        //        var mat1 = Matrix3d.Displacement(ToolObject.Location.Point.GetVectorTo(location.Point));
-        //        var mat2 = Matrix3d.Rotation(Graph.ToRad(ToolObject.Location.AngleC - location.AngleC), Vector3d.ZAxis, location.Point);
-        //        var mat3 = Matrix3d.Rotation(Graph.ToRad(location.AngleA - ToolObject.Location.AngleA), Vector3d.XAxis.RotateBy(Graph.ToRad(-location.AngleC), Vector3d.ZAxis), location.Point);
-        //        matrix = mat3 * mat2 * mat1;
-        //    }
-        //    foreach (var item in ToolObject.Curves)
-        //    {
-        //        item.TransformBy(matrix);
-        //        TransientManager.CurrentTransientManager.UpdateTransient(item, new IntegerCollection());
-        //    }
-        //    ToolObject.Location = location;
-        //    Editor.UpdateScreen();
-        //}
-
-        public static void DeleteToolObject()
-        {
-            ToolObject.DeleteCurves();
-        }
-
-        #endregion
-
         #region Select methods
 
         private static ObjectId[] _highlightedObjects = Array.Empty<ObjectId>();
@@ -310,7 +260,7 @@ namespace CAM
 
         public static void DeleteAll()
         {
-            DeleteToolObject();
+            //ToolObject.Hide();
             App.LockAndExecute(() =>
             {
                 ClearHighlighted();
