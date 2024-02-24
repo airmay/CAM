@@ -166,18 +166,19 @@ namespace CAM
 
         public static Curve[] GetSelectedCurves() => OpenForRead(Interaction.GetPickSet());
 
-        public static ObjectId[] CreateOriginObject(Point3d point)
+        public static ObjectId CreateOriginObject(Point3d point)
         {
-            int length = 100;
-            var curves = new Curve[]
+            var length = 100;
+            var curves = new List<Curve>
             {
                 NoDraw.Line(point, point + Vector3d.XAxis * length),
                 NoDraw.Line(point, point + Vector3d.YAxis * length),
-                NoDraw.Rectang(new Point3d(point.X - length / 10, point.Y - length / 10, 0), new Point3d(point.X + length / 10, point.Y + length / 10, 0))
+                NoDraw.Rectang(new Point3d(point.X - length / 10, point.Y - length / 10, 0),
+                    new Point3d(point.X + length / 10, point.Y + length / 10, 0))
             };
             var layerId = GetExtraObjectsLayerId();
-            App.LockAndExecute(() => curves.Select(p => { p.LayerId = layerId; return p; }).AddToCurrentSpace());
-            return Array.ConvertAll(curves, p => p.ObjectId);
+            curves.ForEach(p => p.LayerId = layerId);
+            return App.LockAndExecute(() => curves.AddToCurrentSpace().Group(selectable: true));
         }
 
         public static ObjectId[] GetSelectedObjectIds()

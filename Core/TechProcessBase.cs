@@ -70,8 +70,8 @@ namespace CAM
 
         public virtual void SerializeInit()
         {
-            if (OriginX != 0 || OriginY != 0)
-                OriginObject = Acad.CreateOriginObject(new Point3d(OriginX, OriginY, 0));
+            //if (OriginX != 0 || OriginY != 0)
+            //    OriginObject = Acad.CreateOriginObject(new Point3d(OriginX, OriginY, 0));
 
             AcadObject.LoadAcadProps(this);
 

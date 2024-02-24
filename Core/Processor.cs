@@ -21,8 +21,7 @@ namespace CAM
         protected int _frequency;
         public int CuttingFeed { get; set; }
         public int PenetrationFeed { get; set; }
-        public double OriginX { get; set; }
-        public double OriginY { get; set; }
+        public Point3d? Origin { get; set; }
         public Side EngineSide { get; set; }
 
         public double ZSafety { get; set; } = 20;
@@ -53,8 +52,7 @@ namespace CAM
             CuttingFeed = generalOperation.CuttingFeed;
             PenetrationFeed = generalOperation.PenetrationFeed;
             ZSafety = generalOperation.ZSafety;
-            OriginX = generalOperation.OriginX;
-            OriginY = generalOperation.OriginY;
+            Origin = generalOperation.Origin;
         }
 
         public void SetOperarion(Operation operation)

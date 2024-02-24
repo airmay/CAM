@@ -42,7 +42,7 @@ namespace CAM
             if (_processing != null)
                 UpdateProcessing();
             _processing = processing;
-            Commands.Clear();
+            Commands?.Clear();
             ProcessingView.SetNodes(GetNodes());
             //Acad.ClearHighlighted();
             return;
