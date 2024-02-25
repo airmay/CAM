@@ -93,13 +93,8 @@ namespace CAM
                 ProcessingView.SelectProcessCommand(commandIndex);
         }
 
-        private const int CommandListCapacity = 10_000;
-
         public static List<Command> ExecuteProcessing()
         {
-            if (Commands == null)
-                Commands = new List<Command>(CommandListCapacity);
-
             UpdateProcessing();
             _processing.Execute();
             UpdateNodeText();

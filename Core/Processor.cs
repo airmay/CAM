@@ -28,6 +28,7 @@ namespace CAM
         public double ZMax { get; set; } = 0;
         public double UpperZ => ZMax + ZSafety;
         public bool IsUpperTool => Position.Z > ZMax;
+        private const int CommandListCapacity = 10_000;
 
         public Processor(IPostProcessor postProcessor)
         {
@@ -39,7 +40,10 @@ namespace CAM
             Position = Algorithms.NullPoint3d.WithZ(ZMax + ZSafety * 3);
             _postProcessor.GCommand(-1, Position, 0, 0, null);
 
+            if (CamManager.Commands == null)
+                CamManager.Commands = new List<Command>(CommandListCapacity);
             CamManager.Commands.Clear();
+
             AddCommands(_postProcessor.StartMachine());
             AddCommands(_postProcessor.SetTool(tool.Number, 0, 0, 0));
 
