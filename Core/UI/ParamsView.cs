@@ -4,6 +4,7 @@ using System.Windows.Forms;
 using System.Collections.Generic;
 using Dreambuild.AutoCAD;
 using Autodesk.AutoCAD.DatabaseServices;
+using Autodesk.AutoCAD.Geometry;
 
 namespace CAM
 {
@@ -308,31 +309,38 @@ namespace CAM
 
         public ParamsView AddOrigin()
         {
-            var originX = _type.GetProperty("OriginX");
-            var originY = _type.GetProperty("OriginY");
-            var originObject = _type.GetField(nameof(MillingTechProcess.OriginObject));
+            var originInfo = _type.GetProperty(nameof(GeneralOperation.Origin));
+            var originGroupInfo = _type.GetField(nameof(GeneralOperation.OriginGroup));
 
             var (textbox, button) = CreateSelector("Начало координат", "۞");
 
             BindingSource.DataSourceChanged += (s, e) => RefreshText();
-            textbox.Enter += (s, e) => Acad.SelectObjectIds((ObjectId[])originObject?.GetValue(ParamsObject));
+            textbox.Enter += (s, e) =>
+            {
+                var originGroup = (ObjectId?)originInfo.GetValue(ParamsObject);
+                if (originGroup.HasValue)
+                    Acad.SelectObjectIds(originGroup.Value);
+            };
             button.Click += (s, e) =>
             {
                 Interaction.SetActiveDocFocus();
                 var point = Interaction.GetPoint("\nВыберите точку начала координат");
                 if (!point.IsNull())
                 {
-                    originX.SetValue(ParamsObject, point.X.Round(3));
-                    originY.SetValue(ParamsObject, point.Y.Round(3));
+                    originInfo.SetValue(ParamsObject, point);
                     RefreshText();
-                    if (originObject.GetValue(ParamsObject) != null)
-                        Acad.DeleteObjects((ObjectId[])originObject.GetValue(ParamsObject));
-                    originObject.SetValue(ParamsObject, Acad.CreateOriginObject(point));
+                    if (originGroupInfo.GetValue(ParamsObject) != null)
+                        ((ObjectId)originGroupInfo.GetValue(ParamsObject)).Delete();
+                    originGroupInfo.SetValue(ParamsObject, Acad.CreateOriginObject(point));
                 }
             };
             return this;
 
-            void RefreshText() => textbox.Text = $"{{{originX.GetValue(ParamsObject)}, {originY.GetValue(ParamsObject)}}}";
+            void RefreshText()
+            {
+                var origin = (Point3d?)originInfo.GetValue(ParamsObject) ?? Point3d.Origin;
+                textbox.Text = $"{{{origin.X.Round(3)}, {origin.Y.Round(3)}}}";
+            }
         }
         #endregion
 

@@ -20,6 +20,7 @@ namespace CAM
         [NonSerialized] public ObjectId? SupportGroup;
         [NonSerialized] public int FirstCommandIndex;
         [NonSerialized] public GeneralOperation GeneralOperation;
+
         public MachineType MachineType => GeneralOperation.MachineType.Value;
         public Tool Tool => GeneralOperation.Tool;
         public int CuttingFeed => GeneralOperation.CuttingFeed;
