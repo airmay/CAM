@@ -338,7 +338,7 @@ namespace CAM
 
             void RefreshText()
             {
-                var origin = (Point3d?)originInfo.GetValue(ParamsObject) ?? Point3d.Origin;
+                var origin = (Point3d)originInfo.GetValue(ParamsObject);
                 textbox.Text = $"{{{origin.X.Round(3)}, {origin.Y.Round(3)}}}";
             }
         }

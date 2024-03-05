@@ -21,7 +21,7 @@ namespace CAM
         protected int _frequency;
         public int CuttingFeed { get; set; }
         public int PenetrationFeed { get; set; }
-        public Point3d? Origin { get; set; }
+        public Point3d Origin { get; set; }
         public Side EngineSide { get; set; }
 
         public double ZSafety { get; set; } = 20;
