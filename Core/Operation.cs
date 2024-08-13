@@ -1,5 +1,6 @@
 ﻿using Autodesk.AutoCAD.DatabaseServices;
 using System;
+using Autodesk.AutoCAD.Geometry;
 
 namespace CAM
 {
@@ -26,6 +27,7 @@ namespace CAM
         public int CuttingFeed => GeneralOperation.CuttingFeed;
         public int PenetrationFeed => GeneralOperation.PenetrationFeed;
         public double ZSafety => GeneralOperation.ZSafety;
+        public Point2d Origin => GeneralOperation.Origin;
 
         public virtual void Init() { }
 

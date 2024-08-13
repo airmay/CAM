@@ -3,6 +3,7 @@ using CAM.Operations.Tactile;
 using System;
 using System.Linq;
 using System.Windows.Forms;
+using CAM.Operations.CableSawing;
 
 namespace CAM
 {
@@ -16,6 +17,11 @@ namespace CAM
                 new OperationItem("Полосы", typeof(TactileBandsOperation)),
                 new OperationItem("Фаска", typeof(TactileChamfersOperation)),
             }),
+            new OperationGroupItem("Трос", new[]
+            {
+                new OperationItem("Стелла", typeof(CableSawingOperation)),
+            }),
+
         };
 
         public static ToolStripMenuItem[] GetMenuItems(Action<string, Type> onClick)

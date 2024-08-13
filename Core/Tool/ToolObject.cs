@@ -20,7 +20,7 @@ namespace CAM
         {
             if (Curves != null && (position.IsNull() || machineType != _machineType || tool != _tool))
                 Hide();
-            if (position.IsNull())
+            if (tool == null || position.IsNull())
                 return;
 
             _machineType = machineType;
@@ -33,6 +33,9 @@ namespace CAM
 
         public void Hide()
         {
+            if (Curves == null)
+                return;
+
             using (Application.DocumentManager.MdiActiveDocument.LockDocument())
             using (Acad.Database.TransactionManager.StartTransaction())
                 foreach (var item in Curves)

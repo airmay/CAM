@@ -317,7 +317,7 @@ namespace CAM
             BindingSource.DataSourceChanged += (s, e) => RefreshText();
             textbox.Enter += (s, e) =>
             {
-                var originGroup = (ObjectId?)originInfo.GetValue(ParamsObject);
+                var originGroup = (ObjectId?)originGroupInfo.GetValue(ParamsObject);
                 if (originGroup.HasValue)
                     Acad.SelectObjectIds(originGroup.Value);
             };
@@ -331,14 +331,14 @@ namespace CAM
                     RefreshText();
                     if (originGroupInfo.GetValue(ParamsObject) != null)
                         ((ObjectId)originGroupInfo.GetValue(ParamsObject)).Delete();
-                    originGroupInfo.SetValue(ParamsObject, Acad.CreateOriginObject(point));
+                    originGroupInfo.SetValue(ParamsObject, Acad.CreateOriginObject(point.ToPoint2d()));
                 }
             };
             return this;
 
             void RefreshText()
             {
-                var origin = (Point3d?)originInfo.GetValue(ParamsObject) ?? Point3d.Origin;
+                var origin = (Point2d)originInfo.GetValue(ParamsObject);
                 textbox.Text = $"{{{origin.X.Round(3)}, {origin.Y.Round(3)}}}";
             }
         }

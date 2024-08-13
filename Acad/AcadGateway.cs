@@ -166,9 +166,10 @@ namespace CAM
 
         public static Curve[] GetSelectedCurves() => OpenForRead(Interaction.GetPickSet());
 
-        public static ObjectId CreateOriginObject(Point3d point)
+        public static ObjectId CreateOriginObject(Point2d point2d)
         {
             var length = 100;
+            var point = point2d.ToPoint3d();
             var curves = new List<Curve>
             {
                 NoDraw.Line(point, point + Vector3d.XAxis * length),

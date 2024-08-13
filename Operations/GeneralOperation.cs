@@ -19,7 +19,9 @@ namespace CAM
         public int PenetrationFeed { get; set; }
         public double ZSafety { get; set; } = 20;
 
-        public Point3d? Origin { get; set; }
+        public double OriginX { get; set; }
+        public double OriginY { get; set; }
+        public Point2d Origin => new Point2d(OriginX, OriginX);
         [NonSerialized] public ObjectId? OriginGroup;
 
         public static void ConfigureParamsView(ParamsView view)
@@ -39,8 +41,8 @@ namespace CAM
 
         public void Init()
         {
-            if (Origin.HasValue)
-                OriginGroup = Acad.CreateOriginObject(Origin.Value);
+            if (Origin != Point2d.Origin)
+                OriginGroup = Acad.CreateOriginObject(Origin);
 
             foreach (var operation in Operations)
             {
