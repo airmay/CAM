@@ -74,10 +74,12 @@ namespace CAM
                 else
                     Acad.Alert("Ошибка при выполнении расчета", ex);
             }
+#if !DEBUG
             catch (Exception ex)
             {
                 Acad.Alert("Ошибка при выполнении расчета", ex);
             }
+#endif
             Acad.CloseProgressor();
         }
 
