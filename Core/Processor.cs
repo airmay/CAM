@@ -9,179 +9,6 @@ namespace CAM
 {
     public class Processor : IDisposable
     {
-        const double Epsilon = 0.000001;
-        public Point3d CenterPoint { get; set; }
-        public Vector2d Vector { get; set; } = Vector2d.YAxis;
-
-        public double U { get; set; }
-        public double V { get; set; }
-        public int Feed { get; set; }
-        public int S { get; set; }
-
-        private bool _isSetPosition;
-        public bool _isEngineStarted = false;
-
-        public Point2d Center { get; set; }
-        public bool IsExtraRotate { get; set; }
-        private Vector2d _normal;
-        private double _angle = 0;
-        private double _signU;
-
-        public void SetToolPosition1(Point3d centerPoint, double angle, double u, double v)
-        {
-            Center = centerPoint.To2d();
-            _angle = angle;
-            U = u.Round(6);
-            V = v.Round(6);
-            _isSetPosition = true;
-        }
-
-        private CableToolPosition GetToolPosition1()
-        {
-            var point = new Point3d(Center.X - U, Center.Y, V);
-            var angle = _angle.ToRad(); // Vector2d.YAxis.MinusPiToPiAngleTo(Vector);
-            return new CableToolPosition(point, Center.ToPoint3d(), angle);
-        }
-        protected void StartEngineCommands1()
-        {
-            Command1($"M03", "Включение");
-            _isEngineStarted = true;
-        }
-        public void Command1(string text, string name = null, double duration = 0)
-        {
-            AddCommand1(new Command
-            {
-                Name = name,
-                Text = text,
-                //HasTool = _hasTool,
-                ToolLocation = GetToolPosition1(),
-                Duration = duration,
-                U = U,
-                V = V,
-                //A =  Vector2d.YAxis.MinusPiToPiAngleTo(Vector).ToDeg(6)
-                A = _angle
-            });
-        }
-        public void AddCommand1(Command command)
-        {
-            command.Owner = _operation;
-            command.Number = CamManager.Commands.Count + 1;
-            CamManager.Commands.Add(command);
-        }
-        public void GCommandAngle1(Vector2d vector, int s)
-        {
-            var angle = Vector.MinusPiToPiAngleTo(vector);
-            if (Math.Abs(angle.ToDeg(6)) >= 90)
-            {
-                vector = vector.Negate();
-                angle = Vector.MinusPiToPiAngleTo(vector);
-            }
-            if (Math.Abs(angle.ToDeg()) < 0.000001)
-                return;
-
-            //var da = angle - Angle;
-            //if (da > 180)
-            //    da -= 360;
-            //if (da < -180)
-            //    da += 360;
-
-            Vector = vector;
-            Command1($"G05 A{angle.ToDeg(6)} S{s}", "Rotate");
-            //Command($"G05 A{angle.ToDeg(6)} S{s} A={Vector.Angle.ToDeg(6)} U={U.Round(6)}", "Rotate");
-        }
-        public void GCommand1(int gCode, Line2d line2d, double z, bool isRevereseAngle)
-        {
-            var angle = Vector2d.YAxis.MinusPiToPiAngleTo(line2d.Direction).ToDeg(4);
-            var da = Math.Sign(_angle - angle) * 180;
-            while (Math.Abs(angle - _angle) > 90)
-                angle += da;
-            angle = angle.Round(4);
-
-            if (isRevereseAngle)
-                angle += -Math.Sign(angle) * 180;
-
-            var normal = !line2d.IsOn(Center) ? line2d.GetClosestPointTo(Center).Point - Center : new Vector2d();
-            if (!_normal.IsZeroLength() && !normal.IsZeroLength())
-            {
-                if (Math.Abs(angle - _angle) == 90)
-                    angle = _angle + normal.MinusPiToPiAngleTo(_normal) > 0 ? 90 : -90;
-                else
-                    if (normal.GetAngleTo(_normal) > Math.PI / 2)
-                    _signU *= -1;
-            }
-            if (_normal.IsZeroLength())
-                _signU = -Math.Sign(angle) * Math.Sign(normal.Y);
-
-            if (angle - _angle > 0.01 && IsExtraRotate)
-                GCommandA1(angle + 1);
-
-            GCommandA1(angle);
-
-            var u = (_signU * normal.Length).Round(4);
-            var v = z.Round(4);
-
-            if (gCode == 0)
-            {
-                if (u - U < 0 && IsExtraRotate)
-                    GCommandUV(0, u - 5, V);
-                GCommandUV(0, u, V);
-                GCommandUV(0, u, v);
-            }
-            else
-            {
-                GCommandUV(1, u, v);
-            }
-            _normal = normal;
-
-            if (!_isEngineStarted)
-            {
-                StartEngineCommands1();
-            }
-        }
-
-        public void GCommandUV(int gCode, double u, double v)
-        {
-            if (u == U && v == V)
-                return;
-
-            var du = (u - U).Round(4);
-            var dv = (v - V).Round(4);
-            U = u;
-            V = v;
-
-            var feed = gCode == 1 ? $"F{Feed}" : "";
-            var text = $"G0{gCode} U{du} V{dv} {feed}";
-            var duration = Math.Sqrt(du * du + dv * dv) / (gCode == 0 ? 500 : Feed) * 60;
-
-            Command1(text, duration: duration);
-        }
-
-        public void GCommandA1(double angle)
-        {
-            if (Math.Abs(angle - _angle) < 0.01)
-                return;
-
-            var da = (angle - _angle).Round(4);
-            _angle = angle;
-
-            var text = $"G05 A{da} S{S}";
-            var duration = Math.Abs(da) / S * 60;
-
-            Command1(text, "Rotate", duration);
-        }
-
-
-        public void GCommand1(int gCode, Line3d line3d, bool isRevereseAngle = false) => GCommand1(gCode, new Line2d(line3d.PointOnLine.To2d(), line3d.Direction.ToVector2d()), line3d.PointOnLine.Z, isRevereseAngle);
-
-        public void GCommand1(int gCode, Point3d point1, Point3d point2, bool isRevereseAngle = false) => GCommand1(gCode, new Line2d(point1.To2d(), point2.To2d()), (point1.Z + point2.Z) / 2, isRevereseAngle);
-
-
-        /// <summary>
-        /// ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        /// </summary>
-
-
-
         private readonly IPostProcessor _postProcessor;
         private ToolpathBuilder _toolpathBuilder;
         private Operation _operation;
@@ -210,15 +37,15 @@ namespace CAM
 
         public void Start(Tool tool)
         {
-            //Position = Algorithms.NullPoint3d.WithZ(ZMax + ZSafety * 3);
-            //_postProcessor.GCommand(-1, Position, 0, 0, null);
+            Position = Algorithms.NullPoint3d.WithZ(ZMax + ZSafety * 3);
+            _postProcessor.GCommand(-1, Position, 0, 0, null);
 
             if (CamManager.Commands == null)
                 CamManager.Commands = new List<Command>(CommandListCapacity);
             CamManager.Commands.Clear();
 
-            //AddCommands(_postProcessor.StartMachine());
-            //AddCommands(_postProcessor.SetTool(tool.Number, 0, 0, 0));
+            AddCommands(_postProcessor.StartMachine());
+            AddCommands(_postProcessor.SetTool(tool.Number, 0, 0, 0));
 
             _toolpathBuilder = new ToolpathBuilder();
         }

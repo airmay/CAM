@@ -99,7 +99,7 @@ namespace CAM.Operations.CableSawing
                 //    processor.GCommandAngle1(angle, S);
                 //}
             }
-            processor.Command1($"M05", "Выключение");
+            //processor.Command($"M05", "Выключение");
 
             //foreach (Region region in regions)
             //{

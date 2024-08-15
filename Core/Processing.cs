@@ -66,14 +66,14 @@ namespace CAM
 
         private void BuildProcessing()
         {
-            //var generalParams = GeneralOperations.First(p => p.Enabled);
-            //var machineType = generalParams.MachineType;
-            //if (!machineType.CheckNotNull("Станок"))
-            //    return;
-            //MachineType = machineType.Value;
-            Tool tool = null;// generalParams.Tool;
-            //if (!tool.CheckNotNull("Инструмент"))
-            //    return;
+            var generalParams = GeneralOperations.First(p => p.Enabled);
+            var machineType = generalParams.MachineType;
+            if (!machineType.CheckNotNull("Станок"))
+                return;
+            MachineType = machineType.Value;
+            var tool = generalParams.Tool;
+            if (!tool.CheckNotNull("Инструмент"))
+                return;
 
             using (var processor = ProcessorFactory.Create(MachineType))
             {
