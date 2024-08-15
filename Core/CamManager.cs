@@ -12,9 +12,8 @@ namespace CAM
     {
         private static CamDocument _camDocument;
         public static readonly ProcessingView ProcessingView = Acad.ProcessingView;
-        public static List<Command> Commands;
 
-        public static CamDocument CreateProcessing()
+        public static CamDocument CreateCamDocument()
         {
             var processing = new CamDocument();
             Load();
@@ -25,7 +24,7 @@ namespace CAM
                 var (value, hash) = DataLoader.Load();
                 if (value is Processing[] operations)
                 {
-                    processing.GeneralOperations = operations;
+                    processing.Processings = operations;
                     processing.Hash = hash;
                     foreach (var operation in operations)
                         operation.Init();
@@ -42,13 +41,13 @@ namespace CAM
             if (_camDocument != null)
                 UpdateProcessing();
             _camDocument = camDocument;
-            Commands?.Clear();
+            //Commands?.Clear();
             ProcessingView.SetNodes(GetNodes());
             //Acad.ClearHighlighted();
             return;
 
             TreeNode[] GetNodes() =>
-                _camDocument?.GeneralOperations?.Select(p =>
+                _camDocument?.Processings?.Select(p =>
                     {
                         var generalOperationNode = new GeneralOperationNode(p);
                         generalOperationNode.Nodes.AddRange(p.Operations.Select(c => new OperationNode(c))
@@ -71,8 +70,8 @@ namespace CAM
 
             //Acad.Documents[sender as Document].GeneralOperations.ForEach(p => p.DeleteProcessing());
 
-            if (_camDocument.GeneralOperations.Length > 0 || _camDocument.Hash != 0)
-                DataLoader.Save(_camDocument.GeneralOperations, _camDocument.Hash);
+            if (_camDocument.Processings.Length > 0 || _camDocument.Hash != 0)
+                DataLoader.Save(_camDocument.Processings, _camDocument.Hash);
 
             //ProcessingView.ClearCommandsView();
             //Acad.DeleteAll();
@@ -80,7 +79,7 @@ namespace CAM
 
         private static void UpdateProcessing()
         {
-            _camDocument.GeneralOperations = ProcessingView.Nodes
+            _camDocument.Processings = ProcessingView.Nodes
                 .Cast<GeneralOperationNode>()
                 .Select(p => p.UpdateGeneralOperation())
                 .ToArray();

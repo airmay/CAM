@@ -9,15 +9,15 @@ namespace CAM
     public class CamDocument
     {
         public int Hash;
-        public Processing[] GeneralOperations { get; set; }
-        public MachineCodes MachineCodes { get; set; }
+        public Processing[] Processings { get; set; }
+        public static List<Command> Commands;
 
         private Dictionary<ObjectId, int> _toolpathCommandDictionary;
         private ToolObject ToolObject { get; } = new ToolObject();
 
         public void Execute()
         {
-            if (!GeneralOperations.Any(p => p.Operations.Any()))
+            if (!Processings.Any(p => p.Operations.Any()))
                 return;
 
             try
@@ -51,7 +51,7 @@ namespace CAM
 
         private void DeleteProcessing()
         {
-            foreach (var generalOperation in GeneralOperations)
+            foreach (var generalOperation in Processings)
             foreach (var operation in generalOperation.Operations)
             {
                 operation.ToolpathGroup?.DeleteGroup();
@@ -66,7 +66,7 @@ namespace CAM
 
         private void BuildProcessing()
         {
-            var generalParams = GeneralOperations.First(p => p.Enabled);
+            var generalParams = Processings.First(p => p.Enabled);
             var machineType = generalParams.MachineType;
             if (!machineType.CheckNotNull("Станок"))
                 return;
@@ -79,7 +79,7 @@ namespace CAM
             {
                 processor.Start(tool);
                 
-                foreach (var generalOperation in GeneralOperations.Where(p => p.Enabled))
+                foreach (var generalOperation in Processings.Where(p => p.Enabled))
                 {
                     processor.SetGeneralOperarion(generalOperation);
                     foreach (var operation in generalOperation.Operations.Where(p => p.Enabled))

@@ -58,7 +58,7 @@ namespace CAM
                 document.BeginDocumentClose += Document_BeginDocumentClose;
                 document.ImpliedSelectionChanged += (sender, args) => CamManager.OnSelectAcadObject();
 
-                document.UserData[ProcessingKey] = CamManager.CreateProcessing();
+                document.UserData[ProcessingKey] = CamManager.CreateCamDocument();
             }
             CamManager.SetProcessing((CamDocument)document.UserData[ProcessingKey]);
         }
