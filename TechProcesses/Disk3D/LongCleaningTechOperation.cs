@@ -161,7 +161,7 @@ namespace CAM.TechProcesses.Disk3D
                     points.Insert(0, new Point3d((IsDepartureOnBorderSection ? points.First().X : minPoint.X) - Departure, points.First().Y, points.First().Z));
                     points.Add(new Point3d((IsDepartureOnBorderSection ? points.Last().X : maxPoint.X) + Departure, points.Last().Y, points.Last().Z));
                 }
-                if (TechProcess.MachineType == MachineType.Donatoni) //Settongs.IsFrontPlaneZero
+                if (TechProcess.MachineType == MachineCodes.Donatoni) //Settongs.IsFrontPlaneZero
                     points = points.ConvertAll(x => new Point3d(x.X, x.Y - TechProcess.Tool.Thickness.Value, x.Z));
                 if (_disk3DTechProcess.Angle != 0)
                     points = points.ConvertAll(x => x.TransformBy(matrix));

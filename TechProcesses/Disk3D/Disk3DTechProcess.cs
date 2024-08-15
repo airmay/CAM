@@ -27,7 +27,7 @@ namespace CAM.TechProcesses.Disk3D
             void refreshSize() => sizeLabel.Text = Acad.GetSize(view.GetParams<Disk3DTechProcess>().ProcessingArea);
             view.BindingSource.DataSourceChanged += (s, e) => refreshSize();
 
-            view.AddMachine(CAM.MachineType.Donatoni, CAM.MachineType.ScemaLogic, CAM.MachineType.Forma, CAM.MachineType.Champion);
+            view.AddMachine(CAM.MachineCodes.Donatoni, CAM.MachineCodes.ScemaLogic, CAM.MachineCodes.Forma, CAM.MachineCodes.Champion);
             view.AddMaterial();
             view.AddTextBox(nameof(Thickness));
             view.AddIndent();
@@ -49,7 +49,7 @@ namespace CAM.TechProcesses.Disk3D
 
         protected override void SetTool(MillingCommandGenerator generator) =>
             generator.SetTool(
-                MachineType.Value != CAM.MachineType.Donatoni ? Tool.Number : 1,
+                MachineType.Value != CAM.MachineCodes.Donatoni ? Tool.Number : 1,
                 Frequency,
                 angleA: IsA90 ? 90 : AngleA,
                 angleC: Angle,

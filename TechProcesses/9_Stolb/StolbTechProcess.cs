@@ -36,7 +36,7 @@ namespace CAM.TechProcesses.Stolb
 
         public StolbTechProcess()
         {
-            MachineType = CAM.MachineType.Champion;
+            MachineType = CAM.MachineCodes.Champion;
             Material = CAM.Material.Granite;
         }
 

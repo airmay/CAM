@@ -4,23 +4,23 @@ namespace CAM.Core.UI
 {
     public class GeneralOperationNode : OperationNodeBase
     {
-        public GeneralOperation GeneralOperation => (GeneralOperation)Tag;
+        public Processing Processing => (Processing)Tag;
         private OperationNode FirstOperationNode => Nodes.Count > 0 ? (OperationNode) Nodes[0] : null;
 
-        public GeneralOperationNode() : base(new GeneralOperation(), "Обработка", 0)
+        public GeneralOperationNode() : base(new Processing(), "Обработка", 0)
         {
         }
-        public GeneralOperationNode(GeneralOperation generalOperation) : base(generalOperation, generalOperation.Caption, 0)
+        public GeneralOperationNode(Processing processing) : base(processing, processing.Caption, 0)
         {
         }
 
-        public GeneralOperation UpdateGeneralOperation()
+        public Processing UpdateGeneralOperation()
         {
             UpdateOperation();
-            GeneralOperation.Operations = Nodes.Cast<OperationNode>()
+            Processing.Operations = Nodes.Cast<OperationNode>()
                 .Select(c => (Operation)c.UpdateOperation())
                 .ToArray();
-            return GeneralOperation;
+            return Processing;
         }
 
         public override void RefreshColor()
@@ -34,7 +34,7 @@ namespace CAM.Core.UI
 
         public override void MoveDown() => Move(TreeView.Nodes, Index + 1);
 
-        public override void RemoveOperation() => GeneralOperation.Teardown();
+        public override void RemoveOperation() => Processing.Teardown();
 
         public override void ShowToolpath()
         {

@@ -50,13 +50,13 @@ namespace CAM
             _toolpathBuilder = new ToolpathBuilder();
         }
 
-        public void SetGeneralOperarion(GeneralOperation generalOperation)
+        public void SetGeneralOperarion(Processing processing)
         {
-            _frequency = generalOperation.Frequency;
-            CuttingFeed = generalOperation.CuttingFeed;
-            PenetrationFeed = generalOperation.PenetrationFeed;
-            ZSafety = generalOperation.ZSafety;
-            Origin = generalOperation.Origin;
+            _frequency = processing.Frequency;
+            CuttingFeed = processing.CuttingFeed;
+            PenetrationFeed = processing.PenetrationFeed;
+            ZSafety = processing.ZSafety;
+            Origin = processing.Origin;
         }
 
         public void SetOperation(Operation operation)

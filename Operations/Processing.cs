@@ -5,11 +5,11 @@ using Autodesk.AutoCAD.Geometry;
 namespace CAM
 {
     [Serializable]
-    public class GeneralOperation : OperationBase
+    public class Processing : OperationBase
     {
         public Operation[] Operations { get; set; }
 
-        public MachineType? MachineType { get; set; }
+        public MachineCodes? MachineType { get; set; }
         public Material? Material { get; set; }
         
         public Tool Tool { get; set; }
@@ -26,7 +26,7 @@ namespace CAM
 
         public static void ConfigureParamsView(ParamsView view)
         {
-            view.AddMachine(CAM.MachineType.Donatoni, CAM.MachineType.ScemaLogic, CAM.MachineType.Forma);
+            view.AddMachine(CAM.MachineCodes.Donatoni, CAM.MachineCodes.ScemaLogic, CAM.MachineCodes.Forma);
             view.AddMaterial();
             view.AddIndent();
             view.AddTool();

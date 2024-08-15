@@ -4,41 +4,41 @@ namespace CAM
 {
     public static class Settings
     {
-        public static readonly Dictionary<MachineType, MachineSettings> Machines = new Dictionary<MachineType, MachineSettings>
+        public static readonly Dictionary<MachineCodes, Machine> Machines = new Dictionary<MachineCodes, Machine>
         {
-            [MachineType.ScemaLogic] = new MachineSettings
+            [MachineCodes.ScemaLogic] = new Machine
             {
                 MaxFrequency = 3000,
                 ProgramFileExtension = "csv",
                 ProgramLineNumberFormat = "{0}",
                 IsFrontPlaneZero = false
             },
-            [MachineType.Donatoni] = new MachineSettings
+            [MachineCodes.Donatoni] = new Machine
             {
                 MaxFrequency = 5000,
                 ProgramFileExtension = "pgm",
                 ProgramLineNumberFormat = "N{0}",
                 IsFrontPlaneZero = true
             },
-            [MachineType.Forma] = new MachineSettings
+            [MachineCodes.Forma] = new Machine
             {
                 MaxFrequency = 1200,
                 ProgramFileExtension = "pgm",
                 ProgramLineNumberFormat = "N{0}"
             },
-            [MachineType.Champion] = new MachineSettings
+            [MachineCodes.Champion] = new Machine
             {
                 MaxFrequency = 1200,
                 ProgramFileExtension = "pim",
                 ProgramLineNumberFormat = "N{0}"
             },
-            [MachineType.Krea] = new MachineSettings
+            [MachineCodes.Krea] = new Machine
             {
                 MaxFrequency = 10000,
                 ProgramFileExtension = "txt",
                 ProgramLineNumberFormat = "N{0}"
             },
-            [MachineType.CableSawing] = new MachineSettings
+            [MachineCodes.CableSawing] = new Machine
             {
                 MaxFrequency = 10000,
                 ProgramFileExtension = "txt",

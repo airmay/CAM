@@ -6,11 +6,11 @@ using System.Linq;
 
 namespace CAM
 {
-    public class Processing
+    public class CamDocument
     {
         public int Hash;
-        public GeneralOperation[] GeneralOperations { get; set; }
-        public MachineType MachineType { get; set; }
+        public Processing[] GeneralOperations { get; set; }
+        public MachineCodes MachineCodes { get; set; }
 
         private Dictionary<ObjectId, int> _toolpathCommandDictionary;
         private ToolObject ToolObject { get; } = new ToolObject();
@@ -70,12 +70,12 @@ namespace CAM
             var machineType = generalParams.MachineType;
             if (!machineType.CheckNotNull("Станок"))
                 return;
-            MachineType = machineType.Value;
+            MachineCodes = machineType.Value;
             var tool = generalParams.Tool;
             if (!tool.CheckNotNull("Инструмент"))
                 return;
 
-            using (var processor = ProcessorFactory.Create(MachineType))
+            using (var processor = ProcessorFactory.Create(MachineCodes))
             {
                 processor.Start(tool);
                 
@@ -87,7 +87,7 @@ namespace CAM
                         Acad.Write($"расчет операции {operation.Caption}");
 
                         processor.SetOperation(operation);
-                        operation.GeneralOperation = generalOperation;
+                        operation.Processing = generalOperation;
                         operation.Execute(processor);
                     }
                 }
@@ -148,7 +148,7 @@ namespace CAM
     */
         public void ShowTool(Command command) 
         {
-            ToolObject.Set(MachineType, command?.Operation.Tool, command.Position, command.AngleC, command.AngleA);
+            ToolObject.Set(MachineCodes, command?.Operation.Tool, command.Position, command.AngleC, command.AngleA);
         }
 
         public void HideTool() => ToolObject.Hide();

@@ -16,7 +16,7 @@ namespace CAM
     {
         public string Caption { get; set; }
 
-        public MachineType? MachineType { get; set; }
+        public MachineCodes? MachineType { get; set; }
 
         public CAM.Tool Tool { get; set; }
 

@@ -211,7 +211,7 @@ namespace CAM
 
         public ComboBox AddMaterial() => AddComboBox<Material>("Material", "Материал");
 
-        public ComboBox AddMachine(params MachineType[] values) => AddComboBox("MachineType", "Станок", values);
+        public ComboBox AddMachine(params MachineCodes[] values) => AddComboBox("MachineType", "Станок", values);
 
         #endregion
 
@@ -260,7 +260,7 @@ namespace CAM
             BindingSource.DataSourceChanged += (s, e) => textbox.Text = toolProp.GetValue(ParamsObject)?.ToString();
             button.Click += (s, e) =>
             {
-                var machine = (MachineType?)machineProp.GetValue(ParamsObject);
+                var machine = (MachineCodes?)machineProp.GetValue(ParamsObject);
                 var material = (Material?)materialProp.GetValue(ParamsObject);
                 if (!machine.CheckNotNull("Станок") || !material.CheckNotNull("Материал"))
                     return;
@@ -309,8 +309,8 @@ namespace CAM
 
         public ParamsView AddOrigin()
         {
-            var originInfo = _type.GetProperty(nameof(GeneralOperation.Origin));
-            var originGroupInfo = _type.GetField(nameof(GeneralOperation.OriginGroup));
+            var originInfo = _type.GetProperty(nameof(Processing.Origin));
+            var originGroupInfo = _type.GetField(nameof(Processing.OriginGroup));
 
             var (textbox, button) = CreateSelector("Начало координат", "۞");
 

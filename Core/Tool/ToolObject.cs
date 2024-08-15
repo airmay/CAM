@@ -10,20 +10,20 @@ namespace CAM
     public class ToolObject
     {
         public Curve[] Curves { get; set; }
-        private MachineType _machineType;
+        private MachineCodes _machineCodes;
         private Tool _tool;
         private Point3d _position;
         private double _angleC;
         private double _angleA;
 
-        public void Set(MachineType machineType, Tool tool, Point3d position, double angleC, double angleA)
+        public void Set(MachineCodes machineCodes, Tool tool, Point3d position, double angleC, double angleA)
         {
-            if (Curves != null && (position.IsNull() || machineType != _machineType || tool != _tool))
+            if (Curves != null && (position.IsNull() || machineCodes != _machineCodes || tool != _tool))
                 Hide();
             if (tool == null || position.IsNull())
                 return;
 
-            _machineType = machineType;
+            _machineCodes = machineCodes;
             _tool = tool;
             if (Curves == null)
                 CreateCurves();
@@ -76,7 +76,7 @@ namespace CAM
                 switch (_tool.Type)
                 {
                     case ToolType.Disk:
-                        var frontY = Settings.Machines[_machineType].IsFrontPlaneZero ? 0 : -thickness;
+                        var frontY = Settings.Machines[_machineCodes].IsFrontPlaneZero ? 0 : -thickness;
                         var radius = _tool.Diameter / 2;
                         var circle0 = new Circle(new Point3d(0, frontY, radius), Vector3d.YAxis, radius);
                         var circle1 = new Circle(circle0.Center + Vector3d.YAxis * thickness, Vector3d.YAxis, radius);

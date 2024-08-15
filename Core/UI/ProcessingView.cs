@@ -10,7 +10,7 @@ namespace CAM
     {
         public TreeNodeCollection Nodes => treeView.Nodes;
         private GeneralOperationNode GeneralOperationNode => (GeneralOperationNode)(treeView.SelectedNode.Parent ?? treeView.SelectedNode);
-        private GeneralOperation GeneralOperation => GeneralOperationNode.GeneralOperation;
+        private Processing Processing => GeneralOperationNode.Processing;
         private OperationNodeBase SelectedNode => treeView.SelectedNode as OperationNodeBase;
         private Operation SelectedOperation => SelectedNode?.Tag as Operation;
         private Command SelectedCommand => processCommandBindingSource.Current as Command;

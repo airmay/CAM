@@ -20,14 +20,14 @@ namespace CAM
         [NonSerialized] public ObjectId? ToolpathGroup;
         [NonSerialized] public ObjectId? SupportGroup;
         [NonSerialized] public int FirstCommandIndex;
-        [NonSerialized] public GeneralOperation GeneralOperation;
+        [NonSerialized] public Processing Processing;
 
-        public MachineType MachineType => GeneralOperation.MachineType.Value;
-        public Tool Tool => GeneralOperation.Tool;
-        public int CuttingFeed => GeneralOperation.CuttingFeed;
-        public int PenetrationFeed => GeneralOperation.PenetrationFeed;
-        public double ZSafety => GeneralOperation.ZSafety;
-        public Point2d Origin => GeneralOperation.Origin;
+        public MachineCodes MachineCodes => Processing.MachineType.Value;
+        public Tool Tool => Processing.Tool;
+        public int CuttingFeed => Processing.CuttingFeed;
+        public int PenetrationFeed => Processing.PenetrationFeed;
+        public double ZSafety => Processing.ZSafety;
+        public Point2d Origin => Processing.Origin;
 
         public virtual void Init() { }
 

@@ -17,7 +17,7 @@ namespace CAM
 
         public int PenetrationFeed { get; set; }
 
-        protected virtual void SetTool(MillingCommandGenerator generator) => generator.SetTool(MachineType.Value != CAM.MachineType.Donatoni ? Tool.Number : 1, Frequency);
+        protected virtual void SetTool(MillingCommandGenerator generator) => generator.SetTool(MachineType.Value != CAM.MachineCodes.Donatoni ? Tool.Number : 1, Frequency);
 
         protected override void BuildProcessing(MillingCommandGenerator generator)
         {

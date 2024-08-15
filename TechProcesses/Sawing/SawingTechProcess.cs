@@ -26,7 +26,7 @@ namespace CAM.TechProcesses.Sawing
         {
             var sawingModesView = new SawingModesView();
 
-            view.AddMachine(CAM.MachineType.Donatoni, CAM.MachineType.ScemaLogic, CAM.MachineType.Forma);
+            view.AddMachine(CAM.MachineCodes.Donatoni, CAM.MachineCodes.ScemaLogic, CAM.MachineCodes.Forma);
             view.AddMaterial();
             view.AddTextBox(nameof(Thickness));
             view.AddIndent();

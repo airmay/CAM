@@ -28,7 +28,7 @@ namespace CAM.TechProcesses.Polishing
 
         public static void ConfigureParamsView(ParamsView view)
         {
-            view.AddMachine(CAM.MachineType.Donatoni, CAM.MachineType.Krea);
+            view.AddMachine(CAM.MachineCodes.Donatoni, CAM.MachineCodes.Krea);
             view.AddTextBox(nameof(Frequency));
             view.AddIndent();
             view.AddTextBox(nameof(Feed));
@@ -58,7 +58,7 @@ namespace CAM.TechProcesses.Polishing
         protected override void BuildProcessing(MillingCommandGenerator generator)
         {
             generator.ZSafety = ZSafety;
-            if (MachineType.Value == CAM.MachineType.Donatoni)
+            if (MachineType.Value == CAM.MachineCodes.Donatoni)
                 generator.SetTool(2, Frequency, angleA: 90, hasTool: false);
             else
                 generator.SetTool(1, Frequency, angleA: 0, hasTool: false);

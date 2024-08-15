@@ -96,8 +96,8 @@ namespace CAM.TechProcesses.SectionProfile
             if (ChangeEngineSide)
                 side = SideExt.Opposite(side);
             var isMinToolCoord = IsA90
-                ? TechProcess.MachineType.Value != MachineType.ScemaLogic
-                : side == Side.Left ^ TechProcess.MachineType.Value == MachineType.ScemaLogic ^ ChangeProcessSide;
+                ? TechProcess.MachineType.Value != MachineCodes.ScemaLogic
+                : side == Side.Left ^ TechProcess.MachineType.Value == MachineCodes.ScemaLogic ^ ChangeProcessSide;
 
             generator.CuttingFeed = CuttingFeed;
             generator.SmallFeed = TechProcess.PenetrationFeed;

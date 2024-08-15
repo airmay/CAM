@@ -129,12 +129,12 @@ namespace CAM.Operations.Sawing
                 return;
             }
 
-            var engineSide = EngineSideCalculator.Calculate(curve, MachineType);
+            var engineSide = EngineSideCalculator.Calculate(curve, MachineCodes);
             var compensation = 0D;
 
             if (curve is Arc arc && side == Side.Left) // внутренний рез дуги
             {
-                if (MachineType == MachineType.Donatoni && !(arc.StartAngle.CosSign() == 1 && arc.EndAngle.CosSign() == -1)) //  дуга не пересекает угол 90 градусов
+                if (MachineCodes == MachineCodes.Donatoni && !(arc.StartAngle.CosSign() == 1 && arc.EndAngle.CosSign() == -1)) //  дуга не пересекает угол 90 градусов
                 {
                     // подворот диска при вн. резе дуги
                     engineSide = Side.Right;
@@ -148,7 +148,7 @@ namespace CAM.Operations.Sawing
                     compensation = arc.Radius - Math.Sqrt(arc.Radius * arc.Radius - Thickness * (Tool.Diameter - Thickness));
             }
 
-            var isFrontPlaneZero = Settings.Machines[MachineType].IsFrontPlaneZero;
+            var isFrontPlaneZero = Settings.Machines[MachineCodes].IsFrontPlaneZero;
             if (engineSide == side ^ isFrontPlaneZero)
                 compensation += ToolThickness;
             var offsetSign = side == Side.Left ^ curve is Line ? -1 : 1;

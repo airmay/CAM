@@ -21,9 +21,9 @@ namespace CAM
     /// </summary>
     public static class Acad
     {
-        public static Dictionary<Document, Processing> Documents = new Dictionary<Document, Processing>();
+        public static Dictionary<Document, CamDocument> Documents = new Dictionary<Document, CamDocument>();
 
-        public static Processing Processing => ActiveDocument != null ? Documents.TryGetAndReturn(ActiveDocument) : null;
+        public static CamDocument CamDocument => ActiveDocument != null ? Documents.TryGetAndReturn(ActiveDocument) : null;
 
         public static ProcessingView ProcessingView = new ProcessingView();
 

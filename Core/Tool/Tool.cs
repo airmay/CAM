@@ -37,12 +37,12 @@ namespace CAM
 
         public override string ToString() => $"№{Number} {Type.GetDescription()} Ø{Diameter}{(Thickness.HasValue ? " × " + Thickness.ToString() : null)} {Name}";
 
-        public Curve[] GetModelCurves(MachineType machineType)
+        public Curve[] GetModelCurves(MachineCodes machineCodes)
         {
             switch (Type)
             {
                 case ToolType.Disk:
-                    var isFrontPlaneZero = machineType == MachineType.Donatoni || machineType == MachineType.Champion;
+                    var isFrontPlaneZero = machineCodes == MachineCodes.Donatoni || machineCodes == MachineCodes.Champion;
                     var circle0 = new Circle(new Point3d(0, isFrontPlaneZero ? 0 : -Thickness.Value, Diameter / 2), Vector3d.YAxis, Diameter / 2);
                     var circle1 = new Circle(circle0.Center + Vector3d.YAxis * Thickness.Value, Vector3d.YAxis, Diameter / 2);
                     var axis = new Line(circle1.Center, circle1.Center + Vector3d.YAxis * Diameter / 4);

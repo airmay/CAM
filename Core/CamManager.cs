@@ -10,20 +10,20 @@ namespace CAM
 {
     public static class CamManager
     {
-        private static Processing _processing;
+        private static CamDocument _camDocument;
         public static readonly ProcessingView ProcessingView = Acad.ProcessingView;
         public static List<Command> Commands;
 
-        public static Processing CreateProcessing()
+        public static CamDocument CreateProcessing()
         {
-            var processing = new Processing();
+            var processing = new CamDocument();
             Load();
             return processing;
 
             void Load()
             {
                 var (value, hash) = DataLoader.Load();
-                if (value is GeneralOperation[] operations)
+                if (value is Processing[] operations)
                 {
                     processing.GeneralOperations = operations;
                     processing.Hash = hash;
@@ -37,18 +37,18 @@ namespace CAM
             }
         }
 
-        public static void SetProcessing(Processing processing)
+        public static void SetProcessing(CamDocument camDocument)
         {
-            if (_processing != null)
+            if (_camDocument != null)
                 UpdateProcessing();
-            _processing = processing;
+            _camDocument = camDocument;
             Commands?.Clear();
             ProcessingView.SetNodes(GetNodes());
             //Acad.ClearHighlighted();
             return;
 
             TreeNode[] GetNodes() =>
-                _processing?.GeneralOperations?.Select(p =>
+                _camDocument?.GeneralOperations?.Select(p =>
                     {
                         var generalOperationNode = new GeneralOperationNode(p);
                         generalOperationNode.Nodes.AddRange(p.Operations.Select(c => new OperationNode(c))
@@ -61,7 +61,7 @@ namespace CAM
 
         public static void RemoveProcessing()
         {
-            _processing = null;
+            _camDocument = null;
             ProcessingView.ClearView();
         }
 
@@ -71,8 +71,8 @@ namespace CAM
 
             //Acad.Documents[sender as Document].GeneralOperations.ForEach(p => p.DeleteProcessing());
 
-            if (_processing.GeneralOperations.Length > 0 || _processing.Hash != 0)
-                DataLoader.Save(_processing.GeneralOperations, _processing.Hash);
+            if (_camDocument.GeneralOperations.Length > 0 || _camDocument.Hash != 0)
+                DataLoader.Save(_camDocument.GeneralOperations, _camDocument.Hash);
 
             //ProcessingView.ClearCommandsView();
             //Acad.DeleteAll();
@@ -80,23 +80,23 @@ namespace CAM
 
         private static void UpdateProcessing()
         {
-            _processing.GeneralOperations = ProcessingView.Nodes
+            _camDocument.GeneralOperations = ProcessingView.Nodes
                 .Cast<GeneralOperationNode>()
                 .Select(p => p.UpdateGeneralOperation())
                 .ToArray();
-            _processing.HideTool();
+            _camDocument.HideTool();
         }
 
         public static void OnSelectAcadObject()
         {
-            if (Acad.GetToolpathId() is ObjectId id && _processing.GetCommandIndex(id) is int commandIndex)
+            if (Acad.GetToolpathId() is ObjectId id && _camDocument.GetCommandIndex(id) is int commandIndex)
                 ProcessingView.SelectProcessCommand(commandIndex);
         }
 
         public static List<Command> ExecuteProcessing()
         {
             UpdateProcessing();
-            _processing.Execute();
+            _camDocument.Execute();
             UpdateNodeText();
 
             return Commands;
@@ -129,8 +129,8 @@ namespace CAM
                 return;
             }
 
-            var machine = Settings.Machines[_processing.MachineType];
-            var fileName = Acad.SaveFileDialog("Программа", machine.ProgramFileExtension, _processing.MachineType.ToString());
+            var machine = Settings.Machines[_camDocument.MachineCodes];
+            var fileName = Acad.SaveFileDialog("Программа", machine.ProgramFileExtension, _camDocument.MachineCodes.ToString());
             if (fileName == null)
                 return;
             try
@@ -151,7 +151,7 @@ namespace CAM
 
         public static void ShowTool(Command command)
         {
-            _processing.ShowTool(command);
+            _camDocument.ShowTool(command);
         }
     }
 }

@@ -1,6 +1,6 @@
 ﻿namespace CAM
 {
-    public enum MachineType
+    public enum MachineCodes
 	{
 		ScemaLogic,
 
@@ -12,6 +12,8 @@
 
         Forma,
 
-        Champion
+        Champion,
+
+        WireSawMachine
     }
 }

@@ -26,7 +26,7 @@ namespace CAM.TechProcesses.RotationProfileBody
 
         public RotationProfileBodyTechProcess()
         {
-            MachineType = CAM.MachineType.Donatoni;
+            MachineType = CAM.MachineCodes.Donatoni;
             Material = CAM.Material.Marble;
         }
 

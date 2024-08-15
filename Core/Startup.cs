@@ -60,7 +60,7 @@ namespace CAM
 
                 document.UserData[ProcessingKey] = CamManager.CreateProcessing();
             }
-            CamManager.SetProcessing((Processing)document.UserData[ProcessingKey]);
+            CamManager.SetProcessing((CamDocument)document.UserData[ProcessingKey]);
         }
 
         private void Document_CommandWillStart(object sender, CommandEventArgs e)

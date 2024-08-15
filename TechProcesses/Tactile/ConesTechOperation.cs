@@ -47,7 +47,7 @@ namespace CAM.TechProcesses.Tactile
             view.AddTextBox(nameof(Depth));
         }
 
-        public override bool CanProcess => TechProcess.MachineType == MachineType.Donatoni || TechProcess.MachineType == MachineType.Krea || TechProcess.MachineType == MachineType.Champion;
+        public override bool CanProcess => TechProcess.MachineType == MachineCodes.Donatoni || TechProcess.MachineType == MachineCodes.Krea || TechProcess.MachineType == MachineCodes.Champion;
 
         public override void BuildProcessing(MillingCommandGenerator generator)
         {
@@ -72,7 +72,7 @@ namespace CAM.TechProcesses.Tactile
 
             generator.ZSafety = ZSafety;
 
-            if (TechProcess.MachineType == MachineType.Champion)
+            if (TechProcess.MachineType == MachineCodes.Champion)
             {
                 var radius = TechProcess.Tool.Diameter / 2;
                 y += radius;
