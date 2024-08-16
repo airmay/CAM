@@ -150,6 +150,9 @@ namespace CAM
             if (_normal.IsZeroLength())
                 _signU = -Math.Sign(angle) * Math.Sign(normal.Y);
 
+            if (_signU == 0)
+                _signU = -1;
+
             if (gCode == 0 && Math.Abs(angle - _angle) > 0.01 && IsExtraRotate)
                 GCommandA(angle + Math.Sign(angle - _angle));
             
@@ -160,8 +163,8 @@ namespace CAM
             
             if (gCode == 0)
             {
-                if (u - U < 0 && IsExtraMove)
-                    GCommandUV(0, u - 20, V);
+                if (IsExtraMove)
+                    GCommandUV(0, u + Math.Sign(u - U) * 20, V);
                 GCommandUV(0, u, V);
                 GCommandUV(0, u, v);
             }
