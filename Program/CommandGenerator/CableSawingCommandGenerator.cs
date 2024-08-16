@@ -121,6 +121,7 @@ namespace CAM
         }
 
         public Point2d Center { get; set; }
+        public bool IsExtraMove { get; set; }
         public bool IsExtraRotate { get; set; }
         private Vector2d _normal;
         private double _angle = 0;
@@ -149,8 +150,8 @@ namespace CAM
             if (_normal.IsZeroLength())
                 _signU = -Math.Sign(angle) * Math.Sign(normal.Y);
 
-            if (angle - _angle > 0.01 && IsExtraRotate)
-                GCommandA(angle + 1);
+            if (gCode == 0 && Math.Abs(angle - _angle) > 0.01 && IsExtraRotate)
+                GCommandA(angle + Math.Sign(angle - _angle));
             
             GCommandA(angle);
 
@@ -159,8 +160,8 @@ namespace CAM
             
             if (gCode == 0)
             {
-                if (u - U < 0 && IsExtraRotate)
-                    GCommandUV(0, u - 5, V);
+                if (u - U < 0 && IsExtraMove)
+                    GCommandUV(0, u - 20, V);
                 GCommandUV(0, u, V);
                 GCommandUV(0, u, v);
             }

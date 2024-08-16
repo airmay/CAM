@@ -19,6 +19,7 @@ namespace CAM.TechProcesses.CableSawing
         public double Departure { get; set; } = 50;
         public double Delta { get; set; } = 0;
         public double Delay { get; set; } = 60;
+        public bool IsExtraMove { get; set; }
         public bool IsExtraRotate { get; set; }
 
         public Point2d Center => new Point2d(OriginX, OriginY);
@@ -44,7 +45,8 @@ namespace CAM.TechProcesses.CableSawing
                 .AddParam(nameof(ToolThickness), "Толщина троса")
                 .AddParam(nameof(Delta))
                 .AddParam(nameof(Delay), "Задержка")
-                .AddParam(nameof(IsExtraRotate), "Поворот+возврат");
+                .AddParam(nameof(IsExtraMove), "Возврат")
+                .AddParam(nameof(IsExtraRotate), "Поворот");
         }
 
         public override List<TechOperation> CreateTechOperations()
@@ -66,6 +68,7 @@ namespace CAM.TechProcesses.CableSawing
         {
             Tool = new Tool { Type = ToolType.Cable, Diameter = ToolThickness, Thickness = ToolThickness };
             var z0 = ProcessingArea.Select(p => p.ObjectId).GetExtents().MaxPoint.Z + ZSafety;
+            generator.IsExtraMove = IsExtraMove;
             generator.IsExtraRotate = IsExtraRotate;
 
             //if (OriginObject == null)

@@ -86,7 +86,7 @@ namespace CAM.TechProcesses.CableSawing
                     if (curve.StartPoint.Z < curve.EndPoint.Z ^ IsRevereseDirection)
                         curve.ReverseCurve();
 
-                if (Approach > 0)
+                //if (Approach > 0)
                 //    points.Add(railCurves.Select(p => p.StartPoint + Vector3d.ZAxis * Approach).ToArray());
 
                 generator.GCommand(0, railCurves[0].StartPoint, railCurves[1].StartPoint, IsRevereseAngle);
