@@ -58,15 +58,14 @@ namespace CAM.TechProcesses.CableSawing
             var offsetDistance = TechProcess.ToolThickness / 2 + Delta;
             var dbObject = AcadObjects.First().ObjectId.QOpenForRead();
 
-            if (AcadObjects.Count == 1 && dbObject is DbSurface) // ----- Стелла ---------------------------
+            if (AcadObjects.Count == 1 && dbObject is DbSurface surface1 && surface1.IsPlanar) // ----- Стелла ---------------------------
             {
-                var surface1 = dbObject as DbSurface;
-                if (dbObject is Region region1)
-                {
-                    var planeSurface = new PlaneSurface();
-                    planeSurface.CreateFromRegion(region1);
-                    surface1 = planeSurface;
-                }
+                //if (o is Region region1)
+                //{
+                //    var planeSurface = new PlaneSurface();
+                //    planeSurface.CreateFromRegion(region1);
+                //    surface1 = planeSurface;
+                //}
 
                 if (IsRevereseOffset)
                     offsetDistance *= -1;
