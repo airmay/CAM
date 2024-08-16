@@ -9,7 +9,7 @@ namespace CAM
 {
     public class Startup : IExtensionApplication
     {
-        public const string ProcessingKey = "Processing";
+        public const string CamDocumentKey = "CamDocument";
 
         public void Initialize()
         {
@@ -52,15 +52,15 @@ namespace CAM
             if (document == null)
                 return;
 
-            if (!document.UserData.ContainsKey(ProcessingKey))
+            if (!document.UserData.ContainsKey(CamDocumentKey))
             {
                 document.CommandWillStart += Document_CommandWillStart;
                 document.BeginDocumentClose += Document_BeginDocumentClose;
                 document.ImpliedSelectionChanged += (sender, args) => CamManager.OnSelectAcadObject();
 
-                document.UserData[ProcessingKey] = CamManager.CreateCamDocument();
+                document.UserData[CamDocumentKey] = CamDocument.Create();
             }
-            CamManager.SetProcessing((CamDocument)document.UserData[ProcessingKey]);
+            CamManager.SetDocument((CamDocument)document.UserData[CamDocumentKey]);
         }
 
         private void Document_CommandWillStart(object sender, CommandEventArgs e)

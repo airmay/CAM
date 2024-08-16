@@ -211,7 +211,7 @@ namespace CAM
 
         public ComboBox AddMaterial() => AddComboBox<Material>("Material", "Материал");
 
-        public ComboBox AddMachine(params MachineCodes[] values) => AddComboBox("MachineType", "Станок", values);
+        public ComboBox AddMachine(params Machine[] values) => AddComboBox("MachineType", "Станок", values);
 
         #endregion
 
@@ -260,7 +260,7 @@ namespace CAM
             BindingSource.DataSourceChanged += (s, e) => textbox.Text = toolProp.GetValue(ParamsObject)?.ToString();
             button.Click += (s, e) =>
             {
-                var machine = (MachineCodes?)machineProp.GetValue(ParamsObject);
+                var machine = (Machine?)machineProp.GetValue(ParamsObject);
                 var material = (Material?)materialProp.GetValue(ParamsObject);
                 if (!machine.CheckNotNull("Станок") || !material.CheckNotNull("Материал"))
                     return;

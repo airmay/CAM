@@ -9,7 +9,7 @@ namespace CAM
     /// <summary>
     /// Генератор команд для станка типа Champion
     /// </summary>
-    [MachineType(MachineCodes.Champion)]
+    [MachineType(Machine.Champion)]
     public class ChampionCommandGenerator : MillingCommandGenerator
     {
         public bool IsSupressMoveHome { get; set; } = false;

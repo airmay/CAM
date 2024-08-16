@@ -11,18 +11,18 @@ namespace CAM
     {
         private static ToolsForm _toolsForm;
 
-        public static Tool SelectTool(MachineCodes machineCodes)
+        public static Tool SelectTool(Machine machine)
         {
             if (_toolsForm == null)
             {
                 _toolsForm = new ToolsForm();
                 _toolsForm.LoadTools += LoadScemaLogicTools;
-                _toolsForm.SaveTools += (sender, args) => SaveTools(machineCodes);
+                _toolsForm.SaveTools += (sender, args) => SaveTools(machine);
             }
 
-            _toolsForm.Text = $"Инструмент {machineCodes}";
-            _toolsForm.ToolBindingSource.DataSource = GetTools(machineCodes);
-            _toolsForm.bLoad.Enabled = machineCodes == MachineCodes.ScemaLogic;
+            _toolsForm.Text = $"Инструмент {machine}";
+            _toolsForm.ToolBindingSource.DataSource = GetTools(machine);
+            _toolsForm.bLoad.Enabled = machine == Machine.ScemaLogic;
 
             var result = Autodesk.AutoCAD.ApplicationServices.Application.ShowModalDialog(_toolsForm);
 
@@ -35,16 +35,16 @@ namespace CAM
 #else
         @"\\Catalina\Tools";
 #endif
-        private static string GetToolFileName(MachineCodes machineCodes) => Path.Combine(ToolsFilePath, $"{machineCodes}.csv");
+        private static string GetToolFileName(Machine machine) => Path.Combine(ToolsFilePath, $"{machine}.csv");
 
-        private static readonly Dictionary<MachineCodes, List<Tool>> Tools = new Dictionary<MachineCodes, List<Tool>>();
+        private static readonly Dictionary<Machine, List<Tool>> Tools = new Dictionary<Machine, List<Tool>>();
 
-        private static void SaveTools(MachineCodes machineCodes)
+        private static void SaveTools(Machine machine)
         {
-            var file = GetToolFileName(machineCodes);
+            var file = GetToolFileName(machine);
             try
             {
-                var lines = Tools[machineCodes].Select(p => $"{p.Number};{p.Name};{(int)p.Type};{p.Diameter};{p.Thickness}");
+                var lines = Tools[machine].Select(p => $"{p.Number};{p.Name};{(int)p.Type};{p.Diameter};{p.Thickness}");
                 File.WriteAllLines(file, lines);
                 Acad.Alert($"Сохранен файл инструментов {file}");
             }
@@ -54,12 +54,12 @@ namespace CAM
             }
         }
 
-        private static List<Tool> GetTools(MachineCodes machineCodes)
+        private static List<Tool> GetTools(Machine machine)
         {
-            if (Tools.TryGetValue(machineCodes, out var tools))
+            if (Tools.TryGetValue(machine, out var tools))
                 return tools;
 
-            var file = GetToolFileName(machineCodes);
+            var file = GetToolFileName(machine);
             if (File.Exists(file))
             {
                 tools = File.ReadAllLines(file)
@@ -80,7 +80,7 @@ namespace CAM
                 tools = new List<Tool>();
             }
 
-            Tools.Add(machineCodes, tools);
+            Tools.Add(machine, tools);
 
             return tools;
         }
@@ -127,21 +127,21 @@ namespace CAM
                     Diameter = p[0].value,
                     Thickness = p[1].value
                 });
-            var tools = GetTools(MachineCodes.ScemaLogic);
+            var tools = GetTools(Machine.ScemaLogic);
             tools.Clear();
             tools.AddRange(lines);
             _toolsForm.ToolBindingSource.DataSource = tools;
             _toolsForm.ToolBindingSource.ResetBindings(false);
         }
 
-        public static int CalcFrequency(Tool tool, MachineCodes machineCodes, Material material)
+        public static int CalcFrequency(Tool tool, Machine machine, Material material)
         {
             // частота для диска 400мм - на граните 1900, на мраморе 2500
             // частота для диска 600мм - на граните 1500, на мраморе 2000
             var f400 = material == Material.Granite ? 1900 : 2500;
             var df = material == Material.Granite ? 1900 - 1500 : 2500 - 2000;
             var frequency = f400 - (tool.Diameter - 400) * df / 200;
-            return Math.Min((int)frequency, Settings.Machines[machineCodes].MaxFrequency);
+            return Math.Min((int)frequency, Settings.Machines[machine].MaxFrequency);
         }
 
         public static bool Validate(Tool tool, ToolType toolType)

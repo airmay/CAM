@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Windows.Forms;
 using CAM.Core;
 using CAM.Core.UI;
@@ -71,6 +72,7 @@ namespace CAM
 
             toolStrip.Enabled = false;
             processCommandBindingSource.DataSource = CamManager.ExecuteProcessing();
+            UpdateNodeText();
             toolStrip.Enabled = true;
         }
 
@@ -108,14 +110,45 @@ namespace CAM
 
         #region Tree
 
-        public void SetNodes(TreeNode[] nodes)
+        public void CreateTree(List<Processing> processings)
         {
             ClearView();
 
-            treeView.Nodes.AddRange(nodes);
+            treeView.Nodes.AddRange(GetNodes());
             treeView.ExpandAll();
             //RefreshToolButtonsState();
             toolStrip.Enabled = true;
+            return;
+
+            TreeNode[] GetNodes() =>
+                processings?.Select(p =>
+                    {
+                        var generalOperationNode = new GeneralOperationNode(p);
+                        generalOperationNode.Nodes.AddRange(p.Operations.Select(c => new OperationNode(c))
+                            .ToArray());
+                        return generalOperationNode;
+                    })
+                    .ToArray()
+                ?? Array.Empty<TreeNode>();
+        }
+        
+        public void UpdateNodeText()
+        {
+            foreach (TreeNode node in treeView.Nodes)
+            {
+                node.Text = GetCaption(node.Text, node.Nodes.Cast<OperationNode>().Sum(p => p.Operation.Duration));
+                foreach (OperationNode operationNode in node.Nodes)
+                    operationNode.Text = GetCaption(operationNode.Text, operationNode.Operation.Duration);
+            }
+
+            return;
+
+            string GetCaption(string caption, double duration)
+            {
+                var ind = caption.IndexOf('(');
+                var timeSpan = new TimeSpan(0, 0, 0, (int)duration);
+                return $"{(ind > 0 ? caption.Substring(0, ind).Trim() : caption)} ({timeSpan})";
+            }
         }
 
         public void ClearView()

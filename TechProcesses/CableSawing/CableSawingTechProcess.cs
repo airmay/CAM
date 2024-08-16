@@ -26,7 +26,7 @@ namespace CAM.TechProcesses.CableSawing
 
         public CableSawingTechProcess()
         {
-            MachineType = CAM.MachineCodes.CableSawing;
+            MachineType = CAM.Machine.CableSawing;
         }
 
         public static void ConfigureParamsView(ParamsView view)

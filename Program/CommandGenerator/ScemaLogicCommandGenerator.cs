@@ -6,7 +6,7 @@ namespace CAM.Commands
     /// <summary>
     /// Генератор команд для станка типа ScemaLogic
     /// </summary>
-    [MachineType(MachineCodes.ScemaLogic)]
+    [MachineType(Machine.ScemaLogic)]
     public class ScemaLogicCommandGenerator : MillingCommandGenerator
     {
         protected override void StartMachineCommands(string caption)

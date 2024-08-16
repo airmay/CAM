@@ -4,8 +4,8 @@ namespace CAM
 {
     public class MachineTypeAttribute : Attribute
     {
-        public MachineCodes MachineCodes { get; }
+        public Machine Machine { get; }
 
-        public MachineTypeAttribute(MachineCodes machineCodes) => this.MachineCodes = machineCodes;
+        public MachineTypeAttribute(Machine machine) => this.Machine = machine;
     }
 }

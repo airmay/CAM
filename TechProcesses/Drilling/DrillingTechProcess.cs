@@ -18,7 +18,7 @@ namespace CAM.TechProcesses.Drilling
 
         public DrillingTechProcess()
         {
-            MachineType = CAM.MachineCodes.Krea;
+            MachineType = CAM.Machine.Krea;
         }
 
         public static void ConfigureParamsView(ParamsView view)

@@ -9,7 +9,7 @@ namespace CAM
     {
         string Caption { get; set; }
 
-        MachineCodes? MachineType { get; set; }
+        Machine? MachineType { get; set; }
 
         Tool Tool { get; set; }
 

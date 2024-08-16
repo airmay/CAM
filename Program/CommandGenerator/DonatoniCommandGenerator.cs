@@ -7,7 +7,7 @@ namespace CAM
     /// <summary>
     /// Генератор команд для станка типа Donatoni
     /// </summary>
-    [MachineType(MachineCodes.Donatoni)]
+    [MachineType(Machine.Donatoni)]
     public class DonatoniCommandGenerator : MillingCommandGenerator
     {
         public bool IsSupressMoveHome { get; set; } = false;

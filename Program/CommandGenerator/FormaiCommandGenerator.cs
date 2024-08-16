@@ -7,7 +7,7 @@ namespace CAM
     /// <summary>
     /// Генератор команд для станка типа Forma.
     /// </summary>
-    [MachineType(MachineCodes.Forma)]
+    [MachineType(Machine.Forma)]
     public class FormaCommandGenerator : MillingCommandGenerator
     {
         public bool IsSupressMoveHome { get; set; } = false;

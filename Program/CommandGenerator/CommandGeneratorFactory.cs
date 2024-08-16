@@ -7,13 +7,13 @@ namespace CAM
 {
     public static class CommandGeneratorFactory
     {
-        private static readonly Dictionary<MachineCodes, Type> GeneratorTypes = Assembly.GetExecutingAssembly().GetTypes()
+        private static readonly Dictionary<Machine, Type> GeneratorTypes = Assembly.GetExecutingAssembly().GetTypes()
                             .Where(p => p.IsClass && !p.IsAbstract && typeof(CommandGeneratorBase).IsAssignableFrom(p))
-                            .ToDictionary(p => ((MachineTypeAttribute)Attribute.GetCustomAttribute(p, typeof(MachineTypeAttribute))).MachineCodes);
+                            .ToDictionary(p => ((MachineTypeAttribute)Attribute.GetCustomAttribute(p, typeof(MachineTypeAttribute))).Machine);
 
-        public static T Create<T>(MachineCodes machineCodes)
+        public static T Create<T>(Machine machine)
         {
-            return (T)Activator.CreateInstance(GeneratorTypes[machineCodes]);
+            return (T)Activator.CreateInstance(GeneratorTypes[machine]);
         }
     }
 }

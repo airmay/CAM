@@ -5,27 +5,27 @@ namespace CAM
 {
     public static class ProcessorFactory
     {
-        public static Processor Create(MachineCodes machineCodes)
+        public static Processor Create(Machine machine)
         {
             IPostProcessor postProcessor;
-            switch (machineCodes)
+            switch (machine)
             {
-                case MachineCodes.ScemaLogic:
+                case Machine.ScemaLogic:
                     postProcessor = new DonatoniPostProcessor();
                     break;
-                case MachineCodes.Donatoni:
+                case Machine.Donatoni:
                     postProcessor = new DonatoniPostProcessor();
                     break;
-                case MachineCodes.Krea:
+                case Machine.Krea:
                     postProcessor = new DonatoniPostProcessor();
                     break;
-                case MachineCodes.CableSawing:
+                case Machine.CableSawing:
                     postProcessor = new DonatoniPostProcessor();
                     break;
-                case MachineCodes.Forma:
+                case Machine.Forma:
                     postProcessor = new DonatoniPostProcessor();
                     break;
-                case MachineCodes.Champion:
+                case Machine.Champion:
                     postProcessor = new DonatoniPostProcessor();
                     break;
                 default:

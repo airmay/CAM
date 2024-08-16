@@ -191,7 +191,7 @@ namespace CAM
         public static ObjectId? GetToolpathId()
         {
             var res = Acad.Editor.SelectImplied();
-            if (res.Status == PromptStatus.OK && res.Value[res.Value.Count - 1].ObjectId.QOpenForRead<Entity>().Layer == ProcessLayerName)
+            if (res.Status == PromptStatus.OK) // && res.Value[res.Value.Count - 1].ObjectId.QOpenForRead<Entity>().Layer == ProcessLayerName)
                 return res.Value[res.Value.Count - 1].ObjectId;
             return null;
         }

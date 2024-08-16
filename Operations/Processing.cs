@@ -9,7 +9,7 @@ namespace CAM
     {
         public Operation[] Operations { get; set; }
 
-        public MachineCodes? MachineType { get; set; }
+        public Machine? MachineType { get; set; }
         public Material? Material { get; set; }
         
         public Tool Tool { get; set; }
@@ -26,7 +26,7 @@ namespace CAM
 
         public static void ConfigureParamsView(ParamsView view)
         {
-            view.AddMachine(CAM.MachineCodes.Donatoni, CAM.MachineCodes.ScemaLogic, CAM.MachineCodes.Forma);
+            view.AddMachine(CAM.Machine.Donatoni, CAM.Machine.ScemaLogic, CAM.Machine.Forma);
             view.AddMaterial();
             view.AddIndent();
             view.AddTool();

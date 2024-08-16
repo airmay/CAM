@@ -1,6 +1,6 @@
 ﻿namespace CAM
 {
-    public enum MachineCodes
+    public enum Machine
 	{
 		ScemaLogic,
 

@@ -5,22 +5,22 @@ namespace CAM.Utils
 {
     public static class EngineSideCalculator
     {
-        public static Side Calculate(Curve curve, MachineCodes machineCodes)
+        public static Side Calculate(Curve curve, Machine machine)
         {
             switch (curve)
             {
                 case Arc arc:
-                    return CalcArc(arc, machineCodes);
+                    return CalcArc(arc, machine);
                 case Line line:
                     return CalcLine(line);
                 case Polyline polyline:
-                    return CalcPolyline(polyline, machineCodes);
+                    return CalcPolyline(polyline, machine);
                 default:
                     throw new InvalidOperationException($"Кривая типа {curve.GetType()} не может быть обработана.");
             }
         }
 
-        private static Side CalcArc(Arc arc, MachineCodes machineCodes)
+        private static Side CalcArc(Arc arc, Machine machine)
         {
             var startSide = arc.StartAngle.CosSign();
             var endSide = arc.EndAngle.CosSign();
@@ -31,7 +31,7 @@ namespace CAM.Utils
 
             if (cornersOneSide < 0) //  дуга пересекает углы 90 или 270 градусов
             {
-                if (machineCodes == MachineCodes.ScemaLogic)
+                if (machine == Machine.ScemaLogic)
                     throw new InvalidOperationException("Обработка дуги на ScemaLogic невозможна - дуга пересекает угол 90 или 270 градусов.");
 
                 return startSide > 0 ? Side.Left : Side.Right;
@@ -47,7 +47,7 @@ namespace CAM.Utils
             return BuilderUtils.CalcEngineSide(line.Angle);
         }
 
-        private static Side CalcPolyline(Polyline polyline, MachineCodes machineCodes)
+        private static Side CalcPolyline(Polyline polyline, Machine machine)
         {
             var sign = 0;
             var engineSide = Side.None;
@@ -70,7 +70,7 @@ namespace CAM.Utils
 
                 if (s != sign)
                 {
-                    if (machineCodes == MachineCodes.ScemaLogic)
+                    if (machine == Machine.ScemaLogic)
                         throw new InvalidOperationException("Обработка полилинии на ScemaLogic невозможна - кривая пересекает углы 90 или 270 градусов.");
 
                     var sd = sign > 0 ^ bulge < 0 ? Side.Left : Side.Right;

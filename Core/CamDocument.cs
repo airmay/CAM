@@ -1,157 +1,36 @@
-﻿using Autodesk.AutoCAD.DatabaseServices;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
+﻿using System.Collections.Generic;
 
 namespace CAM
 {
     public class CamDocument
     {
         public int Hash;
-        public Processing[] Processings { get; set; }
-        public static List<Command> Commands;
+        public List<Processing> Processings { get; private set; } = new List<Processing>();
 
-        private Dictionary<ObjectId, int> _toolpathCommandDictionary;
-        private ToolObject ToolObject { get; } = new ToolObject();
-
-        public void Execute()
+        public static CamDocument Create()
         {
-            if (!Processings.Any(p => p.Operations.Any()))
-                return;
-
-            try
+            var document = new CamDocument();
+            var (value, hash) = DataLoader.Load();
+            if (value is List<Processing> processings)
             {
-                Acad.Write("Выполняется расчет обработки ...");
-                Acad.CreateProgressor("Расчет обработки");
-                var stopwatch = Stopwatch.StartNew();
-                DeleteProcessing();
-                Acad.Editor.UpdateScreen();
-
-                BuildProcessing();
-                if (CamManager.Commands != null)
-                    UpdateFromCommands();
-
-                stopwatch.Stop();
-                Acad.Write($"Расчет обработки завершен {stopwatch.Elapsed}");
+                document.Processings = processings;
+                document.Hash = hash;
+                foreach (var processing in processings)
+                    processing.Init();
             }
-            catch (Autodesk.AutoCAD.Runtime.Exception ex) when (ex.ErrorStatus == Autodesk.AutoCAD.Runtime.ErrorStatus.UserBreak)
+            else if (value != null)
             {
-                Acad.Write("Расчет прерван");
-            }
-#if !DEBUG  
-            catch (Exception ex)
-            {
-                Acad.Alert("Ошибка при выполнении расчета", ex);
-            }
-#endif
-
-            Acad.CloseProgressor();
-        }
-
-        private void DeleteProcessing()
-        {
-            foreach (var generalOperation in Processings)
-            foreach (var operation in generalOperation.Operations)
-            {
-                operation.ToolpathGroup?.DeleteGroup();
-                operation.ToolpathGroup = null;
-                operation.SupportGroup?.DeleteGroup();
-                operation.SupportGroup = null;
+                Acad.Alert("Ошибка при загрузке данных обработки");
             }
 
-            CamManager.Commands = null;
-            ToolObject.Hide();
+            return document;
         }
 
-        private void BuildProcessing()
+
+        public void Save()
         {
-            var generalParams = Processings.First(p => p.Enabled);
-            var machineType = generalParams.MachineType;
-            if (!machineType.CheckNotNull("Станок"))
-                return;
-            MachineCodes = machineType.Value;
-            var tool = generalParams.Tool;
-            if (!tool.CheckNotNull("Инструмент"))
-                return;
-
-            using (var processor = ProcessorFactory.Create(MachineCodes))
-            {
-                processor.Start(tool);
-                
-                foreach (var generalOperation in Processings.Where(p => p.Enabled))
-                {
-                    processor.SetGeneralOperarion(generalOperation);
-                    foreach (var operation in generalOperation.Operations.Where(p => p.Enabled))
-                    {
-                        Acad.Write($"расчет операции {operation.Caption}");
-
-                        processor.SetOperation(operation);
-                        operation.Processing = generalOperation;
-                        operation.Execute(processor);
-                    }
-                }
-                processor.Finish();
-            }
+            if (Processings.Count > 0 || Hash != 0)
+                DataLoader.Save(Processings, Hash);
         }
-
-        private void UpdateFromCommands()
-        {
-            _toolpathCommandDictionary = CamManager.Commands.Select((command, index) => new { command, index })
-                .Where(p => p.command.Toolpath.HasValue)
-                .GroupBy(p => p.command.Toolpath.Value)
-                .ToDictionary(p => p.Key, p => p.Min(k => k.index));
-
-            foreach (var operationGroup in CamManager.Commands.GroupBy(p => p.Operation))
-                operationGroup.Key.ToolpathGroup = operationGroup.Select(p => p.Toolpath).CreateGroup();
-        }
-
-        public int? GetCommandIndex(ObjectId id)
-        {
-            return _toolpathCommandDictionary.TryGetValue(id, out var value) ? (int?)value : null;
-        }
-
-        //public void PartialProcessing(ITechProcess techProcess, ProcessCommand processCommand)
-        //{
-        //    Acad.Write($"Выполняется формирование программы обработки по техпроцессу {techProcess.Caption} с команды номер {processCommand.Number}");
-        //    techProcess.SkipProcessing(processCommand);
-        //    Acad.Editor.UpdateScreen();
-        //}
-
-        /*
-        private void CreateImitationProgramm(string[] contents, string fileName)
-        {
-            List<string> result = new List<string>(contents.Length * 2);
-            foreach (var item in contents)
-            {
-                if (item.StartsWith("M03"))
-                    continue;
-
-                var line = item.Replace("G01", "G00");
-                var vi = line.IndexOf('V');
-                if (vi > 0)
-                    line = line.Substring(0, vi) + "V0";
-
-                if (line == "G00 U0 V0")
-                    continue;
-
-                result.Add(line);
-
-                if (line.StartsWith("G00"))
-                    result.Add("M00");
-            }
-            var parts = fileName.Split('.');
-            fileName = parts[0] + "_i." + parts[1];
-            File.WriteAllLines(fileName, result);
-            Acad.Write($"Создан файл с имитацией {fileName}");
-        }
-    */
-        public void ShowTool(Command command) 
-        {
-            ToolObject.Set(MachineCodes, command?.Operation.Tool, command.Position, command.AngleC, command.AngleA);
-        }
-
-        public void HideTool() => ToolObject.Hide();
-
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Windows.Forms;
@@ -12,50 +13,16 @@ namespace CAM
     {
         private static CamDocument _camDocument;
         public static readonly ProcessingView ProcessingView = Acad.ProcessingView;
+        public static List<Command> Commands;
 
-        public static CamDocument CreateCamDocument()
-        {
-            var processing = new CamDocument();
-            Load();
-            return processing;
-
-            void Load()
-            {
-                var (value, hash) = DataLoader.Load();
-                if (value is Processing[] operations)
-                {
-                    processing.Processings = operations;
-                    processing.Hash = hash;
-                    foreach (var operation in operations)
-                        operation.Init();
-                }
-                else if (value != null)
-                {
-                    Acad.Alert("Ошибка при загрузке данных обработки");
-                }
-            }
-        }
-
-        public static void SetProcessing(CamDocument camDocument)
+        public static void SetDocument(CamDocument camDocument)
         {
             if (_camDocument != null)
                 UpdateProcessing();
             _camDocument = camDocument;
-            //Commands?.Clear();
-            ProcessingView.SetNodes(GetNodes());
+            Commands?.Clear();
+            ProcessingView.CreateTree(_camDocument.Processings);
             //Acad.ClearHighlighted();
-            return;
-
-            TreeNode[] GetNodes() =>
-                _camDocument?.Processings?.Select(p =>
-                    {
-                        var generalOperationNode = new GeneralOperationNode(p);
-                        generalOperationNode.Nodes.AddRange(p.Operations.Select(c => new OperationNode(c))
-                            .ToArray());
-                        return generalOperationNode;
-                    })
-                    .ToArray()
-                ?? Array.Empty<TreeNode>();
         }
 
         public static void RemoveProcessing()
@@ -66,12 +33,11 @@ namespace CAM
 
         public static void SaveProcessing()
         {
-            UpdateProcessing();
+            //UpdateProcessing();
 
             //Acad.Documents[sender as Document].GeneralOperations.ForEach(p => p.DeleteProcessing());
 
-            if (_camDocument.Processings.Length > 0 || _camDocument.Hash != 0)
-                DataLoader.Save(_camDocument.Processings, _camDocument.Hash);
+            _camDocument.Save();
 
             //ProcessingView.ClearCommandsView();
             //Acad.DeleteAll();
@@ -79,45 +45,109 @@ namespace CAM
 
         private static void UpdateProcessing()
         {
-            _camDocument.Processings = ProcessingView.Nodes
-                .Cast<GeneralOperationNode>()
-                .Select(p => p.UpdateGeneralOperation())
-                .ToArray();
-            _camDocument.HideTool();
+            HideTool();
         }
 
+        private static Dictionary<ObjectId, int> _toolpathCommandDictionary;
         public static void OnSelectAcadObject()
         {
-            if (Acad.GetToolpathId() is ObjectId id && _camDocument.GetCommandIndex(id) is int commandIndex)
+            if (Acad.GetToolpathId() is ObjectId id && _toolpathCommandDictionary.TryGetValue(id, out var commandIndex))
                 ProcessingView.SelectProcessCommand(commandIndex);
         }
 
+        private static ToolObject ToolObject { get; } = new ToolObject();
+
         public static List<Command> ExecuteProcessing()
         {
-            UpdateProcessing();
-            _camDocument.Execute();
-            UpdateNodeText();
+            if (!Processings.Any(p => p.Operations.Any()))
+                return;
 
+            try
+            {
+                Acad.Write("Выполняется расчет обработки ...");
+                Acad.CreateProgressor("Расчет обработки");
+                var stopwatch = Stopwatch.StartNew();
+                DeleteProcessing();
+                Acad.Editor.UpdateScreen();
+
+                BuildProcessing();
+                if (CamManager.Commands != null)
+                    UpdateFromCommands();
+
+                stopwatch.Stop();
+                Acad.Write($"Расчет обработки завершен {stopwatch.Elapsed}");
+            }
+            catch (Autodesk.AutoCAD.Runtime.Exception ex) when (ex.ErrorStatus == Autodesk.AutoCAD.Runtime.ErrorStatus.UserBreak)
+            {
+                Acad.Write("Расчет прерван");
+            }
+#if !DEBUG  
+            catch (Exception ex)
+            {
+                Acad.Alert("Ошибка при выполнении расчета", ex);
+            }
+#endif
+
+            Acad.CloseProgressor();
             return Commands;
+
         }
 
-        private static void UpdateNodeText()
+        private static void DeleteProcessing()
         {
-            foreach (TreeNode node in ProcessingView.Nodes)
-            {
-                node.Text = GetCaption(node.Text, node.Nodes.Cast<OperationNode>().Sum(p => p.Operation.Duration));
-                foreach (OperationNode operationNode in node.Nodes)
-                    operationNode.Text = GetCaption(operationNode.Text, operationNode.Operation.Duration);
-            }
+            foreach (var generalOperation in Processings)
+                foreach (var operation in generalOperation.Operations)
+                {
+                    operation.ToolpathGroup?.DeleteGroup();
+                    operation.ToolpathGroup = null;
+                    operation.SupportGroup?.DeleteGroup();
+                    operation.SupportGroup = null;
+                }
 
-            return;
+            CamManager.Commands = null;
+            ToolObject.Hide();
+        }
 
-            string GetCaption(string caption, double duration)
+        private static void BuildProcessing()
+        {
+            var generalParams = Processings.First(p => p.Enabled);
+            var machineType = generalParams.MachineType;
+            if (!machineType.CheckNotNull("Станок"))
+                return;
+            Machine = machineType.Value;
+            var tool = generalParams.Tool;
+            if (!tool.CheckNotNull("Инструмент"))
+                return;
+
+            using (var processor = ProcessorFactory.Create(Machine))
             {
-                var ind = caption.IndexOf('(');
-                var timeSpan = new TimeSpan(0, 0, 0, (int)duration);
-                return $"{(ind > 0 ? caption.Substring(0, ind).Trim() : caption)} ({timeSpan})";
+                processor.Start(tool);
+
+                foreach (var generalOperation in Processings.Where(p => p.Enabled))
+                {
+                    processor.SetGeneralOperarion(generalOperation);
+                    foreach (var operation in generalOperation.Operations.Where(p => p.Enabled))
+                    {
+                        Acad.Write($"расчет операции {operation.Caption}");
+
+                        processor.SetOperation(operation);
+                        operation.Processing = generalOperation;
+                        operation.Execute(processor);
+                    }
+                }
+                processor.Finish();
             }
+        }
+
+        private void UpdateFromCommands()
+        {
+            _toolpathCommandDictionary = Commands.Select((command, index) => new { command, index })
+                .Where(p => p.command.Toolpath.HasValue)
+                .GroupBy(p => p.command.Toolpath.Value)
+                .ToDictionary(p => p.Key, p => p.Min(k => k.index));
+
+            foreach (var operationGroup in Commands.GroupBy(p => p.Operation))
+                operationGroup.Key.ToolpathGroup = operationGroup.Select(p => p.Toolpath).CreateGroup();
         }
 
         public static void SendProgram()
@@ -150,7 +180,45 @@ namespace CAM
 
         public static void ShowTool(Command command)
         {
-            _camDocument.ShowTool(command);
+            ToolObject.Set(command?.Operation.Machine, command?.Operation.Tool, command.Position, command.AngleC, command.AngleA);
         }
+
+        public static void HideTool() => ToolObject.Hide();
+
+        //public void PartialProcessing(ITechProcess techProcess, ProcessCommand processCommand)
+        //{
+        //    Acad.Write($"Выполняется формирование программы обработки по техпроцессу {techProcess.Caption} с команды номер {processCommand.Number}");
+        //    techProcess.SkipProcessing(processCommand);
+        //    Acad.Editor.UpdateScreen();
+        //}
+
+        /*
+        private void CreateImitationProgramm(string[] contents, string fileName)
+        {
+            List<string> result = new List<string>(contents.Length * 2);
+            foreach (var item in contents)
+            {
+                if (item.StartsWith("M03"))
+                    continue;
+
+                var line = item.Replace("G01", "G00");
+                var vi = line.IndexOf('V');
+                if (vi > 0)
+                    line = line.Substring(0, vi) + "V0";
+
+                if (line == "G00 U0 V0")
+                    continue;
+
+                result.Add(line);
+
+                if (line.StartsWith("G00"))
+                    result.Add("M00");
+            }
+            var parts = fileName.Split('.');
+            fileName = parts[0] + "_i." + parts[1];
+            File.WriteAllLines(fileName, result);
+            Acad.Write($"Создан файл с имитацией {fileName}");
+        }
+    */
     }
 }

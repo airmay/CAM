@@ -85,7 +85,7 @@ namespace CAM.TechProcesses.Sawing
             double offsetArc = 0;
             double angleA = 0;
 
-            if (TechProcess.MachineType == MachineCodes.ScemaLogic)
+            if (TechProcess.MachineType == Machine.ScemaLogic)
                 AngleA = 0;
 
             switch (curve)
@@ -107,7 +107,7 @@ namespace CAM.TechProcesses.Sawing
             var offsetCoeff = Math.Tan(angleA) * outerSideSign;
             var depthCoeff = 1 / Math.Cos(angleA);
             var toolThickness = TechProcess.Tool.Thickness.Value * depthCoeff;
-            var compensation = (offsetArc + (engineSide == OuterSide ^ TechProcess.MachineType == MachineCodes.Donatoni ? toolThickness : 0)) * outerSideSign;
+            var compensation = (offsetArc + (engineSide == OuterSide ^ TechProcess.MachineType == Machine.Donatoni ? toolThickness : 0)) * outerSideSign;
             var shift = angleA > 0 ? -thickness * offsetCoeff : 0;
 
             var sumIndent = CalcIndent(thickness) * (Convert.ToInt32(IsExactlyBegin) + Convert.ToInt32(IsExactlyEnd));
@@ -140,7 +140,7 @@ namespace CAM.TechProcesses.Sawing
                     var p0 = point + vector;
                     var angleC = BuilderUtils.CalcToolAngle(toolpathCurve, point, engineSide);
                     generator.Move(p0.X, p0.Y, angleC: angleC, angleA: Math.Abs(AngleA));
-                    if (TechProcess.MachineType == MachineCodes.ScemaLogic)
+                    if (TechProcess.MachineType == Machine.ScemaLogic)
                         generator.Command("28;;XYCZ;;;;;;", "Цикл");
                 }
                 generator.Cutting(toolpathCurve, item.Value, TechProcess.PenetrationFeed, engineSide);
@@ -174,14 +174,14 @@ namespace CAM.TechProcesses.Sawing
 
                 if (cornersOneSide < 0) //  дуга пересекает углы 90 или 270 градусов
                 {
-                    if (TechProcess.MachineType == MachineCodes.ScemaLogic)
+                    if (TechProcess.MachineType == Machine.ScemaLogic)
                         throw new InvalidOperationException("Обработка дуги невозможна - дуга пересекает угол 90 или 270 градусов.");
 
                     engineSide = startSide > 0 ? Side.Left : Side.Right;
                 }
                 if (OuterSide == Side.Left) // внутренний рез дуги
                 {
-                    if (TechProcess.MachineType == MachineCodes.Donatoni && engineSide != Side.Left) // подворот диска при вн. резе дуги
+                    if (TechProcess.MachineType == Machine.Donatoni && engineSide != Side.Left) // подворот диска при вн. резе дуги
                     {
                         engineSide = Side.Right;
                         //var comp = arc.Radius - Math.Sqrt(arc.Radius * arc.Radius - thickness * (toolDiameter - thickness));
@@ -226,7 +226,7 @@ namespace CAM.TechProcesses.Sawing
 
                     if (s != sign)
                     {
-                        if (TechProcess.MachineType == MachineCodes.ScemaLogic)
+                        if (TechProcess.MachineType == Machine.ScemaLogic)
                             throw new InvalidOperationException("Обработка полилинии невозможна - кривая пересекает углы 90 или 270 градусов.");
                         var side = sign > 0 ^ bulge < 0 ? Side.Left : Side.Right;
                         if (engineSide != Side.None)

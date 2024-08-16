@@ -9,7 +9,7 @@ namespace CAM
     /// <summary>
     /// Генератор команд для станка типа Krea
     /// </summary>
-    [MachineType(MachineCodes.Krea)]
+    [MachineType(Machine.Krea)]
     public class KreaCommandGenerator : MillingCommandGenerator
     {
         protected override void StartMachineCommands(string caption)

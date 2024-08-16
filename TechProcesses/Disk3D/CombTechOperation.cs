@@ -69,7 +69,7 @@ namespace CAM.TechProcesses.Disk3D
 
         private void SetTool(MillingCommandGenerator generator, double angleA, double angleC) 
             => generator.SetTool(
-                TechProcess.MachineType.Value != MachineCodes.Donatoni ? TechProcess.Tool.Number : 1, 
+                TechProcess.MachineType.Value != Machine.Donatoni ? TechProcess.Tool.Number : 1, 
                 TechProcess.Frequency, 
                 angleA: angleA,
                 angleC: angleC, 

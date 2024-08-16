@@ -105,7 +105,7 @@
     <Compile Include="Core\CamDocument.cs" />
     <Compile Include="Core\CamManager.cs" />
     <Compile Include="Core\CableSawingProcessor.cs" />
-    <Compile Include="Core\Settings\Machine.cs" />
+    <Compile Include="Core\Settings\MachineSettings.cs" />
     <Compile Include="Core\Settings\MachineType.cs" />
     <Compile Include="Core\ToolpathBuilder.cs" />
     <Compile Include="Core\Tool\ToolObject.cs" />
@@ -184,7 +184,7 @@
       <DependentUpon>UtilsView.cs</DependentUpon>
     </Compile>
     <Compile Include="Acad\AcadObject.cs" />
-    <Compile Include="Core\Enums\MachineCodes.cs" />
+    <Compile Include="Core\Enums\Machine.cs" />
     <Compile Include="Core\Enums\Material.cs" />
     <Compile Include="Program\Generator\PostProcessorBase.cs" />
     <Compile Include="Program\Generator\ScemaLogicPostProcessor.cs" />
