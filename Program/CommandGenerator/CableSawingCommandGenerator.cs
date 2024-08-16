@@ -185,7 +185,7 @@ namespace CAM
             if (u == U && v == V)
                 return;
 
-            var du = (u - U).Round(4);
+            var du = -(u - U).Round(4);
             var dv = (v - V).Round(4);
             U = u;
             V = v;
