@@ -186,10 +186,10 @@ namespace CAM
             if (u == U && v == V)
                 return;
 
-            if (gCode == 1 && DU != 0)
-                u = (Math.Abs(u) + DU) * Math.Sign(u);
-
             var du = -(u - U).Round(4);
+            if (gCode == 1 && DU != 0)
+                du = (Math.Abs(du) + DU) * Math.Sign(du);
+
             var dv = (v - V).Round(4);
             U = u;
             V = v;
