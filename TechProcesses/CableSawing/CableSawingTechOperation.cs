@@ -20,6 +20,7 @@ namespace CAM.TechProcesses.CableSawing
         public bool IsRevereseAngle { get; set; }
         public bool IsRevereseOffset { get; set; }
         public virtual int StepCount { get; set; }
+        public double DU { get; set; }
 
         public abstract Curve[] GetRailCurves(List<Curve> curves);
         //public abstract void BuildProcessing(CableCommandGenerator generator);

@@ -30,7 +30,8 @@ namespace CAM.TechProcesses.CableSawing
                 .AddIndent()
                 .AddParam(nameof(Delta))
                 .AddParam(nameof(Delay), "Задержка")
-                .AddParam(nameof(StepCount), "Количество шагов");
+                .AddParam(nameof(StepCount), "Количество шагов")
+                .AddParam(nameof(DU), "dU");
         }
 
         public LineSawingTechOperation()
@@ -87,7 +88,7 @@ namespace CAM.TechProcesses.CableSawing
 
                 //if (Approach > 0)
                 //    points.Add(railCurves.Select(p => p.StartPoint + Vector3d.ZAxis * Approach).ToArray());
-
+                generator.DU = DU / StepCount;
                 generator.GCommand(0, railCurves[0].StartPoint, railCurves[1].StartPoint, IsRevereseAngle);
 
                 var stepCurves = railCurves.ConvertAll(p => new { Curve = p, step = (p.EndParam - p.StartParam) / StepCount });

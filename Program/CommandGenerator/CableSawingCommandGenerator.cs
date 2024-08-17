@@ -18,6 +18,7 @@ namespace CAM
         public Vector2d Vector { get; set; } = Vector2d.YAxis;
 
         public double U { get; set; }
+        public double DU { get; set; }
         public double V { get; set; }
         public int Feed { get; set; }
         public int S { get; set; }
@@ -184,6 +185,9 @@ namespace CAM
         {
             if (u == U && v == V)
                 return;
+
+            if (gCode == 1 && DU != 0)
+                u = (Math.Abs(u) + DU) * Math.Sign(u);
 
             var du = -(u - U).Round(4);
             var dv = (v - V).Round(4);
