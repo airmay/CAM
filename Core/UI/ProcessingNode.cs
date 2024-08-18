@@ -2,19 +2,19 @@
 
 namespace CAM.Core.UI
 {
-    public class GeneralOperationNode : OperationNodeBase
+    public class ProcessingNode : OperationNodeBase
     {
         public Processing Processing => (Processing)Tag;
         private OperationNode FirstOperationNode => Nodes.Count > 0 ? (OperationNode) Nodes[0] : null;
 
-        public GeneralOperationNode() : base(new Processing(), "Обработка", 0)
+        public ProcessingNode() : base(new Processing(), "Обработка", 0)
         {
         }
-        public GeneralOperationNode(Processing processing) : base(processing, processing.Caption, 0)
+        public ProcessingNode(Processing processing) : base(processing, processing.Caption, 0)
         {
         }
 
-        public Processing UpdateGeneralOperation()
+        public Processing GetProcessing()
         {
             UpdateOperation();
             Processing.Operations = Nodes.Cast<OperationNode>()

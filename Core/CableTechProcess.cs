@@ -18,7 +18,7 @@ namespace CAM
 }
 //        public string Caption { get; set; }
 
-//        public MachineType? MachineType { get; set; }
+//        public Machine? Machine { get; set; }
 
 //        public Tool Tool { get; set; }
 
@@ -72,7 +72,7 @@ namespace CAM
 
 //                //if (Tool != null)
 //                //    generator.SetTool(
-//                //        MachineType.Value != CAM.MachineType.Donatoni ? Tool.Number : 1,
+//                //        Machine.Value != CAM.Machine.Donatoni ? Tool.Number : 1,
 //                //        Frequency);
 
 //                BuildProcessing(generator);
@@ -114,11 +114,11 @@ namespace CAM
 //            //});
 //            //ToolpathObjectIds = null;
 
-//            //using (var generator = CommandGeneratorFactory.Create(MachineType.Value))
+//            //using (var generator = CommandGeneratorFactory.Create(Machine.Value))
 //            //{
 //            //    generator.StartTechProcess(this);
 //            //    generator.SetTool(
-//            //        MachineType.Value != CAM.MachineType.Donatoni ? Tool.Number : 1,
+//            //        Machine.Value != CAM.Machine.Donatoni ? Tool.Number : 1,
 //            //        Frequency);
 
 //            //    generator.SetTechOperation(techOperation);

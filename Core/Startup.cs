@@ -75,7 +75,7 @@ namespace CAM
         {
             ((Document)sender).CommandWillStart -= Document_CommandWillStart;
             ((Document)sender).BeginDocumentClose -= Document_BeginDocumentClose;
-            CamManager.RemoveProcessing();
+            CamManager.RemoveDocument();
         }
 
         public void Terminate()

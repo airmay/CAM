@@ -211,7 +211,7 @@ namespace CAM
 
         public ComboBox AddMaterial() => AddComboBox<Material>("Material", "Материал");
 
-        public ComboBox AddMachine(params Machine[] values) => AddComboBox("MachineType", "Станок", values);
+        public ComboBox AddMachine(params Machine[] values) => AddComboBox("Machine", "Станок", values);
 
         #endregion
 
@@ -252,7 +252,7 @@ namespace CAM
         public (TextBox textbox, Button button) AddTool()
         {
             var toolProp = _type.GetProperty("Tool");
-            var machineProp = _type.GetProperty("MachineType");
+            var machineProp = _type.GetProperty("Machine");
             var materialProp = _type.GetProperty("Material");
             var frequencyProp = _type.GetProperty("Frequency");
 

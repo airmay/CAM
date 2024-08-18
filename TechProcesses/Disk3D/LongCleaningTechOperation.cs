@@ -494,7 +494,7 @@ namespace CAM.TechProcesses.Disk3D
         //    PassList.ForEach(p =>
         //    {
         //        var points = p;
-        //        if (TechProcess.MachineType == MachineType.ScemaLogic) //Settongs.IsFrontPlaneZero
+        //        if (TechProcess.Machine == Machine.ScemaLogic) //Settongs.IsFrontPlaneZero
         //            points = points.ConvertAll(x => new Point3d(x.X, x.Y + TechProcess.Tool.Thickness.Value, x.Z));
         //        if (disk3DTechProcess.Angle != 0)
         //            points = points.ConvertAll(x => x.TransformBy(matrix));

@@ -52,7 +52,7 @@
 //            var passVector = railVector * (rail.Length + 2 * Departure);
 //            var crossVector = railVector.RotateBy(-Math.PI / 2, Vector3d.ZAxis);
 //            var startPass = rail.StartPoint - railVector * Departure;
-//            var shift = TechProcess.MachineType == MachineType.Donatoni ^ BuilderUtils.CalcEngineSide(rail.Angle) == Side.Left ? toolThickness : 0;
+//            var shift = TechProcess.Machine == Machine.Donatoni ^ BuilderUtils.CalcEngineSide(rail.Angle) == Side.Left ? toolThickness : 0;
 //            if (rail.IsNewObject)
 //                rail.Dispose();
 

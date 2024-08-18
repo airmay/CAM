@@ -16,14 +16,14 @@ namespace CAM
         private double _angleC;
         private double _angleA;
 
-        public void Set(Machine machine, Tool tool, Point3d position, double angleC, double angleA)
+        public void Set(Machine? machine, Tool tool, Point3d position, double angleC, double angleA)
         {
             if (Curves != null && (position.IsNull() || machine != _machine || tool != _tool))
                 Hide();
             if (tool == null || position.IsNull())
                 return;
 
-            _machine = machine;
+            _machine = machine.Value;
             _tool = tool;
             if (Curves == null)
                 CreateCurves();

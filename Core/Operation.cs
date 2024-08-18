@@ -22,7 +22,7 @@ namespace CAM
         [NonSerialized] public int FirstCommandIndex;
         [NonSerialized] public Processing Processing;
 
-        public Machine Machine => Processing.MachineType.Value;
+        public Machine Machine => Processing.Machine.Value;
         public Tool Tool => Processing.Tool;
         public int CuttingFeed => Processing.CuttingFeed;
         public int PenetrationFeed => Processing.PenetrationFeed;

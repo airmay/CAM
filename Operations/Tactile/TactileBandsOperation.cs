@@ -83,7 +83,7 @@ namespace CAM.Operations.Tactile
         //    var count = Math.Ceiling(periodAll / periodWidth);
         //    periodWidth = periodAll / count;
         //    var x = (toolThickness - (periodWidth - toolThickness)) / 2;
-        //    var shift = TechProcess.MachineType == MachineType.ScemaLogic ^ ProcessingAngle == 45 ? toolThickness : 0;
+        //    var shift = TechProcess.Machine == Machine.ScemaLogic ^ ProcessingAngle == 45 ? toolThickness : 0;
         //    PassList.Clear();
         //    PassList.Add(new Pass(shift, CuttingType.Roughing));
         //    for (int i = 1; i <= count; i++)
@@ -117,7 +117,7 @@ namespace CAM.Operations.Tactile
 
         //    if (IsEdgeProcessing)
         //    {
-        //        if (ProcessingAngle == 45 ^ (TechProcess.MachineType == MachineType.Donatoni || TechProcess.MachineType == MachineType.Champion))
+        //        if (ProcessingAngle == 45 ^ (TechProcess.Machine == Machine.Donatoni || TechProcess.Machine == Machine.Champion))
         //            Cutting(0.8 * thickness, CuttingFeed, -thickness);
 
         //        if (offset > -0.5 * thickness)
@@ -140,7 +140,7 @@ namespace CAM.Operations.Tactile
         //        if (offset - BandSpacing < size)
         //            Algorithms.Range(offset - BandSpacing, size, 0.8 * thickness).ForEach(p => Cutting(p, CuttingFeed));
 
-        //        if (ProcessingAngle == 45 ^ TechProcess.MachineType == MachineType.ScemaLogic)
+        //        if (ProcessingAngle == 45 ^ TechProcess.Machine == Machine.ScemaLogic)
         //            Cutting(size - 0.8 * thickness, CuttingFeed, thickness);
         //    }
         //    ray.Dispose();

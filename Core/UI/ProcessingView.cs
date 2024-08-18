@@ -10,8 +10,8 @@ namespace CAM
     public partial class ProcessingView : UserControl
     {
         public TreeNodeCollection Nodes => treeView.Nodes;
-        private GeneralOperationNode GeneralOperationNode => (GeneralOperationNode)(treeView.SelectedNode.Parent ?? treeView.SelectedNode);
-        private Processing Processing => GeneralOperationNode.Processing;
+        private ProcessingNode ProcessingNode => (ProcessingNode)(treeView.SelectedNode.Parent ?? treeView.SelectedNode);
+        private Processing Processing => ProcessingNode.Processing;
         private OperationNodeBase SelectedNode => treeView.SelectedNode as OperationNodeBase;
         private Operation SelectedOperation => SelectedNode?.Tag as Operation;
         private Command SelectedCommand => processCommandBindingSource.Current as Command;
@@ -35,7 +35,7 @@ namespace CAM
             var node = new OperationNode(OperationFactory.Create(type, SelectedOperation), caption);
 
             if (Nodes.Count == 0)
-                bCreateGeneralOperation_Click(null, null);
+                bCreateProcessing_Click(null, null);
 
             var generalOperationNode = SelectedNode is null
                 ? treeView.Nodes[treeView.Nodes.Count - 1]
@@ -53,9 +53,9 @@ namespace CAM
             // bVisibility.Enabled = bSendProgramm.Enabled = bPartialProcessing.Enabled = bPlay.Enabled = SelectedNode?.ProcessCommands != null;
         }
 
-        private void bCreateGeneralOperation_Click(object sender, EventArgs e)
+        private void bCreateProcessing_Click(object sender, EventArgs e)
         {
-            var node = new GeneralOperationNode();
+            var node = new ProcessingNode();
             treeView.Nodes.Add(node);
             treeView.SelectedNode = node;
         }
@@ -71,7 +71,7 @@ namespace CAM
             SelectNextControl(ActiveControl, true, true, true, true);
 
             toolStrip.Enabled = false;
-            processCommandBindingSource.DataSource = CamManager.ExecuteProcessing();
+            processCommandBindingSource.DataSource = CamManager.ExecuteProcessing(ProcessingNode.GetProcessing());
             UpdateNodeText();
             toolStrip.Enabled = true;
         }
@@ -110,7 +110,7 @@ namespace CAM
 
         #region Tree
 
-        public void CreateTree(List<Processing> processings)
+        public void CreateTree(Processing[] processings)
         {
             ClearView();
 
@@ -123,7 +123,7 @@ namespace CAM
             TreeNode[] GetNodes() =>
                 processings?.Select(p =>
                     {
-                        var generalOperationNode = new GeneralOperationNode(p);
+                        var generalOperationNode = new ProcessingNode(p);
                         generalOperationNode.Nodes.AddRange(p.Operations.Select(c => new OperationNode(c))
                             .ToArray());
                         return generalOperationNode;
@@ -131,7 +131,12 @@ namespace CAM
                     .ToArray()
                 ?? Array.Empty<TreeNode>();
         }
-        
+
+        public Processing[] GetProcessings()
+        {
+            return treeView.Nodes.Cast<ProcessingNode>().Select(p => p.GetProcessing()).ToArray();
+        }
+
         public void UpdateNodeText()
         {
             foreach (TreeNode node in treeView.Nodes)

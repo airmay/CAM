@@ -1,5 +1,7 @@
 ﻿using Autodesk.AutoCAD.DatabaseServices;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using Autodesk.AutoCAD.Geometry;
 
 namespace CAM
@@ -9,7 +11,8 @@ namespace CAM
     {
         public Operation[] Operations { get; set; }
 
-        public Machine? MachineType { get; set; }
+        public virtual MachineType MachineType { get; set; }
+        public Machine? Machine { get; set; }
         public Material? Material { get; set; }
         
         public Tool Tool { get; set; }
@@ -55,6 +58,28 @@ namespace CAM
         {
             foreach (var operation in Operations)
                 operation.Teardown();
+        }
+
+        public void Execute()
+        {
+            if (!Machine.CheckNotNull("Станок") || !Tool.CheckNotNull("Инструмент"))
+                return;
+
+            using (var processor = ProcessorFactory.Create(Machine.Value))
+            {
+                processor.Start(Tool);
+                processor.SetGeneralOperarion(this);
+                foreach (var operation in Operations.Where(p => p.Enabled))
+                {
+                    Acad.Write($"расчет операции {operation.Caption}");
+
+                    processor.SetOperation(operation);
+                    operation.Processing = this;
+                    operation.Execute(processor);
+                }
+
+                processor.Finish();
+            }
         }
     }
 }

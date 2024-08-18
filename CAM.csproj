@@ -121,7 +121,7 @@
     <Compile Include="Core\Tool\ToolModel.cs" />
     <Compile Include="Core\Tool\ToolPosition.cs" />
     <Compile Include="Core\Tool\ToolTypeAttribute.cs" />
-    <Compile Include="Core\UI\GeneralOperationNode.cs" />
+    <Compile Include="Core\UI\ProcessingNode.cs" />
     <Compile Include="Core\UI\OperationItem.cs" />
     <Compile Include="Core\UI\OperationItemsContainer.cs" />
     <Compile Include="Core\UI\OperationNodeBase.cs" />
