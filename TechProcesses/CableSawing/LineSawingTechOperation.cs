@@ -98,8 +98,13 @@ namespace CAM.TechProcesses.CableSawing
 
                     generator.GCommand(1, points[0], points[1]);
                 }
-                //if (Departure > 0)
-                //    points.Add(railCurves.Select(p => p.EndPoint - Vector3d.ZAxis * Departure).ToArray());
+
+                if (Departure > 0)
+                {
+                    var point0 = railCurves[0].EndPoint.GetExtendedPoint(railCurves[0].StartPoint, Departure);
+                    var point1 = railCurves[1].EndPoint + (point0 - railCurves[0].EndPoint);
+                    generator.GCommand(1, point0, point1);
+                }
 
                 return;
             }            
