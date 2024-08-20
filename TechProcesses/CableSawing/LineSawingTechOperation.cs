@@ -103,6 +103,7 @@ namespace CAM.TechProcesses.CableSawing
                 {
                     var point0 = railCurves[0].EndPoint.GetExtendedPoint(railCurves[0].StartPoint, Departure);
                     var point1 = railCurves[1].EndPoint + (point0 - railCurves[0].EndPoint);
+                    generator.DU = 0;
                     generator.GCommand(1, point0, point1);
                 }
 
