@@ -67,7 +67,7 @@ namespace CAM
         {
             if (e.GlobalCommandName == "CLOSE" || e.GlobalCommandName == "QUIT" || e.GlobalCommandName == "QSAVE" || e.GlobalCommandName == "SAVEAS")
             {
-                CamManager.SaveProcessing(); // TODO сохранять все
+                CamManager.SaveDocument(); // TODO сохранять все
             }
         }
 

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Windows.Forms;
 using CAM.Core;
 using CAM.Core.UI;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
 namespace CAM
 {
@@ -69,7 +70,8 @@ namespace CAM
         private void bBuildProcessing_ButtonClick(object sender, EventArgs e)
         {
             SelectNextControl(ActiveControl, true, true, true, true);
-
+            if (treeView.SelectedNode == null)
+                treeView.SelectedNode = treeView.Nodes[0];
             toolStrip.Enabled = false;
             processCommandBindingSource.DataSource = CamManager.ExecuteProcessing(ProcessingNode.GetProcessing());
             UpdateNodeText();
@@ -91,7 +93,7 @@ namespace CAM
                    Acad.ReportProgressor(false))
             {
                 processCommandBindingSource.MoveNext();
-                System.Threading.Thread.Sleep((int)((ProcessCommand)processCommandBindingSource.Current).Duration * 10);
+                System.Threading.Thread.Sleep((int)((Command)processCommandBindingSource.Current).Duration * 10);
             }
 
             Acad.CloseProgressor();
@@ -172,10 +174,7 @@ namespace CAM
             SelectedNode.SelectAcadObject();
 
             if (IsToolpathVisible)
-            {
                 SelectedNode.ShowToolpath();
-                Acad.Editor.UpdateScreen();
-            }
         }
 
         private void treeView_NodeMouseDoubleClick(object sender, TreeNodeMouseClickEventArgs e)

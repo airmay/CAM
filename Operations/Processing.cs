@@ -81,5 +81,11 @@ namespace CAM
                 processor.Finish();
             }
         }
+
+        public void RemoveAcadObjects()
+        {
+            foreach (var operation in Operations)
+                operation.RemoveAcadObjects();
+        }
     }
 }

@@ -115,12 +115,17 @@ namespace CAM
             }
 
             Acad.Editor.UpdateScreen();
+
+            _position = position;
+            _angleC = angleC;
+            _angleA = angleA;
+
             return;
 
             Matrix3d GetTransformMatrix()
             {
                 var mat1 = Matrix3d.Displacement(_position.GetVectorTo(position));
-                var mat2 = Matrix3d.Rotation(Graph.ToRad(angleC - _angleC), Vector3d.ZAxis, position);
+                var mat2 = Matrix3d.Rotation(Graph.ToRad(_angleC - angleC), Vector3d.ZAxis, position);
                 var mat3 = Matrix3d.Rotation(Graph.ToRad(angleA - _angleA),
                     Vector3d.XAxis.RotateBy(Graph.ToRad(-angleC), Vector3d.ZAxis), position);
 

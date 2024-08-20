@@ -12,20 +12,20 @@ namespace CAM
     public static class CamManager
     {
         private static CamDocument _camDocument;
-        public static readonly ProcessingView ProcessingView = Acad.ProcessingView;
+        public static ProcessingView ProcessingView = new ProcessingView();
         public static List<Command> Commands;
         private static ToolObject ToolObject { get; } = new ToolObject();
         private static Processing _processing;
 
         public static void SetDocument(CamDocument camDocument)
         {
-            //if (_camDocument != null)
-            //    UpdateProcessing();
+            if (_camDocument != null)
+                _camDocument.Processings = ProcessingView.GetProcessings();
             _camDocument = camDocument;
             ToolObject.Hide();
             Commands?.Clear();
             ProcessingView.CreateTree(camDocument.Processings);
-            //Acad.ClearHighlighted();
+            Acad.ClearHighlighted();
         }
 
         public static void RemoveDocument()
@@ -34,50 +34,28 @@ namespace CAM
             ProcessingView.ClearView();
         }
 
-        public static void SaveProcessing()
+        public static void SaveDocument()
         {
-            //UpdateProcessing();
-
-            //Acad.Documents[sender as Document].GeneralOperations.ForEach(p => p.DeleteProcessing());
-
+            DeleteGenerated();
             _camDocument.Save(ProcessingView.GetProcessings());
 
-            //ProcessingView.ClearCommandsView();
-            //Acad.DeleteAll();
-        }
-
-        //private static void UpdateProcessing()
-
-        //{
-
-        //    HideTool();
-
-        //}
-
-        private static Dictionary<ObjectId, int> _toolpathCommandDictionary;
-
-        public static void OnSelectAcadObject()
-        {
-            if (Acad.GetToolpathId() is ObjectId id && _toolpathCommandDictionary.TryGetValue(id, out var commandIndex))
-                ProcessingView.SelectProcessCommand(commandIndex);
+            ProcessingView.ClearCommandsView();
+            Acad.DeleteAll();
         }
 
         public static List<Command> ExecuteProcessing(Processing processing)
         {
+            DeleteGenerated();
+            Acad.Editor.UpdateScreen();
             _processing = processing;
             Acad.Write($"Выполняется расчет обработки {processing.Caption}");
             Acad.CreateProgressor("Расчет обработки");
             try
             {
-                DeleteProcessing();
-                Acad.Editor.UpdateScreen();
-
                 var stopwatch = Stopwatch.StartNew();
-
                 processing.Execute();
                 if (CamManager.Commands != null)
                     UpdateFromCommands();
-
                 stopwatch.Stop();
                 Acad.Write($"Расчет обработки  {processing.Caption} завершен {stopwatch.Elapsed}");
             }
@@ -92,22 +70,23 @@ namespace CAM
             }
 #endif
             Acad.CloseProgressor();
+            //Acad.Editor.Regen();//UpdateScreen();
             return Commands;
         }
 
-        private static void DeleteProcessing()
+        private static void DeleteGenerated()
         {
-            //foreach (var generalOperation in Processings)
-            //    foreach (var operation in generalOperation.Operations)
-            //    {
-            //        operation.ToolpathGroup?.DeleteGroup();
-            //        operation.ToolpathGroup = null;
-            //        operation.SupportGroup?.DeleteGroup();
-            //        operation.SupportGroup = null;
-            //    }
-
-            CamManager.Commands = null;
             ToolObject.Hide();
+            _processing?.RemoveAcadObjects();
+            Commands = null;
+        }
+
+        private static Dictionary<ObjectId, int> _toolpathCommandDictionary;
+
+        public static void OnSelectAcadObject()
+        {
+            if (Acad.GetToolpathId() is ObjectId id && _toolpathCommandDictionary.TryGetValue(id, out var commandIndex))
+                ProcessingView.SelectProcessCommand(commandIndex);
         }
 
         private static void UpdateFromCommands()
@@ -119,6 +98,11 @@ namespace CAM
 
             foreach (var operationGroup in Commands.Where(p => p.Operation != null).GroupBy(p => p.Operation))
                 operationGroup.Key.ToolpathGroup = operationGroup.Select(p => p.Toolpath).CreateGroup();
+        }
+
+        public static void ShowTool(Command command)
+        { 
+            ToolObject.Set(command?.Operation?.Processing.Machine, command?.Operation?.Tool, command.Position, command.AngleC, command.AngleA);
         }
 
         public static void SendProgram()
@@ -147,11 +131,6 @@ namespace CAM
             {
                 Acad.Alert($"Ошибка при записи файла {fileName}", ex);
             }
-        }
-
-        public static void ShowTool(Command command)
-        { 
-            ToolObject.Set(command?.Operation?.Processing.Machine, command?.Operation?.Tool, command.Position, command.AngleC, command.AngleA);
         }
 
         //public static void HideTool() => ToolObject.Hide();

@@ -19,7 +19,7 @@ namespace CAM
                 Dock = DockSides.Left
             };
 
-            paletteSet.Add("Объекты", Acad.ProcessingView);
+            paletteSet.Add("Объекты", CamManager.ProcessingView);
 
             paletteSet.Add("Инструменты", new UtilsView());
 

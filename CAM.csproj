@@ -318,6 +318,7 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
+    <None Include="Properties\DataSources\Command.datasource" />
     <None Include="Resources\arrow-090_.png" />
   </ItemGroup>
   <ItemGroup>

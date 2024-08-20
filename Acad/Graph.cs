@@ -216,7 +216,8 @@ namespace CAM
             const int hatchSize = 40;
             try
             {
-                var offsetPolyline = polyline.GetOffsetCurves(hatchSize * (int)side)[0] as Polyline;
+                var offsetPolyline = polyline.GetOffsetCurves(hatchSize)[0] as Polyline;
+                //var offsetPolyline = polyline.GetOffsetCurves(hatchSize * (int)side)[0] as Polyline;
                 if (!polyline.Closed)
                 {
                     offsetPolyline.ReverseCurve();
@@ -242,7 +243,7 @@ namespace CAM
                     space.AppendEntity(hatch);
                     trans.AddNewlyCreatedDBObject(hatch, true);
 
-                    hatch.LayerId = Acad.GetHatchLayerId();
+                    //hatch.LayerId = Acad.GetHatchLayerId();
                     hatch.SetDatabaseDefaults();
                     hatch.Normal = new Vector3d(0, 0, 1);
                     hatch.Elevation = 0.0;

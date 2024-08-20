@@ -141,7 +141,7 @@ namespace CAM
                     toolpath = _toolpathBuilder.AddToolpath(curve, name);
                 _operation.Duration += curve.Length() / feed.GetValueOrDefault(10000) * 60;
             }
-            AddCommand(name, commandText, toolpath);
+            AddCommand(commandText, name, toolpath);
         }
 
         public void AddCommand(string text, string name = null, ObjectId? toolpath = null)

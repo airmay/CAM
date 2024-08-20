@@ -34,5 +34,13 @@ namespace CAM
         public virtual void Teardown() { }
 
         public abstract void Execute(Processor processor);
+
+        public void RemoveAcadObjects()
+        {
+            ToolpathGroup?.DeleteGroup();
+            ToolpathGroup = null;
+            SupportGroup?.DeleteGroup();
+            SupportGroup = null;
+        }
     }
 }
