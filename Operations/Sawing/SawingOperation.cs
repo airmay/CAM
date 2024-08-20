@@ -87,6 +87,8 @@ namespace CAM.Operations.Sawing
                 if (curve == null)
                 {
                     points[point] = IsExactlyEnd;
+                    if (side == Side.None)
+                        side = Side.Right;
                     break;
                 }
 
@@ -112,8 +114,8 @@ namespace CAM.Operations.Sawing
         {
             var poilyline = curveSides.Keys.ToList().ToPolyline();
             var hatchId = Graph.CreateHatch(poilyline, side);
-            //if (hatchId.HasValue)
-            //    SupportGroup = SupportGroup.AppendToGroup(hatchId.Value);
+            if (hatchId.HasValue)
+                SupportGroup = SupportGroup.AppendToGroup(hatchId.Value);
         }
 
         private void ProcessCurve(Processor processor, Curve curve, Side side, bool isExactlyBegin, bool isExactlyEnd)
@@ -243,7 +245,6 @@ namespace CAM.Operations.Sawing
                 var gash = NoDraw.Pline(point, point2, point2 + offsetVector, point + offsetVector);
                 gash.LayerId = Acad.GetGashLayerId();
                 SupportGroup.AppendToGroup(gash.Add());
-                //gash.Add();
             }
         }
 

@@ -154,7 +154,12 @@ namespace CAM
                 if (!groupId.HasValue)
                 {
                     var id = entityIds.Group(selectable: false);
-                    id.QOpenForWrite<Group>(p => p.SetLayer(entityIds[0].QOpenForRead<Entity>().LayerId));
+                    id.QOpenForWrite<Group>(p =>
+                    {
+                        p.SetLayer(entityIds[0].QOpenForRead<Entity>().LayerId);
+                        p.SetVisibility(true);
+                    });
+
                     return id;
                 }
                 Modify.AppendToGroup(groupId.Value, entityIds);

@@ -216,8 +216,7 @@ namespace CAM
             const int hatchSize = 40;
             try
             {
-                var offsetPolyline = polyline.GetOffsetCurves(hatchSize)[0] as Polyline;
-                //var offsetPolyline = polyline.GetOffsetCurves(hatchSize * (int)side)[0] as Polyline;
+                var offsetPolyline = polyline.GetOffsetCurves(hatchSize * (int)side)[0] as Polyline;
                 if (!polyline.Closed)
                 {
                     offsetPolyline.ReverseCurve();
