@@ -38,7 +38,6 @@ namespace CAM
         {
             DeleteGenerated();
             _camDocument.Save(ProcessingView.GetProcessings());
-
             ProcessingView.ClearCommandsView();
             Acad.DeleteAll();
         }
@@ -85,7 +84,7 @@ namespace CAM
 
         public static void OnSelectAcadObject()
         {
-            if (Acad.GetToolpathId() is ObjectId id && _toolpathCommandDictionary.TryGetValue(id, out var commandIndex))
+            if (Acad.GetToolpathId() is ObjectId id && _toolpathCommandDictionary?.TryGetValue(id, out var commandIndex) == true)
                 ProcessingView.SelectProcessCommand(commandIndex);
         }
 

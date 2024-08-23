@@ -100,6 +100,7 @@
     <Compile Include="Acad\AutoCADCommands\QuickSelection.cs" />
     <Compile Include="Acad\AutoCADCommands\SymbolPack.cs" />
     <Compile Include="Core\CableTechProcess.cs" />
+    <Compile Include="Core\CommandsArray.cs" />
     <Compile Include="Core\MillingProcessor.cs" />
     <Compile Include="Core\OperationFactory.cs" />
     <Compile Include="Core\CamDocument.cs" />

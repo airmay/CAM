@@ -50,7 +50,10 @@ namespace CAM
         private void SetActiveDocument(Document document)
         {
             if (document == null)
+            {
+                CamManager.RemoveDocument();
                 return;
+            }
 
             if (!document.UserData.ContainsKey(CamDocumentKey))
             {

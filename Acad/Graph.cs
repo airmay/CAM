@@ -54,7 +54,7 @@ namespace CAM
         internal static double ToRoundDeg(this double angle) => angle.ToDeg(3);
         internal static int CosSign(this double angle)
         {
-            var deg = angle.ToDeg(3);
+            var deg = angle.ToRoundDeg();
             return deg < 90 || deg > 270 
                 ? 1
                 : (deg > 90 && deg < 270) ? -1 : 0;
@@ -216,7 +216,7 @@ namespace CAM
             const int hatchSize = 40;
             try
             {
-                var offsetPolyline = polyline.GetOffsetCurves(hatchSize * (int)side)[0] as Polyline;
+                var offsetPolyline = polyline.GetOffsetCurves(-hatchSize * (int)side)[0] as Polyline;
                 if (!polyline.Closed)
                 {
                     offsetPolyline.ReverseCurve();
@@ -368,6 +368,11 @@ namespace CAM
             }
         }
         #endregion
+
+        public static Point3d GetCenter(IEnumerable<Point3d> points)
+        {
+            return points.Aggregate(Point3d.Origin, (sum, point) => sum.Add(point.GetAsVector())) / points.Count();
+        }
     }
 
     public enum CurveTip

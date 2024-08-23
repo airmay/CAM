@@ -110,6 +110,7 @@ namespace CAM
         public void Uplifting() => GCommandTo(CommandNames.Uplifting, 0, Position.WithZ(UpperZ));
 
         public void Penetration(Point3d point) => GCommandTo(CommandNames.Penetration, 1, point, PenetrationFeed);
+        public void Penetration(double z) => Penetration(Position.WithZ(z));
 
         public void Cutting(Point3d point) => GCommandTo(CommandNames.Cutting, 1, point, CuttingFeed);
 
@@ -146,6 +147,9 @@ namespace CAM
 
         public void AddCommand(string text, string name = null, ObjectId? toolpath = null)
         {
+            if (text == null)
+                return;
+
             CamManager.Commands.Add(new Command
             {
                 Name = name,

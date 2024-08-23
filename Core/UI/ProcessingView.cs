@@ -76,6 +76,7 @@ namespace CAM
             processCommandBindingSource.DataSource = CamManager.ExecuteProcessing(ProcessingNode.GetProcessing());
             UpdateNodeText();
             toolStrip.Enabled = true;
+            treeView_AfterSelect(sender, null);
         }
 
         private void bVisibility_Click(object sender, EventArgs e)
@@ -118,6 +119,7 @@ namespace CAM
 
             treeView.Nodes.AddRange(GetNodes());
             treeView.ExpandAll();
+            treeView.SelectedNode = treeView.Nodes[0];
             //RefreshToolButtonsState();
             toolStrip.Enabled = true;
             return;

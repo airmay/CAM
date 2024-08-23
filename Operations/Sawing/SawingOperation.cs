@@ -48,7 +48,7 @@ namespace CAM.Operations.Sawing
 
         public override void Execute(Processor processor)
         {
-            var (curveSides, points, side) = CalcСurveProcessingInfo();
+            var (curveSides, points, outerSide) = CalcСurveProcessingInfo();
 
             foreach (var curve in ProcessingArea.GetCurves())
             {
@@ -56,7 +56,7 @@ namespace CAM.Operations.Sawing
                     ProcessCurve(processor, curve, curveSide, points[curve.StartPoint], points[curve.EndPoint]);
             }
 
-            CreateHatch(curveSides, side);
+            CreateHatch(curveSides, outerSide.Opposite());
         }
 
         private (Dictionary<Curve, Side>, Dictionary<Point3d, bool>, Side) CalcСurveProcessingInfo()
@@ -64,7 +64,6 @@ namespace CAM.Operations.Sawing
             var curves = ProcessingArea.GetCurves();
             var curveSides = new Dictionary<Curve, Side>();
             var points = new Dictionary<Point3d, bool>(Graph.Point3dComparer);
-            var side = Side.None;
 
             var pointCurveDict = curves
                 .SelectMany(p => p.GetStartEndPoints(), (cv, pt) => (cv, pt))
@@ -75,37 +74,32 @@ namespace CAM.Operations.Sawing
                 : (curves.First(), curves.First().StartPoint);
             if (corner != null)
                 points[point] = IsExactlyBegin;
-            var startCodirected = curve.IsStartPoint(point);
-            var codirected = startCodirected;
+            var direction = curve.IsStartPoint(point).ToSignInt();
             var startСurve = curve;
+
+            var center = Graph.GetCenter(pointCurveDict.Select(p => p.Key));
+            var side = Graph.IsTurnRight(point, curve.NextPoint(point), center) ^ ChangeSide ? Side.Left : Side.Right;
             do
             {
+                curveSides[curve] = side.Set(direction);
                 point = curve.NextPoint(point);
-                var endTangent = curve.GetTangent(point) * (codirected ? 1 : -1);
+                var endTangent = curve.GetTangent(point) * direction;
 
                 curve = pointCurveDict[point].SingleOrDefault(p => p != curve);
                 if (curve == null)
                 {
                     points[point] = IsExactlyEnd;
-                    if (side == Side.None)
-                        side = Side.Right;
                     break;
                 }
 
                 point = point.IsEqualTo(curve.StartPoint) ? curve.StartPoint : curve.EndPoint;
-                codirected = curve.IsStartPoint(point);
-                var startTangent = curve.GetTangent(point) * (codirected ? 1 : -1);
+                direction = curve.IsStartPoint(point).ToSignInt();
+                var startTangent = curve.GetTangent(point) * direction;
 
                 var angle = endTangent.MinusPiToPiAngleTo(startTangent);
-                if (side == Side.None)
-                    side = angle > 0 ^ ChangeSide ? Side.Left : Side.Right;
-
-                points[point] = side.IsRight() ^ angle < 0;
-                curveSides[curve] = codirected ? side : side.Opposite();
+                points[point] = side.IsLeft() ^ angle < 0;  // angle < 0 - поворот направо
             } 
             while (curve != startСurve);
-
-            curveSides[startСurve] = startCodirected ? side : side.Opposite();
 
             return (curveSides, points, side);
         }
@@ -118,11 +112,11 @@ namespace CAM.Operations.Sawing
                 SupportGroup = SupportGroup.AppendToGroup(hatchId.Value);
         }
 
-        private void ProcessCurve(Processor processor, Curve curve, Side side, bool isExactlyBegin, bool isExactlyEnd)
+        private void ProcessCurve(Processor processor, Curve curve, Side outerSide, bool isExactlyBegin, bool isExactlyEnd)
         {
             var gashLength = GetGashLength(Depth);
             var indent = gashLength + CornerIndentIncrease;
-            AddGash(curve, isExactlyBegin, isExactlyEnd, side, gashLength, indent);
+            AddGash(curve, isExactlyBegin, isExactlyEnd, outerSide, gashLength, indent);
 
             var sumIndent = indent * (Convert.ToInt32(isExactlyBegin) + Convert.ToInt32(isExactlyEnd));
             if (sumIndent >= curve.Length())
@@ -134,7 +128,7 @@ namespace CAM.Operations.Sawing
             var engineSide = EngineSideCalculator.Calculate(curve, Machine);
             var compensation = 0D;
 
-            if (curve is Arc arc && side == Side.Left) // внутренний рез дуги
+            if (curve is Arc arc && outerSide == Side.Left) // внутренний рез дуги
             {
                 if (Machine == Machine.Donatoni && !(arc.StartAngle.CosSign() == 1 && arc.EndAngle.CosSign() == -1)) //  дуга не пересекает угол 90 градусов
                 {
@@ -143,7 +137,7 @@ namespace CAM.Operations.Sawing
                     var R = arc.Radius;
                     var t = Thickness;
                     var d = Tool.Diameter;
-                    var comp = (2 * R * t * t - Math.Sqrt(-d * d * d * d * t * t + 4 * d * d * R * R * t * t + d * d * t * t * t * t)) / (d * d - 4 * R * R);
+                    var comp = (2*R*t*t - Math.Sqrt(-d*d*d*d * t*t + 4 * d*d * R*R * t*t + d*d * t*t*t*t)) / (d*d - 4*R*R);
                     AngleA = -Math.Atan2(comp, Thickness).ToDeg();
                 }
                 else
@@ -151,9 +145,9 @@ namespace CAM.Operations.Sawing
             }
 
             var isFrontPlaneZero = Settings.Machines[Machine].IsFrontPlaneZero;
-            if (engineSide == side ^ isFrontPlaneZero)
+            if (engineSide == outerSide ^ isFrontPlaneZero)
                 compensation += ToolThickness;
-            var offsetSign = side == Side.Left ^ curve is Line ? -1 : 1;
+            var offsetSign = outerSide == Side.Left ^ curve is Line ? -1 : 1;
             var baseCurve = curve.GetOffsetCurves(compensation * offsetSign)[0] as Curve;
 
             var passList = GetPassList(curve is Arc);
@@ -244,7 +238,7 @@ namespace CAM.Operations.Sawing
                 var offsetVector = normal.GetPerpendicularVector() * ToolThickness * (int)side;
                 var gash = NoDraw.Pline(point, point2, point2 + offsetVector, point + offsetVector);
                 gash.LayerId = Acad.GetGashLayerId();
-                SupportGroup.AppendToGroup(gash.Add());
+                SupportGroup = SupportGroup.AppendToGroup(gash.Add());
             }
         }
 
@@ -254,7 +248,7 @@ namespace CAM.Operations.Sawing
             var (point, depth) = CalcSchedulingPoint();
             var angle = BuilderUtils.CalcToolAngle(vector.ToVector2d().Angle);
             processor.Move(point, angle);
-            processor.Penetration(point.WithZ(-depth));
+            processor.Penetration(-depth);
             processor.Uplifting();
             return;
 

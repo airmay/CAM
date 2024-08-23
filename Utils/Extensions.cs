@@ -22,6 +22,7 @@ namespace CAM
             return attribute?.Description ?? value.ToString();
         }
 
+        public static int ToSignInt(this bool value) => value ? 1 : -1;
         public static string ToStringParam(this double value) => value.ToString("0.####");
         public static string ToParam(this double? value) => value?.ToString("0.####");
 
