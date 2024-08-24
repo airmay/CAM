@@ -3,9 +3,8 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Windows.Forms;
 using Autodesk.AutoCAD.DatabaseServices;
-using CAM.Core.UI;
+using CAM.Core;
 
 namespace CAM
 {
@@ -13,7 +12,8 @@ namespace CAM
     {
         private static CamDocument _camDocument;
         public static ProcessingView ProcessingView = new ProcessingView();
-        public static List<Command> Commands;
+        public static CommandsArray<Command> CommandsArray = new CommandsArray<Command>();
+        public static IList<Command> Commands;
         private static ToolObject ToolObject { get; } = new ToolObject();
         private static Processing _processing;
 
@@ -23,7 +23,7 @@ namespace CAM
                 _camDocument.Processings = ProcessingView.GetProcessings();
             _camDocument = camDocument;
             ToolObject.Hide();
-            Commands?.Clear();
+            Commands = null;
             ProcessingView.CreateTree(camDocument.Processings);
             Acad.ClearHighlighted();
         }
@@ -42,7 +42,7 @@ namespace CAM
             Acad.DeleteAll();
         }
 
-        public static List<Command> ExecuteProcessing(Processing processing)
+        public static IList<Command> ExecuteProcessing(Processing processing)
         {
             DeleteGenerated();
             Acad.Editor.UpdateScreen();
@@ -53,6 +53,7 @@ namespace CAM
             {
                 var stopwatch = Stopwatch.StartNew();
                 processing.Execute();
+                Commands = CommandsArray.GetCommands();
                 if (CamManager.Commands != null)
                     UpdateFromCommands();
                 stopwatch.Stop();
@@ -69,7 +70,6 @@ namespace CAM
             }
 #endif
             Acad.CloseProgressor();
-            //Acad.Editor.Regen();//UpdateScreen();
             return Commands;
         }
 
