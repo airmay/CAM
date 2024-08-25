@@ -1,17 +1,17 @@
-﻿using CAM.Program.Generator;
+﻿using System;
 using System.Collections.Generic;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
+using CAM.Program.Generator;
 using Dreambuild.AutoCAD;
-using System;
 
-namespace CAM
+namespace CAM.CncWorkCenter
 {
-    public class CableSawingProcessor : IDisposable
+    public class ProcessorCnc : IDisposable
     {
         private readonly IPostProcessor _postProcessor;
         private ToolpathBuilder _toolpathBuilder;
-        private Operation _operation;
+        private OperationCnc _operation;
         public bool IsEngineStarted;
 
         public Point3d Position { get; set; }
@@ -30,9 +30,10 @@ namespace CAM
         public bool IsUpperTool => Position.Z > ZMax;
         private const int CommandListCapacity = 10_000;
 
-        public CableSawingProcessor(IPostProcessor postProcessor)
+        public ProcessorCnc(IPostProcessor postProcessor)
         {
             _postProcessor = postProcessor;
+            CamManager.CommandsArray.Reset();
         }
 
         public void Start(Tool tool)
@@ -40,8 +41,8 @@ namespace CAM
             Position = Algorithms.NullPoint3d.WithZ(ZMax + ZSafety * 3);
             _postProcessor.GCommand(-1, Position, 0, 0, null);
 
-            //if (CamManager.Commands == null)
-            //    CamManager.Commands = new List<Command>(CommandListCapacity);
+            if (CamManager.Commands == null)
+                CamManager.Commands = new List<CommandCnc>(CommandListCapacity);
             CamManager.Commands.Clear();
 
             AddCommands(_postProcessor.StartMachine());
@@ -50,7 +51,7 @@ namespace CAM
             _toolpathBuilder = new ToolpathBuilder();
         }
 
-        public void SetGeneralOperarion(Processing processing)
+        public void SetGeneralOperarion(ProcessingCnc processing)
         {
             _frequency = processing.Frequency;
             CuttingFeed = processing.CuttingFeed;
@@ -59,7 +60,7 @@ namespace CAM
             Origin = processing.Origin;
         }
 
-        public void SetOperation(Operation operation)
+        public void SetOperation(OperationCnc operation)
         {
             _operation = operation;
             _operation.FirstCommandIndex = CamManager.Commands.Count;
@@ -110,6 +111,7 @@ namespace CAM
         public void Uplifting() => GCommandTo(CommandNames.Uplifting, 0, Position.WithZ(UpperZ));
 
         public void Penetration(Point3d point) => GCommandTo(CommandNames.Penetration, 1, point, PenetrationFeed);
+        public void Penetration(double z) => Penetration(Position.WithZ(z));
 
         public void Cutting(Point3d point) => GCommandTo(CommandNames.Cutting, 1, point, CuttingFeed);
 
@@ -141,22 +143,25 @@ namespace CAM
                     toolpath = _toolpathBuilder.AddToolpath(curve, name);
                 _operation.Duration += curve.Length() / feed.GetValueOrDefault(10000) * 60;
             }
-            AddCommand(name, commandText, toolpath);
+            AddCommand(commandText, name, toolpath);
         }
 
         public void AddCommand(string text, string name = null, ObjectId? toolpath = null)
         {
-            //CamManager.Commands.Add(new Command
-            //{
-            //    Name = name,
-            //    Text = text,
-            //    Position = Position,
-            //    AngleA = AngleA,
-            //    AngleC = AngleC,
-            //    Toolpath = toolpath,
-            //    Operation = _operation,
-            //    Number = CamManager.Commands.Count + 1
-            //});
+            if (text == null)
+                return;
+
+            CamManager.CommandsArray.Add(new CommandCnc
+            {
+                Name = name,
+                Text = text,
+                Position = Position,
+                AngleA = AngleA,
+                AngleC = AngleC,
+                Toolpath = toolpath,
+                Operation = _operation,
+                Number = CamManager.CommandsArray.Count + 1
+            });
         }
 
         private void AddCommands(string[] commands)

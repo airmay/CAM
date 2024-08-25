@@ -1,11 +1,12 @@
 ﻿using System;
+using CAM.CncWorkCenter;
 using CAM.Program.Generator;
 
 namespace CAM
 {
     public static class ProcessorFactory
     {
-        public static Processor Create(Machine machine)
+        public static ProcessorCnc Create(Machine machine)
         {
             IPostProcessor postProcessor;
             switch (machine)
@@ -31,7 +32,7 @@ namespace CAM
                 default:
                     throw new ArgumentOutOfRangeException();
             }
-            return new MillingProcessor(postProcessor);
+            return new ProcessorCnc(postProcessor);
         }
     }
 }

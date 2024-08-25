@@ -41,8 +41,8 @@ namespace CAM
             Position = Algorithms.NullPoint3d.WithZ(ZMax + ZSafety * 3);
             _postProcessor.GCommand(-1, Position, 0, 0, null);
 
-            if (CamManager.Commands == null)
-                CamManager.Commands = new List<Command>(CommandListCapacity);
+            //if (CamManager.Commands == null)
+            //    CamManager.Commands = new List<Command>(CommandListCapacity);
             CamManager.Commands.Clear();
 
             AddCommands(_postProcessor.StartMachine());
@@ -151,17 +151,17 @@ namespace CAM
             if (text == null)
                 return;
 
-            CamManager.CommandsArray.Add(new Command
-            {
-                Name = name,
-                Text = text,
-                Position = Position,
-                AngleA = AngleA,
-                AngleC = AngleC,
-                Toolpath = toolpath,
-                Operation = _operation,
-                Number = CamManager.CommandsArray.Count + 1
-            });
+            //CamManager.CommandsArray.Add(new Command
+            //{
+            //    Name = name,
+            //    Text = text,
+            //    Position = Position,
+            //    AngleA = AngleA,
+            //    AngleC = AngleC,
+            //    Toolpath = toolpath,
+            //    Operation = _operation,
+            //    Number = CamManager.CommandsArray.Count + 1
+            //});
         }
 
         private void AddCommands(string[] commands)

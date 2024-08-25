@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Windows.Forms;
 using CAM.Core;
 using CAM.Core.UI;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.StartPanel;
 
 namespace CAM
 {
@@ -12,9 +14,9 @@ namespace CAM
     {
         public TreeNodeCollection Nodes => treeView.Nodes;
         private ProcessingNode ProcessingNode => (ProcessingNode)(treeView.SelectedNode.Parent ?? treeView.SelectedNode);
-        private Processing Processing => ProcessingNode.Processing;
+        private IProcessing Processing => ProcessingNode.Processing;
         private OperationNodeBase SelectedNode => treeView.SelectedNode as OperationNodeBase;
-        private Operation SelectedOperation => SelectedNode?.Tag as Operation;
+        private OperationCnc SelectedOperation => treeView.SelectedNode?.Tag as OperationCnc;
         private Command SelectedCommand => processCommandBindingSource.Current as Command;
 
         public ProcessingView()
@@ -33,17 +35,20 @@ namespace CAM
 
         private void bCreateTechOperationClick(string caption, Type type)
         {
-            var node = new OperationNode(OperationFactory.Create(type, SelectedOperation), caption);
-
             if (Nodes.Count == 0)
                 bCreateProcessing_Click(null, null);
 
-            var generalOperationNode = SelectedNode is null
+            var processingNode = SelectedNode is null
                 ? treeView.Nodes[treeView.Nodes.Count - 1]
                 : treeView.SelectedNode.Parent ?? treeView.SelectedNode;
+            var machineTypeAttribute = type.GetCustomAttribute<MachineTypeNewAttribute>();
+            var machineType = machineTypeAttribute.MachineType;
+            var processing = (IProcessing)processingNode.Tag;
+            var operation = processing.CreateOperation(type, SelectedOperation);
+            var node = new OperationNode(operation, caption);
 
-            generalOperationNode.Nodes.Add(node);
-            generalOperationNode.ExpandAll();
+            processingNode.Nodes.Add(node);
+            processingNode.ExpandAll();
             treeView.SelectedNode = node;
         }
 
@@ -113,7 +118,7 @@ namespace CAM
 
         #region Tree
 
-        public void CreateTree(Processing[] processings)
+        public void CreateTree(IProcessing[] processings)
         {
             ClearView();
 
@@ -136,7 +141,7 @@ namespace CAM
                 ?? Array.Empty<TreeNode>();
         }
 
-        public Processing[] GetProcessings()
+        public IProcessing[] GetProcessings()
         {
             return treeView.Nodes.Cast<ProcessingNode>().Select(p => p.GetProcessing()).ToArray();
         }

@@ -1,15 +1,15 @@
-﻿using Autodesk.AutoCAD.DatabaseServices;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.Linq;
+using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
+using CAM.Core;
 
-namespace CAM
+namespace CAM.CncWorkCenter
 {
     [Serializable]
-    public class Processing : OperationBase
+    public class ProcessingCnc : OperationBase, IProcessing
     {
-        public Operation[] Operations { get; set; }
+        public OperationCnc[] Operations { get; set; }
 
         public virtual MachineType MachineType { get; set; }
         public Machine? Machine { get; set; }
@@ -54,6 +54,11 @@ namespace CAM
             }
         }
 
+        public OperationCnc CreateOperation(Type type, OperationCnc prototype)
+        {
+            return OperationFactory.Create(type, prototype);
+        }
+
         public void Teardown()
         {
             foreach (var operation in Operations)
@@ -65,21 +70,21 @@ namespace CAM
             if (!Machine.CheckNotNull("Станок") || !Tool.CheckNotNull("Инструмент"))
                 return;
 
-            //using (var processor = ProcessorFactory.Create(Machine.Value))
-            //{
-            //    processor.Start(Tool);
-            //    processor.SetGeneralOperarion(this);
-            //    foreach (var operation in Operations.Where(p => p.Enabled))
-            //    {
-            //        Acad.Write($"расчет операции {operation.Caption}");
+            using (var processor = ProcessorFactory.Create(Machine.Value))
+            {
+                processor.Start(Tool);
+                processor.SetGeneralOperarion(this);
+                foreach (var operation in Operations.Where(p => p.Enabled))
+                {
+                    Acad.Write($"расчет операции {operation.Caption}");
 
-            //        processor.SetOperation(operation);
-            //        operation.Processing = this;
-            //        operation.Execute(processor);
-            //    }
+                    processor.SetOperation(operation);
+                    operation.Processing = this;
+                    operation.Execute(processor);
+                }
 
-            //    processor.Finish();
-            //}
+                processor.Finish();
+            }
         }
 
         public void RemoveAcadObjects()

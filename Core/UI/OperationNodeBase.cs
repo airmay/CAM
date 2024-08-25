@@ -1,14 +1,15 @@
 ﻿using System.Windows.Forms;
 using System.Drawing;
+using CAM.Core;
 
 namespace CAM
 {
     public abstract class OperationNodeBase : TreeNode
     {
-        protected OperationNodeBase(OperationBase operation, string caption, int imageIndex) : base(caption, imageIndex, imageIndex)
+        protected OperationNodeBase(IProcessing operation, string caption, int imageIndex) : base(caption, imageIndex, imageIndex)
         {
             Tag = operation;
-            Checked = operation.Enabled;
+            //Checked = operation.Enabled;
             SetNodeColor();
         }
 

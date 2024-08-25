@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using Autodesk.AutoCAD.DatabaseServices;
+using CAM.CncWorkCenter;
 using CAM.Core;
 
 namespace CAM
@@ -12,10 +13,10 @@ namespace CAM
     {
         private static CamDocument _camDocument;
         public static ProcessingView ProcessingView = new ProcessingView();
-        public static CommandsArray<Command> CommandsArray = new CommandsArray<Command>();
-        public static IList<Command> Commands;
+        public static CommandsArray<CommandCnc> CommandsArray = new CommandsArray<CommandCnc>();
+        public static IList<CommandCnc> Commands;
         private static ToolObject ToolObject { get; } = new ToolObject();
-        private static Processing _processing;
+        private static IProcessing _processing;
 
         public static void SetDocument(CamDocument camDocument)
         {
@@ -24,7 +25,8 @@ namespace CAM
             _camDocument = camDocument;
             ToolObject.Hide();
             Commands = null;
-            ProcessingView.CreateTree(camDocument.Processings);
+            if (camDocument.Processings != null)
+                ProcessingView.CreateTree(camDocument.Processings);
             Acad.ClearHighlighted();
         }
 
@@ -42,7 +44,7 @@ namespace CAM
             Acad.DeleteAll();
         }
 
-        public static IList<Command> ExecuteProcessing(Processing processing)
+        public static IList<CommandCnc> ExecuteProcessing(IProcessing processing)
         {
             DeleteGenerated();
             Acad.Editor.UpdateScreen();
@@ -112,24 +114,24 @@ namespace CAM
                 return;
             }
 
-            var machine = Settings.Machines[_processing.Machine.Value];
-            var fileName = Acad.SaveFileDialog("Программа", machine.ProgramFileExtension, _processing.Machine.ToString());
-            if (fileName == null)
-                return;
-            try
-            {
-                var contents = Commands
-                    .Select(p => $"{string.Format(machine.ProgramLineNumberFormat, p.Number)}{p.Text}")
-                    .ToArray();
-                File.WriteAllLines(fileName, contents);
-                Acad.Write($"Создан файл {fileName}");
-                //if (machineType == Machine.CableSawing)
-                //    CreateImitationProgramm(contents, fileName);
-            }
-            catch (Exception ex)
-            {
-                Acad.Alert($"Ошибка при записи файла {fileName}", ex);
-            }
+            //var machine = Settings.Machines[_processing.Machine.Value];
+            //var fileName = Acad.SaveFileDialog("Программа", machine.ProgramFileExtension, _processing.Machine.ToString());
+            //if (fileName == null)
+            //    return;
+            //try
+            //{
+            //    var contents = Commands
+            //        .Select(p => $"{string.Format(machine.ProgramLineNumberFormat, p.Number)}{p.Text}")
+            //        .ToArray();
+            //    File.WriteAllLines(fileName, contents);
+            //    Acad.Write($"Создан файл {fileName}");
+            //    //if (machineType == Machine.CableSawing)
+            //    //    CreateImitationProgramm(contents, fileName);
+            //}
+            //catch (Exception ex)
+            //{
+            //    Acad.Alert($"Ошибка при записи файла {fileName}", ex);
+            //}
         }
 
         //public static void HideTool() => ToolObject.Hide();

@@ -1,17 +1,18 @@
-﻿using System.Collections.Generic;
+﻿using CAM.CncWorkCenter;
+using CAM.Core;
 
 namespace CAM
 {
     public class CamDocument
     {
         public int Hash;
-        public Processing[] Processings { get; set; }
+        public IProcessing[] Processings { get; set; }
 
         public static CamDocument Create()
         {
             var document = new CamDocument();
             var (value, hash) = DataLoader.Load();
-            if (value is Processing[] processings)
+            if (value is IProcessing[] processings)
             {
                 document.Processings = processings;
                 document.Hash = hash;
@@ -26,11 +27,10 @@ namespace CAM
             return document;
         }
 
-        public void Save(Processing[] processings)
+        public void Save(IProcessing[] processings)
         {
             Processings = processings;
-            if (Processings.Length > 0 || Hash != 0)
-                DataLoader.Save(Processings, Hash);
+            DataLoader.Save(Processings, Hash);
         }
     }
 }

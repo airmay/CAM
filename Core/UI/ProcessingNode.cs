@@ -1,24 +1,25 @@
 ﻿using System.Linq;
+using CAM.CncWorkCenter;
 
 namespace CAM.Core.UI
 {
     public class ProcessingNode : OperationNodeBase
     {
-        public Processing Processing => (Processing)Tag;
+        public IProcessing Processing => (IProcessing)Tag;
         private OperationNode FirstOperationNode => Nodes.Count > 0 ? (OperationNode) Nodes[0] : null;
 
-        public ProcessingNode() : base(new Processing(), "Обработка", 0)
+        public ProcessingNode() : base(new ProcessingCnc(), "Обработка", 0)
         {
         }
-        public ProcessingNode(Processing processing) : base(processing, processing.Caption, 0)
+        public ProcessingNode(IProcessing processing) : base(processing, processing.Caption, 0)
         {
         }
 
-        public Processing GetProcessing()
+        public IProcessing GetProcessing()
         {
             UpdateOperation();
             Processing.Operations = Nodes.Cast<OperationNode>()
-                .Select(c => (Operation)c.UpdateOperation())
+                .Select(c => (OperationCnc)c.UpdateOperation())
                 .ToArray();
             return Processing;
         }
@@ -34,7 +35,7 @@ namespace CAM.Core.UI
 
         public override void MoveDown() => Move(TreeView.Nodes, Index + 1);
 
-        public override void RemoveOperation() => Processing.Teardown();
+        //public override void RemoveOperation() => Processing.Teardown();
 
         public override void ShowToolpath()
         {
@@ -42,6 +43,11 @@ namespace CAM.Core.UI
             //TechOperation.Toolpath?.SetGroupVisibility(true);
             //Acad.Editor.UpdateScreen();
 
+        }
+
+        public override void RemoveOperation()
+        {
+            throw new System.NotImplementedException();
         }
 
         public override void SelectAcadObject() => FirstOperationNode?.SelectAcadObject();

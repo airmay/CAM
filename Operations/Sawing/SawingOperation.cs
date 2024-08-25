@@ -3,13 +3,14 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Autodesk.AutoCAD.Geometry;
+using CAM.CncWorkCenter;
 using Dreambuild.AutoCAD;
 using CAM.Utils;
 
 namespace CAM.Operations.Sawing
 {
     [Serializable]
-    public class SawingOperation : Operation
+    public class SawingOperation : OperationCnc
     {
         public Side OuterSide { get; set; }
         public double ToolThickness => Tool.Thickness.Value;
@@ -46,7 +47,7 @@ namespace CAM.Operations.Sawing
             };
         }
 
-        public override void Execute(Processor processor)
+        public  void Execute(Processor processor)
         {
             var (curveSides, points, outerSide) = CalcСurveProcessingInfo();
 
@@ -268,6 +269,11 @@ namespace CAM.Operations.Sawing
 
                 return (pt, Depth);
             }
+        }
+
+        public override void Execute(ProcessorCnc processor)
+        {
+            throw new NotImplementedException();
         }
     }
 }

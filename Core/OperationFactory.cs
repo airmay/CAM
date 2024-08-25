@@ -8,9 +8,9 @@ namespace CAM.Core
 {
     public static class OperationFactory
     {
-        public static Operation Create(Type operationType, Operation prototype)
+        public static OperationCnc Create(Type operationType, OperationCnc prototype)
         {
-            var operation = (Operation)Activator.CreateInstance(operationType);
+            var operation = (OperationCnc)Activator.CreateInstance(operationType);
             prototype?.CopyPropertiesTo(operation);
 
             if (Acad.GetSelectedObjectIds() is ObjectId[] ids)

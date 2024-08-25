@@ -2,12 +2,12 @@
 {
     public class OperationNode : OperationNodeBase
     {
-        public Operation Operation => (Operation)Tag;
+        public OperationCnc Operation => (OperationCnc)Tag;
 
-        public OperationNode(OperationBase operation) : base(operation, operation.Caption, 1)
+        public OperationNode(OperationCnc operation) : base(operation, operation.Caption, 1)
         {
         }
-        public OperationNode(OperationBase operation, string caption) : base(operation, caption, 1)
+        public OperationNode(OperationCnc operation, string caption) : base(operation, caption, 1)
         {
         }
 
