@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
@@ -9,7 +10,7 @@ namespace CAM.CncWorkCenter
     [Serializable]
     public class ProcessingCnc : OperationBase, IProcessing
     {
-        public OperationCnc[] Operations { get; set; }
+        public List<OperationCnc> Operations { get; set; } = new List<OperationCnc>();
 
         public virtual MachineType MachineType { get; set; }
         public Machine? Machine { get; set; }
@@ -56,7 +57,9 @@ namespace CAM.CncWorkCenter
 
         public OperationCnc CreateOperation(Type type, OperationCnc prototype)
         {
-            return OperationFactory.Create(type, prototype);
+            var operation = OperationFactory.Create(type, prototype);
+            Operations.Add(operation);
+            return operation;
         }
 
         public void Teardown()

@@ -41,8 +41,7 @@ namespace CAM
             var processingNode = SelectedNode is null
                 ? treeView.Nodes[treeView.Nodes.Count - 1]
                 : treeView.SelectedNode.Parent ?? treeView.SelectedNode;
-            var machineTypeAttribute = type.GetCustomAttribute<MachineTypeNewAttribute>();
-            var machineType = machineTypeAttribute.MachineType;
+            var machineType = type.GetCustomAttribute<MachineTypeNewAttribute>().MachineType;
             var processing = (IProcessing)processingNode.Tag;
             var operation = processing.CreateOperation(type, SelectedOperation);
             var node = new OperationNode(operation, caption);

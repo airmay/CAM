@@ -25,7 +25,7 @@ namespace CAM
             _camDocument = camDocument;
             ToolObject.Hide();
             Commands = null;
-            if (camDocument.Processings != null)
+            if (camDocument.Processings?.Any() == true)
                 ProcessingView.CreateTree(camDocument.Processings);
             Acad.ClearHighlighted();
         }
