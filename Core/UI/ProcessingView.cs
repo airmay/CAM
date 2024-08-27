@@ -35,19 +35,31 @@ namespace CAM
 
         private void bCreateTechOperationClick(string caption, Type type)
         {
+            var machineType = type.GetCustomAttribute<MachineTypeNewAttribute>().MachineType;
             if (Nodes.Count == 0)
-                bCreateProcessing_Click(null, null);
+                AddProcessingNode(machineType);
 
             var processingNode = SelectedNode is null
                 ? treeView.Nodes[treeView.Nodes.Count - 1]
                 : treeView.SelectedNode.Parent ?? treeView.SelectedNode;
-            var machineType = type.GetCustomAttribute<MachineTypeNewAttribute>().MachineType;
             var processing = (IProcessing)processingNode.Tag;
-            var operation = processing.CreateOperation(type, SelectedOperation);
-            var node = new OperationNode(operation, caption);
+            if (processing.MachineType != machineType)
+                AddProcessingNode(machineType);
+            var operation = OperationFactory.Create(type, SelectedNode.Tag);
+            AddNode(processingNode.Nodes, operation);
+        }
 
-            processingNode.Nodes.Add(node);
-            processingNode.ExpandAll();
+        private void AddProcessingNode(MachineType machineType)
+        {
+            var processing = ProcessingFactory.Create(machineType);
+            AddNode(treeView.Nodes, processing);
+        }
+
+        private void AddNode(TreeNodeCollection nodes, object @object)
+        {
+            var node = new TreeNode(@object.ToString());
+            node.Tag = @object;
+            nodes.Add(node);
             treeView.SelectedNode = node;
         }
 
@@ -58,12 +70,7 @@ namespace CAM
             // bVisibility.Enabled = bSendProgramm.Enabled = bPartialProcessing.Enabled = bPlay.Enabled = SelectedNode?.ProcessCommands != null;
         }
 
-        private void bCreateProcessing_Click(object sender, EventArgs e)
-        {
-            var node = new ProcessingNode();
-            treeView.Nodes.Add(node);
-            treeView.SelectedNode = node;
-        }
+        private void bCreateProcessing_Click(object sender, EventArgs e) => AddProcessingNode(MachineType.CncWorkCenter);
 
         private void bRemove_Click(object sender, EventArgs e) => Delete();
 

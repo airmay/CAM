@@ -55,13 +55,6 @@ namespace CAM.CncWorkCenter
             }
         }
 
-        public OperationCnc CreateOperation(Type type, OperationCnc prototype)
-        {
-            var operation = OperationFactory.Create(type, prototype);
-            Operations.Add(operation);
-            return operation;
-        }
-
         public void Teardown()
         {
             foreach (var operation in Operations)

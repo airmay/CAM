@@ -42,5 +42,7 @@ namespace CAM
             SupportGroup?.DeleteGroup();
             SupportGroup = null;
         }
+
+        public override string ToString() => Caption;
     }
 }

@@ -10,9 +10,9 @@ namespace CAM.Core
     {
         string Caption { get; set; }
         List<OperationCnc> Operations { get; set; }
+        MachineType MachineType { get; set; }
         void Execute();
         void RemoveAcadObjects();
         void Init();
-        OperationCnc CreateOperation(Type type, OperationCnc prototype);
     }
 }

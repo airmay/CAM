@@ -2,19 +2,15 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using Autodesk.AutoCAD.DatabaseServices;
 
 namespace CAM.Core
 {
     public static class OperationFactory
     {
-        public static OperationCnc Create(Type operationType, OperationCnc prototype)
+        public static object Create(Type operationType, object prototype)
         {
-            var operation = (OperationCnc)Activator.CreateInstance(operationType);
-            prototype?.CopyPropertiesTo(operation);
-
-            if (Acad.GetSelectedObjectIds() is ObjectId[] ids)
-                operation.ProcessingArea = AcadObject.Create(ids);
+            var operation = Activator.CreateInstance(operationType);
+            prototype.CopyPropertiesTo(operation);
 
             return operation;
         }
