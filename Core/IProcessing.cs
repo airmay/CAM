@@ -9,7 +9,7 @@ namespace CAM.Core
     public interface IProcessing
     {
         string Caption { get; set; }
-        List<OperationCnc> Operations { get; set; }
+        IEnumerable<IOperation> Operations { get; }
         MachineType MachineType { get; set; }
         void Execute();
         void RemoveAcadObjects();

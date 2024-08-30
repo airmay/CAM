@@ -8,7 +8,7 @@ namespace CAM
 {
     [Serializable]
     [MachineTypeNew(MachineType.CncWorkCenter)]
-    public abstract class OperationCnc : OperationBase, IProcessing
+    public abstract class OperationCnc : OperationBase, IOperation
     {
         public double Duration { get; set; }
         public AcadObject ProcessingArea { get; set; }

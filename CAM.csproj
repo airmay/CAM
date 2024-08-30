@@ -105,6 +105,7 @@
     <Compile Include="CncWorkCenter\ProcessorCnc.cs" />
     <Compile Include="Core\CableTechProcess.cs" />
     <Compile Include="Core\CommandsArray.cs" />
+    <Compile Include="Core\IOperation.cs" />
     <Compile Include="Core\IProcessing.cs" />
     <Compile Include="Core\MachineTypeAttribute.cs" />
     <Compile Include="Core\MillingProcessor.cs" />

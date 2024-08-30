@@ -36,32 +36,34 @@ namespace CAM
         private void bCreateTechOperationClick(string caption, Type type)
         {
             var machineType = type.GetCustomAttribute<MachineTypeNewAttribute>().MachineType;
-            if (Nodes.Count == 0)
-                AddProcessingNode(machineType);
-
-            var processingNode = SelectedNode is null
-                ? treeView.Nodes[treeView.Nodes.Count - 1]
-                : treeView.SelectedNode.Parent ?? treeView.SelectedNode;
+            var processing = Nodes.Any()
+                ? (IProcessing)(treeView.SelectedNode?.Parent ?? treeView.SelectedNode ?? treeView.Nodes[treeView.Nodes.Count - 1])
             var processing = (IProcessing)processingNode.Tag;
             if (processing.MachineType != machineType)
                 AddProcessingNode(machineType);
+
             var operation = OperationFactory.Create(type, SelectedNode.Tag);
-            AddNode(processingNode.Nodes, operation);
+            var node = CreateOperationNode(operation);
+            processingNode.Nodes.Add(node);
+            treeView.SelectedNode = node;
         }
 
         private void AddProcessingNode(MachineType machineType)
         {
             var processing = ProcessingFactory.Create(machineType);
-            AddNode(treeView.Nodes, processing);
-        }
-
-        private void AddNode(TreeNodeCollection nodes, object @object)
-        {
-            var node = new TreeNode(@object.ToString());
-            node.Tag = @object;
-            nodes.Add(node);
+            var node = CreateProcessingNode(processing);
+            treeView.Nodes.Add(node);
             treeView.SelectedNode = node;
         }
+
+        TreeNode CreateProcessingNode(IProcessing processing)
+        {
+            return new TreeNode(processing.Caption, 0, 0, processing.Operations.Select(CreateOperationNode).ToArray());
+        }
+
+        TreeNode CreateOperationNode(IOperation operation) => CreateNode(operation.Caption, 1, operation);
+
+        TreeNode CreateNode(string text, int imageIndex, object tag) => new TreeNode(text, imageIndex, imageIndex) { Tag = tag };
 
         private void RefreshToolButtonsState()
         {
@@ -124,32 +126,47 @@ namespace CAM
 
         #region Tree
 
-        public void CreateTree(IProcessing[] processings)
+        public void Reset(IProcessing[] processings)
         {
-            ClearView();
+            treeView.Nodes.Clear();
+            ClearParamsViews();
+            if (processings?.Any() != true)
+                return;
 
-            treeView.Nodes.AddRange(GetNodes());
+            treeView.Nodes.AddRange(processings.Select(CreateProcessingNode1).ToArray());
             treeView.ExpandAll();
             treeView.SelectedNode = treeView.Nodes[0];
-            //RefreshToolButtonsState();
-            toolStrip.Enabled = true;
             return;
+            
+            TreeNode CreateProcessingNode1(IProcessing processing)
+            {
+                return new TreeNode(processing.Caption, 0, 0, processing.Operations.Select(CreateOperationNode1).ToArray());
+            }
 
-            TreeNode[] GetNodes() =>
-                processings?.Select(p =>
-                    {
-                        var generalOperationNode = new ProcessingNode(p);
-                        generalOperationNode.Nodes.AddRange(p.Operations.Select(c => new OperationNode(c))
-                            .ToArray());
-                        return generalOperationNode;
-                    })
-                    .ToArray()
-                ?? Array.Empty<TreeNode>();
+            TreeNode CreateOperationNode1(IOperation operation)
+            {
+                return new TreeNode(operation.Caption, 1, 1);
+            }
         }
 
         public IProcessing[] GetProcessings()
         {
-            return treeView.Nodes.Cast<ProcessingNode>().Select(p => p.GetProcessing()).ToArray();
+            return treeView.Nodes.Cast<TreeNode>().Select(GetProcessing).ToArray();
+        }
+
+        private IProcessing GetProcessing(TreeNode node)
+        {
+            var processing = (IProcessing)node.Tag;
+            processing.Caption = node.Text;
+            processing.Operations = node.Nodes.Cast<TreeNode>().Select(p =>
+                {
+                    var operation = (IOperation)p.Tag;
+                    operation.Caption = node.Text;
+                    operation.Enabled = node.Checked;
+                    return operation;
+                })
+                .ToArray();
+            return processing;
         }
 
         public void UpdateNodeText()
@@ -173,8 +190,8 @@ namespace CAM
 
         public void ClearView()
         {
-            treeView.Nodes.Clear();
             toolStrip.Enabled = false;
+            treeView.Nodes.Clear();
             ClearParamsViews();
         }
 

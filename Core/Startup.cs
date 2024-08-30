@@ -59,7 +59,7 @@ namespace CAM
             {
                 document.CommandWillStart += Document_CommandWillStart;
                 document.BeginDocumentClose += Document_BeginDocumentClose;
-                document.ImpliedSelectionChanged += (sender, args) => CamManager.OnSelectAcadObject();
+                document.ImpliedSelectionChanged += (sender, args) => CamManager.OnSelectAcadObject(); // TODO 
 
                 document.UserData[CamDocumentKey] = CamDocument.Create();
             }

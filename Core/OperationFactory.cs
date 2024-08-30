@@ -7,9 +7,9 @@ namespace CAM.Core
 {
     public static class OperationFactory
     {
-        public static object Create(Type operationType, object prototype)
+        public static IOperation Create(Type operationType, object prototype)
         {
-            var operation = Activator.CreateInstance(operationType);
+            var operation = (IOperation)Activator.CreateInstance(operationType);
             prototype.CopyPropertiesTo(operation);
 
             return operation;

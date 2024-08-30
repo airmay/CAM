@@ -12,7 +12,7 @@ namespace CAM
     public static class CamManager
     {
         private static CamDocument _camDocument;
-        public static ProcessingView ProcessingView = new ProcessingView();
+        public static readonly ProcessingView ProcessingView = new ProcessingView();
         public static CommandsArray<CommandCnc> CommandsArray = new CommandsArray<CommandCnc>();
         public static IList<CommandCnc> Commands;
         private static ToolObject ToolObject { get; } = new ToolObject();
@@ -23,10 +23,10 @@ namespace CAM
             if (_camDocument != null)
                 _camDocument.Processings = ProcessingView.GetProcessings();
             _camDocument = camDocument;
-            ToolObject.Hide();
+
+            ProcessingView.Reset(camDocument.Processings);
             Commands = null;
-            if (camDocument.Processings?.Any() == true)
-                ProcessingView.CreateTree(camDocument.Processings);
+            ToolObject.Hide();
             Acad.ClearHighlighted();
         }
 

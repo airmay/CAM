@@ -10,7 +10,8 @@ namespace CAM.CncWorkCenter
     [Serializable]
     public class ProcessingCnc : OperationBase, IProcessing
     {
-        public List<OperationCnc> Operations { get; set; } = new List<OperationCnc>();
+        public IEnumerable<IOperation> Operations => OperationsArray;
+        public OperationCnc[] OperationsArray { get; set; }
 
         public virtual MachineType MachineType { get; set; }
         public Machine? Machine { get; set; }
