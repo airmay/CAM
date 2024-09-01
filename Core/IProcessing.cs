@@ -1,15 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace CAM.Core
+﻿namespace CAM.Core
 {
-    public interface IProcessing
+    public interface IProcessing : IProcessItem
     {
-        string Caption { get; set; }
-        IEnumerable<IOperation> Operations { get; }
+        IOperation[] Operations { get; set; }
         MachineType MachineType { get; set; }
         void Execute();
         void RemoveAcadObjects();

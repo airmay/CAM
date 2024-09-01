@@ -10,7 +10,7 @@ namespace CAM.Core
         public static IOperation Create(Type operationType, object prototype)
         {
             var operation = (IOperation)Activator.CreateInstance(operationType);
-            prototype.CopyPropertiesTo(operation);
+            prototype?.CopyPropertiesTo(operation);
 
             return operation;
         }

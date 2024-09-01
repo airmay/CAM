@@ -107,6 +107,7 @@
     <Compile Include="Core\CommandsArray.cs" />
     <Compile Include="Core\IOperation.cs" />
     <Compile Include="Core\IProcessing.cs" />
+    <Compile Include="Core\IProcessItem.cs" />
     <Compile Include="Core\MachineTypeAttribute.cs" />
     <Compile Include="Core\MillingProcessor.cs" />
     <Compile Include="Core\OperationFactory.cs" />

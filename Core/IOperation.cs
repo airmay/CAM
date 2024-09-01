@@ -1,8 +1,6 @@
 ﻿namespace CAM.Core
 {
-    public interface IOperation
+    public interface IOperation : IProcessItem
     {
-        string Caption { get; set; }
-        bool Enabled { get; set; }
     }
 }
