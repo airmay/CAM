@@ -2,23 +2,15 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Reflection.Emit;
 using System.Windows.Forms;
 using CAM.Core;
-using CAM.Core.UI;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement.StartPanel;
 
 namespace CAM
 {
     public partial class ProcessingView : UserControl
     {
-        public TreeNodeCollection Nodes => treeView.Nodes;
-        private ProcessingNode ProcessingNode => (ProcessingNode)(treeView.SelectedNode.Parent ?? treeView.SelectedNode);
-        private IProcessing Processing => ProcessingNode.Processing;
         private TreeNode SelectedNode => treeView.SelectedNode;
         private IProcessItem ProcessItem => treeView.SelectedNode?.Tag as IProcessItem;
-        private OperationCnc SelectedOperation => treeView.SelectedNode?.Tag as OperationCnc;
         private Command SelectedCommand => processCommandBindingSource.Current as Command;
 
         public ProcessingView()
@@ -33,6 +25,7 @@ namespace CAM
 #endif
         }
 
+        #region Views
         public void Reset(IProcessItem[] items)
         {
             treeView.Nodes.Clear();
@@ -45,21 +38,69 @@ namespace CAM
             treeView.SelectedNode = treeView.Nodes[0];
         }
 
-        public void ClearView()
+        public void ClearView() // Document = null
         {
             toolStrip.Enabled = false;
             treeView.Nodes.Clear();
             ClearParamsViews();
         }
 
-        #region ToolButtons
+        private void ClearParamsViews()
+        {
+            foreach (Control control in tabPageParams.Controls)
+                control.Hide();
+            ClearCommandsView();
+        }
+        #endregion
 
+        #region Tool buttons
         private void RefreshToolButtonsState()
         {
-            // bRemove.Enabled = bMoveUpTechOperation.Enabled = bMoveDownTechOperation.Enabled = bBuildProcessing.Enabled = treeView.SelectedNode != null;
-            // bCreateTechOperation.Enabled = treeView.SelectedNode != null && bCreateTechOperation.DropDownItems.Count > 0;
-            // bVisibility.Enabled = bSendProgramm.Enabled = bPartialProcessing.Enabled = bPlay.Enabled = SelectedNode?.ProcessCommands != null;
+            bRemove.Enabled = bMoveUp.Enabled = bMoveDown.Enabled = bBuildProcessing.Enabled = (SelectedNode != null);
+            //TODO
+            //bVisibility.Enabled = bSendProgramm.Enabled = bPartialProcessing.Enabled = bPlay.Enabled = SelectedNode?.ProcessCommands != null;
         }
+
+        public void UpdateNodeText()
+        {
+            foreach (TreeNode node in treeView.Nodes)
+            {
+                node.Text = GetCaption(node.Text, node.Nodes.Cast<OperationNode>().Sum(p => p.Operation.Duration));
+                foreach (OperationNode operationNode in node.Nodes)
+                    operationNode.Text = GetCaption(operationNode.Text, operationNode.Operation.Duration);
+            }
+
+            return;
+
+            string GetCaption(string caption, double duration)
+            {
+                var ind = caption.IndexOf('(');
+                var timeSpan = new TimeSpan(0, 0, 0, (int)duration);
+                return $"{(ind > 0 ? caption.Substring(0, ind).Trim() : caption)} ({timeSpan})";
+            }
+        }
+
+        private bool IsToolpathVisible => !bVisibility.Checked;
+        #endregion
+
+        #region Tree nodes
+
+        #region Get
+
+        public IProcessItem[] GetProcessItems() => treeView.Nodes.Cast<TreeNode>().Select(GetProcessItem).ToArray();
+
+        public static IProcessItem GetProcessItem(TreeNode node)
+        {
+            var processItem = (IProcessItem)node.Tag;
+            processItem.Caption = node.Text;
+            processItem.Enabled = node.Checked;
+            processItem.Children = node.Nodes.Cast<TreeNode>().Select(GetProcessItem).ToArray();
+            return processItem;
+        }
+
+        #endregion
+
+        #region Add
 
         private void bCreateProcessing_Click(object sender, EventArgs e)
         {
@@ -103,11 +144,41 @@ namespace CAM
             };
         }
 
+        #endregion
+
+        #region Delete
+
         private void bRemove_Click(object sender, EventArgs e) => Delete();
+
+        private void treeView_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Delete)
+                Delete();
+        }
+
+        private void Delete()
+        {
+            if (SelectedNode != null && MessageBox.Show($"Вы хотите удалить {SelectedNode.Text}?",
+                    "Подтверждение", MessageBoxButtons.YesNo, MessageBoxIcon.Question, MessageBoxDefaultButton.Button1) == DialogResult.Yes)
+            {
+                SelectedNode.RemoveOperation();
+
+                //Acad.UnhighlightAll();
+                ClearParamsViews();
+                treeView.SelectedNode.Remove();
+                treeView.Focus();
+                //RefreshToolButtonsState();
+            }
+        }
+        #endregion
+
+        #region Move
 
         private void bMoveUpTechOperation_Click(object sender, EventArgs e) => MoveNode(-1);
 
+
         private void bMoveDownTechOperation_Click(object sender, EventArgs e) => MoveNode(1);
+
 
         private void MoveNode(int direction)
         {
@@ -121,6 +192,38 @@ namespace CAM
                 treeView.SelectedNode = node;
             }
         }
+
+        #region Edit
+
+        private void treeView_NodeMouseDoubleClick(object sender, TreeNodeMouseClickEventArgs e)
+        {
+            treeView.LabelEdit = true;
+            e.Node.BeginEdit();
+        }
+
+        private void treeView_AfterLabelEdit(object sender, NodeLabelEditEventArgs e)
+        {
+            treeView.LabelEdit = false;
+            if (string.IsNullOrWhiteSpace(e.Label))
+                e.CancelEdit = true;
+        }
+
+        private void treeView_AfterCheck(object sender, TreeViewEventArgs e) => ((OperationNodeBase)e.Node).RefreshColor();
+
+        #endregion
+
+        #endregion
+
+        #region Select
+
+        private void treeView_AfterSelect(object sender, TreeViewEventArgs e)
+        {
+            RefreshParamsView();
+            processCommandBindingSource.Position = ProcessItem.CommandIndex;
+            ProcessItem.OnSelect();
+        }
+
+        #endregion
 
         private void bBuildProcessing_ButtonClick(object sender, EventArgs e)
         {
@@ -166,87 +269,7 @@ namespace CAM
 
         #endregion
 
-        #region Tree
-
-        public IProcessItem[] GetProcessItems() => treeView.Nodes.Cast<TreeNode>().Select(GetProcessItem).ToArray();
-
-        public static IProcessItem GetProcessItem(TreeNode node)
-        {
-            var processItem = (IProcessItem)node.Tag;
-            processItem.Caption = node.Text;
-            processItem.Enabled = node.Checked;
-            processItem.Children = node.Nodes.Cast<TreeNode>().Select(GetProcessItem).ToArray();
-            return processItem;
-        }
-
-        public void UpdateNodeText()
-        {
-            foreach (TreeNode node in treeView.Nodes)
-            {
-                node.Text = GetCaption(node.Text, node.Nodes.Cast<OperationNode>().Sum(p => p.Operation.Duration));
-                foreach (OperationNode operationNode in node.Nodes)
-                    operationNode.Text = GetCaption(operationNode.Text, operationNode.Operation.Duration);
-            }
-
-            return;
-
-            string GetCaption(string caption, double duration)
-            {
-                var ind = caption.IndexOf('(');
-                var timeSpan = new TimeSpan(0, 0, 0, (int)duration);
-                return $"{(ind > 0 ? caption.Substring(0, ind).Trim() : caption)} ({timeSpan})";
-            }
-        }
-
-        private bool IsToolpathVisible => !bVisibility.Checked;
-
-        private void treeView_AfterSelect(object sender, TreeViewEventArgs e)
-        {
-            RefreshParamsView();
-            processCommandBindingSource.Position = ProcessItem.CommandIndex;
-            ProcessItem.OnSelect();
-        }
-
-        private void treeView_NodeMouseDoubleClick(object sender, TreeNodeMouseClickEventArgs e)
-        {
-            treeView.LabelEdit = true;
-            e.Node.BeginEdit();
-        }
-
-        private void treeView_AfterLabelEdit(object sender, NodeLabelEditEventArgs e)
-        {
-            treeView.LabelEdit = false;
-            if (string.IsNullOrWhiteSpace(e.Label))
-                e.CancelEdit = true;
-        }
-
-        private void treeView_AfterCheck(object sender, TreeViewEventArgs e) => ((OperationNodeBase)e.Node).RefreshColor();
-
-        private void treeView_KeyDown(object sender, KeyEventArgs e)
-        {
-            if (e.KeyCode == Keys.Delete)
-                Delete();
-        }
-
-        private void Delete()
-        {
-            if (SelectedNode != null && MessageBox.Show($"Вы хотите удалить {SelectedNode.Text}?",
-                    "Подтверждение", MessageBoxButtons.YesNo, MessageBoxIcon.Question, MessageBoxDefaultButton.Button1) == DialogResult.Yes)
-            {
-                SelectedNode.RemoveOperation();
-
-                //Acad.UnhighlightAll();
-                ClearParamsViews();
-                treeView.SelectedNode.Remove();
-                treeView.Focus();
-                //RefreshToolButtonsState();
-            }
-        }
-
-        #endregion
-
-        #region Views
-
+        #region Params view
         private readonly Dictionary<Type, ParamsView> _paramsViews = new Dictionary<Type, ParamsView>();
 
         public void RefreshParamsView()
@@ -264,21 +287,16 @@ namespace CAM
             paramsView.Show();
             paramsView.BringToFront();
         }
+        #endregion
 
-        private void ClearParamsViews()
-        {
-            foreach (Control control in tabPageParams.Controls)
-                control.Hide();
-            ClearCommandsView();
-        }
-
+        #region Command view
         public void ClearCommandsView() => processCommandBindingSource.DataSource = null;
 
         private void processCommandBindingSource_CurrentChanged(object sender, EventArgs e)
         {
-            if (SelectedCommand == null) 
+            if (SelectedCommand == null)
                 return;
-            
+
             if (SelectedCommand.Toolpath.HasValue)
             {
                 Acad.Show(SelectedCommand.Toolpath.Value);
@@ -287,8 +305,7 @@ namespace CAM
             CamManager.ShowTool(SelectedCommand);
         }
 
-        public void SelectProcessCommand(int commandIndex) => processCommandBindingSource.Position = commandIndex;
-
+        public void SelectProcessCommand(int commandIndex) => processCommandBindingSource.Position = commandIndex; 
         #endregion
     }
 }

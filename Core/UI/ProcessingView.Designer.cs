@@ -41,8 +41,8 @@
             this.bCreateTechOperation = new System.Windows.Forms.ToolStripDropDownButton();
             this.bCreateProcessing = new System.Windows.Forms.ToolStripButton();
             this.bRemove = new System.Windows.Forms.ToolStripButton();
-            this.bMoveUpTechOperation = new System.Windows.Forms.ToolStripButton();
-            this.bMoveDownTechOperation = new System.Windows.Forms.ToolStripButton();
+            this.bMoveUp = new System.Windows.Forms.ToolStripButton();
+            this.bMoveDown = new System.Windows.Forms.ToolStripButton();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.bBuildProcessing = new System.Windows.Forms.ToolStripSplitButton();
             this.bPartialProcessing = new System.Windows.Forms.ToolStripMenuItem();
@@ -210,8 +210,8 @@
             this.bCreateTechOperation,
             this.bCreateProcessing,
             this.bRemove,
-            this.bMoveUpTechOperation,
-            this.bMoveDownTechOperation,
+            this.bMoveUp,
+            this.bMoveDown,
             this.toolStripSeparator1,
             this.bBuildProcessing,
             this.bVisibility,
@@ -257,27 +257,27 @@
             this.bRemove.Text = "Удалить";
             this.bRemove.Click += new System.EventHandler(this.bRemove_Click);
             // 
-            // bMoveUpTechOperation
+            // bMoveUp
             // 
-            this.bMoveUpTechOperation.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.bMoveUpTechOperation.Image = global::CAM.Properties.Resources.arrow_up;
-            this.bMoveUpTechOperation.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None;
-            this.bMoveUpTechOperation.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.bMoveUpTechOperation.Name = "bMoveUpTechOperation";
-            this.bMoveUpTechOperation.Size = new System.Drawing.Size(23, 22);
-            this.bMoveUpTechOperation.Text = "Пререместить выше";
-            this.bMoveUpTechOperation.Click += new System.EventHandler(this.bMoveUpTechOperation_Click);
+            this.bMoveUp.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.bMoveUp.Image = global::CAM.Properties.Resources.arrow_up;
+            this.bMoveUp.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None;
+            this.bMoveUp.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.bMoveUp.Name = "bMoveUp";
+            this.bMoveUp.Size = new System.Drawing.Size(23, 22);
+            this.bMoveUp.Text = "Пререместить выше";
+            this.bMoveUp.Click += new System.EventHandler(this.bMoveUpTechOperation_Click);
             // 
-            // bMoveDownTechOperation
+            // bMoveDown
             // 
-            this.bMoveDownTechOperation.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.bMoveDownTechOperation.Image = global::CAM.Properties.Resources.arrow_down;
-            this.bMoveDownTechOperation.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None;
-            this.bMoveDownTechOperation.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.bMoveDownTechOperation.Name = "bMoveDownTechOperation";
-            this.bMoveDownTechOperation.Size = new System.Drawing.Size(23, 22);
-            this.bMoveDownTechOperation.Text = "Переместить ниже";
-            this.bMoveDownTechOperation.Click += new System.EventHandler(this.bMoveDownTechOperation_Click);
+            this.bMoveDown.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.bMoveDown.Image = global::CAM.Properties.Resources.arrow_down;
+            this.bMoveDown.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None;
+            this.bMoveDown.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.bMoveDown.Name = "bMoveDown";
+            this.bMoveDown.Size = new System.Drawing.Size(23, 22);
+            this.bMoveDown.Text = "Переместить ниже";
+            this.bMoveDown.Click += new System.EventHandler(this.bMoveDownTechOperation_Click);
             // 
             // toolStripSeparator1
             // 
@@ -510,8 +510,8 @@
         private System.Windows.Forms.ToolStrip toolStrip;
         private System.Windows.Forms.Panel panel2;
         private System.Windows.Forms.ToolStripButton bRemove;
-        private System.Windows.Forms.ToolStripButton bMoveUpTechOperation;
-        private System.Windows.Forms.ToolStripButton bMoveDownTechOperation;
+        private System.Windows.Forms.ToolStripButton bMoveUp;
+        private System.Windows.Forms.ToolStripButton bMoveDown;
         private System.Windows.Forms.ImageList imageList;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
         private System.Windows.Forms.TabControl tabControl;
