@@ -18,7 +18,7 @@ namespace CAM
             InitializeComponent();
 
             imageList.Images.AddRange(new System.Drawing.Image[] { Properties.Resources.folder, Properties.Resources.drive_download });
-            bCreateTechOperation.DropDownItems.AddRange(OperationItemsContainer.GetMenuItems(bCreateTechOperationClick));
+            bCreateTechOperation.DropDownItems.AddRange(OperationItemsContainer.GetMenuItems(bCreateTechOperation_Click));
             //RefreshToolButtonsState();
 #if DEBUG
             bClose.Visible = true;
@@ -81,6 +81,48 @@ namespace CAM
         }
 
         private bool IsToolpathVisible => !bVisibility.Checked;
+
+        private void bBuildProcessing_ButtonClick(object sender, EventArgs e)
+        {
+            SelectNextControl(ActiveControl, true, true, true, true);
+            if (treeView.SelectedNode == null)
+                treeView.SelectedNode = treeView.Nodes[0];
+            toolStrip.Enabled = false;
+            processCommandBindingSource.DataSource = CamManager.ExecuteProcessing(GetProcessItem(SelectedNode));
+            UpdateNodeText();
+            toolStrip.Enabled = true;
+            treeView_AfterSelect(sender, null);
+        }
+
+        private void bVisibility_Click(object sender, EventArgs e)
+        {
+            //SelectedNode.SetVisibility(IsToolpathVisible);
+            //Acad.Editor.UpdateScreen();
+        }
+
+        private void bPlay_Click(object sender, EventArgs e)
+        {
+            toolStrip.Enabled = false;
+            Acad.CreateProgressor("Проигрывание обработки");
+            Acad.SetLimitProgressor(processCommandBindingSource.Count - processCommandBindingSource.Position);
+            while (processCommandBindingSource.Position < processCommandBindingSource.Count - 1 &&
+                   Acad.ReportProgressor(false))
+            {
+                processCommandBindingSource.MoveNext();
+                System.Threading.Thread.Sleep((int)((Command)processCommandBindingSource.Current).Duration * 10);
+            }
+
+            Acad.CloseProgressor();
+            toolStrip.Enabled = true;
+        }
+
+        private void bSend_Click(object sender, EventArgs e)
+        {
+            dataGridViewCommand.EndEdit();
+            CamManager.SendProgram();
+        }
+
+        private void bClose_Click(object sender, EventArgs e) => Acad.CloseAndDiscard();
         #endregion
 
         #region Tree nodes
@@ -107,19 +149,16 @@ namespace CAM
             treeView.SelectedNode = AddProcessingNode(MachineType.CncWorkCenter);
         }
 
-        private void bCreateTechOperationClick(string caption, Type type)
+        private void bCreateTechOperation_Click(string caption, Type type)
         {
             var machineType = type.GetCustomAttribute<MachineTypeNewAttribute>().MachineType;
             var processingNode = treeView.Nodes.Count > 0
-                ? treeView.SelectedNode?.Parent ?? treeView.SelectedNode ?? treeView.Nodes[treeView.Nodes.Count - 1]
+                ? SelectedNode?.Parent ?? SelectedNode ?? treeView.Nodes[treeView.Nodes.Count - 1]
                 : null;
             if (((IProcessing)processingNode?.Tag)?.MachineType != machineType)
-            {
                 processingNode = AddProcessingNode(machineType);
-                treeView.Nodes.Add(processingNode);
-            }
 
-            var operation = OperationFactory.Create(type, treeView.SelectedNode?.Tag);
+            var operation = OperationFactory.Create(type, SelectedNode?.Tag);
             var node = CreateNode(operation, 1);
             processingNode.Nodes.Add(node);
             treeView.SelectedNode = node;
@@ -224,48 +263,6 @@ namespace CAM
         }
 
         #endregion
-
-        private void bBuildProcessing_ButtonClick(object sender, EventArgs e)
-        {
-            SelectNextControl(ActiveControl, true, true, true, true);
-            if (treeView.SelectedNode == null)
-                treeView.SelectedNode = treeView.Nodes[0];
-            toolStrip.Enabled = false;
-            processCommandBindingSource.DataSource = CamManager.ExecuteProcessing(GetProcessItem(SelectedNode));
-            UpdateNodeText();
-            toolStrip.Enabled = true;
-            treeView_AfterSelect(sender, null);
-        }
-
-        private void bVisibility_Click(object sender, EventArgs e)
-        {
-            //SelectedNode.SetVisibility(IsToolpathVisible);
-            //Acad.Editor.UpdateScreen();
-        }
-
-        private void bPlay_Click(object sender, EventArgs e)
-        {
-            toolStrip.Enabled = false;
-            Acad.CreateProgressor("Проигрывание обработки");
-            Acad.SetLimitProgressor(processCommandBindingSource.Count - processCommandBindingSource.Position);
-            while (processCommandBindingSource.Position < processCommandBindingSource.Count - 1 &&
-                   Acad.ReportProgressor(false))
-            {
-                processCommandBindingSource.MoveNext();
-                System.Threading.Thread.Sleep((int)((Command)processCommandBindingSource.Current).Duration * 10);
-            }
-
-            Acad.CloseProgressor();
-            toolStrip.Enabled = true;
-        }
-
-        private void bSend_Click(object sender, EventArgs e)
-        {
-            dataGridViewCommand.EndEdit();
-            CamManager.SendProgram();
-        }
-
-        private void bClose_Click(object sender, EventArgs e) => Acad.CloseAndDiscard();
 
         #endregion
 
