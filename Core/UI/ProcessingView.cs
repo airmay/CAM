@@ -187,37 +187,34 @@ namespace CAM
 
         #region Delete
 
-        private void bRemove_Click(object sender, EventArgs e) => Delete();
+        private void bRemove_Click(object sender, EventArgs e) => DeleteNode();
 
         private void treeView_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.KeyCode == Keys.Delete)
-                Delete();
+                DeleteNode();
         }
 
-        private void Delete()
+        private void DeleteNode()
         {
             if (SelectedNode != null && MessageBox.Show($"Вы хотите удалить {SelectedNode.Text}?",
                     "Подтверждение", MessageBoxButtons.YesNo, MessageBoxIcon.Question, MessageBoxDefaultButton.Button1) == DialogResult.Yes)
             {
-                SelectedNode.RemoveOperation();
-
-                //Acad.UnhighlightAll();
                 ClearParamsViews();
-                treeView.SelectedNode.Remove();
+                SelectedNode.Remove();
                 treeView.Focus();
-                //RefreshToolButtonsState();
+                RefreshToolButtonsState();
+
+                ProcessItem.OnDelete();
+                Acad.UnhighlightAll();
             }
         }
         #endregion
 
         #region Move
-
         private void bMoveUpTechOperation_Click(object sender, EventArgs e) => MoveNode(-1);
 
-
         private void bMoveDownTechOperation_Click(object sender, EventArgs e) => MoveNode(1);
-
 
         private void MoveNode(int direction)
         {
@@ -231,7 +228,6 @@ namespace CAM
                 treeView.SelectedNode = node;
             }
         }
-
         #region Edit
 
         private void treeView_NodeMouseDoubleClick(object sender, TreeNodeMouseClickEventArgs e)

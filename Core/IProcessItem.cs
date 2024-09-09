@@ -6,7 +6,7 @@
         bool Enabled { get; set; }
         IProcessItem[] Children { get; set; }
         int CommandIndex { get; set; }
-        void Delete();
-        void Select();
+        void OnDelete();
+        void OnSelect();
     }
 }
