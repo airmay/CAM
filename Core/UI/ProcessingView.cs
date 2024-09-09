@@ -158,7 +158,7 @@ namespace CAM
             if (((IProcessing)processingNode?.Tag)?.MachineType != machineType)
                 processingNode = AddProcessingNode(machineType);
 
-            var operation = OperationFactory.Create(type, SelectedNode?.Tag);
+            var operation = ProcessItemFactory.CreateOperation(type, SelectedNode?.Tag);
             var node = CreateNode(operation, 1);
             processingNode.Nodes.Add(node);
             treeView.SelectedNode = node;
@@ -166,7 +166,7 @@ namespace CAM
 
         private TreeNode AddProcessingNode(MachineType machineType)
         {
-            var processing = ProcessingFactory.Create(machineType);
+            var processing = ProcessItemFactory.CreateProcessing(machineType);
             var node = CreateNode(processing, 0);
             treeView.Nodes.Add(node);
             return node;

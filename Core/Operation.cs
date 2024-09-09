@@ -1,14 +1,19 @@
 ﻿using Autodesk.AutoCAD.DatabaseServices;
 using System;
 using Autodesk.AutoCAD.Geometry;
+using CAM.Core;
 
 namespace CAM
 {
     [Serializable]
-    public abstract class OperationBase
+    public abstract class OperationBase : IProcessItem
     {
         public string Caption { get; set; }
         public bool Enabled { get; set; } = true;
+        public IProcessItem[] Children { get; set; } = null;
+        public int CommandIndex { get; set; }
+        public abstract void Delete();
+        public abstract void Select();
     }
 
     [Serializable]

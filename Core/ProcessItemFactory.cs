@@ -1,13 +1,27 @@
-﻿using System;
+﻿using CAM.CncWorkCenter;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
 namespace CAM.Core
 {
-    public static class OperationFactory
+    public static class ProcessItemFactory
     {
-        public static IOperation Create(Type operationType, object prototype)
+        public static IProcessItem CreateProcessing(MachineType machineType)
+        {
+            switch (machineType)
+            {
+                case MachineType.CncWorkCenter:
+                    return new ProcessingCnc();
+                case MachineType.WireSawMachine:
+                    return new ProcessingCnc();
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(machineType), machineType, null);
+            }
+        }
+
+        public static IProcessItem CreateOperation(Type operationType, object prototype)
         {
             var operation = (IOperation)Activator.CreateInstance(operationType);
             prototype?.CopyPropertiesTo(operation);

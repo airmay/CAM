@@ -110,11 +110,10 @@
     <Compile Include="Core\IProcessItem.cs" />
     <Compile Include="Core\MachineTypeAttribute.cs" />
     <Compile Include="Core\MillingProcessor.cs" />
-    <Compile Include="Core\OperationFactory.cs" />
+    <Compile Include="Core\ProcessItemFactory.cs" />
     <Compile Include="Core\CamDocument.cs" />
     <Compile Include="Core\CamManager.cs" />
     <Compile Include="Core\CableSawingProcessor.cs" />
-    <Compile Include="Core\ProcessingFactory.cs" />
     <Compile Include="Core\Settings\MachineSettings.cs" />
     <Compile Include="Core\Settings\MachineType.cs" />
     <Compile Include="Core\ToolpathBuilder.cs" />
