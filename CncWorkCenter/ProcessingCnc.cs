@@ -8,8 +8,11 @@ using CAM.Core;
 namespace CAM.CncWorkCenter
 {
     [Serializable]
-    public class ProcessingCnc : OperationBase, IProcessing
+    public class ProcessingCnc : Processing
     {
+        private static Program<CommandCnc> _program = new Program<CommandCnc>();
+        public IProgram Program => _program;
+
         public IEnumerable<IOperation> Operations => OperationsArray;
         public OperationCnc[] OperationsArray { get; set; }
 

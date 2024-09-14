@@ -1,6 +1,6 @@
 ﻿namespace CAM.Core
 {
-    public interface IOperation : IProcessItem
+    public interface IOperation : ProcessItem
     {
     }
 }

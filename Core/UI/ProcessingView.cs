@@ -10,7 +10,7 @@ namespace CAM
     public partial class ProcessingView : UserControl
     {
         private TreeNode SelectedNode => treeView.SelectedNode;
-        private IProcessItem ProcessItem => treeView.SelectedNode?.Tag as IProcessItem;
+        private ProcessItem ProcessItem => treeView.SelectedNode?.Tag as ProcessItem;
         private Command SelectedCommand => processCommandBindingSource.Current as Command;
 
         public ProcessingView()
@@ -26,7 +26,7 @@ namespace CAM
         }
 
         #region Views
-        public void Reset(IProcessItem[] items)
+        public void Reset(ProcessItem[] items)
         {
             treeView.Nodes.Clear();
             ClearParamsViews();
@@ -61,6 +61,7 @@ namespace CAM
             //bVisibility.Enabled = bSendProgramm.Enabled = bPartialProcessing.Enabled = bPlay.Enabled = SelectedNode?.ProcessCommands != null;
         }
 
+        // TODO перенести
         public void UpdateNodeText()
         {
             foreach (TreeNode node in treeView.Nodes)
@@ -85,10 +86,9 @@ namespace CAM
         private void bBuildProcessing_ButtonClick(object sender, EventArgs e)
         {
             SelectNextControl(ActiveControl, true, true, true, true);
-            if (treeView.SelectedNode == null)
-                treeView.SelectedNode = treeView.Nodes[0];
+            var processItem = GetProcessItem(SelectedNode?.Parent ?? SelectedNode ?? treeView.Nodes[0]);
             toolStrip.Enabled = false;
-            processCommandBindingSource.DataSource = CamManager.ExecuteProcessing(GetProcessItem(SelectedNode));
+            processCommandBindingSource.DataSource = CamManager.ExecuteProcessing(processItem);
             UpdateNodeText();
             toolStrip.Enabled = true;
             treeView_AfterSelect(sender, null);
@@ -129,11 +129,11 @@ namespace CAM
 
         #region Get
 
-        public IProcessItem[] GetProcessItems() => treeView.Nodes.Cast<TreeNode>().Select(GetProcessItem).ToArray();
+        public ProcessItem[] GetProcessItems() => treeView.Nodes.Cast<TreeNode>().Select(GetProcessItem).ToArray();
 
-        public static IProcessItem GetProcessItem(TreeNode node)
+        public static ProcessItem GetProcessItem(TreeNode node)
         {
-            var processItem = (IProcessItem)node.Tag;
+            var processItem = (ProcessItem)node.Tag;
             processItem.Caption = node.Text;
             processItem.Enabled = node.Checked;
             processItem.Children = node.Nodes.Cast<TreeNode>().Select(GetProcessItem).ToArray();
@@ -172,7 +172,7 @@ namespace CAM
             return node;
         }
 
-        private static TreeNode CreateNode(IProcessItem item, int level)
+        private static TreeNode CreateNode(ProcessItem item, int level)
         {
             var children = item.Children?.Select(p => CreateNode(p, level + 1)).ToArray()
                            ?? Array.Empty<TreeNode>();
@@ -267,7 +267,7 @@ namespace CAM
 
         public void RefreshParamsView()
         {
-            var type = SelectedNode.Tag.GetType();
+            var type = ProcessItem.GetType();
             if (!_paramsViews.TryGetValue(type, out var paramsView))
             {
                 paramsView = new ParamsView(type);
@@ -276,7 +276,7 @@ namespace CAM
                 _paramsViews[type] = paramsView;
             }
 
-            paramsView.BindingSource.DataSource = SelectedNode.Tag;
+            paramsView.BindingSource.DataSource = ProcessItem;
             paramsView.Show();
             paramsView.BringToFront();
         }
@@ -298,7 +298,7 @@ namespace CAM
             CamManager.ShowTool(SelectedCommand);
         }
 
-        public void SelectProcessCommand(int commandIndex) => processCommandBindingSource.Position = commandIndex; 
+        public void SelectCommand(int index) => processCommandBindingSource.Position = index; 
         #endregion
     }
 }

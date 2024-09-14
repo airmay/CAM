@@ -3,14 +3,14 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Autodesk.AutoCAD.Geometry;
+using CAM.Core;
 
 namespace CAM
 {
     [Serializable]
-    public class Processing : OperationBase
+    public class Processing : ProcessItem, IProcessing
     {
-        public Operation[] Operations { get; set; }
-
+        public IOperation[] Operations { get; set; }
         public virtual MachineType MachineType { get; set; }
         public Machine? Machine { get; set; }
         public Material? Material { get; set; }
@@ -25,6 +25,7 @@ namespace CAM
         public double OriginX { get; set; }
         public double OriginY { get; set; }
         public Point2d Origin => new Point2d(OriginX, OriginX);
+
         [NonSerialized] public ObjectId? OriginGroup;
 
         public static void ConfigureParamsView(ParamsView view)

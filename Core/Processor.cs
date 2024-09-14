@@ -33,7 +33,7 @@ namespace CAM
         public Processor(IPostProcessor postProcessor)
         {
             _postProcessor = postProcessor;
-            CamManager.CommandsArray.Reset();
+            CamManager.Program.Reset();
         }
 
         public void Start(Tool tool)
@@ -151,16 +151,16 @@ namespace CAM
             if (text == null)
                 return;
 
-            //CamManager.CommandsArray.Add(new Command
+            //CamManager.Program.Add(new Command
             //{
             //    Name = name,
             //    Text = text,
             //    Position = Position,
             //    AngleA = AngleA,
             //    AngleC = AngleC,
-            //    Toolpath = toolpath,
+            //    ObjectId = toolpath,
             //    Operation = _operation,
-            //    Number = CamManager.CommandsArray.Count + 1
+            //    Number = CamManager.Program.Count + 1
             //});
         }
 

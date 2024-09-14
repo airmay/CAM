@@ -33,7 +33,7 @@ namespace CAM.CncWorkCenter
         public ProcessorCnc(IPostProcessor postProcessor)
         {
             _postProcessor = postProcessor;
-            CamManager.CommandsArray.Reset();
+            CamManager.Program.Reset();
         }
 
         public void Start(Tool tool)
@@ -151,16 +151,16 @@ namespace CAM.CncWorkCenter
             if (text == null)
                 return;
 
-            CamManager.CommandsArray.Add(new CommandCnc
+            CamManager.Program.Add(new CommandCnc
             {
                 Name = name,
                 Text = text,
                 Position = Position,
                 AngleA = AngleA,
                 AngleC = AngleC,
-                Toolpath = toolpath,
+                ObjectId = toolpath,
                 Operation = _operation,
-                Number = CamManager.CommandsArray.Count + 1
+                Number = CamManager.Program.Count + 1
             });
         }
 

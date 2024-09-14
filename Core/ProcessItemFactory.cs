@@ -8,7 +8,7 @@ namespace CAM.Core
 {
     public static class ProcessItemFactory
     {
-        public static IProcessItem CreateProcessing(MachineType machineType)
+        public static ProcessItem CreateProcessing(MachineType machineType)
         {
             switch (machineType)
             {
@@ -21,7 +21,7 @@ namespace CAM.Core
             }
         }
 
-        public static IProcessItem CreateOperation(Type operationType, object prototype)
+        public static ProcessItem CreateOperation(Type operationType, object prototype)
         {
             var operation = (IOperation)Activator.CreateInstance(operationType);
             prototype?.CopyPropertiesTo(operation);

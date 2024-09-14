@@ -153,7 +153,7 @@ namespace CAM
             //    Position = Position,
             //    AngleA = AngleA,
             //    AngleC = AngleC,
-            //    Toolpath = toolpath,
+            //    ObjectId = toolpath,
             //    Operation = _operation,
             //    Number = CamManager.Commands.Count + 1
             //});

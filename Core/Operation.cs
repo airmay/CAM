@@ -6,18 +6,18 @@ using CAM.Core;
 namespace CAM
 {
     [Serializable]
-    public abstract class OperationBase : IProcessItem
+    public abstract class OperationBase : ProcessItem
     {
         public string Caption { get; set; }
         public bool Enabled { get; set; } = true;
-        public IProcessItem[] Children { get; set; } = null;
+        public ProcessItem[] Children { get; set; } = null;
         public int CommandIndex { get; set; }
         public abstract void Delete();
         public abstract void Select();
     }
 
     [Serializable]
-    public abstract class Operation : OperationBase
+    public abstract class Operation : ProcessItem
     {
         public double Duration { get; set; }
         public AcadObject ProcessingArea { get; set; }

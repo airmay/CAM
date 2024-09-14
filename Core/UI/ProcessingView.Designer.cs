@@ -394,8 +394,8 @@
             // 
             // toolpathDataGridViewTextBoxColumn
             // 
-            this.toolpathDataGridViewTextBoxColumn.DataPropertyName = "Toolpath";
-            this.toolpathDataGridViewTextBoxColumn.HeaderText = "Toolpath";
+            this.toolpathDataGridViewTextBoxColumn.DataPropertyName = "ObjectId";
+            this.toolpathDataGridViewTextBoxColumn.HeaderText = "ObjectId";
             this.toolpathDataGridViewTextBoxColumn.Name = "toolpathDataGridViewTextBoxColumn";
             this.toolpathDataGridViewTextBoxColumn.Width = 5;
             // 
