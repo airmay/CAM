@@ -31,6 +31,8 @@ namespace CAM
 
         public static Editor Editor => Application.DocumentManager.MdiActiveDocument.Editor;
 
+        public static ToolObject ToolObject { get; } = new ToolObject();
+
         public static void Write(string message, Exception ex = null)
         {
 #if !DEBUG
@@ -141,6 +143,7 @@ namespace CAM
 
         public static ObjectId? CreateGroup(this IEnumerable<ObjectId?> entityIds)
         {
+            // TODO add слой обработка
             var list = entityIds.NotNull().Distinct().ToList();
             return list.Any()
                 ? (ObjectId?)App.LockAndExecute(() => list.Group(selectable: false))
@@ -185,6 +188,10 @@ namespace CAM
             return App.LockAndExecute(() => curves.AddToCurrentSpace().Group(selectable: true));
         }
 
+        public static ObjectId? GetSelectedObjectId()
+        {
+            return Editor.SelectImplied().Value?.GetObjectIds()[0];
+        }
         public static ObjectId[] GetSelectedObjectIds()
         {
             var res = Acad.Editor.SelectImplied();
@@ -265,6 +272,7 @@ namespace CAM
 
         public static void DeleteAll()
         {
+            //TODO
             //ToolObject.Hide();
             App.LockAndExecute(() =>
             {

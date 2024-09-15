@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
+using CAM.Core;
 using CAM.Program.Generator;
 using Dreambuild.AutoCAD;
 
@@ -28,6 +29,8 @@ namespace CAM.CncWorkCenter
         public double ZMax { get; set; } = 0;
         public double UpperZ => ZMax + ZSafety;
         public bool IsUpperTool => Position.Z > ZMax;
+        public Program<CommandCnc> Program { get; set; }
+
         private const int CommandListCapacity = 10_000;
 
         public ProcessorCnc(IPostProcessor postProcessor)

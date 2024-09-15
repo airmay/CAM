@@ -8,7 +8,7 @@ namespace CAM
 {
     static class DataLoader
     {
-        private const string DataKey = "GeneralOperations";
+        private const string DataKey = "ProcessItems";
 
         // https://adn-cis.org/serilizacziya-klassa-.net-v-bazu-chertezha-autocad.html или  https://www.rsdn.org/forum/dotnet/2900485.all
         public sealed class MyBinder : SerializationBinder

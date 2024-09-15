@@ -3,7 +3,7 @@ using System.Linq;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
 
-namespace CAM.Program
+namespace CAM
 {
     public class OperationProcessor
     {

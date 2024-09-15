@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Windows.Forms;
+using Autodesk.AutoCAD.DatabaseServices;
+using Autodesk.AutoCAD.DatabaseServices.Filters;
 using CAM.Core;
 
 namespace CAM
@@ -86,9 +88,11 @@ namespace CAM
         private void bBuildProcessing_ButtonClick(object sender, EventArgs e)
         {
             SelectNextControl(ActiveControl, true, true, true, true);
-            var processItem = GetProcessItem(SelectedNode?.Parent ?? SelectedNode ?? treeView.Nodes[0]);
+            var processing = GetProcessItem(SelectedNode?.Parent ?? SelectedNode ?? treeView.Nodes[0]) as IProcessing;
             toolStrip.Enabled = false;
-            processCommandBindingSource.DataSource = CamManager.ExecuteProcessing(processItem);
+            DeleteGenerated();
+            _program = processing.Execute();
+            processCommandBindingSource.DataSource = _program.GetCommands();
             UpdateNodeText();
             toolStrip.Enabled = true;
             treeView_AfterSelect(sender, null);
@@ -119,7 +123,7 @@ namespace CAM
         private void bSend_Click(object sender, EventArgs e)
         {
             dataGridViewCommand.EndEdit();
-            CamManager.SendProgram();
+            _program.Export();
         }
 
         private void bClose_Click(object sender, EventArgs e) => Acad.CloseAndDiscard();
@@ -282,7 +286,9 @@ namespace CAM
         }
         #endregion
 
-        #region Command view
+        #region Program view
+
+        private IProgram _program;
         public void ClearCommandsView() => processCommandBindingSource.DataSource = null;
 
         private void processCommandBindingSource_CurrentChanged(object sender, EventArgs e)
@@ -295,10 +301,20 @@ namespace CAM
                 Acad.Show(SelectedCommand.Toolpath.Value);
                 Acad.SelectObjectIds(SelectedCommand.Toolpath.Value);
             }
-            CamManager.ShowTool(SelectedCommand);
+            Acad.ToolObject.Set(SelectedCommand?.Operation?.Processing.Machine, SelectedCommand?.Operation?.Tool, SelectedCommand.Position, SelectedCommand.AngleC, SelectedCommand.AngleA);
         }
 
-        public void SelectCommand(int index) => processCommandBindingSource.Position = index; 
+        public void SelectCommand(ObjectId? objectId)
+        {
+            if (objectId.HasValue && _program.TryGetCommandIndex(objectId.Value, out var commandIndex))
+                processCommandBindingSource.Position = commandIndex;
+        }
         #endregion
+
+        private void DeleteGenerated()
+        {
+            ToolObject.Hide();
+            //_processing?.RemoveAcadObjects();
+        }
     }
 }

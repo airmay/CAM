@@ -9,7 +9,7 @@ namespace CAM
 {
     public class ToolObject
     {
-        public Curve[] Curves { get; set; }
+        public static Curve[] Curves { get; set; }
         private Machine _machine;
         private Tool _tool;
         private Point3d _position;
@@ -31,7 +31,7 @@ namespace CAM
             TransformCurves(position, angleC, angleA);
         }
 
-        public void Hide()
+        public static void Hide()
         {
             if (Curves == null)
                 return;

@@ -1,6 +1,6 @@
 ﻿using Autodesk.AutoCAD.Geometry;
 
-namespace CAM.Program.Generator
+namespace CAM
 {
     public interface IPostProcessor
     {

@@ -1,15 +1,18 @@
-﻿using Autodesk.AutoCAD.ApplicationServices;
+﻿using System;
+using Autodesk.AutoCAD.ApplicationServices;
 using Autodesk.AutoCAD.Runtime;
 using System.IO;
 using System.Reflection;
 using Autodesk.AutoCAD.Geometry;
 using Dreambuild.AutoCAD;
+using Autodesk.AutoCAD.DatabaseServices;
 
 namespace CAM
 {
     public class Startup : IExtensionApplication
     {
         public const string CamDocumentKey = "CamDocument";
+        private ProcessingView _processingView = new ProcessingView();
 
         public void Initialize()
         {
@@ -49,28 +52,39 @@ namespace CAM
 
         private void SetActiveDocument(Document document)
         {
-            if (document == null)
-            {
-                CamManager.RemoveDocument();
-                return;
-            }
+            //if (document == null)
+            //{
+            //    CamManager.RemoveDocument();
+            //    return;
+            //}
 
             if (!document.UserData.ContainsKey(CamDocumentKey))
             {
                 document.CommandWillStart += Document_CommandWillStart;
                 document.BeginDocumentClose += Document_BeginDocumentClose;
-                document.ImpliedSelectionChanged += (sender, args) => CamManager.OnSelectAcadObject(); // TODO 
+                document.ImpliedSelectionChanged += DocumentOnImpliedSelectionChanged;
 
                 document.UserData[CamDocumentKey] = CamDocument.Create();
             }
-            CamManager.SetDocument((CamDocument)document.UserData[CamDocumentKey]);
+            if (CamDocument.Current != null)
+                CamDocument.Current.ProcessItems = _processingView.GetProcessItems();
+            CamDocument.Current = (CamDocument)document.UserData[CamDocumentKey];
+
+            _processingView.Reset(CamDocument.Current.ProcessItems);
+            //ToolObject.Hide();
+            Acad.ClearHighlighted();
         }
+
+        private void DocumentOnImpliedSelectionChanged(object sender, EventArgs e) => _processingView.SelectCommand(Acad.GetSelectedObjectId());
 
         private void Document_CommandWillStart(object sender, CommandEventArgs e)
         {
             if (e.GlobalCommandName == "CLOSE" || e.GlobalCommandName == "QUIT" || e.GlobalCommandName == "QSAVE" || e.GlobalCommandName == "SAVEAS")
             {
-                CamManager.SaveDocument(); // TODO сохранять все
+                // TODO сохранять все
+                CamDocument.Current.Save(_processingView.GetProcessItems());
+                _processingView.ClearCommandsView();
+                Acad.DeleteAll();
             }
         }
 
@@ -78,7 +92,9 @@ namespace CAM
         {
             ((Document)sender).CommandWillStart -= Document_CommandWillStart;
             ((Document)sender).BeginDocumentClose -= Document_BeginDocumentClose;
-            CamManager.RemoveDocument();
+
+            CamDocument.Current = null;
+            _processingView.ClearView();
         }
 
         public void Terminate()

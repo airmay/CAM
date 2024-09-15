@@ -8,11 +8,12 @@ using CAM.Core;
 namespace CAM.CncWorkCenter
 {
     [Serializable]
-    public class ProcessingCnc : Processing
+    public class ProcessingCnc : ProcessingBase
     {
         private static Program<CommandCnc> _program = new Program<CommandCnc>();
-        public IProgram Program => _program;
-
+        public override IProgram Program => _program;
+        
+        private ProcessorCnc _processor;
         public IEnumerable<IOperation> Operations => OperationsArray;
         public OperationCnc[] OperationsArray { get; set; }
 
@@ -47,50 +48,31 @@ namespace CAM.CncWorkCenter
             view.AddTextBox(nameof(ZSafety));
         }
 
-        public void Init()
-        {
-            if (Origin != Point2d.Origin)
-                OriginGroup = Acad.CreateOriginObject(Origin);
-
-            foreach (var operation in Operations)
-            {
-                AcadObject.LoadAcadProps(operation);
-                operation.Init();
-            }
-        }
-
-        public void Teardown()
-        {
-            foreach (var operation in Operations)
-                operation.Teardown();
-        }
-
-        public void Execute()
+        protected override void ProcessOperations()
         {
             if (!Machine.CheckNotNull("Станок") || !Tool.CheckNotNull("Инструмент"))
                 return;
 
-            using (var processor = ProcessorFactory.Create(Machine.Value))
+            var processor = ProcessorFactory.Create(Machine.Value);
+            processor = ProcessorFactory.Create(Machine.Value);
+            processor.Program = _program;
+
+            processor.Start(Tool);
+            processor.SetGeneralOperarion(this);
+            foreach (var operation in Operations.Where(p => p.Enabled))
             {
-                processor.Start(Tool);
-                processor.SetGeneralOperarion(this);
-                foreach (var operation in Operations.Where(p => p.Enabled))
-                {
-                    Acad.Write($"расчет операции {operation.Caption}");
+                Acad.Write($"расчет операции {operation.Caption}");
 
-                    processor.SetOperation(operation);
-                    operation.Processing = this;
-                    operation.Execute(processor);
-                }
-
-                processor.Finish();
+                processor.SetOperation(operation);
+                operation.Processing = this;
+                operation.Execute(processor);
             }
         }
 
-        public void RemoveAcadObjects()
-        {
-            foreach (var operation in Operations)
-                operation.RemoveAcadObjects();
-        }
+        //public void RemoveAcadObjects()
+        //{
+        //    foreach (var operation in Operations)
+        //        operation.RemoveAcadObjects();
+        //}
     }
 }

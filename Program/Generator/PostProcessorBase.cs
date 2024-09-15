@@ -2,7 +2,7 @@
 using System.Linq;
 using Autodesk.AutoCAD.Geometry;
 
-namespace CAM.Program.Generator
+namespace CAM
 {
     public abstract class PostProcessorBase : IPostProcessor
     {

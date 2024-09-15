@@ -7,6 +7,6 @@ namespace CAM.Core
         void Reset();
         object GetCommands();
         bool TryGetCommandIndex(ObjectId objectId, out int commandIndex);
-        void Export(Machine machine);
+        void Export();
     }
 }

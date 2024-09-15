@@ -1,4 +1,4 @@
-﻿namespace CAM.Program.Generator
+﻿namespace CAM
 {
     public class CommandParam
     {

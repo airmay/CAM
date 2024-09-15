@@ -4,89 +4,100 @@ using System.Collections.Generic;
 using System.Linq;
 using Autodesk.AutoCAD.Geometry;
 using CAM.Core;
+using System.Diagnostics;
 
 namespace CAM
 {
     [Serializable]
-    public class Processing : ProcessItem, IProcessing
+    public abstract class ProcessingBase : ProcessItem, IProcessing
     {
-        public IOperation[] Operations { get; set; }
-        public virtual MachineType MachineType { get; set; }
-        public Machine? Machine { get; set; }
-        public Material? Material { get; set; }
-        
-        public Tool Tool { get; set; }
-        public int Frequency { get; set; }
-        
-        public int CuttingFeed { get; set; }
-        public int PenetrationFeed { get; set; }
-        public double ZSafety { get; set; } = 20;
+        public abstract IProgram Program { get; }
+        protected abstract void ProcessOperations();
 
-        public double OriginX { get; set; }
-        public double OriginY { get; set; }
-        public Point2d Origin => new Point2d(OriginX, OriginX);
+        //public void Init()
 
-        [NonSerialized] public ObjectId? OriginGroup;
 
-        public static void ConfigureParamsView(ParamsView view)
+        //{
+
+
+        //    if (Origin != Point2d.Origin)
+
+
+        //        OriginGroup = Acad.CreateOriginObject(Origin);
+
+
+        //    foreach (var operation in Operations)
+
+
+        //    {
+
+
+        //        AcadObject.LoadAcadProps(operation);
+
+
+        //        operation.Init();
+
+
+        //    }
+
+
+        //}
+
+
+        //public void Teardown()
+
+
+        //{
+
+
+        //    foreach (var operation in Operations)
+
+
+        //        operation.Teardown();
+
+
+        //}
+
+
+        //public void RemoveAcadObjects()
+
+
+        //{
+
+
+        //    foreach (var operation in Operations)
+
+
+        //        operation.RemoveAcadObjects();
+
+
+        //}
+
+        public IProgram Execute()
         {
-            view.AddMachine(CAM.Machine.Donatoni, CAM.Machine.ScemaLogic, CAM.Machine.Forma);
-            view.AddMaterial();
-            view.AddIndent();
-            view.AddTool();
-            view.AddTextBox(nameof(Frequency));
-            view.AddIndent();
-            view.AddTextBox(nameof(CuttingFeed));
-            view.AddTextBox(nameof(PenetrationFeed));
-            view.AddIndent();
-            view.AddOrigin();
-            view.AddTextBox(nameof(ZSafety));
-        }
-
-        public void Init()
-        {
-            if (Origin != Point2d.Origin)
-                OriginGroup = Acad.CreateOriginObject(Origin);
-
-            foreach (var operation in Operations)
+            Acad.Editor.UpdateScreen();
+            Acad.Write($"Выполняется расчет обработки {Caption}");
+            Acad.CreateProgressor("Расчет обработки");
+            try
             {
-                AcadObject.LoadAcadProps(operation);
-                operation.Init();
+                var stopwatch = Stopwatch.StartNew();
+                ProcessOperations();
+                stopwatch.Stop();
+                Acad.Write($"Расчет обработки завершен {stopwatch.Elapsed}");
             }
-        }
+            catch (Autodesk.AutoCAD.Runtime.Exception ex) when (ex.ErrorStatus == Autodesk.AutoCAD.Runtime.ErrorStatus.UserBreak)
+            {
+                Acad.Write("Расчет прерван");
+            }
+#if !DEBUG  
+            catch (Exception ex)
+            {
+                Acad.Alert("Ошибка при выполнении расчета", ex);
+            }
+#endif
+            Acad.CloseProgressor();
 
-        public void Teardown()
-        {
-            foreach (var operation in Operations)
-                operation.Teardown();
-        }
-
-        public void Execute()
-        {
-            if (!Machine.CheckNotNull("Станок") || !Tool.CheckNotNull("Инструмент"))
-                return;
-
-            //using (var processor = ProcessorFactory.Create(Machine.Value))
-            //{
-            //    processor.Start(Tool);
-            //    processor.SetGeneralOperarion(this);
-            //    foreach (var operation in Operations.Where(p => p.Enabled))
-            //    {
-            //        Acad.Write($"расчет операции {operation.Caption}");
-
-            //        processor.SetOperation(operation);
-            //        operation.Processing = this;
-            //        operation.Execute(processor);
-            //    }
-
-            //    processor.Finish();
-            //}
-        }
-
-        public void RemoveAcadObjects()
-        {
-            foreach (var operation in Operations)
-                operation.RemoveAcadObjects();
+            return Program;
         }
     }
 }

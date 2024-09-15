@@ -11,6 +11,7 @@ namespace CAM.Core
         private T[] _commands;
         private int _capacity = 1_000;
         public int Count;
+        public Machine Machine { get; set; }
         private readonly Dictionary<ObjectId, int> _objectIdDict = new Dictionary<ObjectId, int>();
 
         public void Reset()
@@ -55,7 +56,7 @@ namespace CAM.Core
             return result;
         }
 
-        public void Export(Machine machine)
+        public void Export()
         {
             if (Count == 0)
             {
@@ -63,8 +64,8 @@ namespace CAM.Core
                 return;
             }
 
-            var settings = Settings.Machines[machine];
-            var fileName = Acad.SaveFileDialog("Программа", settings.ProgramFileExtension, machine.ToString());
+            var settings = Settings.Machines[Machine];
+            var fileName = Acad.SaveFileDialog("Программа", settings.ProgramFileExtension, Machine.ToString());
             if (fileName == null)
                 return;
             try

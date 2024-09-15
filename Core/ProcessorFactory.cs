@@ -1,6 +1,5 @@
 ﻿using System;
 using CAM.CncWorkCenter;
-using CAM.Program.Generator;
 
 namespace CAM
 {
