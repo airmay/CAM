@@ -3,14 +3,13 @@ using System.Collections.Generic;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
 using CAM.Core;
-using CAM.Program.Generator;
 using Dreambuild.AutoCAD;
 
 namespace CAM.CncWorkCenter
 {
     public class ProcessorCnc : IDisposable
     {
-        private readonly IPostProcessor _postProcessor;
+        public IPostProcessor _postProcessor;
         private ToolpathBuilder _toolpathBuilder;
         private OperationCnc _operation;
         public bool IsEngineStarted;
@@ -19,7 +18,7 @@ namespace CAM.CncWorkCenter
         public double AngleA { get; set; }
         public double AngleC { get; set; }
 
-        protected int _frequency;
+        public int Frequency { get; set; }
         public int CuttingFeed { get; set; }
         public int PenetrationFeed { get; set; }
         public Point2d Origin { get; set; }
@@ -30,43 +29,29 @@ namespace CAM.CncWorkCenter
         public double UpperZ => ZMax + ZSafety;
         public bool IsUpperTool => Position.Z > ZMax;
         public Program<CommandCnc> Program { get; set; }
-
-        private const int CommandListCapacity = 10_000;
+        public Tool Tool { get; set; }
 
         public ProcessorCnc(IPostProcessor postProcessor)
         {
             _postProcessor = postProcessor;
-            CamManager.Program.Reset();
         }
 
-        public void Start(Tool tool)
+        public void Start()
         {
+            Program.Reset();
+            _toolpathBuilder = new ToolpathBuilder();
+
             Position = Algorithms.NullPoint3d.WithZ(ZMax + ZSafety * 3);
             _postProcessor.GCommand(-1, Position, 0, 0, null);
 
-            if (CamManager.Commands == null)
-                CamManager.Commands = new List<CommandCnc>(CommandListCapacity);
-            CamManager.Commands.Clear();
-
             AddCommands(_postProcessor.StartMachine());
-            AddCommands(_postProcessor.SetTool(tool.Number, 0, 0, 0));
-
-            _toolpathBuilder = new ToolpathBuilder();
-        }
-
-        public void SetGeneralOperarion(ProcessingCnc processing)
-        {
-            _frequency = processing.Frequency;
-            CuttingFeed = processing.CuttingFeed;
-            PenetrationFeed = processing.PenetrationFeed;
-            ZSafety = processing.ZSafety;
-            Origin = processing.Origin;
+            AddCommands(_postProcessor.SetTool(Tool.Number, 0, 0, 0));
         }
 
         public void SetOperation(OperationCnc operation)
         {
             _operation = operation;
-            _operation.FirstCommandIndex = CamManager.Commands.Count;
+            _operation.FirstCommandIndex = Program.Count;
         }
 
         public void Finish()

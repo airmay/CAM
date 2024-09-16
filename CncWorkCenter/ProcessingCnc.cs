@@ -53,19 +53,17 @@ namespace CAM.CncWorkCenter
             if (!Machine.CheckNotNull("Станок") || !Tool.CheckNotNull("Инструмент"))
                 return;
 
-            var processor = ProcessorFactory.Create(Machine.Value);
-            processor = ProcessorFactory.Create(Machine.Value);
-            processor.Program = _program;
-
-            processor.Start(Tool);
-            processor.SetGeneralOperarion(this);
-            foreach (var operation in Operations.Where(p => p.Enabled))
+            using (var processor = ProcessorFactory.Create(this))
             {
-                Acad.Write($"расчет операции {operation.Caption}");
+                processor.Start();
+                foreach (OperationCnc operation in Children.Where(p => p.Enabled))
+                {
+                    Acad.Write($"расчет операции {operation.Caption}");
 
-                processor.SetOperation(operation);
-                operation.Processing = this;
-                operation.Execute(processor);
+                    processor.SetOperation(operation);
+                    operation.Processing = this;
+                    operation.Execute(processor);
+                }
             }
         }
 

@@ -5,10 +5,10 @@ namespace CAM
 {
     public static class ProcessorFactory
     {
-        public static ProcessorCnc Create(Machine machine)
+        public static ProcessorCnc Create(ProcessingCnc processing)
         {
             IPostProcessor postProcessor;
-            switch (machine)
+            switch (processing.Machine)
             {
                 case Machine.ScemaLogic:
                     postProcessor = new DonatoniPostProcessor();
@@ -31,7 +31,16 @@ namespace CAM
                 default:
                     throw new ArgumentOutOfRangeException();
             }
-            return new ProcessorCnc(postProcessor);
+
+            return new ProcessorCnc(postProcessor)
+            {
+                Tool = processing.Tool,
+                Frequency = processing.Frequency,
+                CuttingFeed = processing.CuttingFeed,
+                PenetrationFeed = processing.PenetrationFeed,
+                ZSafety = processing.ZSafety,
+                Origin = processing.Origin
+            };
         }
     }
 }
