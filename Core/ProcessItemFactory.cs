@@ -21,10 +21,12 @@ namespace CAM.Core
             }
         }
 
-        public static ProcessItem CreateOperation(Type operationType, object prototype)
+        public static ProcessItem CreateOperation(string caption, Type operationType, object prototype)
         {
-            var operation = (IOperation)Activator.CreateInstance(operationType);
+            var operation = (ProcessItem)Activator.CreateInstance(operationType);
             prototype?.CopyPropertiesTo(operation);
+            operation.Caption = caption;
+            operation.Enabled = true;
 
             return operation;
         }

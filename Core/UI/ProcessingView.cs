@@ -6,6 +6,7 @@ using System.Windows.Forms;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.DatabaseServices.Filters;
 using CAM.Core;
+using static Autodesk.AutoCAD.DatabaseServices.GripMode;
 
 namespace CAM
 {
@@ -155,15 +156,13 @@ namespace CAM
 
         private void bCreateTechOperation_Click(string caption, Type type)
         {
-            var machineType = type.GetCustomAttribute<MachineTypeNewAttribute>().MachineType;
+            var operation = ProcessItemFactory.CreateOperation(caption, type, SelectedNode?.Tag);
+            var node = CreateNode(operation, 1);
             var processingNode = treeView.Nodes.Count > 0
                 ? SelectedNode?.Parent ?? SelectedNode ?? treeView.Nodes[treeView.Nodes.Count - 1]
                 : null;
-            if (((IProcessing)processingNode?.Tag)?.MachineType != machineType)
-                processingNode = AddProcessingNode(machineType);
-
-            var operation = ProcessItemFactory.CreateOperation(type, SelectedNode?.Tag);
-            var node = CreateNode(operation, 1);
+            if (processingNode == null || ((ProcessItem)processingNode.Tag).MachineType != operation.MachineType)
+                processingNode = AddProcessingNode(operation.MachineType);
             processingNode.Nodes.Add(node);
             treeView.SelectedNode = node;
         }

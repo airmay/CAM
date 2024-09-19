@@ -10,6 +10,7 @@ namespace CAM.CncWorkCenter
     [Serializable]
     public class ProcessingCnc : ProcessingBase
     {
+        public override MachineType MachineType => CAM.MachineType.CncWorkCenter;
         private static Program<CommandCnc> _program = new Program<CommandCnc>();
         public override IProgram Program => _program;
         
@@ -17,7 +18,6 @@ namespace CAM.CncWorkCenter
         public IEnumerable<IOperation> Operations => OperationsArray;
         public OperationCnc[] OperationsArray { get; set; }
 
-        public virtual MachineType MachineType { get; set; }
         public Machine? Machine { get; set; }
         public Material? Material { get; set; }
         
