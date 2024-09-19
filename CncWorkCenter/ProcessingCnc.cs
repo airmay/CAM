@@ -14,16 +14,10 @@ namespace CAM.CncWorkCenter
         private static Program<CommandCnc> _program = new Program<CommandCnc>();
         public override IProgram Program => _program;
         
-        private ProcessorCnc _processor;
-        public IEnumerable<IOperation> Operations => OperationsArray;
-        public OperationCnc[] OperationsArray { get; set; }
-
         public Machine? Machine { get; set; }
         public Material? Material { get; set; }
-        
         public Tool Tool { get; set; }
         public int Frequency { get; set; }
-        
         public int CuttingFeed { get; set; }
         public int PenetrationFeed { get; set; }
         public double ZSafety { get; set; } = 20;
