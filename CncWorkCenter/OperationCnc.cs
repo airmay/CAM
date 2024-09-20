@@ -20,6 +20,8 @@ namespace CAM
 
         public Machine Machine => Processing.Machine.Value;
         public Tool Tool => Processing.Tool;
+        public double ToolDiameter => Processing.Tool.Diameter;
+        public double ToolThickness => Processing.Tool.Thickness.Value;
         public int CuttingFeed => Processing.CuttingFeed;
         public int PenetrationFeed => Processing.PenetrationFeed;
         public double ZSafety => Processing.ZSafety;

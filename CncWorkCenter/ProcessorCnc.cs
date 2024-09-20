@@ -14,9 +14,7 @@ namespace CAM.CncWorkCenter
         private OperationCnc _operation;
         public bool IsEngineStarted;
 
-        public Point3d Position { get; set; }
-        public double AngleA { get; set; }
-        public double AngleC { get; set; }
+        public ToolLocationCnc Location { get; set; }
 
         public int Frequency { get; set; }
         public int CuttingFeed { get; set; }

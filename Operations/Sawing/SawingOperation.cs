@@ -12,12 +12,9 @@ namespace CAM.Operations.Sawing
     [Serializable]
     public class SawingOperation : OperationCnc
     {
-        public Side OuterSide { get; set; }
-        public double ToolThickness => Tool.Thickness.Value;
         public double Thickness { get; set; }
         public bool IsExactlyBegin { get; set; }
         public bool IsExactlyEnd { get; set; }
-        public double AngleA { get; set; }
         public double Departure { get; set; }
         public bool ChangeSide { get; set; }
 
@@ -30,7 +27,6 @@ namespace CAM.Operations.Sawing
             var thicknessTextBox = view.AddTextBox(nameof(Thickness));
             view.AddCheckBox(nameof(IsExactlyBegin), "Начало точно");
             view.AddCheckBox(nameof(IsExactlyEnd), "Конец точно");
-            view.AddTextBox(nameof(AngleA));
             view.AddTextBox(nameof(Departure));
             view.AddIndent();
             view.AddAcadObject(allowedTypes: $"{AcadObjectNames.Line},{AcadObjectNames.Arc},{AcadObjectNames.Lwpolyline}");
@@ -47,7 +43,7 @@ namespace CAM.Operations.Sawing
             };
         }
 
-        public  void Execute(Processor processor)
+        public override void Execute(ProcessorCnc processor)
         {
             var (curveSides, points, outerSide) = CalcСurveProcessingInfo();
 
@@ -113,7 +109,7 @@ namespace CAM.Operations.Sawing
                 SupportGroup = SupportGroup.AppendToGroup(hatchId.Value);
         }
 
-        private void ProcessCurve(Processor processor, Curve curve, Side outerSide, bool isExactlyBegin, bool isExactlyEnd)
+        private void ProcessCurve(ProcessorCnc processor, Curve curve, Side outerSide, bool isExactlyBegin, bool isExactlyEnd)
         {
             var gashLength = GetGashLength(Depth);
             var indent = gashLength + CornerIndentIncrease;
@@ -243,7 +239,7 @@ namespace CAM.Operations.Sawing
             }
         }
 
-        private void Scheduling(Processor processor, Curve curve, bool isExactlyBegin, bool isExactlyEnd, double indent)
+        private void Scheduling(ProcessorCnc processor, Curve curve, bool isExactlyBegin, bool isExactlyEnd, double indent)
         {
             var vector = curve.EndPoint - curve.StartPoint;
             var (point, depth) = CalcSchedulingPoint();
@@ -269,11 +265,6 @@ namespace CAM.Operations.Sawing
 
                 return (pt, Depth);
             }
-        }
-
-        public override void Execute(ProcessorCnc processor)
-        {
-            throw new NotImplementedException();
         }
     }
 }
