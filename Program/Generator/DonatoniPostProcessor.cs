@@ -43,7 +43,7 @@
         {
             return new[]
             {
-                hasTool ? "M7" : "M8",
+                hasTool ? "M7" : "M8", // todo
                 $"S{frequency}",
                 "M3",
             };

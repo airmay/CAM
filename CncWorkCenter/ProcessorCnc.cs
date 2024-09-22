@@ -25,7 +25,7 @@ namespace CAM.CncWorkCenter
         public double ZSafety { get; set; } = 20;
         public double ZMax { get; set; } = 0;
         public double UpperZ => ZMax + ZSafety;
-        public bool IsUpperTool => Position.Z > ZMax;
+        public bool IsUpperTool => Location.Z > ZMax;
         public Program<CommandCnc> Program { get; set; }
         public Tool Tool { get; set; }
 
@@ -39,7 +39,7 @@ namespace CAM.CncWorkCenter
             Program.Reset();
             _toolpathBuilder = new ToolpathBuilder();
 
-            Position = Algorithms.NullPoint3d.WithZ(ZMax + ZSafety * 3);
+            Location.Z = ZMax + ZSafety * 3;
             _postProcessor.GCommand(-1, Position, 0, 0, null);
 
             AddCommands(_postProcessor.StartMachine());
@@ -67,7 +67,7 @@ namespace CAM.CncWorkCenter
             {
                 var angleC = BuilderUtils.CalcToolAngle(line.Angle, EngineSide);
                 Move(point, angleC);
-                Cycle();
+                //Cycle();
             }
             Penetration(point);
             Cutting(line, line.NextPoint(point));
@@ -75,17 +75,17 @@ namespace CAM.CncWorkCenter
 
         public void Move(Point3d point, double? angleC = null, double? angleA = null)
         {
-            GCommandTo(CommandNames.Fast, 0, point.WithZ(Position.Z));
-            if (Position.Z > UpperZ)
-                GCommandTo(CommandNames.InitialMove, 0, Position.WithZ(UpperZ));
-            if (angleC != null && angleC.Value != AngleC)
+            GCommandTo(CommandNames.Fast, 0, point.WithZ(Location.Z));
+            if (Location.Z > UpperZ)
+                GCommandTo(CommandNames.InitialMove, 0, point.WithZ(UpperZ));
+            if (angleC.HasValue)
                 TurnC(angleC.Value);
-            if (angleA != null && angleA.Value != angleA)
+            if (angleA.HasValue)
                 TurnA(angleA.Value);
 
             if (!IsEngineStarted)
             {
-                AddCommands(_postProcessor.StartEngine(_frequency, true));
+                AddCommands(_postProcessor.StartEngine(Frequency, true));
                 IsEngineStarted = true;
             }
         }
@@ -94,10 +94,11 @@ namespace CAM.CncWorkCenter
 
         public void TurnA(double angleA) => GCommand("Наклон", 1, feed: 500, angleA: angleA);
 
-        public void Uplifting() => GCommandTo(CommandNames.Uplifting, 0, Position.WithZ(UpperZ));
+        public void Uplifting() => GCommandTo(CommandNames.Uplifting, 0, Location.Point.WithZ(UpperZ));
 
         public void Penetration(Point3d point) => GCommandTo(CommandNames.Penetration, 1, point, PenetrationFeed);
-        public void Penetration(double z) => Penetration(Position.WithZ(z));
+
+        public void Penetration(double z) => Penetration(Location.Point.WithZ(z));
 
         public void Cutting(Point3d point) => GCommandTo(CommandNames.Cutting, 1, point, CuttingFeed);
 
@@ -106,21 +107,20 @@ namespace CAM.CncWorkCenter
         public void GCommandTo(string name, int gCode, Point3d point, int? feed = null)
         {
             Line line = null;
-            if (!Position.IsNull())
+            if (Location.IsDefined())
             {
-                if (point.IsEqualTo(Position))
+                if (point.IsEqualTo(Location.Point))
                     return;
-                line = NoDraw.Line(Position, point);
+                line = NoDraw.Line(Location.Point, point);
             }
 
             GCommand( name, gCode, feed, line, point);
         }
 
-        public void GCommand(string name, int gCode, int? feed = null, Curve curve = null, Point3d? point = null, double? angleC = null, double? angleA = null, Point2d? arcCenter = null)
+        public void GCommand(string name, int gCode, int? feed = null, Curve curve = null, Point3d? point = null,
+            double? angleC = null, double? angleA = null, Point2d? arcCenter = null)
         {
-            Position = point ?? Position;
-            AngleC = angleC ?? AngleC;
-            AngleA = angleA ?? AngleA;
+            Location = Location.Clone(point, angleC, angleA);
             var commandText = _postProcessor.GCommand(gCode, Position, AngleC, AngleA, feed, arcCenter);
             ObjectId? toolpath = null;
             if (curve != null)
@@ -129,7 +129,25 @@ namespace CAM.CncWorkCenter
                     toolpath = _toolpathBuilder.AddToolpath(curve, name);
                 _operation.Duration += curve.Length() / feed.GetValueOrDefault(10000) * 60;
             }
+
             AddCommand(commandText, name, toolpath);
+            return;
+
+            Dictionary<char, string> GetParams()
+            {
+                return new Dictionary<char, string>
+                {
+                    ['G'] = gCode.ToString(),
+                    ['F'] = feed?.ToString(),
+                    ['X'] = !double.IsNaN(position.X) ? (position.X - Origin.X).ToStringParam() : null,
+                    ['Y'] = !double.IsNaN(position.Y) ? (position.Y - Origin.Y).ToStringParam() : null,
+                    ['Z'] = WithThick ? $"({position.Z.ToStringParam()} + THICK)" : position.Z.ToStringParam(),
+                    ['A'] = angleA.ToStringParam(),
+                    ['C'] = angleC.ToStringParam(),
+                    ['I'] = arcCenter.HasValue ? (arcCenter.Value.X - Origin.X).ToStringParam() : null,
+                    ['J'] = arcCenter.HasValue ? (arcCenter.Value.Y - Origin.Y).ToStringParam() : null,
+                };
+            }
         }
 
         public void AddCommand(string text, string name = null, ObjectId? toolpath = null)

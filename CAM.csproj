@@ -176,7 +176,6 @@
     <Compile Include="Program\CommandGenerator\DonatoniCommandGenerator.cs" />
     <Compile Include="Program\CommandGenerator\MachineTypeAttribute.cs" />
     <Compile Include="Program\CommandGenerator\MillingCommandGenerator.cs" />
-    <Compile Include="Program\Generator\CommandParams.cs" />
     <Compile Include="Program\Generator\DonatoniPostProcessor.cs" />
     <Compile Include="Program\Generator\IPostProcessor.cs" />
     <Compile Include="Program\Generator\MillingGenerator.cs" />

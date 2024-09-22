@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Linq;
 using Autodesk.AutoCAD.Geometry;
 
@@ -6,55 +7,48 @@ namespace CAM
 {
     public abstract class PostProcessorBase : IPostProcessor
     {
-        public Dictionary<char, CommandParam> CommandParams { get; }
+        public class Param
+        {
+            public Param(char code, string value)
+            {
+                Code = code;
+                Value = value;
+            }
+            public char Code { get; set; }
+            public string Value { get; set; }
+        }
+
+        public Dictionary<char, string> Params { get; } = new Dictionary<char, string>();
         protected virtual string ParamCodes => "GXYZCAIJF";
         public Point2d Origin { get; set; } = Point2d.Origin;
         public bool WithThick { get; set; }
 
-        protected PostProcessorBase()
-        {
-            CommandParams = ParamCodes.ToCharArray().ToDictionary(p => p, p => new CommandParam());
-        }
-
         #region GCommand
-        public virtual string GCommand(int gCode, Point3d position, double angleA, double angleC, int? feed, Point2d? arcCenter)
+
+        public virtual string GCommand(Param[] @params)
         {
-            var @params = GetParams(gCode, position, angleA, angleC, feed, arcCenter);
-            Apply(@params);
-            return CreateCommand();
+            var changedParams = GetChangedParams(@params);
+            var command = CreateCommand(changedParams);
+            ApplyParams(@params);
+            return command;
         }
 
-        protected virtual IEnumerable<(char, string)> GetParams(int gCode, Point3d position, double angleA, double angleC, int? feed, Point2d? arcCenter)
+        public virtual IEnumerable<Param> GetChangedParams(IEnumerable<Param> @params)
         {
-            return new List<(char, string)>
-            {
-                ('G', gCode.ToString()),
-                ('F', feed?.ToString()),
-                ('X', !double.IsNaN(position.X) ? (position.X - Origin.X).ToStringParam() : null),
-                ('Y', !double.IsNaN(position.Y) ? (position.Y - Origin.Y).ToStringParam() : null),
-                ('Z', WithThick ? $"({position.Z.ToStringParam()} + THICK)" : position.Z.ToStringParam()),
-                ('A', angleA.ToStringParam()),
-                ('C', angleC.ToStringParam()),
-                ('I', arcCenter.HasValue ? (arcCenter.Value.X - Origin.X).ToStringParam() : null),
-                ('J', arcCenter.HasValue ? (arcCenter.Value.Y - Origin.Y).ToStringParam() : null),
-            };
+            return @params.Where(p => p.Value != null && (!Params.TryGetValue(p.Code, out var value) || value != p.Value));
         }
 
-        protected virtual void Apply(IEnumerable<(char Code, string Value)> @params)
+        protected virtual string CreateCommand(IEnumerable<Param> @params)
         {
-            CommandParams.Values.ToList().ForEach(p => p.IsChanged = false);
-            foreach (var (code, value) in @params.Where(item => item.Value != null && item.Value != CommandParams[item.Code].Value))
-            {
-                CommandParams[code].Value = value;
-                CommandParams[code].IsChanged = true;
-            }
+            return string.Join(" ", @params.Select(p => $"{p.Code}{p.Value}"));
         }
 
-        protected virtual string CreateCommand()
+        public virtual void ApplyParams(IEnumerable<Param> @params)
         {
-            return string.Join(" ", 
-                CommandParams.Where(p => p.Value.IsChanged).Select(p => $"{p.Key}{p.Value.Value}"));
-        } 
+            foreach (var param in @params)
+                Params[param.Code] = param.Value;
+        }
+
         #endregion
 
         public virtual string Cycle() => null;
