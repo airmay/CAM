@@ -1,6 +1,8 @@
-﻿namespace CAM
+﻿using CAM.CncWorkCenter;
+
+namespace CAM
 {
-    public class DonatoniPostProcessor : PostProcessorBase
+    public class DonatoniPostProcessor : PostProcessorCnc
     {
         public override string[] StartMachine()
         {

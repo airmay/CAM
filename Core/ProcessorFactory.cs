@@ -7,7 +7,7 @@ namespace CAM
     {
         public static ProcessorCnc Create(ProcessingCnc processing)
         {
-            IPostProcessor postProcessor;
+            PostProcessorCnc postProcessor;
             switch (processing.Machine)
             {
                 case Machine.ScemaLogic:

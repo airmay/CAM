@@ -5,7 +5,6 @@ namespace CAM
     public interface IPostProcessor
     {
         Point2d Origin { get; set; }
-        bool WithThick { get; set; }
         // string GCommand(int gCode, MillToolPosition position, int? feed, Point2d? arcCenter = null);
         string[] StartMachine();
         string[] StopMachine();
@@ -15,6 +14,5 @@ namespace CAM
         string Pause(double duration);
         // void SetParams(MillToolPosition toolPosition);
         string Cycle();
-        string GCommand(int gCode, Point3d position, double angleA, double angleC, int? feed, Point2d? arcCenter = null);
     }
 }

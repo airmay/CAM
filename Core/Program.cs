@@ -47,6 +47,7 @@ namespace CAM.Core
                 _objectIdDict[command.ObjectId.Value] = Count;
 
             _commands[Count++] = command;
+            command.Number = Count;
         }
 
         public bool TryGetCommandIndex(ObjectId objectId, out int commandIndex)

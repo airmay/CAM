@@ -8,5 +8,7 @@ namespace CAM.Core
         string Name { get; set; }
         string Text { get; set; }
         ObjectId? ObjectId { get; set; }
+
+        void ShowTool();
     }
 }

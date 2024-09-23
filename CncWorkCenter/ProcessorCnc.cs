@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
 using CAM.Core;
@@ -9,13 +8,15 @@ namespace CAM.CncWorkCenter
 {
     public class ProcessorCnc : IDisposable
     {
-        public IPostProcessor _postProcessor;
+        private readonly PostProcessorCnc _postProcessor;
         private ToolpathBuilder _toolpathBuilder;
         private OperationCnc _operation;
         public bool IsEngineStarted;
 
-        public ToolLocationCnc Location { get; set; }
+        public ToolLocationCnc Location { get; set; } = new ToolLocationCnc();
 
+        public Program<CommandCnc> Program { get; set; }
+        public Tool Tool { get; set; }
         public int Frequency { get; set; }
         public int CuttingFeed { get; set; }
         public int PenetrationFeed { get; set; }
@@ -25,11 +26,8 @@ namespace CAM.CncWorkCenter
         public double ZSafety { get; set; } = 20;
         public double ZMax { get; set; } = 0;
         public double UpperZ => ZMax + ZSafety;
-        public bool IsUpperTool => Location.Z > ZMax;
-        public Program<CommandCnc> Program { get; set; }
-        public Tool Tool { get; set; }
 
-        public ProcessorCnc(IPostProcessor postProcessor)
+        public ProcessorCnc(PostProcessorCnc postProcessor)
         {
             _postProcessor = postProcessor;
         }
@@ -40,7 +38,7 @@ namespace CAM.CncWorkCenter
             _toolpathBuilder = new ToolpathBuilder();
 
             Location.Z = ZMax + ZSafety * 3;
-            _postProcessor.GCommand(-1, Position, 0, 0, null);
+            //_postProcessor.GCommand(-1, Position, 0, 0, null);
 
             AddCommands(_postProcessor.StartMachine());
             AddCommands(_postProcessor.SetTool(Tool.Number, 0, 0, 0));
@@ -60,10 +58,37 @@ namespace CAM.CncWorkCenter
 
         public void Cycle() => AddCommand(_postProcessor.Cycle());
 
+        public void AddCommand(string text, string name = null, ObjectId? toolpath = null)
+        {
+            if (text == null)
+                return;
+
+            Program.AddCommand(new CommandCnc
+            {
+                Name = name,
+                Text = text,
+                ToolLocation = Location,
+                ObjectId = toolpath,
+                Operation = _operation,
+            });
+        }
+
+        private void AddCommands(string[] commands)
+        {
+            Array.ForEach(commands, p => AddCommand(p));
+        }
+
+        public void Dispose()
+        {
+            _toolpathBuilder.Dispose();
+        }
+
+        #region GCommands
+
         public void Cutting(Line line, CurveTip tip)
         {
             var point = line.GetPoint(tip);
-            if (IsUpperTool)
+            if (Location.Z > ZMax)
             {
                 var angleC = BuilderUtils.CalcToolAngle(line.Angle, EngineSide);
                 Move(point, angleC);
@@ -121,61 +146,20 @@ namespace CAM.CncWorkCenter
             double? angleC = null, double? angleA = null, Point2d? arcCenter = null)
         {
             Location = Location.Clone(point, angleC, angleA);
-            var commandText = _postProcessor.GCommand(gCode, Position, AngleC, AngleA, feed, arcCenter);
+            var commandText = _postProcessor.GCommand(gCode, Location, feed, arcCenter);
             ObjectId? toolpath = null;
             if (curve != null)
             {
+                if (curve.IsNewObject)
+                    _operation.Duration += curve.Length() / feed.GetValueOrDefault(10000) * 60;
+                // todo проверить что после добавления curve.IsNewObject убрали
                 if (curve.Length() > 1)
                     toolpath = _toolpathBuilder.AddToolpath(curve, name);
-                _operation.Duration += curve.Length() / feed.GetValueOrDefault(10000) * 60;
             }
 
             AddCommand(commandText, name, toolpath);
-            return;
-
-            Dictionary<char, string> GetParams()
-            {
-                return new Dictionary<char, string>
-                {
-                    ['G'] = gCode.ToString(),
-                    ['F'] = feed?.ToString(),
-                    ['X'] = !double.IsNaN(position.X) ? (position.X - Origin.X).ToStringParam() : null,
-                    ['Y'] = !double.IsNaN(position.Y) ? (position.Y - Origin.Y).ToStringParam() : null,
-                    ['Z'] = WithThick ? $"({position.Z.ToStringParam()} + THICK)" : position.Z.ToStringParam(),
-                    ['A'] = angleA.ToStringParam(),
-                    ['C'] = angleC.ToStringParam(),
-                    ['I'] = arcCenter.HasValue ? (arcCenter.Value.X - Origin.X).ToStringParam() : null,
-                    ['J'] = arcCenter.HasValue ? (arcCenter.Value.Y - Origin.Y).ToStringParam() : null,
-                };
-            }
         }
 
-        public void AddCommand(string text, string name = null, ObjectId? toolpath = null)
-        {
-            if (text == null)
-                return;
-
-            CamManager.Program.Add(new CommandCnc
-            {
-                Name = name,
-                Text = text,
-                Position = Position,
-                AngleA = AngleA,
-                AngleC = AngleC,
-                ObjectId = toolpath,
-                Operation = _operation,
-                Number = CamManager.Program.Count + 1
-            });
-        }
-
-        private void AddCommands(string[] commands)
-        {
-            Array.ForEach(commands, p => AddCommand(p));
-        }
-
-        public void Dispose()
-        {
-            _toolpathBuilder.Dispose();
-        }
+        #endregion
     }
 }
