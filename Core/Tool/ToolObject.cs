@@ -9,6 +9,7 @@ namespace CAM
 {
     public class ToolObject
     {
+        protected static ToolObject ToolObjectInstance;
         public static Curve[] Curves { get; set; }
         private Machine _machine;
         private Tool _tool;

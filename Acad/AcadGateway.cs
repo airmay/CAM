@@ -11,6 +11,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using CAM.CncWorkCenter;
 using static Autodesk.AutoCAD.Windows.SaveFileDialog;
 using AcadApplication = Autodesk.AutoCAD.ApplicationServices.Application;
 
@@ -31,7 +32,12 @@ namespace CAM
 
         public static Editor Editor => Application.DocumentManager.MdiActiveDocument.Editor;
 
-        public static ToolObject ToolObject { get; } = new ToolObject();
+        private static ToolObject _toolObject;
+
+        public static void ShowToolCnc(Tool tool, ToolLocationCnc location)
+        {
+            var toolObject = new ToolObjectCnc((tool, location));
+        }
 
         public static void Write(string message, Exception ex = null)
         {

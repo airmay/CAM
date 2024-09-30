@@ -99,6 +99,7 @@
     <Compile Include="Acad\AutoCADCommands\Layouts.cs" />
     <Compile Include="Acad\AutoCADCommands\QuickSelection.cs" />
     <Compile Include="Acad\AutoCADCommands\SymbolPack.cs" />
+    <Compile Include="Acad\ToolObjectCnc.cs" />
     <Compile Include="CncWorkCenter\CommandCnc.cs" />
     <Compile Include="CncWorkCenter\PostProcessorCnc.cs" />
     <Compile Include="CncWorkCenter\ToolLocationCnc.cs" />
