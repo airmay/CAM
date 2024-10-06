@@ -1,4 +1,5 @@
-﻿namespace CAM
+﻿/*
+namespace CAM
 {
     public class OperationNode : OperationNodeBase
     {
@@ -43,3 +44,4 @@
         public override int FirstCommandIndex => Operation.FirstCommandIndex;
     }
 }
+*/

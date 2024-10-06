@@ -261,7 +261,7 @@ namespace Dreambuild.AutoCAD
             labels.QForEach<Entity>(mt => mt.ColorIndex = this.Option.LabelColor);
             entIds.AddRange(labels);
 
-            // Curves
+            // Model
             foreach (var curve in this.Curves)
             {
                 var plineId = Draw.Pline(curve.Item1.OrderBy(point => point.X).Select(point => new Point3d(point.X, this.RealRatio * point.Y, 0)));

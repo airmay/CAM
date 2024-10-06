@@ -32,13 +32,6 @@ namespace CAM
 
         public static Editor Editor => Application.DocumentManager.MdiActiveDocument.Editor;
 
-        private static ToolObject _toolObject;
-
-        public static void ShowToolCnc(Tool tool, ToolLocationCnc location)
-        {
-            var toolObject = new ToolObjectCnc((tool, location));
-        }
-
         public static void Write(string message, Exception ex = null)
         {
 #if !DEBUG
@@ -49,7 +42,7 @@ namespace CAM
         }
         public static void CloseAndDiscard()
         {
-            DocumentExtension.CloseAndDiscard(Application.DocumentManager.CurrentDocument);
+            //DocumentExtension.CloseAndDiscard(Application.DocumentManager.CurrentDocument);
             Application.Quit();
         }
 

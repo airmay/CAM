@@ -19,26 +19,15 @@ namespace CAM
     [Serializable]
     public abstract class Operation : ProcessItem
     {
-        public double Duration { get; set; }
         public AcadObject ProcessingArea { get; set; }
 
         [NonSerialized] public ObjectId? ToolpathGroup;
         [NonSerialized] public ObjectId? SupportGroup;
         [NonSerialized] public int FirstCommandIndex;
-        [NonSerialized] public Processing Processing;
+        [NonSerialized] public double Duration;
 
-        public Machine Machine => Processing.Machine.Value;
-        public Tool Tool => Processing.Tool;
-        public int CuttingFeed => Processing.CuttingFeed;
-        public int PenetrationFeed => Processing.PenetrationFeed;
-        public double ZSafety => Processing.ZSafety;
-        public Point2d Origin => Processing.Origin;
-
-        public virtual void Init() { }
-
-        public virtual void Teardown() { }
-
-        public abstract void Execute(Processor processor);
+        public abstract Machine Machine { get; }
+        public abstract Tool Tool { get; }
 
         public void RemoveAcadObjects()
         {

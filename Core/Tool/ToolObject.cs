@@ -3,59 +3,62 @@ using Autodesk.AutoCAD.Colors;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
 using Autodesk.AutoCAD.GraphicsInterface;
-using Dreambuild.AutoCAD;
 
 namespace CAM
 {
     public class ToolObject
     {
-        protected static ToolObject ToolObjectInstance;
-        public static Curve[] Curves { get; set; }
-        private Machine _machine;
-        private Tool _tool;
-        private Point3d _position;
-        private double _angleC;
-        private double _angleA;
+        public static Curve[] Model { get; set; }
+        private static Machine? _machine;
+        private static ITool _tool;
+        private static IToolLocation _location;
 
-        public void Set(Machine? machine, Tool tool, Point3d position, double angleC, double angleA)
+        public static void Set(Machine? machine, ITool tool, IToolLocation location)
         {
-            if (Curves != null && (position.IsNull() || machine != _machine || tool != _tool))
+            if (machine != _machine || tool != _tool || !location.IsDefined)
+            {
                 Hide();
-            if (tool == null || position.IsNull())
-                return;
+                _machine = machine;
+                _tool = tool;
+            }
 
-            _machine = machine.Value;
-            _tool = tool;
-            if (Curves == null)
-                CreateCurves();
+            if (location.IsDefined)
+            {
+                if (Model == null)
+                {
+                    Model = tool.GetModel(_machine);
+                    AddModel(Model);
+                    _location = location.Origin;
+                }
 
-            TransformCurves(position, angleC, angleA);
+                var matrix = location.GetTransformMatrixFrom(_location);
+                TransformModel(Model, matrix);
+                _location = location;
+            }
         }
 
         public static void Hide()
         {
-            if (Curves == null)
+            if (Model == null)
                 return;
 
             using (Application.DocumentManager.MdiActiveDocument.LockDocument())
             using (Acad.Database.TransactionManager.StartTransaction())
-                foreach (var item in Curves)
+                foreach (var item in Model)
                 {
                     TransientManager.CurrentTransientManager.EraseTransient(item, new IntegerCollection());
                     item.Dispose();
                 }
 
-            Curves = null;
+            Model = null;
         }
 
-        private void CreateCurves()
+        private static void AddModel(Curve[] curves)
         {
-            Curves = Create();
-
             using (Application.DocumentManager.MdiActiveDocument.LockDocument())
             using (var tr = Acad.Database.TransactionManager.StartTransaction())
             {
-                foreach (var item in Curves)
+                foreach (var item in curves)
                 {
                     item.Color = Color.FromColorIndex(ColorMethod.ByColor, 131);
                     TransientManager.CurrentTransientManager.AddTransient(item, TransientDrawingMode.Main, 128,
@@ -64,78 +67,17 @@ namespace CAM
 
                 tr.Commit();
             }
-
-            _position = Point3d.Origin;
-            _angleC = 0;
-            _angleA = 0;
-
-            return;
-
-            Curve[] Create()
-            {
-                var thickness = _tool.Thickness.Value;
-                switch (_tool.Type)
-                {
-                    case ToolType.Disk:
-                        var frontY = Settings.Machines[_machine].IsFrontPlaneZero ? 0 : -thickness;
-                        var radius = _tool.Diameter / 2;
-                        var circle0 = new Circle(new Point3d(0, frontY, radius), Vector3d.YAxis, radius);
-                        var circle1 = new Circle(circle0.Center + Vector3d.YAxis * thickness, Vector3d.YAxis, radius);
-                        var axis = new Line(circle1.Center, circle1.Center + Vector3d.YAxis * radius / 4);
-                        return new Curve[] { circle0, circle1, axis };
-
-                    case ToolType.Mill:
-                        return new Curve[]
-                        {
-                            new Circle(Point3d.Origin, Vector3d.ZAxis, 20),
-                            new Line(Point3d.Origin, Point3d.Origin + Vector3d.ZAxis * 100)
-                        };
-
-                    case ToolType.Cable:
-                        var line = new Line(new Point3d(0, -1500, 0), new Point3d(0, 1500, 0));
-                        circle0 = new Circle(line.StartPoint, Vector3d.YAxis, thickness / 2);
-                        circle1 = new Circle(line.EndPoint, Vector3d.YAxis, thickness / 2);
-                        var circle2 = new Circle(line.GetPointAtParameter(line.Length / 2), Vector3d.YAxis,
-                            thickness / 2);
-                        return new Curve[] { circle0, circle1, circle2, line };
-
-                    default:
-                        return new Curve[] { new Line(Point3d.Origin, Point3d.Origin + Vector3d.ZAxis * 100) };
-                }
-            }
         }
 
-        private void TransformCurves(Point3d position, double angleC, double angleA)
+        private static void TransformModel(Curve[] curves, Matrix3d matrix)
         {
-            var matrix = GetTransformMatrix();
-
-            foreach (var item in Curves)
+            foreach (var item in curves)
             {
                 item.TransformBy(matrix);
                 TransientManager.CurrentTransientManager.UpdateTransient(item, new IntegerCollection());
             }
 
             Acad.Editor.UpdateScreen();
-
-            _position = position;
-            _angleC = angleC;
-            _angleA = angleA;
-
-            return;
-
-            Matrix3d GetTransformMatrix()
-            {
-                var mat1 = Matrix3d.Displacement(_position.GetVectorTo(position));
-                var mat2 = Matrix3d.Rotation(Graph.ToRad(_angleC - angleC), Vector3d.ZAxis, position);
-                var mat3 = Matrix3d.Rotation(Graph.ToRad(angleA - _angleA),
-                    Vector3d.XAxis.RotateBy(Graph.ToRad(-angleC), Vector3d.ZAxis), position);
-
-                //var mat1 = Matrix3d.Displacement(Point.GetVectorTo(millPosition.Point));
-                //var mat2 = Matrix3d.Rotation(Graph.ToRad(AngleC - millPosition.AngleC), Vector3d.ZAxis, millPosition.Point);
-                //var mat3 = Matrix3d.Rotation(Graph.ToRad(millPosition.AngleA - AngleA), Vector3d.XAxis.RotateBy(Graph.ToRad(-millPosition.AngleC), Vector3d.ZAxis), millPosition.Point);
-
-                return mat3 * mat2 * mat1;
-            }
         }
     }
 }

@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
-using System.Reflection;
 using System.Windows.Forms;
+using Autodesk.AutoCAD.ApplicationServices;
 using Autodesk.AutoCAD.DatabaseServices;
-using Autodesk.AutoCAD.DatabaseServices.Filters;
 using CAM.Core;
-using static Autodesk.AutoCAD.DatabaseServices.GripMode;
+using Font = System.Drawing.Font;
 
 namespace CAM
 {
@@ -28,21 +28,10 @@ namespace CAM
 #endif
         }
 
-        #region Views
-        public void Reset(ProcessItem[] items)
-        {
-            treeView.Nodes.Clear();
-            ClearParamsViews();
-            if (items?.Any() != true)
-                return;
-
-            treeView.Nodes.AddRange(items.Select(p => CreateNode(p, 0)).ToArray());
-            treeView.ExpandAll();
-            treeView.SelectedNode = treeView.Nodes[0];
-        }
-
+        #region ClearViews
         public void ClearView() // Document = null
         {
+            _camDocument = null;
             toolStrip.Enabled = false;
             treeView.Nodes.Clear();
             ClearParamsViews();
@@ -64,39 +53,29 @@ namespace CAM
             //bVisibility.Enabled = bSendProgramm.Enabled = bPartialProcessing.Enabled = bPlay.Enabled = SelectedNode?.ProcessCommands != null;
         }
 
-        // TODO перенести
-        public void UpdateNodeText()
-        {
-            foreach (TreeNode node in treeView.Nodes)
-            {
-                node.Text = GetCaption(node.Text, node.Nodes.Cast<OperationNode>().Sum(p => p.Operation.Duration));
-                foreach (OperationNode operationNode in node.Nodes)
-                    operationNode.Text = GetCaption(operationNode.Text, operationNode.Operation.Duration);
-            }
-
-            return;
-
-            string GetCaption(string caption, double duration)
-            {
-                var ind = caption.IndexOf('(');
-                var timeSpan = new TimeSpan(0, 0, 0, (int)duration);
-                return $"{(ind > 0 ? caption.Substring(0, ind).Trim() : caption)} ({timeSpan})";
-            }
-        }
-
         private bool IsToolpathVisible => !bVisibility.Checked;
 
         private void bBuildProcessing_ButtonClick(object sender, EventArgs e)
         {
             SelectNextControl(ActiveControl, true, true, true, true);
-            var processing = GetProcessItem(SelectedNode?.Parent ?? SelectedNode ?? treeView.Nodes[0]) as IProcessing;
+            var processingNode = SelectedNode?.Parent ?? SelectedNode ?? treeView.Nodes[0];
+            var processing = (ProcessingBase)GetProcessItem(processingNode);
+
             toolStrip.Enabled = false;
             DeleteGenerated();
+
             _program = processing.Execute();
-            processCommandBindingSource.DataSource = _program.GetCommands();
-            UpdateNodeText();
+
+            UpdateNodeText(processingNode);
+            processingNode.Nodes.Cast<TreeNode>().ForAll(UpdateNodeText);
+                
+            processCommandBindingSource.DataSource = _program.GetCommandsArraySegment();
+            
             toolStrip.Enabled = true;
             treeView_AfterSelect(sender, null);
+            return;
+
+            void UpdateNodeText(TreeNode node) => node.Text = ((ProcessItem)node.Tag).Caption;
         }
 
         private void bVisibility_Click(object sender, EventArgs e)
@@ -114,7 +93,8 @@ namespace CAM
                    Acad.ReportProgressor(false))
             {
                 processCommandBindingSource.MoveNext();
-                System.Threading.Thread.Sleep((int)((Command)processCommandBindingSource.Current).Duration * 10);
+                System.Threading.Thread.Sleep(100);
+                // System.Threading.Thread.Sleep((int)((Command)processCommandBindingSource.Current).Duration * 10);
             }
 
             Acad.CloseProgressor();
@@ -133,6 +113,30 @@ namespace CAM
         #region Tree nodes
 
         #region Get
+
+        private CamDocument _camDocument;
+
+        public void SetCamDocument(CamDocument camDocument)
+        {
+            if (_camDocument != null)
+                _camDocument.ProcessItems = GetProcessItems();
+            _camDocument = camDocument;
+
+            treeView.Nodes.Clear();
+            ClearParamsViews();
+            if (_camDocument.ProcessItems?.Any() != true)
+                return;
+
+            var nodes = Array.ConvertAll(_camDocument.ProcessItems, p => CreateNode(p, 0));
+            treeView.Nodes.AddRange(nodes);
+            treeView.ExpandAll();
+            treeView.SelectedNode = treeView.Nodes[0];
+        }
+
+        public void SaveCamDocument()
+        {
+            _camDocument.Save(GetProcessItems());
+        }
 
         public ProcessItem[] GetProcessItems() => treeView.Nodes.Cast<TreeNode>().Select(GetProcessItem).ToArray();
 
@@ -161,7 +165,7 @@ namespace CAM
             var processingNode = treeView.Nodes.Count > 0
                 ? SelectedNode?.Parent ?? SelectedNode ?? treeView.Nodes[treeView.Nodes.Count - 1]
                 : null;
-            if (processingNode == null || ((ProcessItem)processingNode.Tag).MachineType != operation.MachineType)
+            if (processingNode == null || ((ProcessingBase)processingNode.Tag).MachineType != operation.MachineType)
                 processingNode = AddProcessingNode(operation.MachineType);
             processingNode.Nodes.Add(node);
             treeView.SelectedNode = node;
@@ -175,13 +179,14 @@ namespace CAM
             return node;
         }
 
-        private static TreeNode CreateNode(ProcessItem item, int level)
+        private TreeNode CreateNode(ProcessItem item, int level)
         {
             var children = item.Children?.Select(p => CreateNode(p, level + 1)).ToArray()
                            ?? Array.Empty<TreeNode>();
             return new TreeNode(item.Caption, level, level, children)
             {
                 Checked = item.Enabled,
+                NodeFont = new Font(this.Font, level == 0 ? FontStyle.Bold : FontStyle.Regular),
                 Tag = item
             };
         }
@@ -246,7 +251,10 @@ namespace CAM
                 e.CancelEdit = true;
         }
 
-        private void treeView_AfterCheck(object sender, TreeViewEventArgs e) => ((OperationNodeBase)e.Node).RefreshColor();
+        private void treeView_AfterCheck(object sender, TreeViewEventArgs e)
+        {
+            e.Node.ForeColor = e.Node.Checked ? Color.Black : Color.Gray;
+        }
 
         #endregion
 
@@ -287,7 +295,7 @@ namespace CAM
 
         #region Program view
 
-        private IProgram _program;
+        private Program _program;
         public void ClearCommandsView() => processCommandBindingSource.DataSource = null;
 
         private void processCommandBindingSource_CurrentChanged(object sender, EventArgs e)
@@ -295,12 +303,13 @@ namespace CAM
             if (SelectedCommand == null)
                 return;
 
-            if (SelectedCommand.Toolpath.HasValue)
+            if (SelectedCommand.ObjectId.HasValue)
             {
-                Acad.Show(SelectedCommand.Toolpath.Value);
-                Acad.SelectObjectIds(SelectedCommand.Toolpath.Value);
+                Acad.Show(SelectedCommand.ObjectId.Value);
+                Acad.SelectObjectIds(SelectedCommand.ObjectId.Value);
             }
-            Acad.ToolObject.Set(SelectedCommand?.Operation?.Processing.Machine, SelectedCommand?.Operation?.Tool, SelectedCommand.Position, SelectedCommand.AngleC, SelectedCommand.AngleA);
+
+            ToolObject.Set(SelectedCommand.Operation?.Machine, SelectedCommand.Operation?.Tool, SelectedCommand.ToolLocation);
         }
 
         public void SelectCommand(ObjectId? objectId)

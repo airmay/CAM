@@ -18,7 +18,7 @@ namespace CAM
             throw new NotImplementedException();
         }
 
-        public override string[] SetTool(int toolNo, double angleA, double angleC, int originCellNumber)
+        public string[] SetTool(int toolNo, double angleA, double angleC, int originCellNumber)
         {
             throw new NotImplementedException();
         }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
 using CAM.Core;
@@ -15,7 +16,7 @@ namespace CAM.CncWorkCenter
 
         public ToolLocationCnc Location { get; set; } = new ToolLocationCnc();
 
-        public Program<CommandCnc> Program { get; set; }
+        public Program Program { get; set; }
         public Tool Tool { get; set; }
         public int Frequency { get; set; }
         public int CuttingFeed { get; set; }
@@ -63,7 +64,7 @@ namespace CAM.CncWorkCenter
             if (text == null)
                 return;
 
-            Program.AddCommand(new CommandCnc
+            Program.AddCommand(new Command
             {
                 Name = name,
                 Text = text,
@@ -132,7 +133,7 @@ namespace CAM.CncWorkCenter
         public void GCommandTo(string name, int gCode, Point3d point, int? feed = null)
         {
             Line line = null;
-            if (Location.IsDefined())
+            if (Location.IsDefined)
             {
                 if (point.IsEqualTo(Location.Point))
                     return;
@@ -145,7 +146,7 @@ namespace CAM.CncWorkCenter
         public void GCommand(string name, int gCode, int? feed = null, Curve curve = null, Point3d? point = null,
             double? angleC = null, double? angleA = null, Point2d? arcCenter = null)
         {
-            Location = Location.Clone(point, angleC, angleA);
+            Location = Location.With(point, angleC, angleA);
             var commandText = _postProcessor.GCommand(gCode, Location, feed, arcCenter);
             ObjectId? toolpath = null;
             if (curve != null)

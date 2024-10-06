@@ -124,6 +124,7 @@ namespace CAM.Operations.Sawing
 
             var engineSide = EngineSideCalculator.Calculate(curve, Machine);
             var compensation = 0D;
+            var аngleA = 0D;
 
             if (curve is Arc arc && outerSide == Side.Left) // внутренний рез дуги
             {
@@ -135,7 +136,7 @@ namespace CAM.Operations.Sawing
                     var t = Thickness;
                     var d = Tool.Diameter;
                     var comp = (2*R*t*t - Math.Sqrt(-d*d*d*d * t*t + 4 * d*d * R*R * t*t + d*d * t*t*t*t)) / (d*d - 4*R*R);
-                    AngleA = -Math.Atan2(comp, Thickness).ToDeg();
+                    аngleA = -Math.Atan2(comp, Thickness).ToDeg();
                 }
                 else
                     compensation = arc.Radius - Math.Sqrt(arc.Radius * arc.Radius - Thickness * (Tool.Diameter - Thickness));
@@ -178,7 +179,7 @@ namespace CAM.Operations.Sawing
                         var indentAngle = indent / toolpathArc.Radius;
                         if (isExactlyBegin) toolpathArc.StartAngle += indentAngle;
                         if (isExactlyEnd) toolpathArc.EndAngle -= indentAngle;
-                        processor.Cutting(toolpathArc, tip);
+                        processor.Cutting(toolpathArc, tip, аngleA);
                         break;
 
                     case Polyline polyline:

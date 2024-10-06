@@ -99,8 +99,6 @@
     <Compile Include="Acad\AutoCADCommands\Layouts.cs" />
     <Compile Include="Acad\AutoCADCommands\QuickSelection.cs" />
     <Compile Include="Acad\AutoCADCommands\SymbolPack.cs" />
-    <Compile Include="Acad\ToolObjectCnc.cs" />
-    <Compile Include="CncWorkCenter\CommandCnc.cs" />
     <Compile Include="CncWorkCenter\PostProcessorCnc.cs" />
     <Compile Include="CncWorkCenter\ToolLocationCnc.cs" />
     <Compile Include="Core\ICommand.cs" />
@@ -110,17 +108,14 @@
     <Compile Include="Core\CableTechProcess.cs" />
     <Compile Include="Core\IProgram.cs" />
     <Compile Include="Core\Program.cs" />
-    <Compile Include="Core\IOperation.cs" />
-    <Compile Include="Core\IProcessing.cs" />
     <Compile Include="Core\ProcessItem.cs" />
-    <Compile Include="Core\MillingProcessor.cs" />
     <Compile Include="Core\ProcessItemFactory.cs" />
     <Compile Include="Core\CamDocument.cs" />
-    <Compile Include="Core\CamManager.cs" />
     <Compile Include="Core\CableSawingProcessor.cs" />
     <Compile Include="Core\Settings\MachineSettings.cs" />
     <Compile Include="Core\Settings\MachineType.cs" />
     <Compile Include="Core\ToolpathBuilder.cs" />
+    <Compile Include="Core\Tool\IToolLocation.cs" />
     <Compile Include="Core\Tool\ToolObject.cs" />
     <Compile Include="Operations\CableSawing\CableSawingOperation.cs" />
     <Compile Include="Core\ProcessingBase.cs" />
@@ -134,10 +129,8 @@
     <Compile Include="Core\Tool\ToolModel.cs" />
     <Compile Include="Core\Tool\ToolPosition.cs" />
     <Compile Include="Core\Tool\ToolTypeAttribute.cs" />
-    <Compile Include="Core\UI\ProcessingNode.cs" />
     <Compile Include="Core\UI\OperationItem.cs" />
     <Compile Include="Core\UI\OperationItemsContainer.cs" />
-    <Compile Include="Core\UI\OperationNodeBase.cs" />
     <Compile Include="Core\UI\ProcessingView.cs">
       <SubType>UserControl</SubType>
     </Compile>

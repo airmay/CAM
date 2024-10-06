@@ -1,6 +1,4 @@
-﻿using CAM.Program.Generator;
-using System.Collections.Generic;
-using Autodesk.AutoCAD.DatabaseServices;
+﻿/*using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
 using Dreambuild.AutoCAD;
 using System;
@@ -174,4 +172,4 @@ namespace CAM
             _toolpathBuilder.Dispose();
         }
     }
-}
+}*/

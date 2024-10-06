@@ -6,11 +6,12 @@ using System.Linq;
 
 namespace CAM.Core
 {
-    public class Program<T> : IProgram where T : ICommand
+    public class Program
     {
-        private T[] _commands;
+        private Command[] _commands;
         private int _capacity = 1_000;
         public int Count;
+        public IEnumerable<Command> Commands => _commands.Take(Count);
         public Machine Machine { get; set; }
         private readonly Dictionary<ObjectId, int> _objectIdDict = new Dictionary<ObjectId, int>();
 
@@ -20,21 +21,21 @@ namespace CAM.Core
             _objectIdDict.Clear();
         }
 
-        public object GetCommands()
+        public ArraySegment<Command> GetCommandsArraySegment()
         {
-            return new ArraySegment<T>(_commands, 0, Count);
+            return new ArraySegment<Command>(_commands, 0, Count);
         }
 
-        public void AddCommand(T command)
+        public void AddCommand(Command command)
         {
             if (_commands == null)
-                _commands = new T[_capacity];
+                _commands = new Command[_capacity];
 
             if (Count == _capacity)
                 if (_capacity < 100_000)
                 {
                     _capacity *= 10;
-                    var newArray = new T[_capacity];
+                    var newArray = new Command[_capacity];
                     Array.Copy(_commands, 0, newArray, 0, _commands.Length);
                     _commands = newArray;
                 }
@@ -71,8 +72,7 @@ namespace CAM.Core
                 return;
             try
             {
-                var lines = _commands
-                    .Take(Count)
+                var lines = Commands
                     .Select(p => $"{string.Format(settings.ProgramLineNumberFormat, p.Number)}{p.Text}")
                     .ToArray();
                 File.WriteAllLines(fileName, lines);

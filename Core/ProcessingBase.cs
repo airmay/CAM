@@ -1,17 +1,14 @@
-﻿using Autodesk.AutoCAD.DatabaseServices;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.Linq;
-using Autodesk.AutoCAD.Geometry;
 using CAM.Core;
 using System.Diagnostics;
 
 namespace CAM
 {
     [Serializable]
-    public abstract class ProcessingBase : ProcessItem, IProcessing
+    public abstract class ProcessingBase : ProcessItem
     {
-        public abstract IProgram Program { get; }
+        public abstract Program Program { get; }
         protected abstract void ProcessOperations();
 
         //public void Init()
@@ -73,7 +70,7 @@ namespace CAM
 
         //}
 
-        public IProgram Execute()
+        public Program Execute()
         {
             Acad.Editor.UpdateScreen();
             Acad.Write($"Выполняется расчет обработки {Caption}");
@@ -82,6 +79,10 @@ namespace CAM
             {
                 var stopwatch = Stopwatch.StartNew();
                 ProcessOperations();
+                
+                CreateToolpathGroups();
+                UpdateCaptions();
+
                 stopwatch.Stop();
                 Acad.Write($"Расчет обработки завершен {stopwatch.Elapsed}");
             }
@@ -98,6 +99,28 @@ namespace CAM
             Acad.CloseProgressor();
 
             return Program;
+        }
+
+        private void CreateToolpathGroups()
+        {
+            foreach (var operationGroup in Program.Commands.Where(p => p.Operation != null).GroupBy(p => p.Operation))
+                operationGroup.Key.ToolpathGroup = operationGroup.Select(p => p.ObjectId).CreateGroup();
+        }
+
+        public void UpdateCaptions()
+        {
+            Caption = GetCaption(Caption, Children.Cast<Operation>().Sum(p => p.Duration));
+            foreach (Operation operation in Children)
+                operation.Caption = GetCaption(operation.Caption, operation.Duration);
+
+            return;
+
+            string GetCaption(string caption, double duration)
+            {
+                var ind = caption.IndexOf('(');
+                var timeSpan = new TimeSpan(0, 0, 0, (int)duration);
+                return $"{(ind > 0 ? caption.Substring(0, ind).Trim() : caption)} ({timeSpan})";
+            }
         }
     }
 }

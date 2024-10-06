@@ -35,7 +35,7 @@ namespace CAM
 
         private void CreateCurves(Machine machine)
         {
-            Curves = _tool.GetModelCurves(machine);
+           // Curves = _tool.GetModelCurves(machine);
 
             using (var doclock = Application.DocumentManager.MdiActiveDocument.LockDocument())
             using (Transaction tr = Acad.Database.TransactionManager.StartTransaction())

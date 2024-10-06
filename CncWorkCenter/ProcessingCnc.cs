@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
@@ -10,9 +9,9 @@ namespace CAM.CncWorkCenter
     [Serializable]
     public class ProcessingCnc : ProcessingBase
     {
-        public override MachineType MachineType => CAM.MachineType.CncWorkCenter;
-        private static Program<CommandCnc> _program = new Program<CommandCnc>();
-        public override IProgram Program => _program;
+        public override MachineType MachineType => MachineType.CncWorkCenter;
+        private static Program _program = new Program();
+        public override Program Program => _program;
         
         public Machine? Machine { get; set; }
         public Material? Material { get; set; }
@@ -40,6 +39,11 @@ namespace CAM.CncWorkCenter
             view.AddIndent();
             view.AddOrigin();
             view.AddTextBox(nameof(ZSafety));
+        }
+
+        public ProcessingCnc()
+        {
+            Caption = "Обработка ЧПУ";
         }
 
         protected override void ProcessOperations()

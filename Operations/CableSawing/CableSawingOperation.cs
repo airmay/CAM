@@ -4,7 +4,6 @@ using System.Linq;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
 using CAM.TechProcesses.CableSawing;
-using Dreambuild.AutoCAD;
 
 namespace CAM.Operations.CableSawing
 {
@@ -51,40 +50,40 @@ namespace CAM.Operations.CableSawing
             view.AddTextBox(nameof(StepCount), "Количество шагов");
         }
 
-        public override void Execute(Processor processor)
-        {
-            var tool = new Tool { Type = ToolType.Cable, Diameter = ToolThickness, Thickness = ToolThickness };
+        //public override void Execute(Processor processor)
+        //{
+        //    var tool = new Tool { Type = ToolType.Cable, Diameter = ToolThickness, Thickness = ToolThickness };
 
-            var offsetDistance = ToolThickness / 2 + Delta;
-            var curves = ProcessingArea.GetCurves();
-            foreach (var curve in curves)
-            {
-                if (curve.StartPoint.Z < curve.EndPoint.Z)
-                    curve.ReverseCurve();
-            }
+        //    var offsetDistance = ToolThickness / 2 + Delta;
+        //    var curves = ProcessingArea.GetCurves();
+        //    foreach (var curve in curves)
+        //    {
+        //        if (curve.StartPoint.Z < curve.EndPoint.Z)
+        //            curve.ReverseCurve();
+        //    }
 
-            processor.AddCommand("G92");
+        //    processor.AddCommand("G92");
 
-            var pt0 = new Point3d[StepCount + 3];
-            var pt1 = new Point3d[StepCount + 3];
-            for (int i = 0; i <= StepCount; i++)
-            {
-                pt0[i + 1] = curves[0].GetPointAtDist(curves[0].Length() / StepCount);
-                pt1[i + 1] = curves[1].GetPointAtDist(curves[1].Length() / StepCount);
-            }
-            pt0[0] = pt0[1].GetExtendedPoint(pt0[2], Departure);
-            pt1[0] = pt1[1].GetExtendedPoint(pt1[2], Departure);
-            pt0[StepCount + 2] = pt0[StepCount + 1].GetExtendedPoint(pt0[StepCount], Departure);
-            pt1[StepCount + 2] = pt1[StepCount + 1].GetExtendedPoint(pt1[StepCount], Departure);
+        //    var pt0 = new Point3d[StepCount + 3];
+        //    var pt1 = new Point3d[StepCount + 3];
+        //    for (int i = 0; i <= StepCount; i++)
+        //    {
+        //        pt0[i + 1] = curves[0].GetPointAtDist(curves[0].Length() / StepCount);
+        //        pt1[i + 1] = curves[1].GetPointAtDist(curves[1].Length() / StepCount);
+        //    }
+        //    pt0[0] = pt0[1].GetExtendedPoint(pt0[2], Departure);
+        //    pt1[0] = pt1[1].GetExtendedPoint(pt1[2], Departure);
+        //    pt0[StepCount + 2] = pt0[StepCount + 1].GetExtendedPoint(pt0[StepCount], Departure);
+        //    pt1[StepCount + 2] = pt1[StepCount + 1].GetExtendedPoint(pt1[StepCount], Departure);
 
-            for (int i = 0; i < pt0.Length; i++)
-            {
-                var line = new Line2d(pt0[i].ToPoint2d(), pt1[i].ToPoint2d());
-                var pNearest = line.GetClosestPointTo(Origin).Point;
-                var vector = pNearest - Origin;
-                var u = vector.Length;
-                var z = (pt0[i] + (pt1[i] - pt0[i]) / 2).Z;
-                var angle = Vector2d.XAxis.Negate().ZeroTo2PiAngleTo(vector).ToDeg();
+        //    for (int i = 0; i < pt0.Length; i++)
+        //    {
+        //        var line = new Line2d(pt0[i].ToPoint2d(), pt1[i].ToPoint2d());
+        //        var pNearest = line.GetClosestPointTo(Origin).Point;
+        //        var vector = pNearest - Origin;
+        //        var u = vector.Length;
+        //        var z = (pt0[i] + (pt1[i] - pt0[i]) / 2).Z;
+        //        var angle = Vector2d.XAxis.Negate().ZeroTo2PiAngleTo(vector).ToDeg();
 
                 //if (i == 0)
                 //{
@@ -98,7 +97,7 @@ namespace CAM.Operations.CableSawing
                 //    processor.GCommand1(1, u, z, CuttingFeed);
                 //    processor.GCommandAngle1(angle, S);
                 //}
-            }
+            // }
             //processor.Command($"M05", "Выключение");
 
             //foreach (Region region in regions)
@@ -147,7 +146,9 @@ namespace CAM.Operations.CableSawing
 
             //    generator.GCommand(1, u3, z3, CuttingFeed);
             //}
-        }
+            public override Machine Machine { get; }
+            public override Tool Tool { get; }
+    
         //    S = S ?? TechProcess.S;
         //    Departure = Departure ?? TechProcess.Departure;
 
@@ -209,6 +210,6 @@ namespace CAM.Operations.CableSawing
             if (operation.IsRevereseDirection)
                 points.Reverse();
             return points;
-        }   
+        }
     }
 }

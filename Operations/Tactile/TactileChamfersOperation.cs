@@ -6,12 +6,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using CAM.CncWorkCenter;
 using Dreambuild.AutoCAD;
 
 namespace CAM.Operations.Tactile
 {
     [Serializable]
-    public class TactileChamfersOperation : Operation
+    public class TactileChamfersOperation : OperationCnc
     {
         public double BandStart { get; set; }
 
@@ -100,7 +101,7 @@ namespace CAM.Operations.Tactile
         //    }
         //}
 
-        public override void Execute(Processor processor)
+        public override void Execute(ProcessorCnc processor)
         {
             throw new NotImplementedException();
         }

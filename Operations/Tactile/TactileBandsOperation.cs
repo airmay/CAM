@@ -7,11 +7,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using CAM.CncWorkCenter;
 
 namespace CAM.Operations.Tactile
 {
     [Serializable]
-    public class TactileBandsOperation : Operation
+    public class TactileBandsOperation : OperationCnc
     {
         public int ProcessingAngle { get; set; }
 
@@ -165,7 +166,7 @@ namespace CAM.Operations.Tactile
         //    }
         //}
 
-        public override void Execute(Processor processor)
+        public override void Execute(ProcessorCnc processor)
         {
             throw new NotImplementedException();
         }

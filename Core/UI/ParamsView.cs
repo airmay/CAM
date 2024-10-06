@@ -309,8 +309,8 @@ namespace CAM
 
         public ParamsView AddOrigin()
         {
-            var originInfo = _type.GetProperty(nameof(Processing.Origin));
-            var originGroupInfo = _type.GetField(nameof(Processing.OriginGroup));
+            var originInfo = _type.GetProperty("Origin");
+            var originGroupInfo = _type.GetField("OriginGroup");
 
             var (textbox, button) = CreateSelector("Начало координат", "۞");
 

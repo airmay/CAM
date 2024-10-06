@@ -42,7 +42,7 @@ namespace CAM
             ProcessCommands.AddRange(commands.Select(p => new ProcessCommand { Text = p }));
         }
 
-        public void WithThick() => _postProcessor.WithThick = true;
+        //public void WithThick() => _postProcessor.WithThick = true;
 
         public string GCommand(int gCode, MillToolPosition position, int feed, Point2d? arcCenter = null)
         {

@@ -52,11 +52,8 @@ namespace CAM
 
         private void SetActiveDocument(Document document)
         {
-            //if (document == null)
-            //{
-            //    CamManager.RemoveDocument();
-            //    return;
-            //}
+            if (document == null)
+                return;
 
             if (!document.UserData.ContainsKey(CamDocumentKey))
             {
@@ -66,12 +63,9 @@ namespace CAM
 
                 document.UserData[CamDocumentKey] = CamDocument.Create();
             }
-            if (CamDocument.Current != null)
-                CamDocument.Current.ProcessItems = _processingView.GetProcessItems();
-            CamDocument.Current = (CamDocument)document.UserData[CamDocumentKey];
-
-            _processingView.Reset(CamDocument.Current.ProcessItems);
-            //ToolObject.Hide();
+            
+            _processingView.SetCamDocument((CamDocument)document.UserData[CamDocumentKey]);
+            ToolObject.Hide();
             Acad.ClearHighlighted();
         }
 
@@ -82,7 +76,7 @@ namespace CAM
             if (e.GlobalCommandName == "CLOSE" || e.GlobalCommandName == "QUIT" || e.GlobalCommandName == "QSAVE" || e.GlobalCommandName == "SAVEAS")
             {
                 // TODO сохранять все
-                CamDocument.Current.Save(_processingView.GetProcessItems());
+                _processingView.SaveCamDocument();
                 _processingView.ClearCommandsView();
                 Acad.DeleteAll();
             }
@@ -93,7 +87,6 @@ namespace CAM
             ((Document)sender).CommandWillStart -= Document_CommandWillStart;
             ((Document)sender).BeginDocumentClose -= Document_BeginDocumentClose;
 
-            CamDocument.Current = null;
             _processingView.ClearView();
         }
 

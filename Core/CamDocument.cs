@@ -6,7 +6,6 @@ namespace CAM
     {
         public int Hash;
         public ProcessItem[] ProcessItems { get; set; }
-        public static CamDocument Current { get; set; }
 
         public static CamDocument Create()
         {
