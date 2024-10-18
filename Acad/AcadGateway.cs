@@ -3,17 +3,14 @@ using Autodesk.AutoCAD.Colors;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.EditorInput;
 using Autodesk.AutoCAD.Geometry;
-using Autodesk.AutoCAD.GraphicsInterface;
 using Autodesk.AutoCAD.Windows;
 using CAM.Core;
 using Dreambuild.AutoCAD;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using CAM.CncWorkCenter;
 using static Autodesk.AutoCAD.Windows.SaveFileDialog;
-using AcadApplication = Autodesk.AutoCAD.ApplicationServices.Application;
+using Application = Autodesk.AutoCAD.ApplicationServices.Core.Application;
 
 namespace CAM
 {
@@ -26,11 +23,11 @@ namespace CAM
 
         public static CamDocument CamDocument => ActiveDocument != null ? Documents.TryGetAndReturn(ActiveDocument) : null;
 
-        public static Document ActiveDocument => AcadApplication.DocumentManager.MdiActiveDocument;
+        public static Document ActiveDocument => Autodesk.AutoCAD.ApplicationServices.Core.Application.DocumentManager.MdiActiveDocument;
 
-        public static Database Database => Application.DocumentManager.MdiActiveDocument.Database;
+        public static Database Database => Autodesk.AutoCAD.ApplicationServices.Core.Application.DocumentManager.MdiActiveDocument.Database;
 
-        public static Editor Editor => Application.DocumentManager.MdiActiveDocument.Editor;
+        public static Editor Editor => Autodesk.AutoCAD.ApplicationServices.Core.Application.DocumentManager.MdiActiveDocument.Editor;
 
         public static void Write(string message, Exception ex = null)
         {
@@ -43,7 +40,7 @@ namespace CAM
         public static void CloseAndDiscard()
         {
             //DocumentExtension.CloseAndDiscard(Application.DocumentManager.CurrentDocument);
-            Application.Quit();
+            Autodesk.AutoCAD.ApplicationServices.Core.Application.Quit();
         }
 
         public static void Write(Exception ex) => Write("Ошибка", ex);
@@ -51,7 +48,7 @@ namespace CAM
         public static void Alert(string message, Exception ex = null)
         {
             Write(message, ex);
-            Application.ShowAlertDialog(ex == null ? message : $"{message}: {ex}");
+            Autodesk.AutoCAD.ApplicationServices.Core.Application.ShowAlertDialog(ex == null ? message : $"{message}: {ex}");
         }
 
         public static void Alert(Exception ex) => Alert("Ошибка", ex);
@@ -273,16 +270,17 @@ namespace CAM
         {
             //TODO
             //ToolObject.Hide();
-            App.LockAndExecute(() =>
-            {
-                ClearHighlighted();
-                var layerTable = HostApplicationServices.WorkingDatabase.LayerTableId.QOpenForRead<SymbolTable>();
-                HostApplicationServices.WorkingDatabase.Clayer = layerTable["0"];
-                DeleteByLayer(layerTable, ProcessLayerName);
-                DeleteByLayer(layerTable, HatchLayerName);
-                DeleteByLayer(layerTable, GashLayerName);
-                DeleteByLayer(layerTable, ExtraObjectsLayerName);
-            });
+            if (Application.DocumentManager.MdiActiveDocument != null)
+                App.LockAndExecute(() =>
+                {
+                    ClearHighlighted();
+                    var layerTable = HostApplicationServices.WorkingDatabase.LayerTableId.QOpenForRead<SymbolTable>();
+                    HostApplicationServices.WorkingDatabase.Clayer = layerTable["0"];
+                    DeleteByLayer(layerTable, ProcessLayerName);
+                    DeleteByLayer(layerTable, HatchLayerName);
+                    DeleteByLayer(layerTable, GashLayerName);
+                    DeleteByLayer(layerTable, ExtraObjectsLayerName);
+                });
 
             void DeleteByLayer(SymbolTable layerTable, string layerName)
             {
@@ -366,11 +364,11 @@ namespace CAM
             mPlotManagerEvents1.Register();
             return;
 
-            Application.Publisher.PublishSelectedLayouts(false);
+            Autodesk.AutoCAD.ApplicationServices.Core.Application.Publisher.PublishSelectedLayouts(false);
 
-            Application.Publisher.AboutToBeginPublishing += new Autodesk.AutoCAD.Publishing.AboutToBeginPublishingEventHandler(Publisher_AboutToBeginPublishing);
-            Application.Publisher.AboutToEndPublishing += new Autodesk.AutoCAD.Publishing.AboutToEndPublishingEventHandler(Publisher_AboutToEndPublishing);
-            Application.Publisher.EndPublish += new Autodesk.AutoCAD.Publishing.EndPublishEventHandler(Publisher_EndPublish);
+            Autodesk.AutoCAD.ApplicationServices.Core.Application.Publisher.AboutToBeginPublishing += new Autodesk.AutoCAD.Publishing.AboutToBeginPublishingEventHandler(Publisher_AboutToBeginPublishing);
+            Autodesk.AutoCAD.ApplicationServices.Core.Application.Publisher.AboutToEndPublishing += new Autodesk.AutoCAD.Publishing.AboutToEndPublishingEventHandler(Publisher_AboutToEndPublishing);
+            Autodesk.AutoCAD.ApplicationServices.Core.Application.Publisher.EndPublish += new Autodesk.AutoCAD.Publishing.EndPublishEventHandler(Publisher_EndPublish);
             Application.Publisher.BeginPublishingSheet += new Autodesk.AutoCAD.Publishing.BeginPublishingSheetEventHandler(Publisher_BeginPublishingSheet);
 
             void Publisher_BeginPublishingSheet(object sender, Autodesk.AutoCAD.Publishing.BeginPublishingSheetEventArgs e)
@@ -426,49 +424,49 @@ namespace CAM
 
         public void PlotManager_BeginDocument_Handler(object sender, Autodesk.AutoCAD.PlottingServices.BeginDocumentEventArgs e)
         {
-            AcadApplication.DocumentManager.MdiActiveDocument.Editor.WriteMessage("BeginDocument");
+            Application.DocumentManager.MdiActiveDocument.Editor.WriteMessage("BeginDocument");
 
         }
 
         public void PlotManager_BeginPage_Handler(object sender, Autodesk.AutoCAD.PlottingServices.BeginPageEventArgs e)
         {
-            AcadApplication.DocumentManager.MdiActiveDocument.Editor.WriteMessage("BeginPage");
+            Application.DocumentManager.MdiActiveDocument.Editor.WriteMessage("BeginPage");
 
         }
 
         public void PlotManager_BeginPlot_Handler(object sender, Autodesk.AutoCAD.PlottingServices.BeginPlotEventArgs e)
         {
-            AcadApplication.DocumentManager.MdiActiveDocument.Editor.WriteMessage("BeginPlot");
+            Application.DocumentManager.MdiActiveDocument.Editor.WriteMessage("BeginPlot");
 
         }
 
         public void PlotManager_EndDocument_Handler(object sender, Autodesk.AutoCAD.PlottingServices.EndDocumentEventArgs e)
         {
-            AcadApplication.DocumentManager.MdiActiveDocument.Editor.WriteMessage("EndDocument");
+            Application.DocumentManager.MdiActiveDocument.Editor.WriteMessage("EndDocument");
 
         }
 
         public void PlotManager_EndPage_Handler(object sender, Autodesk.AutoCAD.PlottingServices.EndPageEventArgs e)
         {
-            AcadApplication.DocumentManager.MdiActiveDocument.Editor.WriteMessage("EndPage");
+            Application.DocumentManager.MdiActiveDocument.Editor.WriteMessage("EndPage");
 
         }
 
         public void PlotManager_EndPlot_Handler(object sender, Autodesk.AutoCAD.PlottingServices.EndPlotEventArgs e)
         {
-            AcadApplication.DocumentManager.MdiActiveDocument.Editor.WriteMessage("EndPlot");
+            Application.DocumentManager.MdiActiveDocument.Editor.WriteMessage("EndPlot");
 
         }
 
         public void PlotManager_PageCancelled_Handler(object sender, EventArgs e)
         {
-            AcadApplication.DocumentManager.MdiActiveDocument.Editor.WriteMessage("PageCancelled");
+            Application.DocumentManager.MdiActiveDocument.Editor.WriteMessage("PageCancelled");
 
         }
 
         public void PlotManager_PlotCancelled_Handler(object sender, EventArgs e)
         {
-            AcadApplication.DocumentManager.MdiActiveDocument.Editor.WriteMessage("PlotCancelled");
+            Application.DocumentManager.MdiActiveDocument.Editor.WriteMessage("PlotCancelled");
 
         }
     }

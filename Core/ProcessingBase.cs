@@ -11,6 +11,10 @@ namespace CAM
         public abstract Program Program { get; }
         protected abstract void ProcessOperations();
 
+        protected ProcessingBase()
+        {
+            Enabled = true;
+        }
         //public void Init()
 
 

@@ -52,22 +52,12 @@
             this.bSendProgramm = new System.Windows.Forms.ToolStripButton();
             this.bClose = new System.Windows.Forms.ToolStripButton();
             this.panel2 = new System.Windows.Forms.Panel();
-            this.processCommandBindingSource = new System.Windows.Forms.BindingSource(this.components);
             this.dataGridViewTextBoxColumn1 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.dataGridViewTextBoxColumn2 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.dataGridViewTextBoxColumn3 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.toolpathDataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.operationDataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.positionDataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.angleCDataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.angleADataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.hasToolDataGridViewCheckBoxColumn = new System.Windows.Forms.DataGridViewCheckBoxColumn();
-            this.toolpathObjectIdDataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.durationDataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.ownerDataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.uDataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.vDataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.aDataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.processCommandBindingSource = new System.Windows.Forms.BindingSource(this.components);
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
@@ -139,7 +129,7 @@
             this.tabPageParams.AutoScroll = true;
             this.tabPageParams.Location = new System.Drawing.Point(4, 22);
             this.tabPageParams.Name = "tabPageParams";
-            this.tabPageParams.Padding = new System.Windows.Forms.Padding(3, 3, 3, 3);
+            this.tabPageParams.Padding = new System.Windows.Forms.Padding(3);
             this.tabPageParams.Size = new System.Drawing.Size(328, 492);
             this.tabPageParams.TabIndex = 0;
             this.tabPageParams.Text = "Параметры";
@@ -150,7 +140,7 @@
             this.tabPageCommands.Controls.Add(this.dataGridViewCommand);
             this.tabPageCommands.Location = new System.Drawing.Point(4, 22);
             this.tabPageCommands.Name = "tabPageCommands";
-            this.tabPageCommands.Padding = new System.Windows.Forms.Padding(3, 3, 3, 3);
+            this.tabPageCommands.Padding = new System.Windows.Forms.Padding(3);
             this.tabPageCommands.Size = new System.Drawing.Size(328, 492);
             this.tabPageCommands.TabIndex = 1;
             this.tabPageCommands.Text = "Программа";
@@ -171,17 +161,7 @@
             this.dataGridViewTextBoxColumn2,
             this.dataGridViewTextBoxColumn3,
             this.toolpathDataGridViewTextBoxColumn,
-            this.operationDataGridViewTextBoxColumn,
-            this.positionDataGridViewTextBoxColumn,
-            this.angleCDataGridViewTextBoxColumn,
-            this.angleADataGridViewTextBoxColumn,
-            this.hasToolDataGridViewCheckBoxColumn,
-            this.toolpathObjectIdDataGridViewTextBoxColumn,
-            this.durationDataGridViewTextBoxColumn,
-            this.ownerDataGridViewTextBoxColumn,
-            this.uDataGridViewTextBoxColumn,
-            this.vDataGridViewTextBoxColumn,
-            this.aDataGridViewTextBoxColumn});
+            this.operationDataGridViewTextBoxColumn});
             this.dataGridViewCommand.DataSource = this.processCommandBindingSource;
             this.dataGridViewCommand.Dock = System.Windows.Forms.DockStyle.Fill;
             this.dataGridViewCommand.Location = new System.Drawing.Point(3, 3);
@@ -366,11 +346,6 @@
             this.panel2.Size = new System.Drawing.Size(336, 673);
             this.panel2.TabIndex = 3;
             // 
-            // processCommandBindingSource
-            // 
-            this.processCommandBindingSource.DataSource = typeof(CAM.Command);
-            this.processCommandBindingSource.CurrentChanged += new System.EventHandler(this.processCommandBindingSource_CurrentChanged);
-            // 
             // dataGridViewTextBoxColumn1
             // 
             this.dataGridViewTextBoxColumn1.DataPropertyName = "Number";
@@ -406,75 +381,10 @@
             this.operationDataGridViewTextBoxColumn.Name = "operationDataGridViewTextBoxColumn";
             this.operationDataGridViewTextBoxColumn.Width = 5;
             // 
-            // positionDataGridViewTextBoxColumn
+            // processCommandBindingSource
             // 
-            this.positionDataGridViewTextBoxColumn.DataPropertyName = "Position";
-            this.positionDataGridViewTextBoxColumn.HeaderText = "Position";
-            this.positionDataGridViewTextBoxColumn.Name = "positionDataGridViewTextBoxColumn";
-            this.positionDataGridViewTextBoxColumn.Width = 5;
-            // 
-            // angleCDataGridViewTextBoxColumn
-            // 
-            this.angleCDataGridViewTextBoxColumn.DataPropertyName = "AngleC";
-            this.angleCDataGridViewTextBoxColumn.HeaderText = "AngleC";
-            this.angleCDataGridViewTextBoxColumn.Name = "angleCDataGridViewTextBoxColumn";
-            this.angleCDataGridViewTextBoxColumn.Width = 5;
-            // 
-            // angleADataGridViewTextBoxColumn
-            // 
-            this.angleADataGridViewTextBoxColumn.DataPropertyName = "AngleA";
-            this.angleADataGridViewTextBoxColumn.HeaderText = "AngleA";
-            this.angleADataGridViewTextBoxColumn.Name = "angleADataGridViewTextBoxColumn";
-            this.angleADataGridViewTextBoxColumn.Width = 5;
-            // 
-            // hasToolDataGridViewCheckBoxColumn
-            // 
-            this.hasToolDataGridViewCheckBoxColumn.DataPropertyName = "HasTool";
-            this.hasToolDataGridViewCheckBoxColumn.HeaderText = "HasTool";
-            this.hasToolDataGridViewCheckBoxColumn.Name = "hasToolDataGridViewCheckBoxColumn";
-            this.hasToolDataGridViewCheckBoxColumn.Width = 5;
-            // 
-            // toolpathObjectIdDataGridViewTextBoxColumn
-            // 
-            this.toolpathObjectIdDataGridViewTextBoxColumn.DataPropertyName = "ToolpathObjectId";
-            this.toolpathObjectIdDataGridViewTextBoxColumn.HeaderText = "ToolpathObjectId";
-            this.toolpathObjectIdDataGridViewTextBoxColumn.Name = "toolpathObjectIdDataGridViewTextBoxColumn";
-            this.toolpathObjectIdDataGridViewTextBoxColumn.Width = 5;
-            // 
-            // durationDataGridViewTextBoxColumn
-            // 
-            this.durationDataGridViewTextBoxColumn.DataPropertyName = "Duration";
-            this.durationDataGridViewTextBoxColumn.HeaderText = "Duration";
-            this.durationDataGridViewTextBoxColumn.Name = "durationDataGridViewTextBoxColumn";
-            this.durationDataGridViewTextBoxColumn.Width = 5;
-            // 
-            // ownerDataGridViewTextBoxColumn
-            // 
-            this.ownerDataGridViewTextBoxColumn.DataPropertyName = "Owner";
-            this.ownerDataGridViewTextBoxColumn.HeaderText = "Owner";
-            this.ownerDataGridViewTextBoxColumn.Name = "ownerDataGridViewTextBoxColumn";
-            this.ownerDataGridViewTextBoxColumn.Width = 5;
-            // 
-            // uDataGridViewTextBoxColumn
-            // 
-            this.uDataGridViewTextBoxColumn.DataPropertyName = "U";
-            this.uDataGridViewTextBoxColumn.HeaderText = "U";
-            this.uDataGridViewTextBoxColumn.Name = "uDataGridViewTextBoxColumn";
-            this.uDataGridViewTextBoxColumn.Width = 5;
-            // 
-            // vDataGridViewTextBoxColumn
-            // 
-            this.vDataGridViewTextBoxColumn.DataPropertyName = "V";
-            this.vDataGridViewTextBoxColumn.HeaderText = "V";
-            this.vDataGridViewTextBoxColumn.Name = "vDataGridViewTextBoxColumn";
-            this.vDataGridViewTextBoxColumn.Width = 5;
-            // 
-            // aDataGridViewTextBoxColumn
-            // 
-            this.aDataGridViewTextBoxColumn.DataPropertyName = "A";
-            this.aDataGridViewTextBoxColumn.HeaderText = "A";
-            this.aDataGridViewTextBoxColumn.Name = "aDataGridViewTextBoxColumn";
-            this.aDataGridViewTextBoxColumn.Width = 5;
+            this.processCommandBindingSource.DataSource = typeof(CAM.Command);
+            this.processCommandBindingSource.CurrentChanged += new System.EventHandler(this.processCommandBindingSource_CurrentChanged);
             // 
             // ProcessingView
             // 

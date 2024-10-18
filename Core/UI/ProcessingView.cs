@@ -28,29 +28,25 @@ namespace CAM
 #endif
         }
 
-        #region ClearViews
-        public void ClearView() // Document = null
+        public void ClearAll()
         {
+            if (_camDocument != null)
+                _camDocument.ProcessItems = GetProcessItems();
             _camDocument = null;
+
             toolStrip.Enabled = false;
             treeView.Nodes.Clear();
-            ClearParamsViews();
-        }
-
-        private void ClearParamsViews()
-        {
+            ClearProgram();
             foreach (Control control in tabPageParams.Controls)
                 control.Hide();
-            ClearCommandsView();
+            Acad.ClearHighlighted();
         }
-        #endregion
 
         #region Tool buttons
         private void RefreshToolButtonsState()
         {
-            bRemove.Enabled = bMoveUp.Enabled = bMoveDown.Enabled = bBuildProcessing.Enabled = (SelectedNode != null);
-            //TODO
-            //bVisibility.Enabled = bSendProgramm.Enabled = bPartialProcessing.Enabled = bPlay.Enabled = SelectedNode?.ProcessCommands != null;
+            bRemove.Enabled = bMoveUp.Enabled = bMoveDown.Enabled = bBuildProcessing.Enabled = SelectedNode != null;
+            bVisibility.Enabled = bSendProgramm.Enabled = bPartialProcessing.Enabled = bPlay.Enabled = _program != null;
         }
 
         private bool IsToolpathVisible => !bVisibility.Checked;
@@ -62,7 +58,7 @@ namespace CAM
             var processing = (ProcessingBase)GetProcessItem(processingNode);
 
             toolStrip.Enabled = false;
-            DeleteGenerated();
+            ClearProgram();
 
             _program = processing.Execute();
 
@@ -118,19 +114,17 @@ namespace CAM
 
         public void SetCamDocument(CamDocument camDocument)
         {
-            if (_camDocument != null)
-                _camDocument.ProcessItems = GetProcessItems();
             _camDocument = camDocument;
+            toolStrip.Enabled = true;
 
-            treeView.Nodes.Clear();
-            ClearParamsViews();
-            if (_camDocument.ProcessItems?.Any() != true)
-                return;
-
-            var nodes = Array.ConvertAll(_camDocument.ProcessItems, p => CreateNode(p, 0));
-            treeView.Nodes.AddRange(nodes);
-            treeView.ExpandAll();
-            treeView.SelectedNode = treeView.Nodes[0];
+            if (_camDocument.ProcessItems?.Any() == true)
+            {
+                var nodes = Array.ConvertAll(_camDocument.ProcessItems, p => CreateNode(p, 0));
+                treeView.Nodes.AddRange(nodes);
+                treeView.ExpandAll();
+                treeView.SelectedNode = treeView.Nodes[0];
+            }
+            RefreshToolButtonsState();
         }
 
         public void SaveCamDocument()
@@ -208,7 +202,6 @@ namespace CAM
             if (SelectedNode != null && MessageBox.Show($"Вы хотите удалить {SelectedNode.Text}?",
                     "Подтверждение", MessageBoxButtons.YesNo, MessageBoxIcon.Question, MessageBoxDefaultButton.Button1) == DialogResult.Yes)
             {
-                ClearParamsViews();
                 SelectedNode.Remove();
                 treeView.Focus();
                 RefreshToolButtonsState();
@@ -253,7 +246,10 @@ namespace CAM
 
         private void treeView_AfterCheck(object sender, TreeViewEventArgs e)
         {
-            e.Node.ForeColor = e.Node.Checked ? Color.Black : Color.Gray;
+            if (e.Node.Level == 1)
+                e.Node.ForeColor = e.Node.Checked ? Color.Black : Color.Gray;
+            else if (!e.Node.Checked)
+                e.Node.Checked = true;
         }
 
         #endregion
@@ -296,7 +292,13 @@ namespace CAM
         #region Program view
 
         private Program _program;
-        public void ClearCommandsView() => processCommandBindingSource.DataSource = null;
+        public void ClearProgram()
+        {
+            _program = null;
+            processCommandBindingSource.DataSource = null;
+            ToolObject.Hide();
+            Acad.DeleteAll();
+        }
 
         private void processCommandBindingSource_CurrentChanged(object sender, EventArgs e)
         {
@@ -318,11 +320,5 @@ namespace CAM
                 processCommandBindingSource.Position = commandIndex;
         }
         #endregion
-
-        private void DeleteGenerated()
-        {
-            ToolObject.Hide();
-            //_processing?.RemoveAcadObjects();
-        }
     }
 }
