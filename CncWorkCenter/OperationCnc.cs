@@ -11,7 +11,7 @@ namespace CAM
     public abstract class OperationCnc : Operation
     {
         public override MachineType MachineType => MachineType.CncWorkCenter;
-        [NonSerialized] public ProcessingCnc Processing;
+        [NonSerialized] protected ProcessingCnc Processing;
 
         public override Machine Machine => Processing.Machine.Value;
         public override Tool Tool => Processing.Tool;
@@ -29,6 +29,12 @@ namespace CAM
 
         public virtual void Teardown()
         {
+        }
+
+        public override void Execute(ProcessingBase processingBase, IProcessor processor)
+        {
+            Processing = (ProcessingCnc)processingBase;
+            Execute((ProcessorCnc)processor);
         }
 
         public abstract void Execute(ProcessorCnc processor);

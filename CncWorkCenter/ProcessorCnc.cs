@@ -7,7 +7,7 @@ using Dreambuild.AutoCAD;
 
 namespace CAM.CncWorkCenter
 {
-    public class ProcessorCnc : IDisposable
+    public class ProcessorCnc : IProcessor
     {
         private readonly PostProcessorCnc _postProcessor;
         private ToolpathBuilder _toolpathBuilder;
@@ -55,6 +55,7 @@ namespace CAM.CncWorkCenter
         {
             AddCommands(_postProcessor.StopEngine());
             AddCommands(_postProcessor.StopMachine());
+            _toolpathBuilder.Dispose();
         }
 
         public void Cycle() => AddCommand(_postProcessor.Cycle());
@@ -77,11 +78,6 @@ namespace CAM.CncWorkCenter
         private void AddCommands(string[] commands)
         {
             Array.ForEach(commands, p => AddCommand(p));
-        }
-
-        public void Dispose()
-        {
-            _toolpathBuilder.Dispose();
         }
 
         #region GCommands

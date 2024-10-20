@@ -9,7 +9,6 @@ namespace CAM
     public abstract class ProcessingBase : ProcessItem
     {
         public abstract Program Program { get; }
-        protected abstract void ProcessOperations();
 
         protected ProcessingBase()
         {
@@ -76,6 +75,9 @@ namespace CAM
 
         public Program Execute()
         {
+            if (!Validate())
+                return null;
+
             Acad.Editor.UpdateScreen();
             Acad.Write($"Выполняется расчет обработки {Caption}");
             Acad.CreateProgressor("Расчет обработки");
@@ -83,27 +85,48 @@ namespace CAM
             {
                 var stopwatch = Stopwatch.StartNew();
                 ProcessOperations();
-                
+
                 CreateToolpathGroups();
                 UpdateCaptions();
 
                 stopwatch.Stop();
                 Acad.Write($"Расчет обработки завершен {stopwatch.Elapsed}");
+
+                return Program;
             }
             catch (Autodesk.AutoCAD.Runtime.Exception ex) when (ex.ErrorStatus == Autodesk.AutoCAD.Runtime.ErrorStatus.UserBreak)
             {
                 Acad.Write("Расчет прерван");
             }
-#if !DEBUG  
+#if !DEBUG
             catch (Exception ex)
             {
                 Acad.Alert("Ошибка при выполнении расчета", ex);
             }
 #endif
-            Acad.CloseProgressor();
+            finally
+            {
+                Acad.CloseProgressor();
+            }
 
-            return Program;
+            return null;
         }
+
+        protected virtual void ProcessOperations()
+        {
+            var processor = CreateProcessor();
+            processor.Start();
+            foreach (Operation operation in Children.Where(p => p.Enabled))
+            {
+                Acad.Write($"расчет операции {operation.Caption}");
+                operation.Execute(this, processor);
+            }
+            processor.Finish();
+        }
+
+        protected abstract IProcessor CreateProcessor();
+
+        protected abstract bool Validate();
 
         private void CreateToolpathGroups()
         {

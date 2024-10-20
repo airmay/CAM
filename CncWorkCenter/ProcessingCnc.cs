@@ -46,23 +46,47 @@ namespace CAM.CncWorkCenter
             Caption = "Обработка ЧПУ";
         }
 
-        protected override void ProcessOperations()
+        protected override IProcessor CreateProcessor()
         {
-            if (!Machine.CheckNotNull("Станок") || !Tool.CheckNotNull("Инструмент"))
-                return;
-
-            using (var processor = ProcessorFactory.Create(this))
+            PostProcessorCnc postProcessor;
+            switch (Machine.Value)
             {
-                processor.Start();
-                foreach (OperationCnc operation in Children.Where(p => p.Enabled))
-                {
-                    Acad.Write($"расчет операции {operation.Caption}");
-
-                    processor.SetOperation(operation);
-                    operation.Processing = this;
-                    operation.Execute(processor);
-                }
+                case CAM.Machine.ScemaLogic:
+                    postProcessor = new DonatoniPostProcessor();
+                    break;
+                case CAM.Machine.Donatoni:
+                    postProcessor = new DonatoniPostProcessor();
+                    break;
+                case CAM.Machine.Krea:
+                    postProcessor = new DonatoniPostProcessor();
+                    break;
+                case CAM.Machine.CableSawing:
+                    postProcessor = new DonatoniPostProcessor();
+                    break;
+                case CAM.Machine.Forma:
+                    postProcessor = new DonatoniPostProcessor();
+                    break;
+                case CAM.Machine.Champion:
+                    postProcessor = new DonatoniPostProcessor();
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
             }
+
+            return new ProcessorCnc(postProcessor)
+            {
+                Tool = this.Tool,
+                Frequency = this.Frequency,
+                CuttingFeed = this.CuttingFeed,
+                PenetrationFeed = this.PenetrationFeed,
+                ZSafety = this.ZSafety,
+                Origin = this.Origin
+            };
+        }
+
+        protected override bool Validate()
+        {
+            return Machine.CheckNotNull("Станок") && Tool.CheckNotNull("Инструмент");
         }
 
         //public void RemoveAcadObjects()

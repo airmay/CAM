@@ -106,6 +106,7 @@
     <Compile Include="CncWorkCenter\ProcessingCnc.cs" />
     <Compile Include="CncWorkCenter\ProcessorCnc.cs" />
     <Compile Include="Core\CableTechProcess.cs" />
+    <Compile Include="Core\IProcessor.cs" />
     <Compile Include="Core\IProgram.cs" />
     <Compile Include="Core\Program.cs" />
     <Compile Include="Core\ProcessItem.cs" />

@@ -1,6 +1,5 @@
 ﻿using Autodesk.AutoCAD.DatabaseServices;
 using System;
-using Autodesk.AutoCAD.Geometry;
 using CAM.Core;
 
 namespace CAM
@@ -28,6 +27,8 @@ namespace CAM
 
         public abstract Machine Machine { get; }
         public abstract Tool Tool { get; }
+        
+        public abstract void Execute(ProcessingBase processingBase, IProcessor processor);
 
         public void RemoveAcadObjects()
         {
@@ -36,7 +37,5 @@ namespace CAM
             SupportGroup?.DeleteGroup();
             SupportGroup = null;
         }
-
-        public override string ToString() => Caption;
     }
 }
