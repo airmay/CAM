@@ -75,7 +75,7 @@ namespace CAM
 
         public Program Execute()
         {
-            if (!Validate())
+            if (!Validate() || Children.Cast<Operation>().Any(p => p.Enabled && !p.Validate()))
                 return null;
 
             Acad.Editor.UpdateScreen();
@@ -98,12 +98,12 @@ namespace CAM
             {
                 Acad.Write("Расчет прерван");
             }
-#if !DEBUG
+//#if !DEBUG
             catch (Exception ex)
             {
                 Acad.Alert("Ошибка при выполнении расчета", ex);
             }
-#endif
+//#endif
             finally
             {
                 Acad.CloseProgressor();
@@ -130,7 +130,7 @@ namespace CAM
 
         private void CreateToolpathGroups()
         {
-            foreach (var operationGroup in Program.Commands.Where(p => p.Operation != null).GroupBy(p => p.Operation))
+            foreach (var operationGroup in Program.ArraySegment.Where(p => p.Operation != null).GroupBy(p => p.Operation))
                 operationGroup.Key.ToolpathGroup = operationGroup.Select(p => p.ObjectId).CreateGroup();
         }
 

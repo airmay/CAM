@@ -16,7 +16,7 @@ namespace CAM.CncWorkCenter
 
         public ToolLocationCnc Location { get; set; } = new ToolLocationCnc();
 
-        public Program Program { get; set; }
+        private static readonly Program Program = new Program();
         public Tool Tool { get; set; }
         public int Frequency { get; set; }
         public int CuttingFeed { get; set; }

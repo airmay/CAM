@@ -11,19 +11,19 @@ namespace CAM.Core
         private Command[] _commands;
         private int _capacity = 1_000;
         public int Count;
-        public IEnumerable<Command> Commands => _commands.Take(Count);
+        public ArraySegment<Command> ArraySegment;
         public Machine Machine { get; set; }
         private readonly Dictionary<ObjectId, int> _objectIdDict = new Dictionary<ObjectId, int>();
+
+        public void CreateProgram()
+        {
+            ArraySegment = new ArraySegment<Command>(_commands, 0, Count);
+        }
 
         public void Reset()
         {
             Count = 0;
             _objectIdDict.Clear();
-        }
-
-        public ArraySegment<Command> GetCommandsArraySegment()
-        {
-            return new ArraySegment<Command>(_commands, 0, Count);
         }
 
         public void AddCommand(Command command)
@@ -72,7 +72,7 @@ namespace CAM.Core
                 return;
             try
             {
-                var lines = Commands
+                var lines = ArraySegment
                     .Select(p => $"{string.Format(settings.ProgramLineNumberFormat, p.Number)}{p.Text}")
                     .ToArray();
                 File.WriteAllLines(fileName, lines);

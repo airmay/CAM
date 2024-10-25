@@ -37,5 +37,10 @@ namespace CAM
             SupportGroup?.DeleteGroup();
             SupportGroup = null;
         }
+
+        public virtual bool Validate()
+        {
+            return 
+        }
     }
 }

@@ -148,8 +148,12 @@ namespace CAM.Operations.CableSawing
             //}
             public override Machine Machine { get; }
             public override Tool Tool { get; }
-    
-        //    S = S ?? TechProcess.S;
+            public override void Execute(ProcessingBase processingBase, IProcessor processor)
+            {
+                throw new NotImplementedException();
+            }
+
+            //    S = S ?? TechProcess.S;
         //    Departure = Departure ?? TechProcess.Departure;
 
         //    var surfaceOrigin = ProcessingArea.ObjectId.QOpenForRead<Entity>();

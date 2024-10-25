@@ -65,7 +65,7 @@ namespace CAM
             UpdateNodeText(processingNode);
             processingNode.Nodes.Cast<TreeNode>().ForAll(UpdateNodeText);
                 
-            processCommandBindingSource.DataSource = _program?.GetCommandsArraySegment();
+            processCommandBindingSource.DataSource = _program?.ArraySegment;
             
             toolStrip.Enabled = true;
             treeView_AfterSelect(sender, null);
