@@ -57,7 +57,9 @@ namespace CAM
             var processingNode = SelectedNode?.Parent ?? SelectedNode ?? treeView.Nodes[0];
             var processing = (ProcessingBase)GetProcessItem(processingNode);
 
+#if !DEBUG
             toolStrip.Enabled = false;
+#endif 
             ClearProgram();
 
             _program = processing.Execute();
@@ -68,7 +70,9 @@ namespace CAM
             processCommandBindingSource.DataSource = _program?.ArraySegment;
             
             toolStrip.Enabled = true;
+            RefreshToolButtonsState();
             treeView_AfterSelect(sender, null);
+            
             return;
 
             void UpdateNodeText(TreeNode node) => node.Text = ((ProcessItem)node.Tag).Caption;
@@ -104,7 +108,7 @@ namespace CAM
         }
 
         private void bClose_Click(object sender, EventArgs e) => Acad.CloseAndDiscard();
-        #endregion
+#endregion
 
         #region Tree nodes
 
@@ -163,6 +167,7 @@ namespace CAM
                 processingNode = AddProcessingNode(operation.MachineType);
             processingNode.Nodes.Add(node);
             treeView.SelectedNode = node;
+            RefreshToolButtonsState();
         }
 
         private TreeNode AddProcessingNode(MachineType machineType)
@@ -208,6 +213,7 @@ namespace CAM
 
                 ProcessItem.OnDelete();
                 Acad.UnhighlightAll();
+                RefreshToolButtonsState();
             }
         }
         #endregion
@@ -316,7 +322,8 @@ namespace CAM
 
         public void SelectCommand(ObjectId? objectId)
         {
-            if (objectId.HasValue && _program.TryGetCommandIndex(objectId.Value, out var commandIndex))
+            if (objectId.HasValue && _program != null 
+                                  && _program.TryGetCommandIndex(objectId.Value, out var commandIndex))
                 processCommandBindingSource.Position = commandIndex;
         }
         #endregion

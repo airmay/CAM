@@ -1,8 +1,11 @@
-﻿namespace CAM
+﻿using System;
+
+namespace CAM
 {
-    public interface IProcessor
+    public interface IProcessor : IDisposable
     {
         void Start();
         void Finish();
+        void SetOperation(Operation operation);
     }
 }

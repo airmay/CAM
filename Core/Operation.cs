@@ -40,7 +40,7 @@ namespace CAM
 
         public virtual bool Validate()
         {
-            return 
+            return ProcessingArea != null;
         }
     }
 }

@@ -11,7 +11,7 @@ namespace CAM.CncWorkCenter
     {
         private readonly PostProcessorCnc _postProcessor;
         private ToolpathBuilder _toolpathBuilder;
-        private OperationCnc _operation;
+        private Operation _operation;
         public bool IsEngineStarted;
 
         public ToolLocationCnc Location { get; set; } = new ToolLocationCnc();
@@ -27,6 +27,7 @@ namespace CAM.CncWorkCenter
         public double ZSafety { get; set; } = 20;
         public double ZMax { get; set; } = 0;
         public double UpperZ => ZMax + ZSafety;
+
 
         public ProcessorCnc(PostProcessorCnc postProcessor)
         {
@@ -45,7 +46,7 @@ namespace CAM.CncWorkCenter
             AddCommands(_postProcessor.SetTool(Tool.Number, 0, 0, 0));
         }
 
-        public void SetOperation(OperationCnc operation)
+        public void SetOperation(Operation operation)
         {
             _operation = operation;
             _operation.FirstCommandIndex = Program.Count;
@@ -55,6 +56,10 @@ namespace CAM.CncWorkCenter
         {
             AddCommands(_postProcessor.StopEngine());
             AddCommands(_postProcessor.StopMachine());
+        }
+
+        public void Dispose()
+        {
             _toolpathBuilder.Dispose();
         }
 
@@ -148,7 +153,7 @@ namespace CAM.CncWorkCenter
             if (curve != null)
             {
                 if (curve.IsNewObject)
-                    _operation.Duration += curve.Length() / feed.GetValueOrDefault(10000) * 60;
+                    _operation.Duration += curve.Length() / (feed ?? 10000) * 60;
                 // todo проверить что после добавления curve.IsNewObject убрали
                 if (curve.Length() > 1)
                     toolpath = _toolpathBuilder.AddToolpath(curve, name);

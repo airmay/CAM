@@ -73,14 +73,14 @@ namespace CAM
             //if (OriginX != 0 || OriginY != 0)
             //    OriginObject = Acad.CreateOriginObject(new Point3d(OriginX, OriginY, 0));
 
-            AcadObject.LoadAcadProps(this);
+            //AcadObject.LoadAcadProps(this);
 
-            _techOperations.ForEach(p =>
-            {
-                AcadObject.LoadAcadProps(p);
-                //p.TechProcessBase = this;
-                p.SerializeInit();
-            });
+            //_techOperations.ForEach(p =>
+            //{
+            //    AcadObject.LoadAcadProps(p);
+            //    //p.TechProcessBase = this;
+            //    p.SerializeInit();
+            //});
         }
 
         public virtual int GetFrequency() => 0;

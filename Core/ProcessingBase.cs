@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using CAM.Core;
 using System.Diagnostics;
@@ -9,6 +10,7 @@ namespace CAM
     public abstract class ProcessingBase : ProcessItem
     {
         public abstract Program Program { get; }
+        private IEnumerable<Operation> Operations => Children.Cast<Operation>().Where(p => p.Enabled);
 
         protected ProcessingBase()
         {
@@ -75,7 +77,7 @@ namespace CAM
 
         public Program Execute()
         {
-            if (!Validate() || Children.Cast<Operation>().Any(p => p.Enabled && !p.Validate()))
+            if (!Validate() || Operations.Any(p => !p.Validate()))
                 return null;
 
             Acad.Editor.UpdateScreen();
@@ -98,12 +100,12 @@ namespace CAM
             {
                 Acad.Write("Расчет прерван");
             }
-//#if !DEBUG
+#if !DEBUG
             catch (Exception ex)
             {
                 Acad.Alert("Ошибка при выполнении расчета", ex);
             }
-//#endif
+#endif
             finally
             {
                 Acad.CloseProgressor();
@@ -114,14 +116,18 @@ namespace CAM
 
         protected virtual void ProcessOperations()
         {
-            var processor = CreateProcessor();
-            processor.Start();
-            foreach (Operation operation in Children.Where(p => p.Enabled))
+            using (var processor = CreateProcessor())
             {
-                Acad.Write($"расчет операции {operation.Caption}");
-                operation.Execute(this, processor);
+                processor.Start();
+                foreach (var operation in Operations)
+                {
+                    Acad.Write($"расчет операции {operation.Caption}");
+                    processor.SetOperation(operation);
+                    operation.Execute(this, processor);
+                }
+
+                processor.Finish();
             }
-            processor.Finish();
         }
 
         protected abstract IProcessor CreateProcessor();
@@ -136,8 +142,8 @@ namespace CAM
 
         public void UpdateCaptions()
         {
-            Caption = GetCaption(Caption, Children.Cast<Operation>().Sum(p => p.Duration));
-            foreach (Operation operation in Children)
+            Caption = GetCaption(Caption, Operations.Sum(p => p.Duration));
+            foreach (var operation in Operations)
                 operation.Caption = GetCaption(operation.Caption, operation.Duration);
 
             return;
