@@ -56,6 +56,7 @@ namespace CAM.CncWorkCenter
         {
             AddCommands(_postProcessor.StopEngine());
             AddCommands(_postProcessor.StopMachine());
+            Program.CreateProgram();
         }
 
         public void Dispose()

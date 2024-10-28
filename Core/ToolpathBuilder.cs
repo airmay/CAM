@@ -43,6 +43,8 @@ namespace CAM
             return curve.ObjectId;
         }
 
+        //public ObjectId AddCurve(Curve curve) TODO AddCurve
+
         public void Dispose()
         {
             _transaction.Commit();
