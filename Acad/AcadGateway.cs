@@ -39,7 +39,7 @@ namespace CAM
         }
         public static void CloseAndDiscard()
         {
-            //DocumentExtension.CloseAndDiscard(Application.DocumentManager.CurrentDocument);
+            DocumentExtension.CloseAndDiscard(Application.DocumentManager.CurrentDocument);
             Autodesk.AutoCAD.ApplicationServices.Core.Application.Quit();
         }
 

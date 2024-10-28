@@ -26,9 +26,9 @@ namespace CAM
                 .Where(p => p != ObjectId.Null)
                 .ToArray());
 
-        public ObjectId ObjectId => _objectIds[0];
+        public ObjectId ObjectId => ObjectIds[0];
         public Curve GetCurve() => Acad.OpenForRead(ObjectId);
-        public Curve[] GetCurves() => Acad.OpenForRead(_objectIds);
+        public Curve[] GetCurves() => Acad.OpenForRead(ObjectIds);
 
         public override string ToString() => ObjectIds.GetDesc();
     }

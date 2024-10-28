@@ -73,15 +73,7 @@ namespace CAM.CncWorkCenter
                     throw new ArgumentOutOfRangeException();
             }
 
-            return new ProcessorCnc(postProcessor)
-            {
-                Tool = this.Tool,
-                Frequency = this.Frequency,
-                CuttingFeed = this.CuttingFeed,
-                PenetrationFeed = this.PenetrationFeed,
-                ZSafety = this.ZSafety,
-                Origin = this.Origin
-            };
+            return new ProcessorCnc(this, postProcessor);
         }
 
         protected override bool Validate()

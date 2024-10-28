@@ -35,7 +35,7 @@ namespace CAM
                 "G64",
                 $"G154O{originCellNumber}",
                 $"T{toolNo}",
-                "M6", "Инструмент",
+                "M6",
                 "G172 T1 H1 D1",
                 "M300",
             };

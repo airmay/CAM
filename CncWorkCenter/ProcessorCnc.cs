@@ -11,27 +11,30 @@ namespace CAM.CncWorkCenter
     {
         private readonly PostProcessorCnc _postProcessor;
         private ToolpathBuilder _toolpathBuilder;
+        private readonly ProcessingCnc _processing;
         private Operation _operation;
         public bool IsEngineStarted;
 
         public ToolLocationCnc Location { get; set; } = new ToolLocationCnc();
-
-        private static readonly Program Program = new Program();
-        public Tool Tool { get; set; }
-        public int Frequency { get; set; }
+        private Program Program => _processing.Program;
+        public Tool Tool => _processing.Tool;
+        public int Frequency => _processing.Frequency;
         public int CuttingFeed { get; set; }
-        public int PenetrationFeed { get; set; }
-        public Point2d Origin { get; set; }
+
+        public int PenetrationFeed => _processing.PenetrationFeed;
+        public Point2d Origin => _processing.Origin;
         public Side EngineSide { get; set; }
 
-        public double ZSafety { get; set; } = 20;
+        public double ZSafety => _processing.ZSafety;
         public double ZMax { get; set; } = 0;
         public double UpperZ => ZMax + ZSafety;
 
 
-        public ProcessorCnc(PostProcessorCnc postProcessor)
+        public ProcessorCnc(ProcessingCnc processing, PostProcessorCnc postProcessor)
         {
+            _processing = processing;
             _postProcessor = postProcessor;
+            CuttingFeed = _processing.CuttingFeed;
         }
 
         public void Start()
