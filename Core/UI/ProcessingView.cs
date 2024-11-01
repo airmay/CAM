@@ -267,7 +267,7 @@ namespace CAM
         private void treeView_AfterSelect(object sender, TreeViewEventArgs e)
         {
             RefreshParamsView();
-            processCommandBindingSource.Position = ProcessItem.CommandIndex;
+            processCommandBindingSource.Position = ProcessItem.GetCommandIndex();
             ProcessItem.OnSelect();
         }
 
@@ -317,7 +317,7 @@ namespace CAM
                 Acad.SelectObjectIds(SelectedCommand.ObjectId.Value);
             }
 
-            ToolObject.Set(SelectedCommand.Operation?.Machine, SelectedCommand.Operation?.Tool, SelectedCommand.ToolLocation);
+            ToolObject.Set(SelectedCommand.OperationBase?.Machine, SelectedCommand.OperationBase?.Tool, SelectedCommand.ToolLocation);
         }
 
         public void SelectCommand(ObjectId? objectId)

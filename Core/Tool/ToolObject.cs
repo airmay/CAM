@@ -1,8 +1,8 @@
-﻿using Autodesk.AutoCAD.ApplicationServices;
-using Autodesk.AutoCAD.Colors;
+﻿using Autodesk.AutoCAD.Colors;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
 using Autodesk.AutoCAD.GraphicsInterface;
+using Application = Autodesk.AutoCAD.ApplicationServices.Core.Application;
 
 namespace CAM
 {
@@ -39,7 +39,7 @@ namespace CAM
 
         public static void Hide()
         {
-            if (Model == null)
+            if (Model == null || Application.DocumentManager.MdiActiveDocument == null)
                 return;
 
             using (Application.DocumentManager.MdiActiveDocument.LockDocument())

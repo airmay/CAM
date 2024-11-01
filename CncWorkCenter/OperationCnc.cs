@@ -8,7 +8,7 @@ using CAM.Core;
 namespace CAM
 {
     [Serializable]
-    public abstract class OperationCnc : Operation
+    public abstract class OperationCnc : OperationBase
     {
         public override MachineType MachineType => MachineType.CncWorkCenter;
         [NonSerialized] protected ProcessingCnc Processing;

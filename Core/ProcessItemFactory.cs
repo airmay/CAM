@@ -21,9 +21,9 @@ namespace CAM.Core
             }
         }
 
-        public static Operation CreateOperation(string caption, Type operationType, object prototype)
+        public static OperationBase CreateOperation(string caption, Type operationType, object prototype)
         {
-            var operation = (Operation)Activator.CreateInstance(operationType);
+            var operation = (OperationBase)Activator.CreateInstance(operationType);
             prototype?.CopyPropertiesTo(operation);
             operation.Caption = caption;
             operation.Enabled = true;

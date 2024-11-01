@@ -12,7 +12,7 @@ namespace CAM.CncWorkCenter
         private readonly PostProcessorCnc _postProcessor;
         private ToolpathBuilder _toolpathBuilder;
         private readonly ProcessingCnc _processing;
-        private Operation _operation;
+        private OperationBase _operation;
         public bool IsEngineStarted;
 
         public ToolLocationCnc Location { get; set; } = new ToolLocationCnc();
@@ -49,10 +49,10 @@ namespace CAM.CncWorkCenter
             AddCommands(_postProcessor.SetTool(Tool.Number, 0, 0, 0));
         }
 
-        public void SetOperation(Operation operation)
+        public void SetOperation(OperationBase operationBase)
         {
-            _operation = operation;
-            _operation.FirstCommandIndex = Program.Count;
+            _operation = operationBase;
+            _operation.CommandIndex = Program.Count;
         }
 
         public void Finish()
@@ -80,7 +80,7 @@ namespace CAM.CncWorkCenter
                 Text = text,
                 ToolLocation = Location,
                 ObjectId = toolpath,
-                Operation = _operation,
+                OperationBase = _operation,
             });
         }
 

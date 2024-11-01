@@ -10,12 +10,8 @@ namespace CAM
     public abstract class ProcessingBase : ProcessItem
     {
         public abstract Program Program { get; }
-        private IEnumerable<Operation> Operations => Children.Cast<Operation>().Where(p => p.Enabled);
+        private IEnumerable<OperationBase> Operations => Children.Cast<OperationBase>().Where(p => p.Enabled);
 
-        protected ProcessingBase()
-        {
-            Enabled = true;
-        }
         //public void Init()
 
 
@@ -136,7 +132,7 @@ namespace CAM
 
         private void CreateToolpathGroups()
         {
-            foreach (var operationGroup in Program.ArraySegment.Where(p => p.Operation != null).GroupBy(p => p.Operation))
+            foreach (var operationGroup in Program.ArraySegment.Where(p => p.OperationBase != null).GroupBy(p => p.OperationBase))
                 operationGroup.Key.ToolpathGroup = operationGroup.Select(p => p.ObjectId).CreateGroup();
         }
 

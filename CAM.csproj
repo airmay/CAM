@@ -121,7 +121,7 @@
     <Compile Include="Operations\CableSawing\CableSawingOperation.cs" />
     <Compile Include="Core\ProcessingBase.cs" />
     <Compile Include="Core\MillingTechProcess.cs" />
-    <Compile Include="Core\Operation.cs" />
+    <Compile Include="Core\OperationBase.cs" />
     <Compile Include="Core\Processor.cs" />
     <Compile Include="Core\TechProcessBase.cs" />
     <Compile Include="Core\Tool\MillToolPosition.cs" />

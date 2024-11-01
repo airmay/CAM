@@ -8,7 +8,7 @@ namespace CAM
         public string Name { get; set; }
         public string Text { get; set; }
         public ObjectId? ObjectId { get; set; }
-        public Operation Operation { get; set; }
+        public OperationBase OperationBase { get; set; }
         public IToolLocation ToolLocation { get; set; }
     }
 }

@@ -8,7 +8,7 @@ using CAM.TechProcesses.CableSawing;
 namespace CAM.Operations.CableSawing
 {
     [Serializable]
-    public class CableSawingOperation : Operation
+    public class CableSawingOperation : OperationBase
     {
         public double ToolThickness { get; set; } = 10;
         public int CuttingFeed { get; set; } = 10;
