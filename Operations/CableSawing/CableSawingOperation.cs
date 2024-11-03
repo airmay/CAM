@@ -50,7 +50,7 @@ namespace CAM.Operations.CableSawing
             view.AddTextBox(nameof(StepCount), "Количество шагов");
         }
 
-        //public override void Execute(Processor processor)
+        //public override void SetProcessing(Processor processor)
         //{
         //    var tool = new Tool { Type = ToolType.Cable, Diameter = ToolThickness, Thickness = ToolThickness };
 
@@ -148,7 +148,12 @@ namespace CAM.Operations.CableSawing
             //}
             public override Machine Machine { get; }
             public override Tool Tool { get; }
-            public override void Execute(ProcessingBase processingBase, IProcessor processor)
+            public override void SetProcessing(ProcessingBase processing)
+            {
+                throw new NotImplementedException();
+            }
+
+            public override void Execute()
             {
                 throw new NotImplementedException();
             }

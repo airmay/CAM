@@ -211,11 +211,12 @@ namespace CAM
             return polyline;
         }
 
-        public static ObjectId? CreateHatch(Polyline polyline, Side side)
+        public static ObjectId? CreateHatch(Polyline polyline, Side side, Func<Entity, ObjectId> addEntity)
         {
             const int hatchSize = 40;
             try
             {
+                addEntity(polyline);
                 var offsetPolyline = polyline.GetOffsetCurves(-hatchSize * (int)side)[0] as Polyline;
                 if (!polyline.Closed)
                 {
@@ -226,44 +227,28 @@ namespace CAM
                     offsetPolyline.Dispose();
                     offsetPolyline = null;
                 }
+                else
+                    addEntity(offsetPolyline);
 
-                using (Acad.ActiveDocument.LockDocument())
-                using (var trans = Acad.Database.TransactionManager.StartTransaction())
-                {
-                    var space = (BlockTableRecord)trans.GetObject(Acad.Database.CurrentSpaceId, OpenMode.ForWrite, false);
-                    space.AppendEntity(polyline);
-                    trans.AddNewlyCreatedDBObject(polyline, true);
-                    if (offsetPolyline != null)
-                    {
-                        space.AppendEntity(offsetPolyline);
-                        trans.AddNewlyCreatedDBObject(offsetPolyline, true);
-                    }
-                    var hatch = new Hatch();
-                    space.AppendEntity(hatch);
-                    trans.AddNewlyCreatedDBObject(hatch, true);
+                var hatch = new Hatch();
+                hatch.SetDatabaseDefaults();
+                hatch.Normal = new Vector3d(0, 0, 1);
+                hatch.Elevation = 0.0;
+                hatch.Associative = false;
+                hatch.PatternScale = 4;
+                hatch.SetHatchPattern(HatchPatternType.PreDefined, "ANSI31");
+                //hatch.PatternAngle = angle; // PatternAngle has to be after SetHatchPattern(). This is AutoCAD .NET SDK violating Framework Design Guidelines, which requires properties to be set in arbitrary order.
+                hatch.HatchStyle = HatchStyle.Outer;
+                hatch.AppendLoop(HatchLoopTypes.External, new ObjectIdCollection(new[] { polyline.ObjectId }));
+                if (offsetPolyline != null)
+                    hatch.AppendLoop(HatchLoopTypes.External, new ObjectIdCollection(new[] { offsetPolyline.ObjectId }));
+                hatch.EvaluateHatch(true);
+                addEntity(hatch);
 
-                    //hatch.LayerId = Acad.GetHatchLayerId();
-                    hatch.SetDatabaseDefaults();
-                    hatch.Normal = new Vector3d(0, 0, 1);
-                    hatch.Elevation = 0.0;
-                    hatch.Associative = false;
-                    hatch.PatternScale = 4;
-                    hatch.SetHatchPattern(HatchPatternType.PreDefined, "ANSI31");
-                    //hatch.PatternAngle = angle; // PatternAngle has to be after SetHatchPattern(). This is AutoCAD .NET SDK violating Framework Design Guidelines, which requires properties to be set in arbitrary order.
-                    hatch.HatchStyle = HatchStyle.Outer;
-                    hatch.AppendLoop(HatchLoopTypes.External, new ObjectIdCollection(new[] { polyline.ObjectId }));
-                    if (offsetPolyline != null)
-                        hatch.AppendLoop(HatchLoopTypes.External, new ObjectIdCollection(new[] { offsetPolyline.ObjectId }));
+                polyline.Erase();
+                offsetPolyline?.Erase();
 
-                    hatch.EvaluateHatch(true);
-
-                    polyline.Erase();
-                    offsetPolyline?.Erase();
-
-                    trans.Commit();
-
-                    return hatch.Id;
-                }
+                return hatch.Id;
             }
             catch (Exception ex)
             {

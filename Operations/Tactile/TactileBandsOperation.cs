@@ -166,7 +166,7 @@ namespace CAM.Operations.Tactile
         //    }
         //}
 
-        public override void Execute(ProcessorCnc processor)
+        public override void Execute()
         {
             throw new NotImplementedException();
         }

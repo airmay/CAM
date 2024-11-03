@@ -3,16 +3,16 @@ using System.Collections.Generic;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
 using CAM.CncWorkCenter;
-using CAM.Core;
 
 namespace CAM
 {
     [Serializable]
     public abstract class OperationCnc : OperationBase
     {
-        public override MachineType MachineType => MachineType.CncWorkCenter;
         [NonSerialized] protected ProcessingCnc Processing;
+        protected ProcessorCnc Processor => Processing.Processor;
 
+        public override MachineType MachineType => MachineType.CncWorkCenter;
         public override Machine Machine => Processing.Machine.Value;
         public override Tool Tool => Processing.Tool;
         public double ToolDiameter => Processing.Tool.Diameter;
@@ -31,13 +31,7 @@ namespace CAM
         {
         }
 
-        public override void Execute(ProcessingBase processingBase, IProcessor processor)
-        {
-            Processing = (ProcessingCnc)processingBase;
-            Execute((ProcessorCnc)processor);
-        }
-
-        public abstract void Execute(ProcessorCnc processor);
+        public override void SetProcessing(ProcessingBase processing) => Processing = (ProcessingCnc)processing;
 
         public void RemoveAcadObjects()
         {

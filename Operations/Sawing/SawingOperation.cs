@@ -6,6 +6,7 @@ using Autodesk.AutoCAD.Geometry;
 using CAM.CncWorkCenter;
 using Dreambuild.AutoCAD;
 using CAM.Utils;
+using Autodesk.AutoCAD.Colors;
 
 namespace CAM.Operations.Sawing
 {
@@ -43,14 +44,13 @@ namespace CAM.Operations.Sawing
             };
         }
 
-        public override void Execute(ProcessorCnc processor)
+        public override void Execute()
         {
             var (curveSides, points, outerSide) = CalcСurveProcessingInfo();
-
             foreach (var curve in ProcessingArea.GetCurves())
             {
                 if (curveSides.TryGetValue(curve, out var curveSide))
-                    ProcessCurve(processor, curve, curveSide, points[curve.StartPoint], points[curve.EndPoint]);
+                    ProcessCurve(Processor, curve, curveSide, points[curve.StartPoint], points[curve.EndPoint]);
             }
 
             CreateHatch(curveSides, outerSide.Opposite());
@@ -104,7 +104,7 @@ namespace CAM.Operations.Sawing
         private void CreateHatch(Dictionary<Curve, Side> curveSides, Side side)
         {
             var poilyline = curveSides.Keys.ToList().ToPolyline();
-            var hatchId = Graph.CreateHatch(poilyline, side);
+            var hatchId = Graph.CreateHatch(poilyline, side, p => Processor.AddEntity(p));
             if (hatchId.HasValue)
                 SupportGroup = SupportGroup.AppendToGroup(hatchId.Value);
         }
@@ -235,8 +235,8 @@ namespace CAM.Operations.Sawing
                 var point2 = point + normal * length;
                 var offsetVector = normal.GetPerpendicularVector() * ToolThickness * (int)side;
                 var gash = NoDraw.Pline(point, point2, point2 + offsetVector, point + offsetVector);
-                gash.LayerId = Acad.GetGashLayerId();
-                SupportGroup = SupportGroup.AppendToGroup(gash.Add());
+                gash.Color = Color.FromColorIndex(ColorMethod.ByColor, 210);
+                Processor.AddEntity(gash);
             }
         }
 

@@ -29,13 +29,14 @@ namespace CAM.CncWorkCenter
         public double ZMax { get; set; } = 0;
         public double UpperZ => ZMax + ZSafety;
 
-
         public ProcessorCnc(ProcessingCnc processing, PostProcessorCnc postProcessor)
         {
             _processing = processing;
             _postProcessor = postProcessor;
             CuttingFeed = _processing.CuttingFeed;
         }
+
+        public ObjectId AddEntity(Entity curve) => _toolpathBuilder.AddEntity(curve);
 
         public void Start()
         {
@@ -49,9 +50,9 @@ namespace CAM.CncWorkCenter
             AddCommands(_postProcessor.SetTool(Tool.Number, 0, 0, 0));
         }
 
-        public void SetOperation(OperationBase operationBase)
+        public void SetOperation(OperationBase operation)
         {
-            _operation = operationBase;
+            _operation = operation;
             _operation.CommandIndex = Program.Count;
         }
 

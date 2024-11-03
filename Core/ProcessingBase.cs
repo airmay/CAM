@@ -119,7 +119,8 @@ namespace CAM
                 {
                     Acad.Write($"расчет операции {operation.Caption}");
                     processor.SetOperation(operation);
-                    operation.Execute(this, processor);
+                    operation.SetProcessing(this);
+                    operation.Execute();
                 }
 
                 processor.Finish();

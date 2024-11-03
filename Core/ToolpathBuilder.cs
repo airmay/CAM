@@ -35,15 +35,18 @@ namespace CAM
 
             if (_colors.TryGetValue(name, out var color))
                 curve.Color = color;
-            curve.LayerId = _layerId;
-            curve.Visible = false;
-            _currentSpace.AppendEntity(curve);
-            _transaction.AddNewlyCreatedDBObject(curve, true);
 
-            return curve.ObjectId;
+            return AddEntity(curve);
         }
 
-        //public ObjectId AddCurve(Curve curve) TODO AddCurve
+        public ObjectId AddEntity(Entity entity)
+        {
+            entity.LayerId = _layerId;
+            _currentSpace.AppendEntity(entity);
+            _transaction.AddNewlyCreatedDBObject(entity, true);
+
+            return entity.ObjectId;
+        }
 
         public void Dispose()
         {

@@ -12,7 +12,8 @@ namespace CAM.CncWorkCenter
         public override MachineType MachineType => MachineType.CncWorkCenter;
         private static Program _program = new Program();
         public override Program Program => _program;
-        
+        [NonSerialized] public ProcessorCnc Processor;
+
         public Machine? Machine { get; set; }
         public Material? Material { get; set; }
         public Tool Tool { get; set; }
@@ -73,7 +74,8 @@ namespace CAM.CncWorkCenter
                     throw new ArgumentOutOfRangeException();
             }
 
-            return new ProcessorCnc(this, postProcessor);
+            Processor = new ProcessorCnc(this, postProcessor);
+            return Processor;
         }
 
         protected override bool Validate()

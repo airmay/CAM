@@ -17,7 +17,8 @@ namespace CAM
         public abstract Machine Machine { get; }
         public abstract Tool Tool { get; }
         
-        public abstract void Execute(ProcessingBase processingBase, IProcessor processor);
+        public abstract void SetProcessing(ProcessingBase processing);
+        public abstract void Execute();
 
         public override int GetCommandIndex() => CommandIndex;
 
