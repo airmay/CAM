@@ -23,6 +23,7 @@ namespace CAM
 
         public static CamDocument CamDocument => ActiveDocument != null ? Documents.TryGetAndReturn(ActiveDocument) : null;
 
+        public static DocumentCollection DocumentManager => Autodesk.AutoCAD.ApplicationServices.Core.Application.DocumentManager;
         public static Document ActiveDocument => Autodesk.AutoCAD.ApplicationServices.Core.Application.DocumentManager.MdiActiveDocument;
 
         public static Database Database => Autodesk.AutoCAD.ApplicationServices.Core.Application.DocumentManager.MdiActiveDocument.Database;
@@ -294,11 +295,11 @@ namespace CAM
             }
         }
 
-        public static void DeleteByLayer(string layerName)
+        public static void DeleteProcessObjects()
         {
             App.LockAndExecute(() => 
             {
-                var ids = QuickSelection.SelectAll(FilterList.Create().Layer(layerName));
+                var ids = QuickSelection.SelectAll(FilterList.Create().Layer(ProcessLayerName));
                 if (ids.Any())
                     ids.QForEach(entity => entity.Erase());
             });

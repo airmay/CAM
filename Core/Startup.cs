@@ -7,7 +7,6 @@ using Autodesk.AutoCAD.Geometry;
 using Dreambuild.AutoCAD;
 using Autodesk.AutoCAD.Windows;
 using System.Drawing;
-using Application = Autodesk.AutoCAD.ApplicationServices.Core.Application;
 
 namespace CAM
 {
@@ -33,15 +32,15 @@ namespace CAM
             paletteSet.Add("Обработка", _processingView);
             paletteSet.Add("Инструменты", new UtilsView());
 
-            Application.DocumentManager.DocumentActivated += (sender, args) => SetActiveDocument(args.Document);
+            Acad.DocumentManager.DocumentToBeDeactivated += (sender, args) => _processingView.ClearAll();
+            Acad.DocumentManager.DocumentBecameCurrent += (sender, args) => SetActiveDocument(args.Document);
 
             SetActiveDocument(Acad.ActiveDocument);
         }
 
         private void SetActiveDocument(Document document)
         {
-            _processingView.ClearAll();
-            if (document == null)
+            if (document == null || !document.IsActive)
                 return;
 
             if (!document.UserData.ContainsKey(CamDocumentKey))
@@ -52,7 +51,7 @@ namespace CAM
 
                 document.UserData[CamDocumentKey] = CamDocument.Create();
             }
-            
+
             _processingView.SetCamDocument((CamDocument)document.UserData[CamDocumentKey]);
         }
 

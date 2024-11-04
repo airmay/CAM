@@ -54,9 +54,9 @@ namespace CAM
         private void bBuildProcessing_ButtonClick(object sender, EventArgs e)
         {
             SelectNextControl(ActiveControl, true, true, true, true);
+            Acad.DocumentManager.DocumentActivationEnabled = false;
             var processingNode = SelectedNode?.Parent ?? SelectedNode ?? treeView.Nodes[0];
-            var processing = (ProcessingBase)GetProcessItem(processingNode);
-
+            var processing = GetProcessItem(processingNode).As<ProcessingBase>();
 #if !DEBUG
             toolStrip.Enabled = false;
 #endif 
@@ -72,10 +72,11 @@ namespace CAM
             toolStrip.Enabled = true;
             RefreshToolButtonsState();
             treeView_AfterSelect(sender, null);
-            
+            Acad.DocumentManager.DocumentActivationEnabled = true;
+
             return;
 
-            void UpdateNodeText(TreeNode node) => node.Text = ((ProcessItem)node.Tag).Caption;
+            void UpdateNodeText(TreeNode node) => node.Text = node.Tag.As<ProcessItem>().Caption;
         }
 
         private void bVisibility_Click(object sender, EventArgs e)
@@ -302,8 +303,8 @@ namespace CAM
         {
             _program = null;
             processCommandBindingSource.DataSource = null;
+            Acad.DeleteProcessObjects();
             ToolObject.Hide();
-            Acad.DeleteAll();
         }
 
         private void processCommandBindingSource_CurrentChanged(object sender, EventArgs e)
