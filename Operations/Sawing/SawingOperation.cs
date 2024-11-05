@@ -104,9 +104,9 @@ namespace CAM.Operations.Sawing
         private void CreateHatch(Dictionary<Curve, Side> curveSides, Side side)
         {
             var poilyline = curveSides.Keys.ToList().ToPolyline();
-            var hatchId = Graph.CreateHatch(poilyline, side, p => Processor.AddEntity(p));
-            if (hatchId.HasValue)
-                SupportGroup = SupportGroup.AppendToGroup(hatchId.Value);
+            Graph.CreateHatch(poilyline, side, p => Processor.AddEntity(p));
+            //if (hatchId.HasValue)
+            //    SupportGroup = SupportGroup.AppendToGroup(hatchId.Value);
         }
 
         private void ProcessCurve(ProcessorCnc processor, Curve curve, Side outerSide, bool isExactlyBegin, bool isExactlyEnd)

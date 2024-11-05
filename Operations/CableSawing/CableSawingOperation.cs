@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
+using CAM.CncWorkCenter;
 using CAM.TechProcesses.CableSawing;
 
 namespace CAM.Operations.CableSawing
@@ -10,6 +11,13 @@ namespace CAM.Operations.CableSawing
     [Serializable]
     public class CableSawingOperation : OperationBase
     {
+        [NonSerialized] protected ProcessingCnc Processing;
+        public override ProcessingBase ProcessingBase
+        {
+            get => Processing;
+            set => Processing = (ProcessingCnc)value;
+        }
+
         public double ToolThickness { get; set; } = 10;
         public int CuttingFeed { get; set; } = 10;
 
@@ -148,10 +156,7 @@ namespace CAM.Operations.CableSawing
             //}
             public override Machine Machine { get; }
             public override Tool Tool { get; }
-            public override void SetProcessing(ProcessingBase processing)
-            {
-                throw new NotImplementedException();
-            }
+
 
             public override void Execute()
             {
@@ -220,5 +225,7 @@ namespace CAM.Operations.CableSawing
                 points.Reverse();
             return points;
         }
+
+        public override MachineType MachineType { get; }
     }
 }

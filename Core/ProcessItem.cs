@@ -8,9 +8,7 @@ namespace CAM.Core
         public string Caption { get; set; }
         public bool Enabled { get; set; } = true;
         public ProcessItem[] Children { get; set; }
-        public virtual MachineType MachineType { get; }
-        public virtual int GetCommandIndex() => 0;
-        public virtual void OnDelete() {}
-        public virtual void OnSelect() {}
+        public abstract MachineType MachineType { get; }
+        public abstract void OnSelect();
     }
 }

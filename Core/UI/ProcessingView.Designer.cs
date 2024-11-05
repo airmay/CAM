@@ -56,7 +56,6 @@
             this.dataGridViewTextBoxColumn2 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.dataGridViewTextBoxColumn3 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.toolpathDataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.operationDataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.processCommandBindingSource = new System.Windows.Forms.BindingSource(this.components);
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
@@ -160,8 +159,7 @@
             this.dataGridViewTextBoxColumn1,
             this.dataGridViewTextBoxColumn2,
             this.dataGridViewTextBoxColumn3,
-            this.toolpathDataGridViewTextBoxColumn,
-            this.operationDataGridViewTextBoxColumn});
+            this.toolpathDataGridViewTextBoxColumn});
             this.dataGridViewCommand.DataSource = this.processCommandBindingSource;
             this.dataGridViewCommand.Dock = System.Windows.Forms.DockStyle.Fill;
             this.dataGridViewCommand.Location = new System.Drawing.Point(3, 3);
@@ -287,14 +285,13 @@
             // 
             // bVisibility
             // 
-            this.bVisibility.CheckOnClick = true;
             this.bVisibility.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
             this.bVisibility.Image = global::CAM.Properties.Resources.eraser;
             this.bVisibility.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None;
             this.bVisibility.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.bVisibility.Name = "bVisibility";
             this.bVisibility.Size = new System.Drawing.Size(23, 22);
-            this.bVisibility.Text = "Удалить доп. объекты";
+            this.bVisibility.Text = "Скрыть обработку";
             this.bVisibility.Click += new System.EventHandler(this.bVisibility_Click);
             // 
             // bPlay
@@ -373,13 +370,6 @@
             this.toolpathDataGridViewTextBoxColumn.HeaderText = "ObjectId";
             this.toolpathDataGridViewTextBoxColumn.Name = "toolpathDataGridViewTextBoxColumn";
             this.toolpathDataGridViewTextBoxColumn.Width = 5;
-            // 
-            // operationDataGridViewTextBoxColumn
-            // 
-            this.operationDataGridViewTextBoxColumn.DataPropertyName = "Operation";
-            this.operationDataGridViewTextBoxColumn.HeaderText = "Operation";
-            this.operationDataGridViewTextBoxColumn.Name = "operationDataGridViewTextBoxColumn";
-            this.operationDataGridViewTextBoxColumn.Width = 5;
             // 
             // processCommandBindingSource
             // 

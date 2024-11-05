@@ -15,6 +15,8 @@ namespace CAM
         private TreeNode SelectedNode => treeView.SelectedNode;
         private ProcessItem ProcessItem => treeView.SelectedNode?.Tag as ProcessItem;
         private Command SelectedCommand => processCommandBindingSource.Current as Command;
+        private ProcessingBase _calculatedProcessing;
+        private TreeNode _processingNode;
 
         public ProcessingView()
         {
@@ -66,7 +68,9 @@ namespace CAM
 
             UpdateNodeText(processingNode);
             processingNode.Nodes.Cast<TreeNode>().ForAll(UpdateNodeText);
-                
+               
+            _calculatedProcessing = _program != null ? processing : null;
+            _processingNode = _program != null ? processingNode : null;
             processCommandBindingSource.DataSource = _program?.ArraySegment;
             
             toolStrip.Enabled = true;
@@ -81,8 +85,8 @@ namespace CAM
 
         private void bVisibility_Click(object sender, EventArgs e)
         {
-            //SelectedNode.SetVisibility(IsToolpathVisible);
-            //Acad.Editor.UpdateScreen();
+            _calculatedProcessing.HideToolpath(null);
+            Acad.Editor.UpdateScreen();
         }
 
         private void bPlay_Click(object sender, EventArgs e)
@@ -211,10 +215,7 @@ namespace CAM
                 SelectedNode.Remove();
                 treeView.Focus();
                 RefreshToolButtonsState();
-
-                ProcessItem.OnDelete();
                 Acad.UnhighlightAll();
-                RefreshToolButtonsState();
             }
         }
         #endregion
@@ -268,7 +269,8 @@ namespace CAM
         private void treeView_AfterSelect(object sender, TreeViewEventArgs e)
         {
             RefreshParamsView();
-            processCommandBindingSource.Position = ProcessItem.GetCommandIndex();
+            if (_program?.TryGetCommandIndex(SelectedNode.Tag, out var commandIndex) == true)
+                processCommandBindingSource.Position = commandIndex;
             ProcessItem.OnSelect();
         }
 
@@ -318,13 +320,16 @@ namespace CAM
                 Acad.SelectObjectIds(SelectedCommand.ObjectId.Value);
             }
 
-            ToolObject.Set(SelectedCommand.OperationBase?.Machine, SelectedCommand.OperationBase?.Tool, SelectedCommand.ToolLocation);
+            ToolObject.Set(SelectedCommand.Operation?.Machine, SelectedCommand.Operation?.Tool, SelectedCommand.ToolLocation);
+
+            var node = _processingNode.Nodes.Cast<TreeNode>().FirstOrDefault(p => p.Tag == SelectedCommand.Operation);
+            if (node != null)
+                treeView.SelectedNode = node;
         }
 
         public void SelectCommand(ObjectId? objectId)
         {
-            if (objectId.HasValue && _program != null 
-                                  && _program.TryGetCommandIndex(objectId.Value, out var commandIndex))
+            if (objectId.HasValue && _program != null && _program.TryGetCommandIndex(objectId.Value, out var commandIndex))
                 processCommandBindingSource.Position = commandIndex;
         }
         #endregion

@@ -14,6 +14,7 @@ namespace CAM.Core
         public ArraySegment<Command> ArraySegment;
         public Machine Machine { get; set; }
         private readonly Dictionary<ObjectId, int> _objectIdDict = new Dictionary<ObjectId, int>();
+        private readonly Dictionary<object, int> _operationDict = new Dictionary<object, int>();
 
         public void CreateProgram()
         {
@@ -24,6 +25,7 @@ namespace CAM.Core
         {
             Count = 0;
             _objectIdDict.Clear();
+            _operationDict.Clear();
         }
 
         public void AddCommand(Command command)
@@ -47,6 +49,9 @@ namespace CAM.Core
             if (command.ObjectId.HasValue && !_objectIdDict.ContainsKey(command.ObjectId.Value))
                 _objectIdDict[command.ObjectId.Value] = Count;
 
+            if (command.Operation != null && !_operationDict.ContainsKey(command.Operation))
+                _operationDict[command.Operation] = Count;
+
             _commands[Count++] = command;
             command.Number = Count;
         }
@@ -54,6 +59,13 @@ namespace CAM.Core
         public bool TryGetCommandIndex(ObjectId objectId, out int commandIndex)
         {
             var result = _objectIdDict.TryGetValue(objectId, out var index);
+            commandIndex = index;
+            return result;
+        }
+
+        public bool TryGetCommandIndex(object operation, out int commandIndex)
+        {
+            var result = _operationDict.TryGetValue(operation, out var index);
             commandIndex = index;
             return result;
         }
@@ -85,6 +97,7 @@ namespace CAM.Core
                 Acad.Alert($"Ошибка при записи файла {fileName}", ex);
             }
         }
+
         /*
 private void CreateImitationProgramm(string[] contents, string fileName)
 {

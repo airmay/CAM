@@ -10,6 +10,11 @@ namespace CAM
     public abstract class OperationCnc : OperationBase
     {
         [NonSerialized] protected ProcessingCnc Processing;
+        public override ProcessingBase ProcessingBase
+        {
+            get => Processing;
+            set => Processing = (ProcessingCnc)value;
+        }
         protected ProcessorCnc Processor => Processing.Processor;
 
         public override MachineType MachineType => MachineType.CncWorkCenter;
@@ -21,25 +26,6 @@ namespace CAM
         public int PenetrationFeed => Processing.PenetrationFeed;
         public double ZSafety => Processing.ZSafety;
         public Point2d Origin => Processing.Origin;
-
-
-        public virtual void Init()
-        {
-        }
-
-        public virtual void Teardown()
-        {
-        }
-
-        public override void SetProcessing(ProcessingBase processing) => Processing = (ProcessingCnc)processing;
-
-        public void RemoveAcadObjects()
-        {
-            ToolpathGroup?.DeleteGroup();
-            ToolpathGroup = null;
-            SupportGroup?.DeleteGroup();
-            SupportGroup = null;
-        }
 
         public void Update(List<ObjectId?> objectIds)
         {
