@@ -1,22 +1,21 @@
-﻿using CAM.Core;
-
-namespace CAM
+﻿namespace CAM
 {
     public class CamDocument
     {
         public int Hash;
-        public ProcessItem[] ProcessItems { get; set; }
+        public IProcessing[] Processings { get; set; }
 
         public static CamDocument Create()
         {
             var document = new CamDocument();
             var (value, hash) = DataLoader.Load();
-            if (value is ProcessItem[] processItems)
+            if (value is IProcessing[] processings)
             {
-                document.ProcessItems = processItems;
+                document.Processings = processings;
                 document.Hash = hash;
-                //foreach (var processing in processItems)
-                //    processing.Init(); // TODO
+                foreach (var processing in processings)
+                foreach (var operation in processing.Operations)
+                    operation.ProcessingBase = processing;
             }
             else if (value != null)
             {
@@ -26,10 +25,10 @@ namespace CAM
             return document;
         }
 
-        public void Save(ProcessItem[] processItems)
+        public void Save(IProcessing[] processings)
         {
-            ProcessItems = processItems;
-            DataLoader.Save(ProcessItems, Hash);
+            Processings = processings;
+            DataLoader.Save(Processings, Hash);
         }
     }
 }

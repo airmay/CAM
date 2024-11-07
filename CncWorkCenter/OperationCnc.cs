@@ -9,12 +9,7 @@ namespace CAM
     [Serializable]
     public abstract class OperationCnc : OperationBase
     {
-        [NonSerialized] protected ProcessingCnc Processing;
-        public override ProcessingBase ProcessingBase
-        {
-            get => Processing;
-            set => Processing = (ProcessingCnc)value;
-        }
+        public ProcessingCnc Processing => (ProcessingCnc)ProcessingBase;
         protected ProcessorCnc Processor => Processing.Processor;
 
         public override MachineType MachineType => MachineType.CncWorkCenter;

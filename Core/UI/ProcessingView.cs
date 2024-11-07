@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
-using Autodesk.AutoCAD.ApplicationServices;
 using Autodesk.AutoCAD.DatabaseServices;
 using CAM.Core;
 using Font = System.Drawing.Font;
@@ -13,9 +12,9 @@ namespace CAM
     public partial class ProcessingView : UserControl
     {
         private TreeNode SelectedNode => treeView.SelectedNode;
-        private ProcessItem ProcessItem => treeView.SelectedNode?.Tag as ProcessItem;
+        private TreeNode SelectedProcessingNode => treeView.SelectedNode?.Parent ?? treeView.SelectedNode;
         private Command SelectedCommand => processCommandBindingSource.Current as Command;
-        private ProcessingBase _calculatedProcessing;
+        private IProcessing _calculatedProcessing;
         private TreeNode _processingNode;
 
         public ProcessingView()
@@ -33,7 +32,7 @@ namespace CAM
         public void ClearAll()
         {
             if (_camDocument != null)
-                _camDocument.ProcessItems = GetProcessItems();
+                _camDocument.Processings = GetProcessings();
             _camDocument = null;
 
             toolStrip.Enabled = false;
@@ -57,8 +56,8 @@ namespace CAM
         {
             SelectNextControl(ActiveControl, true, true, true, true);
             Acad.DocumentManager.DocumentActivationEnabled = false;
-            var processingNode = SelectedNode?.Parent ?? SelectedNode ?? treeView.Nodes[0];
-            var processing = GetProcessItem(processingNode).As<ProcessingBase>();
+            var processingNode = SelectedProcessingNode ?? treeView.Nodes[0];
+            var processing = GetProcessing(processingNode);
 #if !DEBUG
             toolStrip.Enabled = false;
 #endif 
@@ -80,7 +79,7 @@ namespace CAM
 
             return;
 
-            void UpdateNodeText(TreeNode node) => node.Text = node.Tag.As<ProcessItem>().Caption;
+            void UpdateNodeText(TreeNode node) => node.Text = node.Tag.As<ITreeNode>().Caption;
         }
 
         private void bVisibility_Click(object sender, EventArgs e)
@@ -126,9 +125,9 @@ namespace CAM
             _camDocument = camDocument;
             toolStrip.Enabled = true;
 
-            if (_camDocument.ProcessItems?.Any() == true)
+            if (_camDocument.Processings?.Any() == true)
             {
-                var nodes = Array.ConvertAll(_camDocument.ProcessItems, p => CreateNode(p, 0));
+                var nodes = Array.ConvertAll(_camDocument.Processings, CreateProcessingNode);
                 treeView.Nodes.AddRange(nodes);
                 treeView.ExpandAll();
                 treeView.SelectedNode = treeView.Nodes[0];
@@ -136,20 +135,44 @@ namespace CAM
             RefreshToolButtonsState();
         }
 
-        public void SaveCamDocument()
+        private TreeNode CreateProcessingNode(IProcessing processing)
         {
-            _camDocument.Save(GetProcessItems());
+            var children = processing.Operations?.Select(CreateOperationNode).ToArray()
+                           ?? Array.Empty<TreeNode>();
+            return new TreeNode(processing.Caption, 0, 0, children)
+            {
+                NodeFont = new Font(this.Font, FontStyle.Bold),
+                Tag = processing
+            };
         }
 
-        public ProcessItem[] GetProcessItems() => treeView.Nodes.Cast<TreeNode>().Select(GetProcessItem).ToArray();
-
-        public static ProcessItem GetProcessItem(TreeNode node)
+        private static TreeNode CreateOperationNode(OperationBase operation)
         {
-            var processItem = (ProcessItem)node.Tag;
-            processItem.Caption = node.Text;
-            processItem.Enabled = node.Checked;
-            processItem.Children = node.Nodes.Cast<TreeNode>().Select(GetProcessItem).ToArray();
-            return processItem;
+            return new TreeNode(operation.Caption, 1, 1)
+            {
+                Checked = operation.Enabled,
+                Tag = operation
+            };
+        }
+
+        public void SaveCamDocument() => _camDocument.Save(GetProcessings());
+
+        private IProcessing[] GetProcessings() => treeView.Nodes.Cast<TreeNode>().Select(GetProcessing).ToArray();
+
+        private static IProcessing GetProcessing(TreeNode node)
+        {
+            var processing = (IProcessing)node.Tag;
+            processing.Caption = node.Text;
+            processing.Operations = node.Nodes.Cast<TreeNode>()
+                .Select(p =>
+                {
+                    var operation = (OperationBase)p.Tag;
+                    operation.Caption = p.Text;
+                    operation.Enabled = p.Checked;
+                    return operation;
+                })
+                .ToArray();
+            return processing;
         }
 
         #endregion
@@ -159,40 +182,30 @@ namespace CAM
         private void bCreateProcessing_Click(object sender, EventArgs e)
         {
             treeView.SelectedNode = AddProcessingNode(MachineType.CncWorkCenter);
-        }
-
-        private void bCreateTechOperation_Click(string caption, Type type)
-        {
-            var operation = ProcessItemFactory.CreateOperation(caption, type, SelectedNode?.Tag);
-            var node = CreateNode(operation, 1);
-            var processingNode = treeView.Nodes.Count > 0
-                ? SelectedNode?.Parent ?? SelectedNode ?? treeView.Nodes[treeView.Nodes.Count - 1]
-                : null;
-            if (processingNode == null || ((ProcessingBase)processingNode.Tag).MachineType != operation.MachineType)
-                processingNode = AddProcessingNode(operation.MachineType);
-            processingNode.Nodes.Add(node);
-            treeView.SelectedNode = node;
             RefreshToolButtonsState();
         }
 
         private TreeNode AddProcessingNode(MachineType machineType)
         {
             var processing = ProcessItemFactory.CreateProcessing(machineType);
-            var node = CreateNode(processing, 0);
+            var node = CreateProcessingNode(processing);
             treeView.Nodes.Add(node);
             return node;
         }
 
-        private TreeNode CreateNode(ProcessItem item, int level)
+        private void bCreateTechOperation_Click(string caption, Type type)
         {
-            var children = item.Children?.Select(p => CreateNode(p, level + 1)).ToArray()
-                           ?? Array.Empty<TreeNode>();
-            return new TreeNode(item.Caption, level, level, children)
-            {
-                Checked = item.Enabled,
-                NodeFont = new Font(this.Font, level == 0 ? FontStyle.Bold : FontStyle.Regular),
-                Tag = item
-            };
+            var operation = ProcessItemFactory.CreateOperation(caption, type, SelectedNode?.Tag);
+            var processingNode = treeView.Nodes.Count > 0
+                ? SelectedProcessingNode ?? treeView.Nodes[treeView.Nodes.Count - 1]
+                : null;
+            if (processingNode == null || ((IProcessing)processingNode.Tag).MachineType != operation.MachineType)
+                processingNode = AddProcessingNode(operation.MachineType);
+            operation.ProcessingBase = (ProcessingBase)processingNode.Tag;
+            var node = CreateOperationNode(operation);
+            processingNode.Nodes.Add(node);
+            treeView.SelectedNode = node;
+            RefreshToolButtonsState();
         }
 
         #endregion
@@ -237,6 +250,8 @@ namespace CAM
                 treeView.SelectedNode = node;
             }
         }
+        #endregion
+
         #region Edit
 
         private void treeView_NodeMouseDoubleClick(object sender, TreeNodeMouseClickEventArgs e)
@@ -262,8 +277,6 @@ namespace CAM
 
         #endregion
 
-        #endregion
-
         #region Select
 
         private void treeView_AfterSelect(object sender, TreeViewEventArgs e)
@@ -271,7 +284,7 @@ namespace CAM
             RefreshParamsView();
             if (_program?.TryGetCommandIndex(SelectedNode.Tag, out var commandIndex) == true)
                 processCommandBindingSource.Position = commandIndex;
-            ProcessItem.OnSelect();
+            SelectedNode.Tag.As<ITreeNode>().OnSelect();
         }
 
         #endregion
@@ -281,9 +294,9 @@ namespace CAM
         #region Params view
         private readonly Dictionary<Type, ParamsView> _paramsViews = new Dictionary<Type, ParamsView>();
 
-        public void RefreshParamsView()
+        private void RefreshParamsView()
         {
-            var type = ProcessItem.GetType();
+            var type = SelectedNode.Tag.GetType();
             if (!_paramsViews.TryGetValue(type, out var paramsView))
             {
                 paramsView = new ParamsView(type);
@@ -292,7 +305,7 @@ namespace CAM
                 _paramsViews[type] = paramsView;
             }
 
-            paramsView.BindingSource.DataSource = ProcessItem;
+            paramsView.BindingSource.DataSource = SelectedNode.Tag;
             paramsView.Show();
             paramsView.BringToFront();
         }

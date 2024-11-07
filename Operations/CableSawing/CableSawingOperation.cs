@@ -11,12 +11,6 @@ namespace CAM.Operations.CableSawing
     [Serializable]
     public class CableSawingOperation : OperationBase
     {
-        [NonSerialized] protected ProcessingCnc Processing;
-        public override ProcessingBase ProcessingBase
-        {
-            get => Processing;
-            set => Processing = (ProcessingCnc)value;
-        }
 
         public double ToolThickness { get; set; } = 10;
         public int CuttingFeed { get; set; } = 10;

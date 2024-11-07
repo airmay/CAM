@@ -7,10 +7,13 @@ using System.Diagnostics;
 namespace CAM
 {
     [Serializable]
-    public abstract class ProcessingBase : ProcessItem
+    public abstract class ProcessingBase : IProcessing
     {
+        public string Caption { get; set; }
+        public OperationBase[] Operations { get; set; }
+        public abstract MachineType MachineType { get; }
         public abstract Program Program { get; }
-        private IEnumerable<OperationBase> OperationsEnabled => Children.Cast<OperationBase>().Where(p => p.Enabled);
+        private IEnumerable<OperationBase> OperationsEnabled => Operations.Cast<OperationBase>().Where(p => p.Enabled);
 
         //public void Init()
 
@@ -124,7 +127,6 @@ namespace CAM
                 {
                     Acad.Write($"расчет операции {operation.Caption}");
                     processor.Operation = operation;
-                    operation.ProcessingBase = this;
                     operation.Execute();
                 }
 
@@ -154,7 +156,7 @@ namespace CAM
             }
         }
 
-        public override void OnSelect()
+        public void OnSelect()
         {
             var objectIds = OperationsEnabled.Where(p => p.ProcessingArea != null).SelectMany(p => p.ProcessingArea.ObjectIds).ToArray();
             Acad.SelectObjectIds(objectIds);
@@ -163,7 +165,21 @@ namespace CAM
 
         public void HideToolpath(OperationBase operationToShow)
         {
-            Children.Cast<OperationBase>().ForAll(p => p.ToolpathGroup?.SetGroupVisibility(p == operationToShow));
+            Operations?.Cast<OperationBase>().ForAll(p => p.ToolpathGroup?.SetGroupVisibility(p == operationToShow));
         }
+    }
+
+    public interface IProcessing : ITreeNode
+    {
+        OperationBase[] Operations { get; set; }
+        MachineType MachineType { get; }
+        Program Execute();
+        void HideToolpath(OperationBase operation);
+    }
+
+    public interface ITreeNode
+    { 
+        string Caption { get; set; }
+        void OnSelect();
     }
 }

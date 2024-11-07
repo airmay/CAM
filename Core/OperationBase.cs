@@ -1,13 +1,15 @@
 ﻿using Autodesk.AutoCAD.DatabaseServices;
 using System;
-using CAM.Core;
 
 namespace CAM
 {
     [Serializable]
-    public abstract class OperationBase : ProcessItem
+    public abstract class OperationBase : IOperation
     {
-        public abstract ProcessingBase ProcessingBase { get; set; }
+        public string Caption { get; set; }
+        public bool Enabled { get; set; }
+        public abstract MachineType MachineType { get; }
+        public ProcessingBase ProcessingBase { get; set; }
         public AcadObject ProcessingArea { get; set; }
 
         [NonSerialized] public ObjectId? ToolpathGroup;
@@ -29,10 +31,14 @@ namespace CAM
             return ProcessingArea != null;
         }
 
-        public override void OnSelect()
+        public void OnSelect()
         {
             Acad.SelectObjectIds(ProcessingArea?.ObjectIds);
             ProcessingBase?.HideToolpath(this);
         }
+    }
+
+    public interface IOperation : ITreeNode
+    {
     }
 }
