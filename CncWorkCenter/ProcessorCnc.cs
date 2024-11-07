@@ -12,7 +12,7 @@ namespace CAM.CncWorkCenter
         private readonly PostProcessorCnc _postProcessor;
         private ToolpathBuilder _toolpathBuilder;
         private readonly ProcessingCnc _processing;
-        public OperationBase Operation { get; set; }
+        public IOperation Operation { get; set; }
         public bool IsEngineStarted;
 
         public ToolLocationCnc Location { get; set; } = new ToolLocationCnc();
@@ -152,7 +152,7 @@ namespace CAM.CncWorkCenter
             if (curve != null)
             {
                 if (curve.IsNewObject)
-                    Operation.Duration += curve.Length() / (feed ?? 10000) * 60;
+                    Operation.AddDuration(curve.Length() / (feed ?? 10000) * 60);
                 // todo проверить что после добавления curve.IsNewObject убрали
                 if (curve.Length() > 1)
                     toolpath = _toolpathBuilder.AddToolpath(curve, name);

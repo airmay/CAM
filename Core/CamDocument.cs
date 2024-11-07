@@ -13,9 +13,6 @@
             {
                 document.Processings = processings;
                 document.Hash = hash;
-                foreach (var processing in processings)
-                foreach (var operation in processing.Operations)
-                    operation.ProcessingBase = processing;
             }
             else if (value != null)
             {

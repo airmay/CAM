@@ -9,6 +9,12 @@ using Font = System.Drawing.Font;
 
 namespace CAM
 {
+    public interface ITreeNode
+    {
+        string Caption { get; set; }
+        void OnSelect();
+    }
+
     public partial class ProcessingView : UserControl
     {
         private TreeNode SelectedNode => treeView.SelectedNode;
@@ -146,7 +152,7 @@ namespace CAM
             };
         }
 
-        private static TreeNode CreateOperationNode(OperationBase operation)
+        private static TreeNode CreateOperationNode(IOperation operation)
         {
             return new TreeNode(operation.Caption, 1, 1)
             {
@@ -166,7 +172,7 @@ namespace CAM
             processing.Operations = node.Nodes.Cast<TreeNode>()
                 .Select(p =>
                 {
-                    var operation = (OperationBase)p.Tag;
+                    var operation = (IOperation)p.Tag;
                     operation.Caption = p.Text;
                     operation.Enabled = p.Checked;
                     return operation;
@@ -199,9 +205,8 @@ namespace CAM
             var processingNode = treeView.Nodes.Count > 0
                 ? SelectedProcessingNode ?? treeView.Nodes[treeView.Nodes.Count - 1]
                 : null;
-            if (processingNode == null || ((IProcessing)processingNode.Tag).MachineType != operation.MachineType)
+            if (processingNode == null || processingNode.Tag.As<IProcessing>().MachineType != operation.MachineType)
                 processingNode = AddProcessingNode(operation.MachineType);
-            operation.ProcessingBase = (ProcessingBase)processingNode.Tag;
             var node = CreateOperationNode(operation);
             processingNode.Nodes.Add(node);
             treeView.SelectedNode = node;

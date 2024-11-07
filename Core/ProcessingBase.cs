@@ -6,11 +6,19 @@ using System.Diagnostics;
 
 namespace CAM
 {
+    public interface IProcessing : ITreeNode
+    {
+        IOperation[] Operations { get; set; }
+        MachineType MachineType { get; }
+        Program Execute();
+        void HideToolpath(IOperation operation);
+    }
+
     [Serializable]
     public abstract class ProcessingBase : IProcessing
     {
         public string Caption { get; set; }
-        public OperationBase[] Operations { get; set; }
+        public IOperation[] Operations { get; set; }
         public abstract MachineType MachineType { get; }
         public abstract Program Program { get; }
         private IEnumerable<OperationBase> OperationsEnabled => Operations.Cast<OperationBase>().Where(p => p.Enabled);
@@ -127,6 +135,7 @@ namespace CAM
                 {
                     Acad.Write($"расчет операции {operation.Caption}");
                     processor.Operation = operation;
+                    operation.ProcessingBase = this;
                     operation.Execute();
                 }
 
@@ -136,8 +145,8 @@ namespace CAM
 
         private void CreateToolpathGroups()
         {
-            foreach (var operationGroup in Program.ArraySegment.Where(p => p.Operation != null).GroupBy(p => p.Operation))
-                operationGroup.Key.ToolpathGroup = operationGroup.Select(p => p.ObjectId).CreateGroup();
+            //foreach (var operationGroup in Program.ArraySegment.Where(p => p.Operation != null).GroupBy(p => p.Operation))
+            //    operationGroup.Key.ToolpathGroup = operationGroup.Select(p => p.ObjectId).CreateGroup();
         }
 
         public void UpdateCaptions()
@@ -163,23 +172,6 @@ namespace CAM
             OperationsEnabled.ForAll(p => p.ToolpathGroup?.SetGroupVisibility(true));
         }
 
-        public void HideToolpath(OperationBase operationToShow)
-        {
-            Operations?.Cast<OperationBase>().ForAll(p => p.ToolpathGroup?.SetGroupVisibility(p == operationToShow));
-        }
-    }
-
-    public interface IProcessing : ITreeNode
-    {
-        OperationBase[] Operations { get; set; }
-        MachineType MachineType { get; }
-        Program Execute();
-        void HideToolpath(OperationBase operation);
-    }
-
-    public interface ITreeNode
-    { 
-        string Caption { get; set; }
-        void OnSelect();
+        public void HideToolpath(IOperation operationToShow) => Operations?.Cast<OperationBase>().ForAll(p => p.ToolpathGroup?.SetGroupVisibility(p == operationToShow));
     }
 }

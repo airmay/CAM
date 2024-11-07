@@ -3,13 +3,26 @@ using System;
 
 namespace CAM
 {
+    public interface IOperation : ITreeNode
+    {
+        bool Enabled { get; set; }
+        IProcessing ProcessingBase { set; }
+        MachineType MachineType { get; }
+        Machine Machine { get; }
+        Tool Tool { get; }
+        void AddDuration(double duration);
+    }
+
     [Serializable]
     public abstract class OperationBase : IOperation
     {
         public string Caption { get; set; }
         public bool Enabled { get; set; }
         public abstract MachineType MachineType { get; }
-        public ProcessingBase ProcessingBase { get; set; }
+        public void AddDuration(double duration) => Duration += duration;
+
+        public IProcessing ProcessingBase { get; set; }
+
         public AcadObject ProcessingArea { get; set; }
 
         [NonSerialized] public ObjectId? ToolpathGroup;
@@ -36,9 +49,5 @@ namespace CAM
             Acad.SelectObjectIds(ProcessingArea?.ObjectIds);
             ProcessingBase?.HideToolpath(this);
         }
-    }
-
-    public interface IOperation : ITreeNode
-    {
     }
 }
