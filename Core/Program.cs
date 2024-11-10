@@ -13,7 +13,7 @@ namespace CAM.Core
         public int Count;
         public ArraySegment<Command> ArraySegment;
         public Machine Machine { get; set; }
-        private readonly Dictionary<ObjectId, int> _objectIdDict = new Dictionary<ObjectId, int>();
+        private readonly Dictionary<ObjectId, int> _objectIdDict = new Dictionary<ObjectId, int>(1_000);
         private readonly Dictionary<object, int> _operationDict = new Dictionary<object, int>();
 
         public void CreateProgram()

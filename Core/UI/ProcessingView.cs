@@ -56,8 +56,6 @@ namespace CAM
             bVisibility.Enabled = bSendProgramm.Enabled = bPartialProcessing.Enabled = bPlay.Enabled = _program != null;
         }
 
-        private bool IsToolpathVisible => !bVisibility.Checked;
-
         private void bBuildProcessing_ButtonClick(object sender, EventArgs e)
         {
             SelectNextControl(ActiveControl, true, true, true, true);
@@ -118,16 +116,17 @@ namespace CAM
         }
 
         private void bClose_Click(object sender, EventArgs e) => Acad.CloseAndDiscard();
-#endregion
+        #endregion
 
-        #region Tree nodes
-
-        #region Get
+        #region CamDocument
 
         private CamDocument _camDocument;
 
         public void SetCamDocument(CamDocument camDocument)
         {
+            if (camDocument == _camDocument)
+                return;
+
             _camDocument = camDocument;
             toolStrip.Enabled = true;
 
@@ -147,6 +146,7 @@ namespace CAM
                            ?? Array.Empty<TreeNode>();
             return new TreeNode(processing.Caption, 0, 0, children)
             {
+                Checked = true,
                 NodeFont = new Font(this.Font, FontStyle.Bold),
                 Tag = processing
             };
@@ -182,6 +182,8 @@ namespace CAM
         }
 
         #endregion
+
+        #region Tree nodes
 
         #region Add
 
@@ -290,6 +292,7 @@ namespace CAM
             if (_program?.TryGetCommandIndex(SelectedNode.Tag, out var commandIndex) == true)
                 processCommandBindingSource.Position = commandIndex;
             SelectedNode.Tag.As<ITreeNode>().OnSelect();
+            Acad.Editor.UpdateScreen();
         }
 
         #endregion
@@ -324,6 +327,8 @@ namespace CAM
             _program = null;
             processCommandBindingSource.DataSource = null;
             Acad.DeleteProcessObjects();
+            _calculatedProcessing?.Operations?.Select(p => p.ToolpathGroupId).Delete();
+            _calculatedProcessing?.Operations?.ForAll(p => p.ToolpathGroupId = null);
             ToolObject.Hide();
         }
 

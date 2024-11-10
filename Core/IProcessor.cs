@@ -6,6 +6,6 @@ namespace CAM
     {
         void Start();
         void Finish();
-        IOperation Operation { get; set; }
+        void SetOperation(IOperation operation);
     }
 }

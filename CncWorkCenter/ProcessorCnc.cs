@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
 using CAM.Core;
@@ -12,8 +11,10 @@ namespace CAM.CncWorkCenter
         private readonly PostProcessorCnc _postProcessor;
         private ToolpathBuilder _toolpathBuilder;
         private readonly ProcessingCnc _processing;
-        public IOperation Operation { get; set; }
         public bool IsEngineStarted;
+        private IOperation _operation;
+        private double _processDuration;
+        private double _operationDuration;
 
         public ToolLocationCnc Location { get; set; } = new ToolLocationCnc();
         private Program Program => _processing.Program;
@@ -36,7 +37,35 @@ namespace CAM.CncWorkCenter
             CuttingFeed = _processing.CuttingFeed;
         }
 
+        public void SetOperation(IOperation operation)
+        {
+            if (_operation != null)
+                FinishOperation();
+            _operation = operation;
+            _toolpathBuilder.CreateGroup(_operation.Caption);
+        }
+
+        private void FinishOperation()
+        {
+            _operation.ToolpathGroupId = _toolpathBuilder.AddGroup(_operation.Caption);
+            _operation.Caption = GetCaption(_operation.Caption, _operationDuration);
+            _processDuration += _operationDuration;
+            _operationDuration = 0;
+        }
+
+        private static string GetCaption(string caption, double duration)
+        {
+            var ind = caption.IndexOf('(');
+            var timeSpan = new TimeSpan(0, 0, 0, (int)duration);
+            return $"{(ind > 0 ? caption.Substring(0, ind).Trim() : caption)} ({timeSpan})";
+        }
+
         public ObjectId AddEntity(Entity curve) => _toolpathBuilder.AddEntity(curve);
+
+        public void Dispose()
+        {
+            _toolpathBuilder.Dispose();
+        }
 
         public void Start()
         {
@@ -50,16 +79,14 @@ namespace CAM.CncWorkCenter
             AddCommands(_postProcessor.SetTool(Tool.Number, 0, 0, 0));
         }
 
+
         public void Finish()
         {
             AddCommands(_postProcessor.StopEngine());
             AddCommands(_postProcessor.StopMachine());
             Program.CreateProgram();
-        }
-
-        public void Dispose()
-        {
-            _toolpathBuilder.Dispose();
+            FinishOperation();
+            _processing.Caption = GetCaption(_processing.Caption, _processDuration);
         }
 
         public void Cycle() => AddCommand(_postProcessor.Cycle());
@@ -75,7 +102,7 @@ namespace CAM.CncWorkCenter
                 Text = text,
                 ToolLocation = Location,
                 ObjectId = toolpath,
-                Operation = this.Operation,
+                Operation = _operation,
             });
         }
 
@@ -152,7 +179,7 @@ namespace CAM.CncWorkCenter
             if (curve != null)
             {
                 if (curve.IsNewObject)
-                    Operation.AddDuration(curve.Length() / (feed ?? 10000) * 60);
+                    _operationDuration += curve.Length() / (feed ?? 10000) * 60;
                 // todo проверить что после добавления curve.IsNewObject убрали
                 if (curve.Length() > 1)
                     toolpath = _toolpathBuilder.AddToolpath(curve, name);

@@ -88,7 +88,6 @@ namespace CAM
 
         public Program Execute()
         {
-            OperationsEnabled.ForAll(p => p.Clear());
             if (!Validate() || OperationsEnabled.Any(p => !p.Validate()))
                 return null;
 
@@ -99,10 +98,6 @@ namespace CAM
             {
                 var stopwatch = Stopwatch.StartNew();
                 ProcessOperations();
-
-                CreateToolpathGroups();
-                UpdateCaptions();
-
                 stopwatch.Stop();
                 Acad.Write($"Расчет обработки завершен {stopwatch.Elapsed}");
 
@@ -134,7 +129,7 @@ namespace CAM
                 foreach (var operation in OperationsEnabled)
                 {
                     Acad.Write($"расчет операции {operation.Caption}");
-                    processor.Operation = operation;
+                    processor.SetOperation(operation);
                     operation.ProcessingBase = this;
                     operation.Execute();
                 }
@@ -143,35 +138,16 @@ namespace CAM
             }
         }
 
-        private void CreateToolpathGroups()
-        {
-            //foreach (var operationGroup in Program.ArraySegment.Where(p => p.Operation != null).GroupBy(p => p.Operation))
-            //    operationGroup.Key.ToolpathGroup = operationGroup.Select(p => p.ObjectId).CreateGroup();
-        }
-
-        public void UpdateCaptions()
-        {
-            Caption = GetCaption(Caption, OperationsEnabled.Sum(p => p.Duration));
-            foreach (var operation in OperationsEnabled)
-                operation.Caption = GetCaption(operation.Caption, operation.Duration);
-
-            return;
-
-            string GetCaption(string caption, double duration)
-            {
-                var ind = caption.IndexOf('(');
-                var timeSpan = new TimeSpan(0, 0, 0, (int)duration);
-                return $"{(ind > 0 ? caption.Substring(0, ind).Trim() : caption)} ({timeSpan})";
-            }
-        }
-
         public void OnSelect()
         {
+            if (Operations == null)
+                return;
+
             var objectIds = OperationsEnabled.Where(p => p.ProcessingArea != null).SelectMany(p => p.ProcessingArea.ObjectIds).ToArray();
             Acad.SelectObjectIds(objectIds);
-            OperationsEnabled.ForAll(p => p.ToolpathGroup?.SetGroupVisibility(true));
+            OperationsEnabled.ForAll(p => p.ToolpathGroupId?.SetGroupVisibility(true));
         }
 
-        public void HideToolpath(IOperation operationToShow) => Operations?.Cast<OperationBase>().ForAll(p => p.ToolpathGroup?.SetGroupVisibility(p == operationToShow));
+        public void HideToolpath(IOperation operationToShow) => Operations?.ForAll(p => p.ToolpathGroupId?.SetGroupVisibility(p == operationToShow));
     }
 }

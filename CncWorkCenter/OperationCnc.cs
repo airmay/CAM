@@ -9,7 +9,7 @@ namespace CAM
     [Serializable]
     public abstract class OperationCnc : OperationBase
     {
-        public ProcessingCnc Processing => (ProcessingCnc)ProcessingBase;
+        protected ProcessingCnc Processing => (ProcessingCnc)ProcessingBase;
         protected ProcessorCnc Processor => Processing.Processor;
 
         public override MachineType MachineType => MachineType.CncWorkCenter;
@@ -21,10 +21,5 @@ namespace CAM
         public int PenetrationFeed => Processing.PenetrationFeed;
         public double ZSafety => Processing.ZSafety;
         public Point2d Origin => Processing.Origin;
-
-        public void Update(List<ObjectId?> objectIds)
-        {
-            ToolpathGroup = objectIds.CreateGroup();
-        }
     }
 }
