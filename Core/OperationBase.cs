@@ -35,13 +35,13 @@ namespace CAM
 
         public virtual bool Validate()
         {
-            return ProcessingArea != null;
+            return ProcessingArea.CheckNotNull("Объекты автокада");
         }
 
         void ITreeNode.OnSelect()
         {
-            Acad.SelectObjectIds(ProcessingArea?.ObjectIds);
             ProcessingBase?.HideToolpath(this);
+            Acad.SelectObjectIds(ProcessingArea?.ObjectIds);
         }
     }
 }

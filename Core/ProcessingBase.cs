@@ -19,6 +19,7 @@ namespace CAM
     {
         public string Caption { get; set; }
         public IOperation[] Operations { get; set; }
+        public int LastOperationNumber { get; set; }
         public abstract MachineType MachineType { get; }
         public abstract Program Program { get; }
         private IEnumerable<OperationBase> OperationsEnabled => Operations.Cast<OperationBase>().Where(p => p.Enabled);
@@ -143,9 +144,9 @@ namespace CAM
             if (Operations == null)
                 return;
 
+            OperationsEnabled.ForAll(p => p.ToolpathGroupId?.SetGroupVisibility(true));
             var objectIds = OperationsEnabled.Where(p => p.ProcessingArea != null).SelectMany(p => p.ProcessingArea.ObjectIds).ToArray();
             Acad.SelectObjectIds(objectIds);
-            OperationsEnabled.ForAll(p => p.ToolpathGroupId?.SetGroupVisibility(true));
         }
 
         public void HideToolpath(IOperation operationToShow) => Operations?.ForAll(p => p.ToolpathGroupId?.SetGroupVisibility(p == operationToShow));

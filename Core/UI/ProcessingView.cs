@@ -195,7 +195,7 @@ namespace CAM
 
         private TreeNode AddProcessingNode(MachineType machineType)
         {
-            var processing = ProcessItemFactory.CreateProcessing(machineType);
+            var processing = ProcessingFactory.CreateProcessing(machineType);
             var node = CreateProcessingNode(processing);
             treeView.Nodes.Add(node);
             return node;
@@ -203,12 +203,13 @@ namespace CAM
 
         private void bCreateTechOperation_Click(string caption, Type type)
         {
-            var operation = ProcessItemFactory.CreateOperation(caption, type, SelectedNode?.Tag);
+            var operation = OperationFactory.CreateOperation(caption, type, SelectedNode?.Tag);
             var processingNode = treeView.Nodes.Count > 0
                 ? SelectedProcessingNode ?? treeView.Nodes[treeView.Nodes.Count - 1]
                 : null;
             if (processingNode == null || processingNode.Tag.As<IProcessing>().MachineType != operation.MachineType)
                 processingNode = AddProcessingNode(operation.MachineType);
+            operation.Caption += ++processingNode.Tag.As<ProcessingBase>().LastOperationNumber;
             var node = CreateOperationNode(operation);
             processingNode.Nodes.Add(node);
             treeView.SelectedNode = node;

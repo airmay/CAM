@@ -46,7 +46,7 @@ namespace CAM
         public static bool CheckNotNull(this object value, string field)
         {
             if (value == null)
-                Acad.Alert($"Не заполнено поле {field}");
+                Acad.Alert($"Не заполнено поле \"{field}\"");
             return value != null;
         }
 
