@@ -4,7 +4,6 @@ using System.Windows.Forms;
 using System.Collections.Generic;
 using Dreambuild.AutoCAD;
 using Autodesk.AutoCAD.DatabaseServices;
-using Autodesk.AutoCAD.Geometry;
 
 namespace CAM
 {
@@ -47,6 +46,7 @@ namespace CAM
         private readonly Type _type;
 
         public object ParamsObject => BindingSource.DataSource;
+        public ProcessingBase Processing => (ProcessingBase)BindingSource.DataSource;
 
         public T GetParams<T>() => BindingSource.GetSource<T>();
 
@@ -220,7 +220,6 @@ namespace CAM
         public (TextBox, Button) CreateSelector(string displayName, string buttonText = "Ξ", string toolTipText = null)
         {
             AddLabel(displayName, toolTipText);
-
             var userControl = new UserControl
             {
                 Dock = DockStyle.Fill,
@@ -228,14 +227,8 @@ namespace CAM
                 //BorderStyle = BorderStyle.FixedSingle,
                 Height = 0
             };
-
-            var textBox = new TextBox
-            {
-                Dock = DockStyle.Fill,
-                ReadOnly = true
-            };
+            var textBox = new TextBox { Dock = DockStyle.Fill, ReadOnly = true };
             userControl.Controls.Add(textBox);
-
             var button = new Button
             {
                 Dock = DockStyle.Right,
@@ -309,38 +302,16 @@ namespace CAM
 
         public ParamsView AddOrigin()
         {
-            var originInfo = _type.GetProperty("Origin");
-            var originGroupInfo = _type.GetField("OriginGroup");
-
             var (textbox, button) = CreateSelector("Начало координат", "۞");
-
-            BindingSource.DataSourceChanged += (s, e) => RefreshText();
-            textbox.Enter += (s, e) =>
-            {
-                var originGroup = (ObjectId?)originGroupInfo.GetValue(ParamsObject);
-                if (originGroup.HasValue)
-                    Acad.SelectObjectIds(originGroup.Value);
-            };
+            BindingSource.DataSourceChanged += (s, e) => textbox.Text = Processing.Origin.ToString();
+            textbox.Enter += (s, e) => Acad.SelectObjectIds(Processing.Origin.OriginObject?.ObjectIds);
             button.Click += (s, e) =>
             {
-                Interaction.SetActiveDocFocus();
-                var point = Interaction.GetPoint("\nВыберите точку начала координат");
-                if (!point.IsNull())
-                {
-                    originInfo.SetValue(ParamsObject, point);
-                    RefreshText();
-                    if (originGroupInfo.GetValue(ParamsObject) != null)
-                        ((ObjectId)originGroupInfo.GetValue(ParamsObject)).Delete();
-                    originGroupInfo.SetValue(ParamsObject, Acad.CreateOriginObject(point.ToPoint2d()));
-                }
+                textbox.Text = @"{0, 0}";
+                Processing.Origin.CreateOriginObject();
+                textbox.Text = Processing.Origin.ToString();
             };
             return this;
-
-            void RefreshText()
-            {
-                var origin = (Point2d)originInfo.GetValue(ParamsObject);
-                textbox.Text = $"{{{origin.X.Round(3)}, {origin.Y.Round(3)}}}";
-            }
         }
         #endregion
 

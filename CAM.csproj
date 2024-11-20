@@ -108,6 +108,7 @@
     <Compile Include="Core\CableTechProcess.cs" />
     <Compile Include="Core\IProcessor.cs" />
     <Compile Include="Core\IProgram.cs" />
+    <Compile Include="Core\Origin.cs" />
     <Compile Include="Core\ProcessingFactory.cs" />
     <Compile Include="Core\Program.cs" />
     <Compile Include="Core\OperationFactory.cs" />

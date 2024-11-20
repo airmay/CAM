@@ -20,6 +20,7 @@ namespace CAM
         public string Caption { get; set; }
         public IOperation[] Operations { get; set; }
         public int LastOperationNumber { get; set; }
+        public Origin Origin { get; set; } = new Origin();
         public abstract MachineType MachineType { get; }
         public abstract Program Program { get; }
         private IEnumerable<OperationBase> OperationsEnabled => Operations.Cast<OperationBase>().Where(p => p.Enabled);

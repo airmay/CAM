@@ -55,6 +55,7 @@ namespace CAM
         public static void Alert(Exception ex) => Alert("Ошибка", ex);
 
         public static ObjectId Add(this Curve curve) => App.LockAndExecute(() => curve.AddToCurrentSpace());
+        public static ObjectId[] Add(this IEnumerable<Curve> curves) => App.LockAndExecute(() => curves.AddToCurrentSpace());
 
 
         //public static void QForEach(this IEnumerable<ObjectId> ids, Action<DBObject> action)
@@ -169,21 +170,7 @@ namespace CAM
 
         public static Curve[] GetSelectedCurves() => OpenForRead(Interaction.GetPickSet());
 
-        public static ObjectId CreateOriginObject(Point2d point2d)
-        {
-            var length = 100;
-            var point = point2d.ToPoint3d();
-            var curves = new List<Curve>
-            {
-                NoDraw.Line(point, point + Vector3d.XAxis * length),
-                NoDraw.Line(point, point + Vector3d.YAxis * length),
-                NoDraw.Rectang(new Point3d(point.X - length / 10, point.Y - length / 10, 0),
-                    new Point3d(point.X + length / 10, point.Y + length / 10, 0))
-            };
-            var layerId = GetExtraObjectsLayerId();
-            curves.ForEach(p => p.LayerId = layerId);
-            return App.LockAndExecute(() => curves.AddToCurrentSpace().Group(selectable: true));
-        }
+
 
         public static ObjectId? GetSelectedObjectId()
         {

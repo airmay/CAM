@@ -20,6 +20,5 @@ namespace CAM
         public int CuttingFeed => Processing.CuttingFeed;
         public int PenetrationFeed => Processing.PenetrationFeed;
         public double ZSafety => Processing.ZSafety;
-        public Point2d Origin => Processing.Origin;
     }
 }

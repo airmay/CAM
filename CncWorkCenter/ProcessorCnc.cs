@@ -23,7 +23,6 @@ namespace CAM.CncWorkCenter
         public int CuttingFeed { get; set; }
 
         public int PenetrationFeed => _processing.PenetrationFeed;
-        public Point2d Origin => _processing.Origin;
         public Side EngineSide { get; set; }
 
         public double ZSafety => _processing.ZSafety;

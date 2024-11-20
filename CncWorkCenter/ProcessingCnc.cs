@@ -22,11 +22,6 @@ namespace CAM.CncWorkCenter
         public int PenetrationFeed { get; set; }
         public double ZSafety { get; set; } = 20;
 
-        public double OriginX { get; set; }
-        public double OriginY { get; set; }
-        public Point2d Origin => new Point2d(OriginX, OriginX);
-        [NonSerialized] public ObjectId? OriginGroup;
-
         public static void ConfigureParamsView(ParamsView view)
         {
             view.AddMachine(CAM.Machine.Donatoni, CAM.Machine.ScemaLogic, CAM.Machine.Forma);
