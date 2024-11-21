@@ -1,4 +1,5 @@
 ﻿using Autodesk.AutoCAD.DatabaseServices;
+using CAM.Core;
 
 namespace CAM
 {
@@ -9,6 +10,6 @@ namespace CAM
         public string Text { get; set; }
         public ObjectId? ObjectId { get; set; }
         public IOperation Operation { get; set; }
-        public IToolLocation ToolLocation { get; set; }
+        public ToolLocationParams? ToolLocationParams { get; set; }
     }
 }

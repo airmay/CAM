@@ -10,8 +10,6 @@ namespace CAM.CncWorkCenter
     public class ProcessingCnc : ProcessingBase
     {
         public override MachineType MachineType => MachineType.CncWorkCenter;
-        private static Program _program = new Program();
-        public override Program Program => _program;
         [NonSerialized] public ProcessorCnc Processor;
 
         public Machine? Machine { get; set; }

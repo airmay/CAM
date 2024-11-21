@@ -2,58 +2,54 @@
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
 using Autodesk.AutoCAD.GraphicsInterface;
+using CAM.Core;
 using Application = Autodesk.AutoCAD.ApplicationServices.Core.Application;
 
 namespace CAM
 {
-    public class ToolObject
+    public static class ToolObject
     {
-        public static Curve[] Model { get; set; }
+        private static Curve[] _model;
         private static Machine? _machine;
         private static ITool _tool;
-        private static IToolLocation _location;
+        private static ToolLocationParams? _location;
 
-        public static void Set(Machine? machine, ITool tool, IToolLocation location)
+        public static void Set(Machine? machine, ITool tool, ToolLocationParams? location)
         {
-            if (machine != _machine || tool != _tool || !location.IsDefined)
-            {
+            if (machine != _machine || tool != _tool || !location.HasValue)
                 Hide();
-                _machine = machine;
-                _tool = tool;
-            }
 
-            if (location.IsDefined)
-            {
-                if (Model == null)
-                {
-                    Model = tool.GetModel(_machine);
-                    AddModel(Model);
-                    _location = location.Origin;
-                }
+            if (!location.HasValue) 
+                return;
 
-                var matrix = location.GetTransformMatrixFrom(_location);
-                TransformModel(Model, matrix);
-                _location = location;
-            }
+            if (_model == null)
+                CreateModel(tool.GetModel(machine));
+
+            TransformModel(tool.GetTransformMatrix(_location, location.Value));
+
+            _location = location;
+            _machine = machine;
+            _tool = tool;
         }
 
         public static void Hide()
         {
-            if (Model == null || Application.DocumentManager.MdiActiveDocument == null)
+            if (_model == null || Acad.ActiveDocument == null)
                 return;
 
             using (Application.DocumentManager.MdiActiveDocument.LockDocument())
             using (Acad.Database.TransactionManager.StartTransaction())
-                foreach (var item in Model)
+                foreach (var item in _model)
                 {
                     TransientManager.CurrentTransientManager.EraseTransient(item, new IntegerCollection());
                     item.Dispose();
                 }
 
-            Model = null;
+            _model = null;
+            _location = null;
         }
 
-        private static void AddModel(Curve[] curves)
+        private static void CreateModel(Curve[] curves)
         {
             using (Application.DocumentManager.MdiActiveDocument.LockDocument())
             using (var tr = Acad.Database.TransactionManager.StartTransaction())
@@ -67,11 +63,12 @@ namespace CAM
 
                 tr.Commit();
             }
+            _model = curves;
         }
 
-        private static void TransformModel(Curve[] curves, Matrix3d matrix)
+        private static void TransformModel(Matrix3d matrix)
         {
-            foreach (var item in curves)
+            foreach (var item in _model)
             {
                 item.TransformBy(matrix);
                 TransientManager.CurrentTransientManager.UpdateTransient(item, new IntegerCollection());

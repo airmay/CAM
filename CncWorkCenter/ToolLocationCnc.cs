@@ -1,53 +1,42 @@
 ﻿using Autodesk.AutoCAD.Geometry;
+using CAM.Core;
 
 namespace CAM.CncWorkCenter
 {
-    public class ToolLocationCnc : IToolLocation
+    public class ToolLocationCnc
     {
-        public Point3d Point
-        {
-            get => new Point3d(X, Y, Z);
-            set
-            {
-                X = value.X;
-                Y = value.Y;
-                Z = value.Z;
-            }
-        }
-
         public double X { get; set; } = double.NaN;
         public double Y { get; set; } = double.NaN;
         public double Z { get; set; } = double.NaN;
         public double AngleA { get; set; }
         public double AngleC { get; set; }
 
-        public ToolLocationCnc With(Point3d? point, double? angleC, double? angleA)
+        public ToolLocationCnc() { }
+        public ToolLocationCnc(ToolLocationParams? locationParams)
         {
-            return new ToolLocationCnc
-            {
-                Point = point ?? this.Point,
-                AngleC = angleC ?? this.AngleC,
-                AngleA = angleA ?? this.AngleA
-            };
+            X = locationParams?.Param1 ?? 0;
+            Y = locationParams?.Param2 ?? 0;
+            Z = locationParams?.Param3 ?? 0;
+            AngleC = locationParams?.Param4 ?? 0;
+            AngleA = locationParams?.Param5 ?? 0;
+        }
+
+        public Point3d Point => new Point3d(X, Y, Z);
+
+        public void Set(Point3d? point, double? angleC, double? angleA)
+        {
+            X = point?.X ?? X;
+            Y = point?.Y ?? Y;
+            Z = point?.Z ?? Z;
+            AngleC = angleC ?? AngleC;
+            AngleA = angleA ?? AngleA;
+        }
+
+        public ToolLocationParams? GetParams()
+        {
+            return IsDefined ? new ToolLocationParams(X, Y, Z, AngleC, AngleA) : (ToolLocationParams?)null;
         }
 
         public bool IsDefined => !double.IsNaN(X);
-
-        public IToolLocation Origin => new ToolLocationCnc { Point = Point3d.Origin };
-
-        public Matrix3d GetTransformMatrixFrom(IToolLocation location)
-        {
-            var from = (ToolLocationCnc)location;
-            var mat1 = Matrix3d.Displacement(from.Point.GetVectorTo(Point));
-            var mat2 = Matrix3d.Rotation((from.AngleC - AngleC).ToRad(), Vector3d.ZAxis, Point);
-            var mat3 = Matrix3d.Rotation((from.AngleA - AngleA).ToRad(),
-                Vector3d.XAxis.RotateBy(-AngleC.ToRad(), Vector3d.ZAxis), Point);
-
-            //var mat1 = Matrix3d.Displacement(Point.GetVectorTo(millPosition.Point));
-            //var mat2 = Matrix3d.Rotation(Graph.ToRad(AngleC - millPosition.AngleC), Vector3d.ZAxis, millPosition.Point);
-            //var mat3 = Matrix3d.Rotation(Graph.ToRad(millPosition.AngleA - AngleA), Vector3d.XAxis.RotateBy(Graph.ToRad(-millPosition.AngleC), Vector3d.ZAxis), millPosition.Point);
-
-            return mat3 * mat2 * mat1;
-        }
     }
 }

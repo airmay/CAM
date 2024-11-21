@@ -344,7 +344,7 @@ namespace CAM
                 Acad.SelectObjectIds(SelectedCommand.ObjectId.Value);
             }
 
-            ToolObject.Set(SelectedCommand.Operation?.Machine, SelectedCommand.Operation?.Tool, SelectedCommand.ToolLocation);
+            ToolObject.Set(SelectedCommand.Operation?.Machine, SelectedCommand.Operation?.Tool, SelectedCommand.ToolLocationParams);
 
             var node = _processingNode.Nodes.Cast<TreeNode>().FirstOrDefault(p => p.Tag == SelectedCommand.Operation);
             if (node != null)

@@ -116,8 +116,8 @@
     <Compile Include="Core\CableSawingProcessor.cs" />
     <Compile Include="Core\Settings\MachineSettings.cs" />
     <Compile Include="Core\Settings\MachineType.cs" />
+    <Compile Include="Core\ToolLocationParams.cs" />
     <Compile Include="Core\ToolpathBuilder.cs" />
-    <Compile Include="Core\Tool\IToolLocation.cs" />
     <Compile Include="Core\Tool\ToolObject.cs" />
     <Compile Include="Operations\CableSawing\CableSawingOperation.cs" />
     <Compile Include="Core\ProcessingBase.cs" />

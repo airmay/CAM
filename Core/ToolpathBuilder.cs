@@ -60,7 +60,7 @@ namespace CAM
             return entity.ObjectId;
         }
 
-        public void CreateGroup(string name) => _group = new Group("*", false);
+        public void CreateGroup() => _group = new Group("*", false);
 
         public ObjectId AddGroup(string name)
         {

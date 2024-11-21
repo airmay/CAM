@@ -1,7 +1,6 @@
 ﻿using System;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
-using CAM.Core;
 using Dreambuild.AutoCAD;
 
 namespace CAM.CncWorkCenter
@@ -16,8 +15,7 @@ namespace CAM.CncWorkCenter
         private double _processDuration;
         private double _operationDuration;
 
-        public ToolLocationCnc Location { get; set; } = new ToolLocationCnc();
-        private Program Program => _processing.Program;
+        public ToolLocationCnc Location { get; } = new ToolLocationCnc();
         public Tool Tool => _processing.Tool;
         public int Frequency => _processing.Frequency;
         public int CuttingFeed { get; set; }
@@ -41,7 +39,7 @@ namespace CAM.CncWorkCenter
             if (_operation != null)
                 FinishOperation();
             _operation = operation;
-            _toolpathBuilder.CreateGroup(_operation.Caption);
+            _toolpathBuilder.CreateGroup();
         }
 
         private void FinishOperation()
@@ -68,7 +66,7 @@ namespace CAM.CncWorkCenter
 
         public void Start()
         {
-            Program.Reset();
+            ProcessingBase.Program.Reset();
             _toolpathBuilder = new ToolpathBuilder();
 
             Location.Z = ZMax + ZSafety * 3;
@@ -83,7 +81,7 @@ namespace CAM.CncWorkCenter
         {
             AddCommands(_postProcessor.StopEngine());
             AddCommands(_postProcessor.StopMachine());
-            Program.CreateProgram();
+            ProcessingBase.Program.CreateProgram();
             FinishOperation();
             _processing.Caption = GetCaption(_processing.Caption, _processDuration);
         }
@@ -95,11 +93,11 @@ namespace CAM.CncWorkCenter
             if (text == null)
                 return;
 
-            Program.AddCommand(new Command
+            ProcessingBase.Program.AddCommand(new Command
             {
                 Name = name,
                 Text = text,
-                ToolLocation = Location,
+                ToolLocationParams = Location.GetParams(),
                 ObjectId = toolpath,
                 Operation = _operation,
             });
@@ -132,7 +130,7 @@ namespace CAM.CncWorkCenter
                 GCommandTo(CommandNames.InitialMove, 0, point.WithZ(UpperZ));
             if (angleC.HasValue)
                 TurnC(angleC.Value);
-            if (angleA.HasValue)
+            if (angleA.HasValue && angleA.Value != Location.AngleA)
                 TurnA(angleA.Value);
 
             if (!IsEngineStarted)
@@ -172,14 +170,14 @@ namespace CAM.CncWorkCenter
         public void GCommand(string name, int gCode, int? feed = null, Curve curve = null, Point3d? point = null,
             double? angleC = null, double? angleA = null, Point2d? arcCenter = null)
         {
-            Location = Location.With(point, angleC, angleA);
+            Location.Set(point, angleC, angleA);
             var commandText = _postProcessor.GCommand(gCode, Location, feed, arcCenter);
             ObjectId? toolpath = null;
             if (curve != null)
             {
                 if (curve.IsNewObject)
                     _operationDuration += curve.Length() / (feed ?? 10000) * 60;
-                // todo проверить что после добавления curve.IsNewObject убрали
+
                 if (curve.Length() > 1)
                     toolpath = _toolpathBuilder.AddToolpath(curve, name);
             }
