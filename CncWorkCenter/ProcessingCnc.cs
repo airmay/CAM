@@ -12,7 +12,6 @@ namespace CAM.CncWorkCenter
         public override MachineType MachineType => MachineType.CncWorkCenter;
         [NonSerialized] public ProcessorCnc Processor;
 
-        public Machine? Machine { get; set; }
         public Material? Material { get; set; }
         public Tool Tool { get; set; }
         public int Frequency { get; set; }

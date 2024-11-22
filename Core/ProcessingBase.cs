@@ -10,6 +10,7 @@ namespace CAM
     {
         IOperation[] Operations { get; set; }
         MachineType MachineType { get; }
+        Machine? Machine { get; set; }
         Program Execute();
         void HideToolpath(IOperation operation);
     }
@@ -20,6 +21,7 @@ namespace CAM
         public string Caption { get; set; }
         public IOperation[] Operations { get; set; }
         public int LastOperationNumber { get; set; }
+        public Machine? Machine { get; set; }
         public Origin Origin { get; set; } = new Origin();
         public abstract MachineType MachineType { get; }
         public static Program Program = new Program();

@@ -10,22 +10,23 @@ namespace CAM.Core
     {
         private Command[] _commands;
         private int _capacity = 1_000;
-        public int Count;
+        private int _count;
         public ArraySegment<Command> ArraySegment;
-        public Machine Machine { get; set; }
+        public IProcessing Processing { get; private set; }
         private readonly Dictionary<ObjectId, int> _objectIdDict = new Dictionary<ObjectId, int>(1_000);
         private readonly Dictionary<object, int> _operationDict = new Dictionary<object, int>();
 
         public void CreateProgram()
         {
-            ArraySegment = new ArraySegment<Command>(_commands, 0, Count);
+            ArraySegment = new ArraySegment<Command>(_commands, 0, _count);
         }
 
-        public void Reset()
+        public void Init(IProcessing processing)
         {
-            Count = 0;
+            _count = 0;
             _objectIdDict.Clear();
             _operationDict.Clear();
+            Processing = processing;
         }
 
         public void AddCommand(Command command)
@@ -33,7 +34,7 @@ namespace CAM.Core
             if (_commands == null)
                 _commands = new Command[_capacity];
 
-            if (Count == _capacity)
+            if (_count == _capacity)
                 if (_capacity < 100_000)
                 {
                     _capacity *= 10;
@@ -47,13 +48,13 @@ namespace CAM.Core
                 }
 
             if (command.ObjectId.HasValue && !_objectIdDict.ContainsKey(command.ObjectId.Value))
-                _objectIdDict[command.ObjectId.Value] = Count;
+                _objectIdDict[command.ObjectId.Value] = _count;
 
             if (command.Operation != null && !_operationDict.ContainsKey(command.Operation))
-                _operationDict[command.Operation] = Count;
+                _operationDict[command.Operation] = _count;
 
-            _commands[Count++] = command;
-            command.Number = Count;
+            _commands[_count++] = command;
+            command.Number = _count;
         }
 
         public bool TryGetCommandIndex(ObjectId objectId, out int commandIndex)
@@ -72,14 +73,14 @@ namespace CAM.Core
 
         public void Export()
         {
-            if (Count == 0)
+            if (_count == 0)
             {
                 Acad.Alert("Программа не сформирована");
                 return;
             }
 
-            var settings = Settings.Machines[Machine];
-            var fileName = Acad.SaveFileDialog("Программа", settings.ProgramFileExtension, Machine.ToString());
+            var settings = Settings.Machines[Processing.Machine.Value];
+            var fileName = Acad.SaveFileDialog("Программа", settings.ProgramFileExtension, Processing.Machine.ToString());
             if (fileName == null)
                 return;
             try

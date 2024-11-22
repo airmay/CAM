@@ -66,7 +66,7 @@ namespace CAM.CncWorkCenter
 
         public void Start()
         {
-            ProcessingBase.Program.Reset();
+            ProcessingBase.Program.Init(_processing);
             _toolpathBuilder = new ToolpathBuilder();
 
             Location.Z = ZMax + ZSafety * 3;

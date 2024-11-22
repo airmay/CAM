@@ -10,25 +10,24 @@ namespace CAM
     public static class ToolObject
     {
         private static Curve[] _model;
-        private static Machine? _machine;
         private static ITool _tool;
         private static ToolLocationParams? _location;
+        public static Machine Machine { get; set; }
 
-        public static void Set(Machine? machine, ITool tool, ToolLocationParams? location)
+        public static void Set(ITool tool, ToolLocationParams? location)
         {
-            if (machine != _machine || tool != _tool || !location.HasValue)
+            if (tool != _tool || !location.HasValue)
                 Hide();
 
             if (!location.HasValue) 
                 return;
 
             if (_model == null)
-                CreateModel(tool.GetModel(machine));
+                CreateModel(tool.GetModel(Machine));
 
             TransformModel(tool.GetTransformMatrix(_location, location.Value));
 
             _location = location;
-            _machine = machine;
             _tool = tool;
         }
 

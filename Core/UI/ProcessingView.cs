@@ -17,10 +17,10 @@ namespace CAM
 
     public partial class ProcessingView : UserControl
     {
+        private Program _program;
         private TreeNode SelectedNode => treeView.SelectedNode;
         private TreeNode SelectedProcessingNode => treeView.SelectedNode?.Parent ?? treeView.SelectedNode;
         private Command SelectedCommand => processCommandBindingSource.Current as Command;
-        private IProcessing _calculatedProcessing;
         private TreeNode _processingNode;
 
         public ProcessingView()
@@ -72,14 +72,15 @@ namespace CAM
             UpdateNodeText(processingNode);
             processingNode.Nodes.Cast<TreeNode>().ForAll(UpdateNodeText);
                
-            _calculatedProcessing = _program != null ? processing : null;
             _processingNode = _program != null ? processingNode : null;
             processCommandBindingSource.DataSource = _program?.ArraySegment;
             
             toolStrip.Enabled = true;
             RefreshToolButtonsState();
             treeView_AfterSelect(sender, null);
+
             Acad.DocumentManager.DocumentActivationEnabled = true;
+            ToolObject.Machine = processing.Machine.Value;
 
             return;
 
@@ -88,7 +89,7 @@ namespace CAM
 
         private void bVisibility_Click(object sender, EventArgs e)
         {
-            _calculatedProcessing.HideToolpath(null);
+            _program?.Processing.HideToolpath(null);
             Acad.Editor.UpdateScreen();
         }
 
@@ -322,14 +323,13 @@ namespace CAM
 
         #region Program view
 
-        private Program _program;
         public void ClearProgram()
         {
-            _program = null;
             processCommandBindingSource.DataSource = null;
             Acad.DeleteProcessObjects();
-            _calculatedProcessing?.Operations?.Select(p => p.ToolpathGroupId).Delete();
-            _calculatedProcessing?.Operations?.ForAll(p => p.ToolpathGroupId = null);
+            _program?.Processing.Operations?.Select(p => p.ToolpathGroupId).Delete();
+            _program?.Processing.Operations?.ForAll(p => p.ToolpathGroupId = null);
+            _program = null;
             ToolObject.Hide();
         }
 
@@ -344,7 +344,7 @@ namespace CAM
                 Acad.SelectObjectIds(SelectedCommand.ObjectId.Value);
             }
 
-            ToolObject.Set(SelectedCommand.Operation?.Machine, SelectedCommand.Operation?.Tool, SelectedCommand.ToolLocationParams);
+            ToolObject.Set(SelectedCommand.Operation?.Tool, SelectedCommand.ToolLocationParams);
 
             var node = _processingNode.Nodes.Cast<TreeNode>().FirstOrDefault(p => p.Tag == SelectedCommand.Operation);
             if (node != null)
