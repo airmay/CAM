@@ -55,7 +55,6 @@
             this.dataGridViewTextBoxColumn1 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.dataGridViewTextBoxColumn2 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.dataGridViewTextBoxColumn3 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.toolpathDataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.processCommandBindingSource = new System.Windows.Forms.BindingSource(this.components);
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
@@ -120,6 +119,7 @@
             this.tabControl.Location = new System.Drawing.Point(0, 0);
             this.tabControl.Name = "tabControl";
             this.tabControl.SelectedIndex = 0;
+            this.tabControl.ShowToolTips = true;
             this.tabControl.Size = new System.Drawing.Size(336, 518);
             this.tabControl.TabIndex = 0;
             // 
@@ -158,8 +158,7 @@
             this.dataGridViewCommand.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.dataGridViewTextBoxColumn1,
             this.dataGridViewTextBoxColumn2,
-            this.dataGridViewTextBoxColumn3,
-            this.toolpathDataGridViewTextBoxColumn});
+            this.dataGridViewTextBoxColumn3});
             this.dataGridViewCommand.DataSource = this.processCommandBindingSource;
             this.dataGridViewCommand.Dock = System.Windows.Forms.DockStyle.Fill;
             this.dataGridViewCommand.Location = new System.Drawing.Point(3, 3);
@@ -359,17 +358,10 @@
             // 
             // dataGridViewTextBoxColumn3
             // 
+            this.dataGridViewTextBoxColumn3.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
             this.dataGridViewTextBoxColumn3.DataPropertyName = "Text";
             this.dataGridViewTextBoxColumn3.HeaderText = "Text";
             this.dataGridViewTextBoxColumn3.Name = "dataGridViewTextBoxColumn3";
-            this.dataGridViewTextBoxColumn3.Width = 5;
-            // 
-            // toolpathDataGridViewTextBoxColumn
-            // 
-            this.toolpathDataGridViewTextBoxColumn.DataPropertyName = "ObjectId";
-            this.toolpathDataGridViewTextBoxColumn.HeaderText = "ObjectId";
-            this.toolpathDataGridViewTextBoxColumn.Name = "toolpathDataGridViewTextBoxColumn";
-            this.toolpathDataGridViewTextBoxColumn.Width = 5;
             // 
             // processCommandBindingSource
             // 
@@ -437,10 +429,6 @@
         private System.Windows.Forms.DataGridViewTextBoxColumn nameDataGridViewTextBoxColumn;
         private System.Windows.Forms.DataGridViewTextBoxColumn textDataGridViewTextBoxColumn;
         private System.Windows.Forms.ToolStripButton bCreateProcessing;
-        private System.Windows.Forms.DataGridViewTextBoxColumn dataGridViewTextBoxColumn1;
-        private System.Windows.Forms.DataGridViewTextBoxColumn dataGridViewTextBoxColumn2;
-        private System.Windows.Forms.DataGridViewTextBoxColumn dataGridViewTextBoxColumn3;
-        private System.Windows.Forms.DataGridViewTextBoxColumn toolpathDataGridViewTextBoxColumn;
         private System.Windows.Forms.DataGridViewTextBoxColumn operationDataGridViewTextBoxColumn;
         private System.Windows.Forms.DataGridViewTextBoxColumn positionDataGridViewTextBoxColumn;
         private System.Windows.Forms.DataGridViewTextBoxColumn angleCDataGridViewTextBoxColumn;
@@ -452,5 +440,8 @@
         private System.Windows.Forms.DataGridViewTextBoxColumn uDataGridViewTextBoxColumn;
         private System.Windows.Forms.DataGridViewTextBoxColumn vDataGridViewTextBoxColumn;
         private System.Windows.Forms.DataGridViewTextBoxColumn aDataGridViewTextBoxColumn;
+        private System.Windows.Forms.DataGridViewTextBoxColumn dataGridViewTextBoxColumn1;
+        private System.Windows.Forms.DataGridViewTextBoxColumn dataGridViewTextBoxColumn2;
+        private System.Windows.Forms.DataGridViewTextBoxColumn dataGridViewTextBoxColumn3;
     }
 }
