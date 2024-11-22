@@ -64,9 +64,11 @@ namespace CAM
 
         public void ResetControls() => BindingSource.ResetBindings(false);
 
-        private void AddControl(Control control)
+        private void AddControl1(Control control, string toolTipText = null)
         {
             control.Margin = new Padding(ControsMargin);
+            if (toolTipText != null)
+                toolTip.SetToolTip(control, toolTipText);
             tablePanel.Controls.Add(control);
         }
 
@@ -110,9 +112,7 @@ namespace CAM
                 AutoEllipsis = true,
                 //BorderStyle = BorderStyle.FixedSingle
             };
-            if (toolTipText != null)
-                toolTip.SetToolTip(label, toolTipText);
-            AddControl(label);
+            AddControl1(label, toolTipText);
             
             return label;
         }
@@ -130,7 +130,7 @@ namespace CAM
             };
             control.DataBindings.Add(new Binding("Text", BindingSource, paramName, true,
                 DataSourceUpdateMode.OnPropertyChanged, string.Empty));
-            AddControl(control);
+            AddControl1(control, toolTipText);
 
             return control;
         }
@@ -145,7 +145,7 @@ namespace CAM
                 // Dock = DockStyle.Fill
             };
             control.DataBindings.Add(new Binding("Checked", BindingSource, paramName, true));
-            AddControl(control);
+            AddControl1(control, toolTipText);
 
             return control;
         }
@@ -204,7 +204,7 @@ namespace CAM
                 Dock = DockStyle.Fill,
                 //Margin = new Padding(3, 3, 3, Font.Height / 2),
             };
-            AddControl(comboBox);
+            AddControl1(comboBox);
 
             return comboBox;
         }
