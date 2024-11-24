@@ -23,6 +23,7 @@ namespace CAM
         public int LastOperationNumber { get; set; }
         public Machine? Machine { get; set; }
         public Origin Origin { get; set; } = new Origin();
+        public double ZSafety { get; set; } = 20;
         public abstract MachineType MachineType { get; }
         public static Program Program = new Program();
         private IEnumerable<OperationBase> OperationsEnabled => Operations.Cast<OperationBase>().Where(p => p.Enabled);

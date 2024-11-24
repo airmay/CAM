@@ -14,34 +14,34 @@ namespace CAM.TechProcesses.CableSawing
     {
         public bool Across { get; set; }
 
-        public override int StepCount => 1;
-
         public static void ConfigureParamsView(ParamsView view)
         {
-            view.AddAcadObject("AcadObjects");
-            view.AddTextBox(nameof(CuttingFeed));
-            view.AddTextBox(nameof(S), "Угловая скорость");
-            view.AddIndent();
-            view.AddTextBox(nameof(Approach), "Заезд");
-            view.AddTextBox(nameof(Departure), "Выезд");
-            view.AddIndent();
-            view.AddTextBox(nameof(Across), "Поперек");
-            view.AddTextBox(nameof(IsRevereseDirection), "Обратное напр.");
-            view.AddTextBox(nameof(IsRevereseAngle), "Обратный угол");
-            view.AddTextBox(nameof(IsRevereseOffset), "Обратный Offset");
-            view.AddIndent();
-            view.AddTextBox(nameof(Delta));
-            view.AddTextBox(nameof(Delay), "Задержка");
+            view.AddAcadObject("AcadObjects")
+                .AddParam(nameof(CuttingFeed))
+                .AddParam(nameof(S), "Угловая скорость")
+                .AddIndent()
+                .AddParam(nameof(Approach), "Заезд")
+                .AddParam(nameof(Departure), "Выезд")
+                .AddIndent()
+                .AddParam(nameof(Across), "Поперек")
+                .AddParam(nameof(IsRevereseDirection), "Обратное напр.")
+                .AddParam(nameof(IsRevereseAngle), "Обратный угол")
+                .AddParam(nameof(IsRevereseOffset), "Обратный Offset")
+                .AddIndent()
+                .AddParam(nameof(Delta))
+                .AddParam(nameof(Delay), "Задержка")
+                .AddParam(nameof(StepCount), "Количество шагов")
+                .AddParam(nameof(DU), "dU");
         }
 
-        public LineSawingTechOperation(CableSawingTechProcess techProcess) : base(techProcess, "Распиловка по прямой")
+        public LineSawingTechOperation()
         {
+            StepCount = 100;
         }
-
 
         public override Curve[] GetRailCurves(List<Curve> curves)
         {
-            var bounds = AcadObjects.ObjectId.QOpenForRead<Entity>().Bounds.Value;
+            var bounds = AcadObjects.First().ObjectId.QOpenForRead<Entity>().Bounds.Value;
 
             var pts = curves.SelectMany(p => p.GetStartEndPoints()).ToList();
             var p0 = pts.OrderBy(p => p.DistanceTo(bounds.MaxPoint)).First();
@@ -54,15 +54,60 @@ namespace CAM.TechProcesses.CableSawing
             return new Curve[] { rail0, rail1 };
         }
 
-        public override void BuildProcessing(CableCommandGenerator generator)
+        public void BuildProcessing(CableCommandGenerator generator)
         {
             var offsetDistance = TechProcess.ToolThickness / 2 + Delta;
-            var dbObject = AcadObjects.ObjectId.QOpenForRead();
-            
-            if (AcadObjects.ObjectIds.Length == 2)
+            var dbObject = AcadObjects.First().ObjectId.QOpenForRead();
+
+            if (AcadObjects.Count == 1 && dbObject is DbSurface surface1) // ----- Стелла ---------------------------
+            {
+                //if (o is Region region1)
+                //{
+                //    var planeSurface = new PlaneSurface();
+                //    planeSurface.CreateFromRegion(region1);
+                //    surface1 = planeSurface;
+                //}
+
+                if (IsRevereseOffset)
+                    offsetDistance *= -1;
+                var offsetSurface1 = DbSurface.CreateOffsetSurface(surface1, offsetDistance);
+
+                //if (curves[0] is Region r)
+                //{
+                //    curves.Clear();
+                //    r.Explode(curves);
+                //}
+                //var plane = offsetSurface.GetPlane();
+
+                var curves1 = new DBObjectCollection();
+                offsetSurface1.Explode(curves1);
+                var railCurves = curves1.Cast<Curve>().OrderByDescending(p => Math.Abs(p.EndPoint.Z - p.StartPoint.Z)).Take(2).ToList();
+                foreach(var curve in railCurves)
+                    if (curve.StartPoint.Z < curve.EndPoint.Z ^ IsRevereseDirection)
+                        curve.ReverseCurve();
+
+                //if (Approach > 0)
+                //    points.Add(railCurves.Select(p => p.StartPoint + Vector3d.ZAxis * Approach).ToArray());
+                generator.DU = (DU / StepCount).Round(4);
+                generator.GCommand(0, railCurves[0].StartPoint, railCurves[1].StartPoint, IsRevereseAngle);
+
+                var stepCurves = railCurves.ConvertAll(p => new { Curve = p, step = (p.EndParam - p.StartParam) / StepCount });
+                for (var i = 0; i <= StepCount; i++)
+                {
+                    var points = stepCurves.ConvertAll(p => p.Curve.GetPointAtParameter(i * p.step));
+
+                    generator.GCommand(1, points[0], points[1]);
+                }
+                //if (Departure > 0)
+                //    points.Add(railCurves.Select(p => p.EndPoint - Vector3d.ZAxis * Departure).ToArray());
+
+                return;
+            }            
+
+            if (AcadObjects.Count == 2)
             {
                 var matrix = Matrix3d.Displacement(Vector3d.ZAxis * offsetDistance);
-                var railCurves = AcadObjects.ObjectIds.QOpenForRead<Curve>().Select(p => (Curve)p.GetTransformedCopy(matrix))
+                var railCurves = AcadObjects.Select(p => (Curve)p.ObjectId.QOpenForRead<Curve>().GetTransformedCopy(matrix))
                     .Select(p => new Line(p.StartPoint, p.EndPoint)).ToArray();
                 if (railCurves[0].StartPoint.GetVectorTo(railCurves[0].EndPoint).GetAngleTo(railCurves[1].StartPoint.GetVectorTo(railCurves[1].EndPoint)) > Math.PI / 2)
                     railCurves[1].ReverseCurve();

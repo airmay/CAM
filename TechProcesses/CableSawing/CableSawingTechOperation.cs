@@ -7,11 +7,7 @@ namespace CAM.TechProcesses.CableSawing
     [Serializable]
     public abstract class CableSawingTechOperation : WireSawingTechOperation<CableSawingTechProcess>
     {
-        protected CableSawingTechOperation(CableSawingTechProcess techProcess, string caption) : base(techProcess, caption)
-        {
-        }
-
-        public AcadObject AcadObjects { get; set; }
+        public List<AcadObject> AcadObjects { get; set; }
         public int CuttingFeed { get; set; }
         public int S { get; set; }
         public double Approach { get; set; }
@@ -24,6 +20,7 @@ namespace CAM.TechProcesses.CableSawing
         public bool IsRevereseAngle { get; set; }
         public bool IsRevereseOffset { get; set; }
         public virtual int StepCount { get; set; }
+        public double DU { get; set; }
 
         public abstract Curve[] GetRailCurves(List<Curve> curves);
         //public abstract void BuildProcessing(CableCommandGenerator generator);
