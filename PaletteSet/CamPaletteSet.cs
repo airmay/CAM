@@ -1,6 +1,8 @@
 ﻿using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Windows;
 using System.Drawing;
+using Autodesk.Windows.Palettes;
+using PaletteSet = Autodesk.AutoCAD.Windows.PaletteSet;
 
 namespace CAM
 {
