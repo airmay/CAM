@@ -14,17 +14,12 @@ namespace CAM
     public class OperationWireSaw : OperationWireSawBase
     {
         public List<AcadObject> AcadObjects { get; set; }
-        public int CuttingFeed { get; set; }
-        public int S { get; set; }
-        public double Approach { get; set; }
-        public double Departure { get; set; }
-        public double Delta { get; set; }
-
-        public double Delay { get; set; }
-
-        public bool IsRevereseDirection { get; set; }
-        public bool IsRevereseAngle { get; set; }
-        public bool IsRevereseOffset { get; set; }
+        public double Delay { get; set; } = 60;
+        public bool IsExtraMove { get; set; }
+        public bool IsExtraRotate { get; set; }
+        public bool IsReverseDirection { get; set; }
+        public bool IsReverseAngle { get; set; }
+        public bool IsReverseOffset { get; set; }
         public virtual int StepCount { get; set; } = 100;
         public double DU { get; set; }
 
@@ -32,29 +27,23 @@ namespace CAM
 
         public static void ConfigureParamsView(ParamsView view)
         {
-            view.AddAcadObject("AcadObjects");
-                view.AddTextBox(nameof(CuttingFeed));
-                view.AddTextBox(nameof(S), "Угловая скорость");
-                view.AddIndent();
-                view.AddTextBox(nameof(Approach), "Заезд");
-                view.AddTextBox(nameof(Departure), "Выезд");
-                view.AddIndent();
+            view.AddAcadObject();
                 view.AddTextBox(nameof(Across), "Поперек");
-                view.AddTextBox(nameof(IsRevereseDirection), "Обратное напр.");
-                view.AddTextBox(nameof(IsRevereseAngle), "Обратный угол");
-                view.AddTextBox(nameof(IsRevereseOffset), "Обратный Offset");
+                view.AddTextBox(nameof(IsReverseDirection), "Обратное напр.");
+                view.AddTextBox(nameof(IsReverseAngle), "Обратный угол");
+                view.AddTextBox(nameof(IsReverseOffset), "Обратный Offset");
                 view.AddIndent();
-                view.AddTextBox(nameof(Delta));
                 view.AddTextBox(nameof(Delay), "Задержка");
+                view.AddTextBox(nameof(IsExtraMove), "Возврат");
+                view.AddTextBox(nameof(IsExtraRotate), "Поворот");
                 view.AddTextBox(nameof(StepCount), "Количество шагов");
                 view.AddTextBox(nameof(DU), "dU");
         }
 
         public override void Execute()
         {
-            Processing.Tool = new Tool { Type = ToolType.Cable, Diameter = ToolThickness, Thickness = ToolThickness };
-            var z0 = ProcessingArea.Select(p => p.ObjectId).GetExtents().MaxPoint.Z + ZSafety;
-            generator.IsExtraMove = IsExtraMove;
+            var z0 = ProcessingArea.ObjectIds.GetExtents().MaxPoint.Z + ZSafety;
+            Processor.Tool
             generator.IsExtraRotate = IsExtraRotate;
 
             generator.S = S;
@@ -75,7 +64,7 @@ namespace CAM
                     surface1 = planeSurface;
                 }
 
-                if (IsRevereseOffset)
+                if (IsReverseOffset)
                     offsetDistance *= -1;
                 var offsetSurface1 = DbSurface.CreateOffsetSurface(surface1, offsetDistance);
 
@@ -91,13 +80,13 @@ namespace CAM
                 var railCurves = curves1.Cast<Curve>().OrderByDescending(p => Math.Abs(p.EndPoint.Z - p.StartPoint.Z))
                     .Take(2).ToList();
                 foreach (var curve in railCurves)
-                    if (curve.StartPoint.Z < curve.EndPoint.Z ^ IsRevereseDirection)
+                    if (curve.StartPoint.Z < curve.EndPoint.Z ^ IsReverseDirection)
                         curve.ReverseCurve();
 
                 //if (Approach > 0)
                 //    points.Add(railCurves.Select(p => p.StartPoint + Vector3d.ZAxis * Approach).ToArray());
                 generator.DU = (DU / StepCount).Round(4);
-                generator.GCommand(0, railCurves[0].StartPoint, railCurves[1].StartPoint, IsRevereseAngle);
+                generator.GCommand(0, railCurves[0].StartPoint, railCurves[1].StartPoint, IsReverseAngle);
 
                 var stepCurves = railCurves.ConvertAll(p => new
                     { Curve = p, step = (p.EndParam - p.StartParam) / StepCount });
