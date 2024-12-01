@@ -14,7 +14,7 @@ namespace CAM
 
         public override MachineType MachineType => MachineType.CncWorkCenter;
         public override Machine Machine => Processing.Machine.Value;
-        public override Tool Tool => Processing.Tool;
+        public override ITool Tool => Processing.Tool;
         public double ToolDiameter => Processing.Tool.Diameter;
         public double ToolThickness => Processing.Tool.Thickness.Value;
         public int CuttingFeed => Processing.CuttingFeed;

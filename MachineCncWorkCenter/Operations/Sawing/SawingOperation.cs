@@ -134,12 +134,12 @@ namespace CAM.Operations.Sawing
                     engineSide = Side.Right;
                     var R = arc.Radius;
                     var t = Thickness;
-                    var d = Tool.Diameter;
+                    var d = ToolDiameter;
                     var comp = (2*R*t*t - Math.Sqrt(-d*d*d*d * t*t + 4 * d*d * R*R * t*t + d*d * t*t*t*t)) / (d*d - 4*R*R);
                     аngleA = -Math.Atan2(comp, Thickness).ToDeg();
                 }
                 else
-                    compensation = arc.Radius - Math.Sqrt(arc.Radius * arc.Radius - Thickness * (Tool.Diameter - Thickness));
+                    compensation = arc.Radius - Math.Sqrt(arc.Radius * arc.Radius - Thickness * (ToolDiameter - Thickness));
             }
 
             var isFrontPlaneZero = Settings.Machines[Machine].IsFrontPlaneZero;
@@ -216,7 +216,7 @@ namespace CAM.Operations.Sawing
         }
 
         private const int CornerIndentIncrease = 5;
-        private double GetGashLength(double depth) => Math.Sqrt(depth * (Tool.Diameter - depth));
+        private double GetGashLength(double depth) => Math.Sqrt(depth * (ToolDiameter - depth));
 
         private void AddGash(Curve curve, bool isExactlyBegin, bool isExactlyEnd, Side side, double gashLength, double indent)
         {
@@ -255,7 +255,7 @@ namespace CAM.Operations.Sawing
                 if (isExactlyBegin && isExactlyEnd)
                 {
                     var l = vector.Length - 2 * CornerIndentIncrease;
-                    var d = (Tool.Diameter - Math.Sqrt(Tool.Diameter * Tool.Diameter - l * l)) / 2;
+                    var d = (ToolDiameter - Math.Sqrt(ToolDiameter * ToolDiameter - l * l)) / 2;
                     return (curve.StartPoint + vector / 2, d);
                 }
 

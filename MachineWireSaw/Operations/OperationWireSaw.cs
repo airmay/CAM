@@ -1,12 +1,9 @@
 ﻿using Autodesk.AutoCAD.DatabaseServices;
-using CAM.Core;
-using CAM.TechProcesses.CableSawing;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection.Emit;
-using Autodesk.AutoCAD.Geometry;
 using Dreambuild.AutoCAD;
+using DbSurface = Autodesk.AutoCAD.DatabaseServices.Surface;
 
 namespace CAM
 {
@@ -42,31 +39,24 @@ namespace CAM
 
         public override void Execute()
         {
-            var z0 = ProcessingArea.ObjectIds.GetExtents().MaxPoint.Z + ZSafety;
-            Processor.Tool
-            generator.IsExtraRotate = IsExtraRotate;
+            var z0 = ProcessingArea.ObjectIds.GetExtents().MaxPoint.Z + Processing.ZSafety;
+            Processor.SetToolPosition(0, 0, z0);
+            var offsetDistance = Processing.ToolThickness / 2 + Processing.Delta;
 
-            generator.S = S;
-            generator.Feed = CuttingFeed;
-            var z00 = ProcessingArea.Select(p => p.ObjectId).GetExtents().MaxPoint.Z + ZSafety;
-            generator.SetToolPosition(new Point3d(OriginX, OriginY, 0), 0, 0, z00);
-            generator.Command($"G92");
-
-            var offsetDistance = Processing.ToolThickness / 2 + Delta;
-            var dbObject = AcadObjects.First().ObjectId.QOpenForRead();
-
-            if (AcadObjects.Count == 1 && dbObject is DbSurface surface1) // ----- Стелла ---------------------------
+            if (ProcessingArea.ObjectIds.Length == 1)
             {
-                if (o is Region region1)
+                var dBObject = ProcessingArea.ObjectId.QOpenForRead();
+                var surface = dBObject as DbSurface;
+                if (dBObject is Region region)
                 {
                     var planeSurface = new PlaneSurface();
-                    planeSurface.CreateFromRegion(region1);
-                    surface1 = planeSurface;
+                    planeSurface.CreateFromRegion(region);
+                    surface = planeSurface;
                 }
 
                 if (IsReverseOffset)
                     offsetDistance *= -1;
-                var offsetSurface1 = DbSurface.CreateOffsetSurface(surface1, offsetDistance);
+                var offsetSurface = DbSurface.CreateOffsetSurface(surface, offsetDistance);
 
                 //if (curves[0] is Region r)
                 //{
@@ -75,18 +65,19 @@ namespace CAM
                 //}
                 //var plane = offsetSurface.GetPlane();
 
-                var curves1 = new DBObjectCollection();
-                offsetSurface1.Explode(curves1);
-                var railCurves = curves1.Cast<Curve>().OrderByDescending(p => Math.Abs(p.EndPoint.Z - p.StartPoint.Z))
-                    .Take(2).ToList();
+                var curves = new DBObjectCollection();
+                offsetSurface.Explode(curves);
+                var railCurves = curves.Cast<Curve>()
+                    .OrderByDescending(p => Math.Abs(p.EndPoint.Z - p.StartPoint.Z))
+                    .Take(2)
+                    .ToList();
                 foreach (var curve in railCurves)
                     if (curve.StartPoint.Z < curve.EndPoint.Z ^ IsReverseDirection)
                         curve.ReverseCurve();
 
                 //if (Approach > 0)
                 //    points.Add(railCurves.Select(p => p.StartPoint + Vector3d.ZAxis * Approach).ToArray());
-                generator.DU = (DU / StepCount).Round(4);
-                generator.GCommand(0, railCurves[0].StartPoint, railCurves[1].StartPoint, IsReverseAngle);
+                Processor.GCommand(0, railCurves[0].StartPoint, railCurves[1].StartPoint, IsReverseAngle);
 
                 var stepCurves = railCurves.ConvertAll(p => new
                     { Curve = p, step = (p.EndParam - p.StartParam) / StepCount });
@@ -94,7 +85,7 @@ namespace CAM
                 {
                     var points = stepCurves.ConvertAll(p => p.Curve.GetPointAtParameter(i * p.step));
 
-                    generator.GCommand(1, points[0], points[1]);
+                    Processor.GCommand(1, points[0], points[1]);
                 }
             }
         }

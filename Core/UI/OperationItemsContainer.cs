@@ -3,7 +3,6 @@ using CAM.Operations.Tactile;
 using System;
 using System.Linq;
 using System.Windows.Forms;
-using CAM.Operations.CableSawing;
 
 namespace CAM
 {
@@ -19,7 +18,7 @@ namespace CAM
             }),
             new OperationGroupItem("Трос", new[]
             {
-                new OperationItem("Стелла", typeof(CableSawingOperation)),
+                new OperationItem("Стелла", typeof(OperationWireSaw)),
             }),
 
         };

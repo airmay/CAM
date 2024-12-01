@@ -1,4 +1,6 @@
-﻿namespace CAM.Core
+﻿using Autodesk.AutoCAD.Geometry;
+
+namespace CAM.Core
 {
     public struct ToolLocationParams
     {

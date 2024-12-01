@@ -8,10 +8,7 @@ namespace CAM
         {
             return new[]
             {
-                "%300",
-                "RTCP=1",
-                "G600 X0 Y-2500 Z-370 U3800 V0 W0 N0",
-                "G601",
+                "G92"
             };
         }
 
@@ -26,28 +23,16 @@ namespace CAM
             };
         }
 
-        public override string[] SetTool()
-        {
-            return new[]
-            {
-                "G0 G53 Z0",
-                $"G0 G53 C{angleC} A{angleA}",
-                "G64",
-                $"G154O{originCellNumber}",
-                $"T{toolNo}",
-                "M6",
-                "G172 T1 H1 D1",
-                "M300",
-            };
-        }
-
         public override string[] StartEngine(int frequency, bool hasTool)
         {
+            throw new System.NotImplementedException();
+        }
+
+        public new string[] StartEngine()
+        {
             return new[]
             {
-                hasTool ? "M7" : "M8", // todo
-                $"S{frequency}",
-                "M3",
+                "M03"
             };
         }
 

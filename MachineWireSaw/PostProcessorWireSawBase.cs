@@ -29,8 +29,5 @@ namespace CAM.CncWorkCenter
                 ['J'] = arcCenter.HasValue ? (arcCenter.Value.Y - Origin.Y).ToStringParam() : null,
             };
         }
-
-        public string[] SetTool();
-
     }
 }

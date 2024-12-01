@@ -9,7 +9,7 @@ namespace CAM
     /// <summary>
     /// Генератор команд для тросикового станка
     /// </summary>
-    [MachineType(MachineType.CableSawing)]
+    //[MachineType(MachineType.CableSawing)]
     public class CableCommandGenerator : CommandGeneratorBase
     {
         const double Epsilon = 0.000001;
@@ -71,7 +71,7 @@ namespace CAM
         {
         }
 
-        protected override void SetToolCommands(int toolNo, double angleA)
+        protected void SetToolCommands(int toolNo, double angleA)
         {
         }
 

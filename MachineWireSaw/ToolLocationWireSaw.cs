@@ -5,6 +5,7 @@ namespace CAM.CncWorkCenter
 {
     public class ToolLocationWireSaw
     {
+        public Point2d OriginPoint { get; set; }
         public double U { get; set; }
         public double V { get; set; }
         public double Angle { get; set; }
@@ -17,15 +18,13 @@ namespace CAM.CncWorkCenter
             Angle = locationParams?.Param3 ?? 0;
         }
 
-        public Point3d Point => new Point3d(X, Y, Z);
+        //public Point3d Point => new Point3d(X, Y, Z);
 
-        //public void Set(Point3d? point, double? angleC, double? angleA)
+        //public void Set(double u, double v, double angle)
         //{
-        //    X = point?.X ?? X;
-        //    Y = point?.Y ?? Y;
-        //    Z = point?.Z ?? Z;
-        //    AngleC = angleC ?? AngleC;
-        //    AngleA = angleA ?? AngleA;
+        //    var point = new Point3d(Center.X - U, Center.Y, V);
+        //    var angle = _angle.ToRad(); // Vector2d.YAxis.MinusPiToPiAngleTo(Vector);
+        //    return new CableToolPosition(point, Center.ToPoint3d(), angle);
         //}
 
         public ToolLocationParams? GetParams()

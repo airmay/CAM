@@ -1,4 +1,5 @@
 ﻿using Autodesk.AutoCAD.DatabaseServices;
+/*
 using Autodesk.AutoCAD.Geometry;
 using Dreambuild.AutoCAD;
 using System;
@@ -14,19 +15,19 @@ namespace CAM.TechProcesses.CableSawing
     {
         public static void ConfigureParamsView(ParamsView view)
         {
-            view.AddAcadObject("AcadObjects")
-                .AddParam(nameof(CuttingFeed))
-                .AddParam(nameof(S), "Угловая скорость")
-                .AddIndent()
-                .AddParam(nameof(Approach), "Заезд")
-                .AddParam(nameof(Departure), "Выезд")
-                .AddIndent()
-                .AddParam(nameof(IsRevereseDirection), "Обратное напр.")
-                .AddParam(nameof(IsRevereseOffset), "Обратный Offset")
-                .AddIndent()
-                .AddParam(nameof(Delta))
-                .AddParam(nameof(Delay), "Задержка")
-                .AddParam(nameof(StepCount), "Количество шагов");
+            //view.AddAcadObject("AcadObjects")
+            //    //.AddParam(nameof(CuttingFeed))
+            //    .AddParam(nameof(S), "Угловая скорость")
+            //    .AddIndent()
+            //    .AddParam(nameof(Approach), "Заезд")
+            //    .AddParam(nameof(Departure), "Выезд")
+            //    .AddIndent()
+            //    .AddParam(nameof(IsRevereseDirection), "Обратное напр.")
+            //    .AddParam(nameof(IsRevereseOffset), "Обратный Offset")
+            //    .AddIndent()
+            //    .AddParam(nameof(Delta))
+            //    .AddParam(nameof(Delay), "Задержка")
+            //    .AddParam(nameof(StepCount), "Количество шагов");
         }
 
         public ArcSawingTechOperation()
@@ -92,7 +93,7 @@ namespace CAM.TechProcesses.CableSawing
             return objectId.QOpenForRead<Polyline3d>();
         }
 
-        public void BuildProcessing(CableCommandGenerator generator)
+        public override void BuildProcessing(CableCommandGenerator generator)
         {
             //var dbObject = ProcessingArea.ObjectId.QOpenForRead();
             var surface = AcadObjects.First().ObjectId.QOpenForRead<DbSurface>();
@@ -312,5 +313,7 @@ namespace CAM.TechProcesses.CableSawing
         //    }
         //    generator.Command($"M05", "Выключение");
         //}
+
     }
 }
+*/

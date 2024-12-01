@@ -1,4 +1,5 @@
-﻿using Autodesk.AutoCAD.DatabaseServices;
+﻿/*
+using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
 using Dreambuild.AutoCAD;
 using System;
@@ -26,50 +27,50 @@ namespace CAM.TechProcesses.CableSawing
 
         public CableSawingTechProcess()
         {
-            MachineType = CAM.MachineType.CableSawing;
+            //MachineType = CAM.MachineType.CableSawing;
         }
 
         public static void ConfigureParamsView(ParamsView view)
         {
-            view.AddAcadObject(nameof(ProcessingArea), "Объекты", "Выберите обрабатываемые области")
-                .AddOrigin()
-                .AddIndent()
-                .AddParam(nameof(CuttingFeed))
-                .AddParam(nameof(S), "Угловая скорость")
-                .AddParam(nameof(ZSafety))
-                .AddText("Z безопасности отсчитывается от верха выбранных объектов техпроцесса")
-                .AddIndent()
-                .AddParam(nameof(Approach), "Заезд")
-                .AddParam(nameof(Departure), "Выезд")
-                .AddIndent()
-                .AddParam(nameof(ToolThickness), "Толщина троса")
-                .AddParam(nameof(Delta))
-                .AddParam(nameof(Delay), "Задержка")
-                .AddParam(nameof(IsExtraMove), "Возврат")
-                .AddParam(nameof(IsExtraRotate), "Поворот");
+            //view.AddAcadObject(nameof(ProcessingArea), "Объекты", "Выберите обрабатываемые области")
+            //    .AddOrigin()
+            //    .AddIndent()
+            //    .AddParam(nameof(CuttingFeed))
+            //    .AddParam(nameof(S), "Угловая скорость")
+            //    .AddParam(nameof(ZSafety))
+            //    .AddText("Z безопасности отсчитывается от верха выбранных объектов техпроцесса")
+            //    .AddIndent()
+            //    .AddParam(nameof(Approach), "Заезд")
+            //    .AddParam(nameof(Departure), "Выезд")
+            //    .AddIndent()
+            //    .AddParam(nameof(ToolThickness), "Толщина троса")
+            //    .AddParam(nameof(Delta))
+            //    .AddParam(nameof(Delay), "Задержка")
+            //    .AddParam(nameof(IsExtraMove), "Возврат")
+            //    .AddParam(nameof(IsExtraRotate), "Поворот");
         }
 
-        public override List<TechOperation> CreateTechOperations()
-        {
-            return ProcessingArea.ConvertAll(p =>
-            {
-                var dbObject = p.ObjectId.QOpenForRead();
-                var operation = dbObject is Region || dbObject is PlaneSurface
-                    ? (TechOperation)new LineSawingTechOperation()
-                    : new ArcSawingTechOperation();
-                operation.ProcessingArea = p;
-                var caption = ((MenuItemAttribute)Attribute.GetCustomAttribute(operation.GetType(), typeof(MenuItemAttribute))).Name;
-                operation.Setup(this, caption);
-                return operation;
-            });
-        }
+        //public override List<TechOperation> CreateTechOperations()
+        //{
+        //    return ProcessingArea.ConvertAll(p =>
+        //    {
+        //        var dbObject = p.ObjectId.QOpenForRead();
+        //        var operation = dbObject is Region || dbObject is PlaneSurface
+        //            ? (TechOperation)new LineSawingTechOperation()
+        //            : new ArcSawingTechOperation();
+        //        operation.ProcessingArea = p;
+        //        var caption = ((MenuItemAttribute)Attribute.GetCustomAttribute(operation.GetType(), typeof(MenuItemAttribute))).Name;
+        //        operation.Setup(this, caption);
+        //        return operation;
+        //    });
+        //}
 
         protected override void BuildProcessing(CableCommandGenerator generator)
         {
             Tool = new Tool { Type = ToolType.Cable, Diameter = ToolThickness, Thickness = ToolThickness };
-            var z0 = ProcessingArea.Select(p => p.ObjectId).GetExtents().MaxPoint.Z + ZSafety;
-            generator.IsExtraMove = IsExtraMove;
-            generator.IsExtraRotate = IsExtraRotate;
+            //var z0 = ProcessingArea.Select(p => p.ObjectId).GetExtents().MaxPoint.Z + ZSafety;
+            //generator.IsExtraMove = IsExtraMove;
+            //generator.IsExtraRotate = IsExtraRotate;
 
             //if (OriginObject == null)
             //{
@@ -331,3 +332,4 @@ namespace CAM.TechProcesses.CableSawing
         }   
     }
 }
+*/
