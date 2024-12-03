@@ -1,6 +1,5 @@
 ﻿using Autodesk.AutoCAD.DatabaseServices;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using Dreambuild.AutoCAD;
 using DbSurface = Autodesk.AutoCAD.DatabaseServices.Surface;
@@ -8,9 +7,8 @@ using DbSurface = Autodesk.AutoCAD.DatabaseServices.Surface;
 namespace CAM
 {
     [Serializable]
-    public class OperationWireSaw : OperationWireSawBase
+    public class VerticalWireSawOperation : OperationWireSawBase
     {
-        public List<AcadObject> AcadObjects { get; set; }
         public double Delay { get; set; } = 60;
         public bool IsExtraMove { get; set; }
         public bool IsExtraRotate { get; set; }
@@ -25,14 +23,14 @@ namespace CAM
         public static void ConfigureParamsView(ParamsView view)
         {
             view.AddAcadObject();
-                view.AddTextBox(nameof(Across), "Поперек");
-                view.AddTextBox(nameof(IsReverseDirection), "Обратное напр.");
-                view.AddTextBox(nameof(IsReverseAngle), "Обратный угол");
-                view.AddTextBox(nameof(IsReverseOffset), "Обратный Offset");
+                view.AddCheckBox(nameof(Across), "Поперек");
+                view.AddCheckBox(nameof(IsReverseDirection), "Обратное напр.");
+                view.AddCheckBox(nameof(IsReverseAngle), "Обратный угол");
+                view.AddCheckBox(nameof(IsReverseOffset), "Обратный Offset");
                 view.AddIndent();
                 view.AddTextBox(nameof(Delay), "Задержка");
-                view.AddTextBox(nameof(IsExtraMove), "Возврат");
-                view.AddTextBox(nameof(IsExtraRotate), "Поворот");
+                view.AddCheckBox(nameof(IsExtraMove), "Возврат");
+                view.AddCheckBox(nameof(IsExtraRotate), "Поворот");
                 view.AddTextBox(nameof(StepCount), "Количество шагов");
                 view.AddTextBox(nameof(DU), "dU");
         }

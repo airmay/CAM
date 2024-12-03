@@ -12,7 +12,7 @@ namespace CAM
                 case MachineType.CncWorkCenter:
                     return new ProcessingCnc();
                 case MachineType.WireSawMachine:
-                    return new ProcessingCnc();
+                    return new ProcessingWireSaw();
                 default:
                     throw new ArgumentOutOfRangeException(nameof(machineType), machineType, null);
             }

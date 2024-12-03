@@ -59,7 +59,6 @@ namespace CAM.CncWorkCenter
             ProcessingBase.Program.Init(_processing);
 
             //Location.Z = ZMax + ZSafety * 3;
-
             AddCommands(_postProcessor.StartMachine());
         }
 
@@ -137,7 +136,8 @@ namespace CAM.CncWorkCenter
         private ToolLocationParams GetToolPosition()
         {
             var point = new Point3d(Center.X - U, Center.Y, V);
-            var angle = _angle.ToRad(); // Vector2d.YAxis.MinusPiToPiAngleTo(Vector);
+            point = point.RotateBy(_angle.ToRad(), Vector3d.ZAxis, Center.ToPoint3d());
+            var angle = _angle; // Vector2d.YAxis.MinusPiToPiAngleTo(Vector);
             return new ToolLocationParams(point.X, point.Y, point.Z, angle, 0);
         }
 
@@ -238,11 +238,11 @@ namespace CAM.CncWorkCenter
 
         public void GCommandA(double angle)
         {
-            if (Math.Abs(angle - Location.Angle) < 0.01)
+            if (Math.Abs(angle - _angle) < 0.01)
                 return;
 
-            var da = (angle - Location.Angle).Round(4);
-            Location.Angle += da;
+            var da = (angle - _angle).Round(4);
+            _angle += da;
 
             var text = $"G05 A{da} S{_processing.S}";
             var duration = Math.Abs(da) / _processing.S * 60;

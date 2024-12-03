@@ -16,10 +16,10 @@ namespace CAM
 
         public static void Set(ITool tool, ToolLocationParams? location)
         {
-            if (tool != _tool || !location.HasValue)
+            if (tool == null || !location.HasValue || tool != _tool)
                 Hide();
 
-            if (!location.HasValue) 
+            if (tool == null || !location.HasValue) 
                 return;
 
             if (_model == null)

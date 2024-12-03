@@ -20,6 +20,7 @@ namespace CAM.Core
         {
             X = Y = 0;
             Acad.DeleteObjects(OriginObject?.ObjectIds);
+            OriginObject = null;
             Interaction.SetActiveDocFocus();
             var point = Interaction.GetPoint("\nВыберите точку начала координат");
             if (point.IsNull()) 

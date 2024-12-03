@@ -26,66 +26,6 @@ namespace CAM
         public double ZSafety { get; set; } = 20;
         public abstract MachineType MachineType { get; }
         public static Program Program = new Program();
-        private IEnumerable<OperationBase> OperationsEnabled => Operations.Cast<OperationBase>().Where(p => p.Enabled);
-
-        //public void Init()
-
-
-        //{
-
-
-        //    if (Origin != Point2d.Origin)
-
-
-        //        OriginGroup = Acad.CreateOriginObject(Origin);
-
-
-        //    foreach (var operation in Operations)
-
-
-        //    {
-
-
-        //        AcadObject.LoadAcadProps(operation);
-
-
-        //        operation.Init();
-
-
-        //    }
-
-
-        //}
-
-
-        //public void Teardown()
-
-
-        //{
-
-
-        //    foreach (var operation in Operations)
-
-
-        //        operation.Teardown();
-
-
-        //}
-
-
-        //public void RemoveAcadObjects()
-
-
-        //{
-
-
-        //    foreach (var operation in Operations)
-
-
-        //        operation.RemoveAcadObjects();
-
-
-        //}
 
         protected abstract IProcessor CreateProcessor();
 
@@ -93,7 +33,8 @@ namespace CAM
 
         public Program Execute()
         {
-            if (!Validate() || OperationsEnabled.Any(p => !p.Validate()))
+            var operations = Operations.Cast<OperationBase>().Where(p => p.Enabled).ToArray();
+            if (!Validate() || operations.Length == 0 || operations.Any(p => !p.Validate()))
                 return null;
 
             Acad.Editor.UpdateScreen();
@@ -102,7 +43,7 @@ namespace CAM
             try
             {
                 var stopwatch = Stopwatch.StartNew();
-                ProcessOperations();
+                ProcessOperations(operations);
                 stopwatch.Stop();
                 Acad.Write($"Расчет обработки завершен {stopwatch.Elapsed}");
 
@@ -126,12 +67,12 @@ namespace CAM
             return null;
         }
 
-        protected virtual void ProcessOperations()
+        protected virtual void ProcessOperations(OperationBase[] operations)
         {
             using (var processor = CreateProcessor())
             {
                 processor.Start();
-                foreach (var operation in OperationsEnabled)
+                foreach (var operation in operations)
                 {
                     Acad.Write($"расчет операции {operation.Caption}");
                     processor.SetOperation(operation);
@@ -145,12 +86,8 @@ namespace CAM
 
         public void OnSelect()
         {
-            if (Operations == null)
-                return;
-
-            OperationsEnabled.ForAll(p => p.ToolpathGroupId?.SetGroupVisibility(true));
-            var objectIds = OperationsEnabled.Where(p => p.ProcessingArea != null).SelectMany(p => p.ProcessingArea.ObjectIds).ToArray();
-            Acad.SelectObjectIds(objectIds);
+            Operations?.ForAll(p => p.ToolpathGroupId?.SetGroupVisibility(true));
+            Acad.SelectObjectIds();
         }
 
         public void HideToolpath(IOperation operationToShow) => Operations?.ForAll(p => p.ToolpathGroupId?.SetGroupVisibility(p == operationToShow));

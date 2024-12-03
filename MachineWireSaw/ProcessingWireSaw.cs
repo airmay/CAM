@@ -44,7 +44,8 @@ namespace CAM.CncWorkCenter
 
         protected override IProcessor CreateProcessor()
         {
-            return new ProcessorWireSaw(this, new PostProcessorWireSaw());
+            Processor = new ProcessorWireSaw(this, new PostProcessorWireSaw());
+            return Processor;
         }
 
         protected override bool Validate()

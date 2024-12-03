@@ -1,4 +1,6 @@
-﻿using System;
+﻿// test /b "C:\Catalina\CAM\bin\Debug\netload.scr"
+
+using System;
 using Autodesk.AutoCAD.ApplicationServices;
 using Autodesk.AutoCAD.Runtime;
 using System.IO;
