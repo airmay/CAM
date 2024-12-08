@@ -1,4 +1,5 @@
 ﻿using System;
+using CAM.MachineWireSaw;
 
 namespace CAM.CncWorkCenter
 {

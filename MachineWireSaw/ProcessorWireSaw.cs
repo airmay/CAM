@@ -1,11 +1,10 @@
 ﻿using System;
-using System.Globalization;
-using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
+using CAM.CncWorkCenter;
 using CAM.Core;
 using Dreambuild.AutoCAD;
 
-namespace CAM.CncWorkCenter
+namespace CAM.MachineWireSaw
 {
     public class ProcessorWireSaw : IProcessor
     {
@@ -16,17 +15,10 @@ namespace CAM.CncWorkCenter
         private double _processDuration;
         private double _operationDuration;
 
-        public ToolLocationWireSaw Location { get; } = new ToolLocationWireSaw();
-        public int CuttingFeed { get; set; }
-        public double ZSafety => _processing.ZSafety;
-        public double ZMax { get; set; } = 0;
-        public double UpperZ => ZMax + ZSafety;
-
         public ProcessorWireSaw(ProcessingWireSaw processing, PostProcessorWireSaw postProcessor)
         {
             _processing = processing;
             _postProcessor = postProcessor;
-            CuttingFeed = _processing.CuttingFeed;
         }
 
         public void SetOperation(IOperation operation)
@@ -57,9 +49,6 @@ namespace CAM.CncWorkCenter
         public void Start()
         {
             ProcessingBase.Program.Init(_processing);
-
-            //Location.Z = ZMax + ZSafety * 3;
-            AddCommands(_postProcessor.StartMachine());
         }
 
         public void Finish()
@@ -76,12 +65,15 @@ namespace CAM.CncWorkCenter
             if (text == null)
                 return;
 
+            var x = Center.X - U * Math.Cos(Angle.ToRad());
+            var y = Center.Y - U * Math.Sin(Angle.ToRad());
+            var toolLocationParams = new ToolLocationParams(x, y, V, Angle, 0);
+
             ProcessingBase.Program.AddCommand(new Command
             {
                 Name = name,
                 Text = text,
-                // ToolLocationParams = Location.GetParams(),
-                ToolLocationParams = GetToolPosition(),
+                ToolLocationParams = toolLocationParams,
                 Operation = _operation,
             });
         }
@@ -91,70 +83,39 @@ namespace CAM.CncWorkCenter
             Array.ForEach(commands, p => AddCommand(p));
         }
 
-        #region GCommands
-        // public void GCommandTo(string name, int gCode, Point3d point, int? feed = null)
-        // {
-        //     Line line = null;
-        //     if (Location.IsDefined)
-        //     {
-        //         if (point.IsEqualTo(Location.Point))
-        //             return;
-        //         line = NoDraw.Line(Location.Point, point);
-        //     }
-        //
-        //     GCommand( name, gCode, feed, line, point);
-        // }
-        //
-        // public void GCommand(string name, int gCode, int? feed = null, Curve curve = null, Point3d? point = null,
-        //     double? angleC = null, double? angleA = null, Point2d? arcCenter = null)
-        // {
-        //     //Location.Set(point, angleC, angleA);
-        //     //var commandText = _postProcessor.GCommand(gCode, Location, feed, arcCenter);
-        //     //AddCommand(commandText, name);
-        // }
-
-        #endregion
-
+        public double Angle;
         public double U { get; set; }
         public double DU { get; set; }
         public double V { get; set; }
         public int Feed => _processing.CuttingFeed;
-        public int S => _processing.S;
 
-        private bool _isSetPosition;
-        public bool _isEngineStarted = false;
-
-        public void SetToolPosition(double angle, double u, double v)
+        public void StartOperation(double angle, double u, double v)
         {
-            Center = _processing.Origin.Point;
-            _angle = angle;
-            U = u.Round(6);
-            V = v.Round(6);
-            _isSetPosition = true;
+            if (IsEngineStarted)
+                return;
+
+            IsEngineStarted = true;
+            Angle = angle;
+            U = u;
+            V = v;
+
+            AddCommands(_postProcessor.StartMachine());
         }
 
-        private ToolLocationParams GetToolPosition()
-        {
-            var point = new Point3d(Center.X - U, Center.Y, V);
-            point = point.RotateBy(_angle.ToRad(), Vector3d.ZAxis, Center.ToPoint3d());
-            var angle = _angle; // Vector2d.YAxis.MinusPiToPiAngleTo(Vector);
-            return new ToolLocationParams(point.X, point.Y, point.Z, angle, 0);
-        }
-
-        public Point2d Center { get; set; }
+        public Point2d Center => _processing.Origin.Point;
         public bool IsExtraMove { get; set; }
         public bool IsExtraRotate { get; set; }
         private Vector2d _normal;
-        private double _angle = 0;
         private double _signU;
+
         public void Pause(double duration)
         {
             AddCommand("(DLY,{duration})", "Пауза");
         }
 
-        public void GCommand(int gCode, Line3d line3d, bool isRevereseAngle = false)
+        public void GCommand(int gCode, Line3d line3d, bool isReverseAngle = false)
         {
-            GCommand(gCode, new Line2d(line3d.PointOnLine.To2d(), line3d.Direction.ToVector2d()), line3d.PointOnLine.Z, isRevereseAngle);
+            GCommand(gCode, new Line2d(line3d.PointOnLine.To2d(), line3d.Direction.ToVector2d()), line3d.PointOnLine.Z, isReverseAngle);
         }
 
         public void GCommand(int gCode, Point3d point1, Point3d point2, bool isRevereseAngle = false)
@@ -162,22 +123,22 @@ namespace CAM.CncWorkCenter
             GCommand(gCode, new Line2d(point1.To2d(), point2.To2d()), (point1.Z + point2.Z) / 2, isRevereseAngle);
         }
 
-        public void GCommand(int gCode, Line2d line2d, double z, bool isRevereseAngle)
+        public void GCommand(int gCode, Line2d line2d, double z, bool isReverseAngle)
         {
             var angle = Vector2d.YAxis.MinusPiToPiAngleTo(line2d.Direction).ToDeg(4);
-            var da = Math.Sign(_angle - angle) * 180;
-            while (Math.Abs(angle - _angle) > 90)
+            var da = Math.Sign(Angle - angle) * 180;
+            while (Math.Abs(angle - Angle) > 90)
                 angle += da;
             angle = angle.Round(4);
 
-            if (isRevereseAngle)
+            if (isReverseAngle)
                 angle += -Math.Sign(angle) * 180;
 
             var normal = !line2d.IsOn(Center) ? line2d.GetClosestPointTo(Center).Point - Center : new Vector2d();
             if (!_normal.IsZeroLength() && !normal.IsZeroLength())
             {
-                if (Math.Abs(angle - _angle) == 90)
-                    angle = _angle + normal.MinusPiToPiAngleTo(_normal) > 0 ? 90 : -90;
+                if (Math.Abs(angle - Angle) == 90)
+                    angle = Angle + normal.MinusPiToPiAngleTo(_normal) > 0 ? 90 : -90;
                 else
                     if (normal.GetAngleTo(_normal) > Math.PI / 2)
                     _signU *= -1;
@@ -188,8 +149,8 @@ namespace CAM.CncWorkCenter
             if (_signU == 0)
                 _signU = -1;
 
-            if (gCode == 0 && Math.Abs(angle - _angle) > 0.01 && IsExtraRotate)
-                GCommandA(angle + Math.Sign(angle - _angle));
+            if (gCode == 0 && Math.Abs(angle - Angle) > 0.01 && IsExtraRotate)
+                GCommandA(angle + Math.Sign(angle - Angle));
 
             GCommandA(angle);
 
@@ -209,7 +170,7 @@ namespace CAM.CncWorkCenter
             }
             _normal = normal;
 
-            if (!_isEngineStarted)
+            if (!IsEngineStarted)
             {
                 AddCommands(_postProcessor.StartEngine());
                 IsEngineStarted = true;
@@ -238,11 +199,11 @@ namespace CAM.CncWorkCenter
 
         public void GCommandA(double angle)
         {
-            if (Math.Abs(angle - _angle) < 0.01)
+            if (Math.Abs(angle - Angle) < 0.01)
                 return;
 
-            var da = (angle - _angle).Round(4);
-            _angle += da;
+            var da = (angle - Angle).Round(4);
+            Angle += da;
 
             var text = $"G05 A{da} S{_processing.S}";
             var duration = Math.Abs(da) / _processing.S * 60;

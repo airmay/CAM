@@ -17,7 +17,6 @@ namespace CAM
         public bool IsReverseOffset { get; set; }
         public virtual int StepCount { get; set; } = 100;
         public double DU { get; set; }
-
         public bool Across { get; set; }
 
         public static void ConfigureParamsView(ParamsView view)
@@ -38,7 +37,7 @@ namespace CAM
         public override void Execute()
         {
             var z0 = ProcessingArea.ObjectIds.GetExtents().MaxPoint.Z + Processing.ZSafety;
-            Processor.SetToolPosition(0, 0, z0);
+            Processor.StartOperation(0, 0, z0);
             var offsetDistance = Processing.ToolThickness / 2 + Processing.Delta;
 
             if (ProcessingArea.ObjectIds.Length == 1)
