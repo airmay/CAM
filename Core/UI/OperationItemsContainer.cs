@@ -18,7 +18,7 @@ namespace CAM
             }),
             new OperationGroupItem("Трос", new[]
             {
-                new OperationItem("Вертикально", typeof(VerticalWireSawOperation)),
+                new OperationItem("Вертикально", typeof(WireSawOperation)),
             }),
 
         };

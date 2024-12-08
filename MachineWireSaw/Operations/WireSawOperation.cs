@@ -7,7 +7,7 @@ using DbSurface = Autodesk.AutoCAD.DatabaseServices.Surface;
 namespace CAM
 {
     [Serializable]
-    public class VerticalWireSawOperation : OperationWireSawBase
+    public class WireSawOperation : OperationWireSawBase
     {
         public double Delay { get; set; } = 60;
         public bool IsExtraMove { get; set; }

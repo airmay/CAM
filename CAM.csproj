@@ -165,7 +165,7 @@
     <Compile Include="Core\UI\TechOperationNode.cs" />
     <Compile Include="Core\UI\TechProcessNode.cs" />
     <Compile Include="MachineWireSaw\PostProcessorWireSaw.cs" />
-    <Compile Include="MachineWireSaw\Operations\VerticalWireSawOperation.cs" />
+    <Compile Include="MachineWireSaw\Operations\WireSawOperation.cs" />
     <Compile Include="MachineWireSaw\OperationWireSawBase.cs" />
     <Compile Include="MachineWireSaw\PostProcessorWireSawBase.cs" />
     <Compile Include="MachineWireSaw\ProcessingWireSaw.cs" />
