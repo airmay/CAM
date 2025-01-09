@@ -1,8 +1,11 @@
 ﻿using System;
+using System.Diagnostics;
+using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
 using CAM.CncWorkCenter;
 using CAM.Core;
 using Dreambuild.AutoCAD;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.Window;
 
 namespace CAM.MachineWireSaw
 {
@@ -107,6 +110,7 @@ namespace CAM.MachineWireSaw
         public bool IsExtraRotate { get; set; }
         private Vector2d _normal;
         private double _signU;
+        private Point2d _point;
 
         public void Pause(double duration)
         {
@@ -115,7 +119,8 @@ namespace CAM.MachineWireSaw
 
         public void GCommand(int gCode, Line3d line3d, bool isReverseAngle = false)
         {
-            GCommand(gCode, new Line2d(line3d.PointOnLine.To2d(), line3d.Direction.ToVector2d()), line3d.PointOnLine.Z, isReverseAngle);
+            GCommand(gCode, new Line2d(line3d.PointOnLine.To2d(), line3d.Direction.ToVector2d()), line3d.PointOnLine.Z,
+                isReverseAngle);
         }
 
         public void GCommand(int gCode, Point3d point1, Point3d point2, bool isRevereseAngle = false)
@@ -139,10 +144,10 @@ namespace CAM.MachineWireSaw
             {
                 if (Math.Abs(angle - Angle) == 90)
                     angle = Angle + normal.MinusPiToPiAngleTo(_normal) > 0 ? 90 : -90;
-                else
-                    if (normal.GetAngleTo(_normal) > Math.PI / 2)
+                else if (normal.GetAngleTo(_normal) > Math.PI / 2)
                     _signU *= -1;
             }
+
             if (_normal.IsZeroLength())
                 _signU = -Math.Sign(angle) * Math.Sign(normal.Y);
 
@@ -168,6 +173,7 @@ namespace CAM.MachineWireSaw
             {
                 GCommandUV(1, u, v);
             }
+
             _normal = normal;
 
             if (!IsEngineStarted)
@@ -209,6 +215,20 @@ namespace CAM.MachineWireSaw
             var duration = Math.Abs(da) / _processing.S * 60;
 
             AddCommand(text, "Rotate");
+        }
+
+        public void GCommand(int gCode, Line2d line, double z)
+        {
+            var angle = line.Direction.Angle.ToRoundDeg() % 180;
+            var da = angle - Angle;
+            if (da > 90)
+                da -= 180;
+            if (da < -90)
+                da += 180;
+
+            var normal = line.GetClosestPointTo(Center).Point - Center;
+            if (normal.GetAngleTo(_normal) > Math.PI / 2)
+                _signU *= -1;
         }
     }
 }
