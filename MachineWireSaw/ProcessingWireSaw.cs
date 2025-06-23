@@ -16,7 +16,6 @@ namespace CAM.CncWorkCenter
             get => Tool.Thickness;
             set => Tool.Thickness = value;
         }
-
         public int CuttingFeed { get; set; } = 10;
         public int S { get; set; } = 100;
         public double Approach { get; set; }

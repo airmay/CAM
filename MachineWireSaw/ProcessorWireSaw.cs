@@ -108,9 +108,10 @@ namespace CAM.MachineWireSaw
         public Point2d Center => _processing.Origin.Point;
         public bool IsExtraMove { get; set; }
         public bool IsExtraRotate { get; set; }
-        private Vector2d _normal;
-        private double _signU;
+        private Vector2d _normal = Vector2d.XAxis;
+        private double _signU = -1;
         private Point2d _point;
+        private double _angle;
 
         public void Pause(double duration)
         {
@@ -128,7 +129,178 @@ namespace CAM.MachineWireSaw
             GCommand(gCode, new Line2d(point1.To2d(), point2.To2d()), (point1.Z + point2.Z) / 2, isRevereseAngle);
         }
 
+        private int _uSign = -1;   // положение троса: -1 - до центра вращения, 1 - после
+        private int _startNormalAngle;
+        private Point2d _toolPoint;
+
+        private int _startAngle;
+
+        public void Move(Line2d line, bool isReverseAngle, bool isReverseU)
+        {
+            var angle = line.Direction.Angle.ToRoundDeg() % 180;
+            _toolPoint = line.GetClosestPointTo(Center).Point;
+            var normal = _toolPoint - Center;
+
+            if (isReverseU)
+            {
+                normal = normal.Negate();
+                _signU *= -1;
+            }
+
+            var da = normal.MinusPiToPiAngleTo(_normal);
+            if (isReverseAngle)
+                da -= 2 * Math.PI * Math.Sign(da);
+
+
+            if (_toolPoint.Y > 0)
+                _signU *= -1;
+            u = normal.Length.Round(3) * _signU;
+            _normal = normal;
+            if (isReverseAngle)
+                da =
+            GcommandA(angle);
+
+            var u = 0D;
+            if (!line.IsOn(Center))
+            {
+                _toolPoint = line.GetClosestPointTo(Center).Point;
+                var normal = _toolPoint - Center;
+                if (normal.DotProduct(_normal) < 0)
+                    _signU *= -1;
+                u = normal.Length.Round(3) * _signU;
+                _normal = normal;
+            }
+            else
+            {
+                _toolPoint = Center;
+            }
+
+            GCommandUV(1, u, z.Round(3));
+        }
+
+        public void GcommandA(double da)
+        {
+            AddCommand($"G05 A{da} S{_processing.S}", "Rotate");
+            var duration = Math.Abs(da) / _processing.S * 60;
+        }
+
+        public void Cutting(Line2d line, double z)
+        {
+            var angle = line.Direction.Angle.ToRoundDeg() % 180;
+            GCommandA(angle);
+
+            var u = 0D;
+            if (!line.IsOn(Center))
+            {
+                _toolPoint = line.GetClosestPointTo(Center).Point;
+                var normal = _toolPoint - Center;
+                if (normal.DotProduct(_normal) < 0)
+                    _signU *= -1;
+                u = normal.Length.Round(3) * _signU;
+                _normal = normal;
+            }
+            else
+            {
+                _toolPoint = Center;
+            }
+
+            GCommandUV(1, u, z.Round(3));
+        }
+
+        public void GCommandA(double angle)
+        {
+            var da = angle - Angle;
+            if (da == 0)
+                return;
+
+            var abs = Math.Abs(da);
+            if (abs > 90)
+                da = (180 - abs) * Math.Sign(-da);
+
+            AddCommand($"G05 A{da} S{_processing.S}", "Rotate");
+            var duration = abs / _processing.S * 60;
+        }
+
+        public void GCommandUV(int gCode, double u, double v)
+        {
+            var du = u - U;
+            var dv = v - V;
+            if (du == 0 && dv == 0)
+                return;
+
+            var text = $"G0{gCode} U{du} V{dv}";
+            if (gCode == 1)
+                text += $" F{Feed}";
+
+            var duration = Math.Sqrt(du * du + dv * dv) / (gCode == 0 ? 500 : Feed) * 60;
+
+            AddCommand(text);
+            U = u;
+            V = v;
+        }
+
         public void GCommand(int gCode, Line2d line2d, double z, bool isReverseAngle)
+        {
+            var angle = line2d.Direction.Angle.ToRoundDeg() % 180;
+            var da = angle - _angle;
+            if (Math.Abs(da) > 90) // переход через ось Х
+                da = (180 - Math.Abs(da)) * Math.Sign(-da);
+            _angle = angle;
+
+            var normal = !line2d.IsOn(Center) ? line2d.GetClosestPointTo(Center).Point - Center : new Vector2d();
+            //var normalAngle = normal.
+            //var u = normal.Length.Round(3);
+            var dn = Math.Abs(normal.Angle - _normal.Angle).ToDeg();
+            if (dn > 90 && dn < 270) // переход через центр
+            {
+
+            }
+
+
+            if (!_normal.IsZeroLength() && !normal.IsZeroLength())
+            {
+                if (Math.Abs(angle - Angle) == 90)
+                    angle = Angle + normal.MinusPiToPiAngleTo(_normal) > 0 ? 90 : -90;
+                else if (normal.GetAngleTo(_normal) > Math.PI / 2)
+                    _signU *= -1;
+            }
+
+            if (_normal.IsZeroLength())
+                _signU = -Math.Sign(angle) * Math.Sign(normal.Y);
+
+            if (_signU == 0)
+                _signU = -1;
+
+            if (gCode == 0 && Math.Abs(angle - Angle) > 0.01 && IsExtraRotate)
+                GCommandA(angle + Math.Sign(angle - Angle));
+
+            GCommandA(angle);
+
+            var u = (_signU * normal.Length).Round(4);
+            var v = z.Round(4);
+
+            if (gCode == 0)
+            {
+                if (IsExtraMove)
+                    GCommandUV(0, u + Math.Sign(u - U) * 20, V);
+                GCommandUV(0, u, V);
+                GCommandUV(0, u, v);
+            }
+            else
+            {
+                GCommandUV(1, u, v);
+            }
+
+            _normal = normal;
+
+            if (!IsEngineStarted)
+            {
+                AddCommands(_postProcessor.StartEngine());
+                IsEngineStarted = true;
+            }
+        }
+
+        public void GCommand1(int gCode, Line2d line2d, double z, bool isReverseAngle)
         {
             var angle = Vector2d.YAxis.MinusPiToPiAngleTo(line2d.Direction).ToDeg(4);
             var da = Math.Sign(Angle - angle) * 180;
@@ -183,29 +355,9 @@ namespace CAM.MachineWireSaw
             }
         }
 
-        public void GCommandUV(int gCode, double u, double v)
+        public void GCommandA1(double angle)
         {
-            if (u == U && v == V)
-                return;
-
-            var du = -(u - U).Round(4);
-            if (gCode == 1 && DU != 0)
-                du = (Math.Abs(du) + DU) * Math.Sign(du);
-
-            var dv = (v - V).Round(4);
-            U = u;
-            V = v;
-
-            var feed = gCode == 1 ? $"F{Feed}" : "";
-            var text = $"G0{gCode} U{du} V{dv} {feed}";
-            var duration = Math.Sqrt(du * du + dv * dv) / (gCode == 0 ? 500 : Feed) * 60;
-
-            AddCommand(text);
-        }
-
-        public void GCommandA(double angle)
-        {
-            if (Math.Abs(angle - Angle) < 0.01)
+            if (Math.Abs(angle - Angle) < 0.001)
                 return;
 
             var da = (angle - Angle).Round(4);
