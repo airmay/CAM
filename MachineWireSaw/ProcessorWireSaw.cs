@@ -137,27 +137,28 @@ namespace CAM.MachineWireSaw
 
         public void Move(Line2d line, bool isReverseAngle, bool isReverseU)
         {
-            var angle = line.Direction.Angle.ToRoundDeg() % 180;
-            _toolPoint = line.GetClosestPointTo(Center).Point;
-            var normal = _toolPoint - Center;
-
-            if (isReverseU)
+            var da = 0D;
+            if (!line.IsOn(Center))
             {
-                normal = normal.Negate();
-                _signU *= -1;
+                _toolPoint = line.GetClosestPointTo(Center).Point;
+                var normal = _toolPoint - Center;
+                if (isReverseU)
+                {
+                    _normal = _normal.Negate();
+                    _signU *= -1;
+                }
+                da = _normal.MinusPiToPiAngleTo(normal).ToRoundDeg();
+            }
+            else
+            {
+                _toolPoint = Center;
+                var angle = line.Direction.Angle.ToRoundDeg() % 180;
+                da = angle - 90;
             }
 
-            var da = normal.MinusPiToPiAngleTo(_normal);
             if (isReverseAngle)
-                da -= 2 * Math.PI * Math.Sign(da);
+                da -= 360 * Math.Sign(da);
 
-
-            if (_toolPoint.Y > 0)
-                _signU *= -1;
-            u = normal.Length.Round(3) * _signU;
-            _normal = normal;
-            if (isReverseAngle)
-                da =
             GcommandA(angle);
 
             var u = 0D;
