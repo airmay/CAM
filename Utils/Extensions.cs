@@ -22,7 +22,20 @@ namespace CAM
             return attribute?.Description ?? value.ToString();
         }
 
-        public static int ToSignInt(this bool value) => value ? 1 : -1;
+        /// <summary>
+        ///  value ? 1 : -1
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public static int GetSign(this bool value) => value ? 1 : -1;
+        public static int GetSign(this int value) => value >= 0 ? 1 : -1;
+
+        /// <summary>
+        /// value >= 0 ? 1 : -1
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public static int GetSign(this double value) => value >= 0 ? 1 : -1;
         public static string ToStringParam(this double value) => value.ToString("0.####");
         public static string ToParam(this double? value) => value?.ToString("0.####");
 

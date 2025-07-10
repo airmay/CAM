@@ -1,11 +1,8 @@
 ﻿using System;
-using System.Diagnostics;
-using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
 using CAM.CncWorkCenter;
 using CAM.Core;
 using Dreambuild.AutoCAD;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement.Window;
 
 namespace CAM.MachineWireSaw
 {
@@ -86,7 +83,7 @@ namespace CAM.MachineWireSaw
             Array.ForEach(commands, p => AddCommand(p));
         }
 
-        public double Angle;
+        public double Angle { get; set; } = 90;
         public double U { get; set; }
         public double DU { get; set; }
         public double V { get; set; }
@@ -109,6 +106,7 @@ namespace CAM.MachineWireSaw
         public bool IsExtraMove { get; set; }
         public bool IsExtraRotate { get; set; }
         private Vector2d _normal = Vector2d.XAxis;
+        private Vector2d _uVector = -Vector2d.XAxis;
         private double _signU = -1;
         private Point2d _point;
         private double _angle;
@@ -135,94 +133,44 @@ namespace CAM.MachineWireSaw
 
         private int _startAngle;
 
-        public void Move(Line2d line, bool isReverseAngle, bool isReverseU)
+        public void Move(Point2d point1, Point2d point2, bool isReverseAngle, bool isReverseU)
         {
-            var da = 0D;
-            if (!line.IsOn(Center))
-            {
-                _toolPoint = line.GetClosestPointTo(Center).Point;
-                var normal = _toolPoint - Center;
-                if (isReverseU)
-                {
-                    _normal = _normal.Negate();
-                    _signU *= -1;
-                }
-                da = _normal.MinusPiToPiAngleTo(normal).ToRoundDeg();
-            }
-            else
-            {
-                _toolPoint = Center;
-                var angle = line.Direction.Angle.ToRoundDeg() % 180;
-                da = angle - 90;
-            }
-
-            if (isReverseAngle)
-                da -= 360 * Math.Sign(da);
-
-            GcommandA(angle);
-
-            var u = 0D;
-            if (!line.IsOn(Center))
-            {
-                _toolPoint = line.GetClosestPointTo(Center).Point;
-                var normal = _toolPoint - Center;
-                if (normal.DotProduct(_normal) < 0)
-                    _signU *= -1;
-                u = normal.Length.Round(3) * _signU;
-                _normal = normal;
-            }
-            else
-            {
-                _toolPoint = Center;
-            }
-
-            GCommandUV(1, u, z.Round(3));
+            GCommands(0, point1, point2, null, isReverseAngle, isReverseU);
+        }
+        public void Cutting(Point2d point1, Point2d point2, double z)
+        {
+            GCommands(1, point1, point2, z, false, false);
         }
 
-        public void GcommandA(double da)
+        public void GCommands(int gCode, Point2d point1, Point2d point2, double? z, bool isReverseAngle, bool isReverseU)
         {
-            AddCommand($"G05 A{da} S{_processing.S}", "Rotate");
-            var duration = Math.Abs(da) / _processing.S * 60;
+            var line = new Line2d(point1, point2);
+            _toolPoint = line.GetClosestPointTo(Center).Point;
+            var vector = _toolPoint - Center;
+            var u = vector.Length.Round(3);
+            if (u == 0)
+                vector = line.Direction.GetPerpendicularVector();
+            var uSign = vector.DotProduct(_uVector).GetSign();
+            uSign *= -isReverseU.GetSign();
+
+            GCommandA(vector * uSign, isReverseAngle);
+            GCommandUV(gCode, u * uSign, (z ?? V).Round(3));
         }
 
-        public void Cutting(Line2d line, double z)
+        private void GCommandA(Vector2d vector, bool isReverseAngle)
         {
-            var angle = line.Direction.Angle.ToRoundDeg() % 180;
-            GCommandA(angle);
-
-            var u = 0D;
-            if (!line.IsOn(Center))
-            {
-                _toolPoint = line.GetClosestPointTo(Center).Point;
-                var normal = _toolPoint - Center;
-                if (normal.DotProduct(_normal) < 0)
-                    _signU *= -1;
-                u = normal.Length.Round(3) * _signU;
-                _normal = normal;
-            }
-            else
-            {
-                _toolPoint = Center;
-            }
-
-            GCommandUV(1, u, z.Round(3));
-        }
-
-        public void GCommandA(double angle)
-        {
-            var da = angle - Angle;
-            if (da == 0)
+            var da = _uVector.MinusPiToPiAngleTo(vector).ToRoundDeg();
+            if (da == 0) 
                 return;
 
-            var abs = Math.Abs(da);
-            if (abs > 90)
-                da = (180 - abs) * Math.Sign(-da);
-
+            if (isReverseAngle)
+                da -= 360 * da.GetSign();
             AddCommand($"G05 A{da} S{_processing.S}", "Rotate");
-            var duration = abs / _processing.S * 60;
+            var duration = Math.Abs(da) / _processing.S * 60;
+            _uVector = _uVector.RotateBy(da.ToRad());
         }
 
-        public void GCommandUV(int gCode, double u, double v)
+        private void GCommandUV(int gCode, double u, double v)
         {
             var du = u - U;
             var dv = v - V;
