@@ -71,7 +71,7 @@ namespace CAM.Operations.Sawing
                 : (curves.First(), curves.First().StartPoint);
             if (corner != null)
                 points[point] = IsExactlyBegin;
-            var direction = curve.IsStartPoint(point).ToSignInt();
+            var direction = curve.IsStartPoint(point).GetSign();
             var startСurve = curve;
 
             var center = Graph.GetCenter(pointCurveDict.Select(p => p.Key));
@@ -90,7 +90,7 @@ namespace CAM.Operations.Sawing
                 }
 
                 point = point.IsEqualTo(curve.StartPoint) ? curve.StartPoint : curve.EndPoint;
-                direction = curve.IsStartPoint(point).ToSignInt();
+                direction = curve.IsStartPoint(point).GetSign();
                 var startTangent = curve.GetTangent(point) * direction;
 
                 var angle = endTangent.MinusPiToPiAngleTo(startTangent);

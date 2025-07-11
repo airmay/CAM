@@ -25,7 +25,7 @@ namespace CAM
         public Origin Origin { get; set; } = new Origin();
         public double ZSafety { get; set; } = 20;
         public abstract MachineType MachineType { get; }
-        public static Program Program = new Program();
+        public static Program Program = new Program();   // TODO static Program
 
         protected abstract IProcessor CreateProcessor();
 
