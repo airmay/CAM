@@ -3,6 +3,7 @@ using System;
 using System.Linq;
 using Dreambuild.AutoCAD;
 using DbSurface = Autodesk.AutoCAD.DatabaseServices.Surface;
+using Autodesk.AutoCAD.Geometry;
 
 namespace CAM
 {
@@ -35,6 +36,30 @@ namespace CAM
         }
 
         public override void Execute()
+        {
+            var dBObject = ProcessingArea.ObjectId.QOpenForRead();
+            if (dBObject is Region region)
+            {
+                Point3d point;
+                using (DBObjectCollection exploded = new DBObjectCollection())
+                {
+                    region.Explode(exploded);
+                    point = ((Curve)exploded[0]).StartPoint;
+
+                }
+                var normal = region.Normal;
+                var lineDirection = new Vector3d(normal.Y, -normal.X, 0);
+
+                // Уравнение плоскости: N · (P - P₀) = 0  =>  planeNormal.x * (x - x0) + planeNormal.y * (y - y0) + planeNormal.z * (z - z0) = 0
+                // Мы знаем X=point.X и Z, находим 
+                var y = point.Y - normal.Z * (z - point.Z) / normal.Y;
+                Point3d basePoint = new Point3d(point.X, y, z);
+
+                return new Line3d(basePoint, basePoint + lineDirection);
+            }
+        }
+
+        public void Execute1()
         {
             var z0 = ProcessingArea.ObjectIds.GetExtents().MaxPoint.Z + Processing.ZSafety;
             Processor.StartOperation(0, 0, z0);
@@ -74,7 +99,7 @@ namespace CAM
 
                 //if (Approach > 0)
                 //    points.Add(railCurves.Select(p => p.StartPoint + Vector3d.ZAxis * Approach).ToArray());
-                Processor.GCommand(0, railCurves[0].StartPoint, railCurves[1].StartPoint, IsReverseAngle);
+                //Processor.GCommand(0, railCurves[0].StartPoint, railCurves[1].StartPoint, IsReverseAngle);
 
                 var stepCurves = railCurves.ConvertAll(p => new
                     { Curve = p, step = (p.EndParam - p.StartParam) / StepCount });
@@ -82,7 +107,7 @@ namespace CAM
                 {
                     var points = stepCurves.ConvertAll(p => p.Curve.GetPointAtParameter(i * p.step));
 
-                    Processor.GCommand(1, points[0], points[1]);
+                  //  Processor.GCommand(1, points[0], points[1]);
                 }
             }
         }
