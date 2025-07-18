@@ -103,7 +103,12 @@ namespace CAM.MachineWireSaw
         }
 
         private void AddCommands(string[] commands) => Array.ForEach(commands, p => AddCommand(p));
-        
+
+        public void Move(Point3d point, Vector3d direction, bool isReverseAngle, bool isReverseU)
+        {
+            Move(point.ToPoint2d(), (point + direction).ToPoint2d(), isReverseAngle, isReverseU);
+        }
+
         public void Move(Point2d point1, Point2d point2, bool isReverseAngle, bool isReverseU)
         {
             GCommands(0, point1, point2, null, isReverseAngle, isReverseU);

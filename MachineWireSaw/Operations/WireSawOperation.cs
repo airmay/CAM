@@ -38,10 +38,20 @@ namespace CAM
         public override void Execute()
         {
             var dBObject = ProcessingArea.ObjectId.QOpenForRead();
+
+            //var surface = dBObject as DbSurface;
+            //var plane = surface.GetPlane();
+            //var n = plane.Normal;
+            //if (surf is Plane)
+            //{
+            //    Plane plane = (Plane)dBObject;
+            //    Vector3d normal = plane.Normal;
+            //}
+
             if (dBObject is Region region)
             {
                 Point3d point;
-                using (DBObjectCollection exploded = new DBObjectCollection())
+                using (var exploded = new DBObjectCollection())
                 {
                     region.Explode(exploded);
                     point = ((Curve)exploded[0]).StartPoint;
@@ -50,12 +60,16 @@ namespace CAM
                 var normal = region.Normal;
                 var lineDirection = new Vector3d(normal.Y, -normal.X, 0);
 
+                var z = region.GeometricExtents.MaxPoint.Z;
+
                 // Уравнение плоскости: N · (P - P₀) = 0  =>  planeNormal.x * (x - x0) + planeNormal.y * (y - y0) + planeNormal.z * (z - z0) = 0
                 // Мы знаем X=point.X и Z, находим 
                 var y = point.Y - normal.Z * (z - point.Z) / normal.Y;
-                Point3d basePoint = new Point3d(point.X, y, z);
+                var basePoint = new Point3d(point.X, y, z);
 
-                return new Line3d(basePoint, basePoint + lineDirection);
+                Processor.Move(basePoint, lineDirection, IsReverseAngle, IsReverseDirection);
+
+
             }
         }
 
