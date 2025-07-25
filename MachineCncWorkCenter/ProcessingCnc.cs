@@ -17,7 +17,6 @@ namespace CAM.CncWorkCenter
         public int Frequency { get; set; }
         public int CuttingFeed { get; set; }
         public int PenetrationFeed { get; set; }
-        public double ZSafety { get; set; } = 20;
 
         public static void ConfigureParamsView(ParamsView view)
         {

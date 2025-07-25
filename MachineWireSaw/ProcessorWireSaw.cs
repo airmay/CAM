@@ -58,15 +58,15 @@ namespace CAM.MachineWireSaw
             _processing.Caption = GetCaption(_processing.Caption, _processDuration);
         }
 
-        public void StartOperation(double angle, double u, double v)
+        public void StartOperation(double v)
         {
             if (IsEngineStarted)
                 return;
 
-            //IsEngineStarted = true;
-            //Angle = angle;
-            //U = u;
-            //V = v;
+            IsEngineStarted = true;
+            Angle = Math.PI / 2;
+            U = 0;
+            V = v;
 
             AddCommands(_postProcessor.StartMachine());
         }
@@ -77,7 +77,7 @@ namespace CAM.MachineWireSaw
         }
 
         //----------------------------------------------------------------------------------------------------------------------------------------------
-        public double Angle { get; set; } = 90;
+        public double Angle { get; set; } = Math.PI / 2;
         public double U { get; set; }
         public double V { get; set; }
 
@@ -120,6 +120,7 @@ namespace CAM.MachineWireSaw
             }
         }
 
+        public void Cutting(Point3d point, Vector3d direction) => Cutting(point.ToPoint2d(), (point + direction).ToPoint2d(), point.Z);
         public void Cutting(Line3d line) => Cutting(line.StartPoint, line.EndPoint);
 
         public void Cutting(Point3d point1, Point3d point2) => Cutting(point1.To2d(), point2.To2d(), (point1.Z + point2.Z) / 2);
@@ -132,7 +133,7 @@ namespace CAM.MachineWireSaw
         public void GCommands(int gCode, Point2d point1, Point2d point2, double? z, bool isReverseAngle, bool isReverseU)
         {
             var line = new Line2d(point1, point2);
-            Angle = line.Direction.Angle.ToRoundDeg() % 180;
+            Angle = line.Direction.Angle;
             _toolPoint = line.GetClosestPointTo(Center).Point;
             var vector = _toolPoint - Center;
             var u = vector.Length.Round(3);
@@ -169,9 +170,9 @@ namespace CAM.MachineWireSaw
             var text = $"G0{gCode} U{du} V{dv}";
             if (gCode == 1)
                 text += $" F{Feed}";
-            AddCommand(text);
             U = u;
             V = v;
+            AddCommand(text);
             _operationDuration += Math.Sqrt(du * du + dv * dv) / (gCode == 0 ? 500 : Feed) * 60;
         }
     }

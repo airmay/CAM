@@ -21,13 +21,13 @@ namespace CAM
 
         public Curve[] GetModel(Machine? machine)
         {
-            var line = new Line(new Point3d(0, -1500, 0), new Point3d(0, 1500, 0));
+            var line = new Line(new Point3d(-1500, 0, 0), new Point3d(1500, 0, 0));
             return new Curve[]
             {
                 line, 
-                new Circle(line.StartPoint, Vector3d.YAxis, Thickness / 2),
-                new Circle(line.EndPoint, Vector3d.YAxis, Thickness / 2),
-                new Circle(line.GetPointAtParameter(line.Length / 2), Vector3d.YAxis, Thickness / 2)
+                new Circle(line.StartPoint, Vector3d.XAxis, Thickness / 2),
+                new Circle(line.EndPoint, Vector3d.XAxis, Thickness / 2),
+                new Circle(line.GetPointAtParameter(line.Length / 2), Vector3d.XAxis, Thickness / 2)
             };
         }
 
@@ -37,7 +37,7 @@ namespace CAM
             var to = new ToolLocationWireSaw(locationParamsTo);
 
             var mat1 = Matrix3d.Displacement(from.Point.GetVectorTo(to.Point));
-            var mat2 = Matrix3d.Rotation(-(from.Angle - to.Angle).ToRad(), Vector3d.ZAxis, to.Point);
+            var mat2 = Matrix3d.Rotation(-(from.Angle - to.Angle), Vector3d.ZAxis, to.Point);
 
             return mat2 * mat1;
         }

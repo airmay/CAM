@@ -18,10 +18,9 @@ namespace CAM.CncWorkCenter
         }
         public int CuttingFeed { get; set; } = 10;
         public int S { get; set; } = 100;
-        public double Approach { get; set; }
-        public double Departure { get; set; } = 50;
+        //public double Approach { get; set; }
+        //public double Departure { get; set; } = 50;
         public double Delta { get; set; } = 0;
-
 
         public static void ConfigureParamsView(ParamsView view)
         {
@@ -31,9 +30,10 @@ namespace CAM.CncWorkCenter
             view.AddIndent();
             view.AddTextBox(nameof(ToolThickness), "Толщина троса");
             view.AddTextBox(nameof(Delta));
-            view.AddIndent();
-            view.AddTextBox(nameof(Approach), "Заезд");
-            view.AddTextBox(nameof(Departure), "Выезд");
+            view.AddTextBox(nameof(ZSafety));
+            //view.AddIndent();
+            //view.AddTextBox(nameof(Approach), "Заезд");
+            //view.AddTextBox(nameof(Departure), "Выезд");
         }
 
         public ProcessingWireSaw()
