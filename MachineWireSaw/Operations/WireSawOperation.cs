@@ -2,6 +2,7 @@
 using Autodesk.AutoCAD.Geometry;
 using Dreambuild.AutoCAD;
 using System;
+using System.Collections.Generic;
 using System.IO.Pipes;
 using System.Linq;
 using System.Xml.Linq;
@@ -12,29 +13,32 @@ namespace CAM
     [Serializable]
     public class WireSawOperation : OperationWireSawBase
     {
+
+        public bool IsReverseDirection { get; set; }
+        public bool Across { get; set; }
+        public bool IsReverseOffset { get; set; }
+        public int? StepCount { get; set; }
+        public bool IsReverseU { get; set; }
+        public bool IsReverseAngle { get; set; }
+        //public double DU { get; set; }
         //public double Delay { get; set; } = 60;
         //public bool IsExtraMove { get; set; }
         //public bool IsExtraRotate { get; set; }
-        public bool IsReverseDirection { get; set; }
-        public bool IsReverseAngle { get; set; }
-        public bool IsReverseOffset { get; set; }
-        public virtual int StepCount { get; set; } = 100;
-        //public double DU { get; set; }
-        public bool Across { get; set; }
-
         public static void ConfigureParamsView(ParamsView view)
         {
             view.AddAcadObject();
-                view.AddCheckBox(nameof(Across), "Поперек");
-                view.AddCheckBox(nameof(IsReverseDirection), "Обратное напр.");
-                view.AddCheckBox(nameof(IsReverseAngle), "Обратный угол");
-                view.AddCheckBox(nameof(IsReverseOffset), "Обратный Offset");
-                //view.AddIndent();
-                //view.AddTextBox(nameof(Delay), "Задержка");
-                //view.AddCheckBox(nameof(IsExtraMove), "Возврат");
-                //view.AddCheckBox(nameof(IsExtraRotate), "Поворот");
-                view.AddTextBox(nameof(StepCount), "Количество шагов");
-                //view.AddTextBox(nameof(DU), "dU");
+            view.AddCheckBox(nameof(IsReverseDirection), "Обратное направление");
+            view.AddCheckBox(nameof(Across), "Поперек");
+            view.AddCheckBox(nameof(IsReverseOffset), "Обратный Offset");
+            view.AddTextBox(nameof(StepCount), "Количество шагов");
+            view.AddIndent();
+            view.AddCheckBox(nameof(IsReverseU), "Обратное U");
+            view.AddCheckBox(nameof(IsReverseAngle), "Обратный угол");
+            //view.AddIndent();
+            //view.AddTextBox(nameof(Delay), "Задержка");
+            //view.AddCheckBox(nameof(IsExtraMove), "Возврат");
+            //view.AddCheckBox(nameof(IsExtraRotate), "Поворот");
+            //view.AddTextBox(nameof(DU), "dU");
         }
 
         public override void Execute()
@@ -68,19 +72,44 @@ namespace CAM
 
         private void PlaneCutting(Point3d maxPoint, Point3d minPoint, Vector3d normal, Point3d point)
         {
-            Processor.StartOperation(maxPoint.Z + Processing.ZSafety);
+            var startZ = maxPoint.Z + Processing.ZSafety;
+            Processor.StartOperation(startZ);
 
-            var lineDirection = new Vector3d(normal.Y, -normal.X, 0);
-            Processor.Move(GetPoint(maxPoint.Z + Processing.ZSafety), lineDirection, IsReverseAngle, IsReverseDirection);
-            Processor.Cutting(GetPoint(maxPoint.Z), lineDirection);
-            Processor.Cutting(GetPoint(minPoint.Z), lineDirection);
+            var (startPoint, endPoint) = IsReverseDirection ? (minPoint, maxPoint) : (maxPoint, minPoint);
+
+            Vector3d cuttingDirection;
+            if (normal.IsParallelTo(Vector3d.ZAxis))
+            {
+                cuttingDirection = (Across ? Vector3d.YAxis : Vector3d.XAxis) * IsReverseDirection.GetSign();
+            }
+            else
+            {
+                // Вычисляем проекцию оси Z на нормаль: (Z · n) * n
+                var projOnNormal = normal * Vector3d.ZAxis.DotProduct(normal);
+                // Вычитаем из оси Z её проекцию на нормаль → получаем проекцию на плоскость
+                cuttingDirection = (Vector3d.ZAxis - projOnNormal).GetNormal() * IsReverseDirection.GetSign();
+                //wireDirection = new Vector3d(normal.Y, -normal.X, 0);
+
+                startPoint = GetPoint(startPoint.Z);
+                endPoint = GetPoint(endPoint.Z);
+            }
+
+            var wireDirection = cuttingDirection.GetPerpendicularVector();
+            var approachPoint = startPoint - Processing.Approach * cuttingDirection;
+            if (approachPoint.Z > startZ)
+                approachPoint = GetPoint(startZ);
+            
+            Processor.Move(approachPoint, wireDirection);
+            Processor.Cutting(startPoint, wireDirection);
+            Processor.Cutting(endPoint, wireDirection);
+            Processor.Cutting(endPoint + Processing.Departure * cuttingDirection, wireDirection);
 
             return;
 
             Point3d GetPoint(double z)
             {
                 // Уравнение плоскости: N · (P - P₀) = 0  =>  planeNormal.x * (x - x0) + planeNormal.y * (y - y0) + planeNormal.z * (z - z0) = 0
-                return normal.Y < Tolerance.Global.EqualPoint
+                return Math.Abs(normal.Y) < Tolerance.Global.EqualPoint
                     ? new Point3d(point.X - normal.Z * (z - point.Z) / normal.X, 0, z)
                     : new Point3d(point.X, point.Y - normal.Z * (z - point.Z) / normal.Y, z);
             }
@@ -132,7 +161,7 @@ namespace CAM
                     { Curve = p, step = (p.EndParam - p.StartParam) / StepCount });
                 for (var i = 0; i <= StepCount; i++)
                 {
-                    var points = stepCurves.ConvertAll(p => p.Curve.GetPointAtParameter(i * p.step));
+                    var points = stepCurves.ConvertAll(p => p.Curve.GetPointAtParameter(i * p.step.Value));
 
                   //  Processor.GCommand(1, points[0], points[1]);
                 }

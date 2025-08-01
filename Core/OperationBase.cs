@@ -20,6 +20,9 @@ namespace CAM
         public abstract MachineType MachineType { get; }
         [NonSerialized] public IProcessing ProcessingBase;
 
+        //public double ZSafety { get; set; } = 20;
+
+
         [NonSerialized] private ObjectId? _toolpathGroupId;
         public ObjectId? ToolpathGroupId
         {

@@ -70,16 +70,6 @@ namespace CAM
             return collection?.Where(p => p.HasValue).Select(p => p.Value);
         }
 
-        public static T If<T>(this T obj, bool condition, Func<T, T> func)
-        {
-            if (condition)
-            {
-                return func(obj);
-            }
-
-            return obj;
-        }
-
         public static void WriteToFile(this Exception ex, string message)
         {
             var builder = new StringBuilder();

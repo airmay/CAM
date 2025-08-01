@@ -14,6 +14,7 @@ namespace CAM.MachineWireSaw
         public bool IsEngineStarted;
         private double _processDuration;
         private double _operationDuration;
+        public double UpperZ;
 
         public ProcessorWireSaw(ProcessingWireSaw processing, PostProcessorWireSaw postProcessor)
         {
@@ -58,15 +59,14 @@ namespace CAM.MachineWireSaw
             _processing.Caption = GetCaption(_processing.Caption, _processDuration);
         }
 
-        public void StartOperation(double v)
+        public void StartOperation(double upperZ)
         {
             if (IsEngineStarted)
                 return;
 
-            IsEngineStarted = true;
             Angle = Math.PI / 2;
             U = 0;
-            V = v;
+            V = UpperZ = upperZ;
 
             AddCommands(_postProcessor.StartMachine());
         }
@@ -104,20 +104,27 @@ namespace CAM.MachineWireSaw
 
         private void AddCommands(string[] commands) => Array.ForEach(commands, p => AddCommand(p));
 
-        public void Move(Point3d point, Vector3d direction, bool isReverseAngle, bool isReverseU)
+        public void Move(Point3d point, Vector3d direction, bool isReverseAngle = false, bool isReverseU = false)
         {
-            Move(point.ToPoint2d(), (point + direction).ToPoint2d(), isReverseAngle, isReverseU);
+            if (UpperZ - V > 0.1)
+                return;
+
+            if (point.Z > UpperZ)
+                point = point.WithZ(UpperZ);
+
+            if (UpperZ - point.Z > 0.1)
+            {
+                Move(point.WithZ(UpperZ), direction, isReverseAngle, isReverseU);
+                isReverseAngle = false;
+                isReverseU = false;
+            }
+
+            GCommands(0, point.ToPoint2d(), (point + direction).ToPoint2d(), point.Z, isReverseAngle, isReverseU);
         }
 
-        public void Move(Point2d point1, Point2d point2, bool isReverseAngle, bool isReverseU)
+        public void Move(Point2d point1, Point2d point2, bool isReverseAngle = false, bool isReverseU = false)
         {
             GCommands(0, point1, point2, null, isReverseAngle, isReverseU);
-
-            if (!IsEngineStarted)
-            {
-                AddCommands(_postProcessor.StartEngine());
-                IsEngineStarted = true;
-            }
         }
 
         public void Cutting(Point3d point, Vector3d direction) => Cutting(point.ToPoint2d(), (point + direction).ToPoint2d(), point.Z);
@@ -127,6 +134,11 @@ namespace CAM.MachineWireSaw
 
         public void Cutting(Point2d point1, Point2d point2, double z)
         {
+            if (!IsEngineStarted)
+            {
+                AddCommands(_postProcessor.StartEngine());
+                IsEngineStarted = true;
+            }
             GCommands(1, point1, point2, z, false, false);
         }
 
@@ -134,16 +146,17 @@ namespace CAM.MachineWireSaw
         {
             var line = new Line2d(point1, point2);
             Angle = line.Direction.Angle;
-            _toolPoint = line.GetClosestPointTo(Center).Point;
-            var vector = _toolPoint - Center;
+            var point = line.GetClosestPointTo(Center).Point;
+            var vector = point - Center;
             var u = vector.Length.Round(3);
             if (u == 0)
                 vector = line.Direction.GetPerpendicularVector();
             var uSign = vector.DotProduct(_uVector).GetSign();
-            uSign *= -isReverseU.GetSign();
+            uSign *= isReverseU.GetSign(-1);
 
             GCommandA(vector * uSign, isReverseAngle);
-            GCommandUV(gCode, u * uSign, (z ?? V).Round(3));
+            _toolPoint = point;
+            GCommandUV(gCode, u * uSign, z ?? V);
         }
 
         private void GCommandA(Vector2d vector, bool isReverseAngle)
@@ -162,16 +175,16 @@ namespace CAM.MachineWireSaw
 
         private void GCommandUV(int gCode, double u, double v)
         {
-            var du = u - U;
-            var dv = v - V;
+            var du = (u - U).Round(3);
+            var dv = (v - V).Round(3);
             if (du == 0 && dv == 0)
                 return;
 
             var text = $"G0{gCode} U{du} V{dv}";
             if (gCode == 1)
                 text += $" F{Feed}";
-            U = u;
-            V = v;
+            U += du;
+            V += dv;
             AddCommand(text);
             _operationDuration += Math.Sqrt(du * du + dv * dv) / (gCode == 0 ? 500 : Feed) * 60;
         }
