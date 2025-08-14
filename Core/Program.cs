@@ -49,6 +49,8 @@ namespace CAM.Core
 
             if (command.ObjectId.HasValue && !_objectIdDict.ContainsKey(command.ObjectId.Value))
                 _objectIdDict[command.ObjectId.Value] = _count;
+            if (command.ObjectId2.HasValue && !_objectIdDict.ContainsKey(command.ObjectId2.Value))
+                _objectIdDict[command.ObjectId2.Value] = _count;
 
             if (command.Operation != null && !_operationDict.ContainsKey(command.Operation))
                 _operationDict[command.Operation] = _count;

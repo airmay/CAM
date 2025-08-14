@@ -21,7 +21,7 @@ namespace CAM
         {
             Tolerance.Global = new Tolerance( Consts.Epsilon, Consts.Epsilon);
 
-            Acad.Write($"Инициализация плагина. Версия сборки от {File.GetLastWriteTime(Assembly.GetExecutingAssembly().Location)}");
+            Acad.Write($"Инициализация плагина. Версия сборки {Assembly.GetExecutingAssembly().GetProductVersion()} от {File.GetLastWriteTime(Assembly.GetExecutingAssembly().Location)}");
 
             var paletteSet = new PaletteSet("Технология")
             {

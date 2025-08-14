@@ -2,12 +2,13 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Windows.Forms;
-using System.IO;
-using System.Text;
 using System.Runtime.Serialization.Formatters.Binary;
+using System.Text;
+using System.Windows.Forms;
 using static CAM.DataLoader;
 
 namespace CAM
@@ -157,5 +158,19 @@ namespace CAM
             return type.IsPrimitive || type.IsValueType || type == typeof(string) || type == typeof(DateTime) ||
                    type == typeof(DateTimeOffset) || type == typeof(TimeSpan);
         }
+
+        public static string GetProductVersion(this Assembly assembly)
+        {
+            var result = FileVersionInfo.GetVersionInfo(assembly.Location).ProductVersion;
+
+            var plusIndex = result.IndexOf('+');
+            if (plusIndex >= 0)
+            {
+                result = result.Substring(0, plusIndex);
+            }
+
+            return result;
+        }
+
     }
 }
