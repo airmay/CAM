@@ -12,18 +12,16 @@ namespace CAM.MachineWireSaw
         private readonly PostProcessorWireSaw _postProcessor;
         private readonly ProcessingWireSaw _processing;
         private IOperation _operation;
-        public bool IsEngineStarted;
+        private ToolpathBuilder _toolpathBuilder;
         private double _processDuration;
         private double _operationDuration;
-        public double UpperZ;
-        private ToolpathBuilder _toolpathBuilder;
 
         public ProcessorWireSaw(ProcessingWireSaw processing, PostProcessorWireSaw postProcessor)
         {
             _processing = processing;
             _postProcessor = postProcessor;
 
-
+            _uAxis = -Vector2d.XAxis;
             _toolAngle = Math.PI / 2;
             U = 0;
         }
@@ -66,17 +64,20 @@ namespace CAM.MachineWireSaw
         {
             AddCommands(_postProcessor.StopEngine());
             AddCommands(_postProcessor.StopMachine());
+
             ProcessingBase.Program.CreateProgram();
             FinishOperation();
             _processing.Caption = GetCaption(_processing.Caption, _processDuration);
         }
+
+        public bool IsEngineStarted;
+        public double UpperZ;
 
         public void StartOperation(double upperZ)
         {
             if (IsEngineStarted)
                 return;
 
-            U = 0;
             V = UpperZ = upperZ;
             _toolPoint = Center.WithZ(upperZ);
 
@@ -90,6 +91,7 @@ namespace CAM.MachineWireSaw
 
         //----------------------------------------------------------------------------------------------------------------------------------------------
         private const int ToolLength = 1500;
+        private Vector2d _uAxis;
         private Point3d _toolPoint;
         private double _toolAngle;
 
@@ -97,14 +99,10 @@ namespace CAM.MachineWireSaw
         public double V { get; set; }
 
         public int Feed => _processing.CuttingFeed;
-        public Point2d Center => _processing.Origin.Point;
-        private Vector2d _uAxis = -Vector2d.XAxis;
+        private Point2d Center => _processing.Origin.Point;
 
         public void AddCommand(string text, string name = null, ObjectId? toolpath1 = null, ObjectId? toolpath2 = null)
         {
-            if (text == null)
-                return;
-
             var toolLocationParams = new ToolLocationParams(_toolPoint.X, _toolPoint.Y, _toolPoint.Z, _toolAngle, 0);
 
             ProcessingBase.Program.AddCommand(new Command
@@ -119,6 +117,8 @@ namespace CAM.MachineWireSaw
         }
 
         private void AddCommands(string[] commands) => Array.ForEach(commands, p => AddCommand(p));
+
+        #region public 
 
         public void Move(Point3d point, Vector3d direction, bool isReverseAngle = false, bool isReverseU = false)
         {
@@ -135,33 +135,32 @@ namespace CAM.MachineWireSaw
                 isReverseU = false;
             }
 
-            GCommands(0, point.ToPoint2d(), (point + direction).ToPoint2d(), point.Z, isReverseAngle, isReverseU);
+            GCommands(0, point, point + direction, isReverseAngle, isReverseU);
         }
 
-        public void Move(Point2d point1, Point2d point2, bool isReverseAngle = false, bool isReverseU = false)
-        {
-            GCommands(0, point1, point2, null, isReverseAngle, isReverseU);
-        }
-
-        public void Cutting(Point3d point, Vector3d direction) => Cutting(point.ToPoint2d(), (point + direction).ToPoint2d(), point.Z);
+        public void Cutting(Point3d point, Vector3d direction) => Cutting(point, point + direction);
         
         public void Cutting(Line3d line) => Cutting(line.StartPoint, line.EndPoint);
 
-        public void Cutting(Point3d point1, Point3d point2) => Cutting(point1.To2d(), point2.To2d(), (point1.Z + point2.Z) / 2);
-
-        public void Cutting(Point2d point1, Point2d point2, double z)
+        public void Cutting(Point3d point1, Point3d point2)
         {
             if (!IsEngineStarted)
             {
                 AddCommands(_postProcessor.StartEngine());
                 IsEngineStarted = true;
             }
-            GCommands(1, point1, point2, z, false, false);
+            GCommands(1, point1, point2, false, false);
         }
 
-        public void GCommands(int gCode, Point2d point1, Point2d point2, double? z, bool isReverseAngle, bool isReverseU)
+        #endregion
+
+        private void GCommands(int gCode, Point3d point1, Point3d point2, bool isReverseAngle, bool isReverseU)
         {
-            var line = new Line2d(point1, point2);
+            GCommands(gCode, new Line2d(point1.ToPoint2d(), point2.ToPoint2d()), (point1.Z + point2.Z) / 2, isReverseAngle, isReverseU);
+        }
+
+        private void GCommands(int gCode, Line2d line, double z, bool isReverseAngle, bool isReverseU)
+        {
             var point = line.GetClosestPointTo(Center).Point;
             var centerVector = point - Center;
             var centerDist = centerVector.Length.Round(3);
@@ -172,7 +171,7 @@ namespace CAM.MachineWireSaw
 
             GCommandA(centerVector * uSign, isReverseAngle, line.Direction.Angle);
 
-            GCommandUV(gCode, centerDist * uSign, z ?? V, point);
+            GCommandUV(gCode, centerDist * uSign, z, point);
         }
 
         private void GCommandA(Vector2d vector, bool isReverseAngle, double newToolAngle)
