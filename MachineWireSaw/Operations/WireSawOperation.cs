@@ -2,10 +2,7 @@
 using Autodesk.AutoCAD.Geometry;
 using Dreambuild.AutoCAD;
 using System;
-using System.Collections.Generic;
-using System.IO.Pipes;
 using System.Linq;
-using System.Xml.Linq;
 using DbSurface = Autodesk.AutoCAD.DatabaseServices.Surface;
 
 namespace CAM
@@ -45,8 +42,9 @@ namespace CAM
         {
             var entities = ProcessingArea.ObjectIds.QOpenForRead<Entity>();
             var extents = entities.GetExtents();
+            var offset = (Processing.ToolThickness / 2 + Processing.Delta) * IsReverseOffset.GetSign(-1);
 
-            //var surface = dBObject as DbSurface;
+                //var surface = dBObject as DbSurface;
             //var plane = surface.GetPlane();
             //var n = plane.Normal;
             //if (surf is Plane)
@@ -64,14 +62,34 @@ namespace CAM
                     region.Explode(exploded);
                     point = ((Curve)exploded[0]).StartPoint;
                 }
-                var offset = normal * (Processing.ToolThickness / 2 + Processing.Delta) * IsReverseOffset.GetSign(-1);
 
-                PlaneCutting(extents.MaxPoint + offset, extents.MinPoint + offset, normal, point + offset);
+                PlaneCutting(extents, normal, point, offset);
+            }
+
+            if (entities.Length > 1 && entities[0] is Line linе1 && entities[1] is Line linе2)
+            {
+                var vecBetween = linе1.StartPoint - (linе1.Delta.IsParallelTo(linе2.StartPoint - linе1.StartPoint) ? linе2.EndPoint : linе2.StartPoint);
+                var normal = linе1.Delta.CrossProduct(vecBetween);
+                // Если нормаль нулевая (отрезки коллинеарны или один из них - точка)
+                if (normal.Length > Tolerance.Global.EqualPoint)
+                {
+                    // Смешанное произведение
+                    var tripleProduct = linе2.Delta.DotProduct(normal);
+                    // Если смешанное произведение близко к нулю - отрезки компланарны
+                    if (Math.Abs(tripleProduct) < Tolerance.Global.EqualPoint)
+                        PlaneCutting(extents, normal, linе1.StartPoint, offset);
+                }
             }
         }
 
-        private void PlaneCutting(Point3d maxPoint, Point3d minPoint, Vector3d normal, Point3d point)
+        private void PlaneCutting(Extents3d extents, Vector3d normal, Point3d point, double offset)
         {
+            normal = normal.GetNormal();
+            var offsetVector = offset * normal;
+            var maxPoint = extents.MaxPoint + offsetVector;
+            var minPoint = extents.MinPoint + offsetVector;
+            point += offsetVector;
+
             var startZ = maxPoint.Z + Processing.ZSafety;
             Processor.StartOperation(startZ);
 
