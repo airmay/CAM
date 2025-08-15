@@ -1,9 +1,12 @@
 ﻿using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
+using Autodesk.AutoCAD.Runtime;
 using Dreambuild.AutoCAD;
 using System;
 using System.Linq;
+using System.Security.Cryptography;
 using DbSurface = Autodesk.AutoCAD.DatabaseServices.Surface;
+using Exception = Autodesk.AutoCAD.Runtime.Exception;
 
 namespace CAM
 {
@@ -44,7 +47,9 @@ namespace CAM
             var extents = entities.GetExtents();
             var offset = (Processing.ToolThickness / 2 + Processing.Delta) * IsReverseOffset.GetSign(-1);
 
-                //var surface = dBObject as DbSurface;
+            Processor.StartOperation(extents.MaxPoint.Z + Processing.ZSafety);
+
+            //var surface = dBObject as DbSurface;
             //var plane = surface.GetPlane();
             //var n = plane.Normal;
             //if (surf is Plane)
@@ -65,8 +70,7 @@ namespace CAM
 
                 PlaneCutting(extents, normal, point, offset);
             }
-
-            if (entities.Length > 1 && entities[0] is Line linе1 && entities[1] is Line linе2)
+            else if (entities.Length > 1 && entities[0] is Line linе1 && entities[1] is Line linе2)
             {
                 var vecBetween = linе1.StartPoint - (linе1.Delta.IsParallelTo(linе2.StartPoint - linе1.StartPoint) ? linе2.EndPoint : linе2.StartPoint);
                 var normal = linе1.Delta.CrossProduct(vecBetween);
@@ -80,6 +84,38 @@ namespace CAM
                         PlaneCutting(extents, normal, linе1.StartPoint, offset);
                 }
             }
+            else if (entities[0] is DbSurface dbSurface)
+            {
+                using (var exploded = new DBObjectCollection())
+                {
+                    dbSurface.Explode(exploded);
+                    var railCurves = exploded.Cast<Curve>()
+                        .OrderByDescending(p => Math.Abs(p.EndPoint.Z - p.StartPoint.Z))
+                        .Take(2)
+                        .ToList();
+                    foreach (var curve in railCurves)
+                        if (curve.StartPoint.Z < curve.EndPoint.Z ^ IsReverseDirection)
+                            curve.ReverseCurve();
+
+                    var points = railCurves.Select(c =>
+                        c.GetGeCurve().GetSamplePoints(StepCount.Value).Select(p => p.Point).ToArray()).ToArray();
+
+                    //if (Approach > 0)
+                    //    points.Add(railCurves.Select(p => p.StartPoint + Vector3d.ZAxis * Approach).ToArray());
+                    Processor.Move(points[0][0], points[1][0], IsReverseAngle, IsReverseU);
+
+                    //var stepCurves = railCurves.ConvertAll(p => new
+                    //    { Curve = p, step = (p.EndParam - p.StartParam) / StepCount });
+                    for (var i = 0; i < StepCount; i++)
+                    {
+                        //var points = stepCurves.ConvertAll(p1 => p1.Curve.GetPointAtParameter(i * p.step.Value));
+
+                        Processor.Cutting(points[0][i], points[1][i]);
+                    }
+                }
+            }
+            else
+                throw new Exception(ErrorStatus.NotImplementedYet, "Нет реализации обработки для данной области");
         }
 
         private void PlaneCutting(Extents3d extents, Vector3d normal, Point3d point, double offset)
@@ -89,10 +125,6 @@ namespace CAM
             var maxPoint = extents.MaxPoint + offsetVector;
             var minPoint = extents.MinPoint + offsetVector;
             point += offsetVector;
-
-            var startZ = maxPoint.Z + Processing.ZSafety;
-            Processor.StartOperation(startZ);
-
             var (startPoint, endPoint) = IsReverseDirection ? (minPoint, maxPoint) : (maxPoint, minPoint);
 
             Vector3d cuttingDirection;
@@ -114,10 +146,10 @@ namespace CAM
 
             var wireDirection = cuttingDirection.GetPerpendicularVector();
             var approachPoint = startPoint - Processing.Approach * cuttingDirection;
-            if (approachPoint.Z > startZ)
-                approachPoint = GetPoint(startZ);
+            if (approachPoint.Z > Processor.UpperZ)
+                approachPoint = GetPoint(Processor.UpperZ);
             
-            Processor.Move(approachPoint, wireDirection);
+            Processor.Move(approachPoint, wireDirection, IsReverseAngle, IsReverseU);
             Processor.Cutting(startPoint, wireDirection);
             Processor.Cutting(endPoint, wireDirection);
             Processor.Cutting(endPoint + Processing.Departure * cuttingDirection, wireDirection);

@@ -4,6 +4,8 @@ using CAM.CncWorkCenter;
 using CAM.Core;
 using Dreambuild.AutoCAD;
 using System;
+using System.Drawing;
+using static Dreambuild.AutoCAD.Algorithms;
 
 namespace CAM.MachineWireSaw
 {
@@ -118,24 +120,29 @@ namespace CAM.MachineWireSaw
 
         private void AddCommands(string[] commands) => Array.ForEach(commands, p => AddCommand(p));
 
-        #region public 
+        #region public
 
         public void Move(Point3d point, Vector3d direction, bool isReverseAngle = false, bool isReverseU = false)
+        {
+            Move(point, point + direction, isReverseAngle, isReverseU);
+        }
+
+        public void Move(Point3d point1, Point3d point2, bool isReverseAngle = false, bool isReverseU = false)
         {
             if (UpperZ - V > 0.1)
                 return;
 
-            if (point.Z > UpperZ)
-                point = point.WithZ(UpperZ);
+            var z = (point1.Z + point2.Z) / 2;
+            var line = new Line2d(point1.ToPoint2d(), point2.ToPoint2d());
 
-            if (UpperZ - point.Z > 0.1)
+            if (UpperZ - z > 0.001)
             {
-                Move(point.WithZ(UpperZ), direction, isReverseAngle, isReverseU);
+                GCommands(0, line, UpperZ, isReverseAngle, isReverseU);
                 isReverseAngle = false;
                 isReverseU = false;
             }
 
-            GCommands(0, point, point + direction, isReverseAngle, isReverseU);
+            GCommands(0, line, z, isReverseAngle, isReverseU);
         }
 
         public void Cutting(Point3d point, Vector3d direction) => Cutting(point, point + direction);
