@@ -5,6 +5,7 @@ using CAM.Core;
 using Dreambuild.AutoCAD;
 using System;
 using System.Drawing;
+using System.Windows;
 using static Dreambuild.AutoCAD.Algorithms;
 
 namespace CAM.MachineWireSaw
@@ -88,7 +89,7 @@ namespace CAM.MachineWireSaw
 
         public void Pause(double duration)
         {
-            AddCommand("(DLY,{duration})", "Пауза");
+            AddCommand("(DLY,{duration})", duration);
         }
 
         //----------------------------------------------------------------------------------------------------------------------------------------------
@@ -103,19 +104,22 @@ namespace CAM.MachineWireSaw
         public int Feed => _processing.CuttingFeed;
         private Point2d Center => _processing.Origin.Point;
 
-        public void AddCommand(string text, string name = null, ObjectId? toolpath1 = null, ObjectId? toolpath2 = null)
+        public void AddCommand(string text, double? duration = null, ObjectId? toolpath1 = null, ObjectId? toolpath2 = null)
         {
             var toolLocationParams = new ToolLocationParams(_toolPoint.X, _toolPoint.Y, _toolPoint.Z, _toolAngle, 0);
+            var timeSpan = duration.HasValue ? new TimeSpan(0, 0, 0, (int)Math.Round(duration.Value)).ToString() : null;
 
             ProcessingBase.Program.AddCommand(new Command
             {
-                Name = name,
                 Text = text,
+                Duration = timeSpan,
                 ToolLocationParams = toolLocationParams,
                 Operation = _operation,
                 ObjectId = toolpath1,
                 ObjectId2 = toolpath2,
             });
+
+            _operationDuration += duration.GetValueOrDefault();
         }
 
         private void AddCommands(string[] commands) => Array.ForEach(commands, p => AddCommand(p));
@@ -195,10 +199,10 @@ namespace CAM.MachineWireSaw
             var toolVector = Vector3d.XAxis.RotateBy(_toolAngle, Vector3d.ZAxis) * ToolLength;
             _toolAngle = newToolAngle;
 
-            AddCommand($"G05 A{da} S{_processing.S}", "Rotate", CreateToolpath(toolVector), CreateToolpath(-toolVector));
+            var duration = Math.Abs(da) / _processing.S * 60;
+            AddCommand($"G05 A{da} S{_processing.S}", duration, CreateToolpath(toolVector), CreateToolpath(-toolVector));
 
             _uAxis = _uAxis.RotateBy(daRad);
-            _operationDuration += Math.Abs(da) / _processing.S * 60;
 
             return;
 
@@ -225,9 +229,8 @@ namespace CAM.MachineWireSaw
             var toolpath2 = CreateToolpath(-toolVector);
             _toolPoint = newToolPoint;
 
-            AddCommand(commandText, "", toolpath1, toolpath2);
-
-            _operationDuration += Math.Sqrt(du * du + dv * dv) / (gCode == 0 ? 500 : Feed) * 60;
+            var duration = Math.Sqrt(du * du + dv * dv) / (gCode == 0 ? 500 : Feed) * 60;
+            AddCommand(commandText, duration, toolpath1, toolpath2);
             
             return;
 

@@ -16,11 +16,7 @@ namespace CAM
                 new OperationItem("Полосы", typeof(TactileBandsOperation)),
                 new OperationItem("Фаска", typeof(TactileChamfersOperation)),
             }),
-            new OperationGroupItem("Трос", new[]
-            {
-                new OperationItem("Вертикально", typeof(WireSawOperation)),
-            }),
-
+            new OperationItem("Трос", typeof(WireSawOperation)),
         };
 
         public static ToolStripMenuItem[] GetMenuItems(Action<string, Type> onClick)
