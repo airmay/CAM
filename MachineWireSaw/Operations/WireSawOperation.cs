@@ -4,7 +4,7 @@ using Autodesk.AutoCAD.Runtime;
 using Dreambuild.AutoCAD;
 using System;
 using System.Linq;
-using System.Security.Cryptography;
+using static Dreambuild.AutoCAD.Algorithms;
 using DbSurface = Autodesk.AutoCAD.DatabaseServices.Surface;
 using Exception = Autodesk.AutoCAD.Runtime.Exception;
 
@@ -100,9 +100,19 @@ namespace CAM
                     var points = railCurves.Select(c =>
                         c.GetGeCurve().GetSamplePoints(StepCount.Value).Select(p => p.Point).ToArray()).ToArray();
 
-                    //if (Approach > 0)
-                    //    points.Add(railCurves.Select(p => p.StartPoint + Vector3d.ZAxis * Approach).ToArray());
-                    Processor.Move(points[0][0], points[1][0], IsReverseAngle, IsReverseU);
+                    if (Processing.Approach > 0)
+                    {
+                        var v1 = railCurves[0].GetFirstDerivative(railCurves[0].StartParam);
+                        var v2 = railCurves[1].GetFirstDerivative(railCurves[1].StartParam);
+                        var v = (v1 + v2).GetNormal() * Processing.Approach;
+                        //var approachPoint = points[0][0] - Processing.Approach * v;
+                        //if (approachPoint.Z > Processor.UpperZ)
+                        //    approachPoint = GetPoint(Processor.UpperZ);
+
+                        Processor.Move(points[0][0] - v, points[1][0] - v, IsReverseAngle, IsReverseU);
+                    }
+                    else
+                        Processor.Move(points[0][0], points[1][0], IsReverseAngle, IsReverseU);
 
                     //var stepCurves = railCurves.ConvertAll(p => new
                     //    { Curve = p, step = (p.EndParam - p.StartParam) / StepCount });
@@ -140,29 +150,19 @@ namespace CAM
                 cuttingDirection = (Vector3d.ZAxis - projOnNormal).GetNormal() * IsReverseDirection.GetSign();
                 //wireDirection = new Vector3d(normal.Y, -normal.X, 0);
 
-                startPoint = GetPoint(startPoint.Z);
-                endPoint = GetPoint(endPoint.Z);
+                startPoint = point.GetPoint(cuttingDirection, startPoint.Z);
+                endPoint = point.GetPoint(cuttingDirection, endPoint.Z);
             }
 
             var wireDirection = cuttingDirection.GetPerpendicularVector();
             var approachPoint = startPoint - Processing.Approach * cuttingDirection;
             if (approachPoint.Z > Processor.UpperZ)
-                approachPoint = GetPoint(Processor.UpperZ);
+                approachPoint = point.GetPoint(cuttingDirection, Processor.UpperZ);
             
             Processor.Move(approachPoint, wireDirection, IsReverseAngle, IsReverseU);
             Processor.Cutting(startPoint, wireDirection);
             Processor.Cutting(endPoint, wireDirection);
             Processor.Cutting(endPoint + Processing.Departure * cuttingDirection, wireDirection);
-
-            return;
-
-            Point3d GetPoint(double z)
-            {
-                // Уравнение плоскости: N · (P - P₀) = 0  =>  planeNormal.x * (x - x0) + planeNormal.y * (y - y0) + planeNormal.z * (z - z0) = 0
-                return Math.Abs(normal.Y) < Tolerance.Global.EqualPoint
-                    ? new Point3d(point.X - normal.Z * (z - point.Z) / normal.X, 0, z)
-                    : new Point3d(point.X, point.Y - normal.Z * (z - point.Z) / normal.Y, z);
-            }
         }
 
         public void Execute1()

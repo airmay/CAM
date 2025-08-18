@@ -81,6 +81,22 @@ namespace CAM
 
         public static Point3d GetPoint(this Curve curve, Corner corner) => corner == Corner.Start ? curve.StartPoint : curve.EndPoint;
 
+        /// <summary>
+        /// Получить точку с указанной координатой Z, расположенную на прямой заданной вектором
+        /// </summary>
+        /// <param name="p"></param>
+        /// <param name="v"></param>
+        /// <param name="z"></param>
+        /// <returns></returns>
+        public static Point3d GetPoint(this Point3d p, Vector3d v, double z)
+        {
+            var t = (z - p.Z) / v.Z;
+            var x = p.X + v.X * t;
+            var y = p.Y + v.Y * t;
+
+            return new Point3d(x, y, z);
+        }
+
         public static Corner GetCorner(this Curve curve, Point3d point) =>
             point == curve.StartPoint ? Corner.Start : (point == curve.EndPoint ? Corner.End : throw new ArgumentException($"Ошибка GetCorner: Точка {point} не принадлежит кривой {curve}"));
 
