@@ -17,6 +17,7 @@ namespace CAM
         public bool IsReverseDirection { get; set; }
         public bool Across { get; set; }
         public bool IsReverseOffset { get; set; }
+        public double? Angle { get; set; }
         public int? StepCount { get; set; }
         public bool IsReverseU { get; set; }
         public bool IsReverseAngle { get; set; }
@@ -30,6 +31,7 @@ namespace CAM
             view.AddCheckBox(nameof(IsReverseDirection), "Обратное направление");
             view.AddCheckBox(nameof(Across), "Поперек");
             view.AddCheckBox(nameof(IsReverseOffset), "Обратный Offset");
+            view.AddTextBox(nameof(Angle), "Угол");
             view.AddTextBox(nameof(StepCount), "Количество шагов");
             view.AddIndent();
             view.AddCheckBox(nameof(IsReverseU), "Обратное U");
@@ -74,7 +76,7 @@ namespace CAM
             {
                 var vecBetween = linе1.StartPoint - (linе1.Delta.IsParallelTo(linе2.StartPoint - linе1.StartPoint) ? linе2.EndPoint : linе2.StartPoint);
                 var normal = linе1.Delta.CrossProduct(vecBetween);
-                // Если нормаль нулевая (отрезки коллинеарны или один из них - точка)
+                // Если нормаль ненулевая (нормаль нулевая если отрезки коллинеарны или один из них - точка) 
                 if (normal.Length > Tolerance.Global.EqualPoint)
                 {
                     // Смешанное произведение
@@ -137,32 +139,52 @@ namespace CAM
             point += offsetVector;
             var (startPoint, endPoint) = IsReverseDirection ? (minPoint, maxPoint) : (maxPoint, minPoint);
 
-            Vector3d cuttingDirection;
-            if (normal.IsParallelTo(Vector3d.ZAxis))
+            Vector3d direction;
+            if (normal.IsParallelTo(Vector3d.ZAxis)) // горизонтальная плоскость
             {
-                cuttingDirection = (Across ? Vector3d.YAxis : Vector3d.XAxis) * IsReverseDirection.GetSign();
+                var angle = Angle.GetValueOrDefault().ToRad();
+                if (Across)
+                    angle += Math.PI / 2;
+                if (IsReverseDirection)
+                    angle += Math.PI;
+                direction = -Vector3d.XAxis.RotateBy(angle, Vector3d.ZAxis);
+
+                var matrix = Matrix3d.Rotation(-angle, Vector3d.ZAxis, Processing.Origin.Point.ToPoint3d());
+
+                Extents3d? ext = null;
+                ProcessingArea.ObjectIds.ForEach<Entity>(p =>
+                {
+                    var entity = p.GetTransformedCopy(matrix);
+                    if (!ext.HasValue)
+                        ext = entity.GeometricExtents;
+                    else
+                        ext.Value.AddExtents(entity.GeometricExtents);
+                });
+                matrix = matrix.Inverse();
+                startPoint = (ext.Value.MaxPoint + offsetVector).TransformBy(matrix);
+                endPoint = (ext.Value.MinPoint + offsetVector).TransformBy(matrix);
             }
             else
             {
                 // Вычисляем проекцию оси Z на нормаль: (Z · n) * n
                 var projOnNormal = normal * Vector3d.ZAxis.DotProduct(normal);
                 // Вычитаем из оси Z её проекцию на нормаль → получаем проекцию на плоскость
-                cuttingDirection = (Vector3d.ZAxis - projOnNormal).GetNormal() * IsReverseDirection.GetSign();
+                direction = (Vector3d.ZAxis - projOnNormal).GetNormal() * IsReverseDirection.GetSign();
                 //wireDirection = new Vector3d(normal.Y, -normal.X, 0);
 
-                startPoint = point.GetPoint(cuttingDirection, startPoint.Z);
-                endPoint = point.GetPoint(cuttingDirection, endPoint.Z);
+                startPoint = point.GetPoint(direction, startPoint.Z);
+                endPoint = point.GetPoint(direction, endPoint.Z);
             }
 
-            var wireDirection = cuttingDirection.GetPerpendicularVector();
-            var approachPoint = startPoint - Processing.Approach * cuttingDirection;
+            var wireDirection = direction.GetPerpendicularVector();
+            var approachPoint = startPoint - Processing.Approach * direction;
             if (approachPoint.Z > Processor.UpperZ)
-                approachPoint = point.GetPoint(cuttingDirection, Processor.UpperZ);
+                approachPoint = point.GetPoint(direction, Processor.UpperZ);
             
             Processor.Move(approachPoint, wireDirection, IsReverseAngle, IsReverseU);
             Processor.Cutting(startPoint, wireDirection);
             Processor.Cutting(endPoint, wireDirection);
-            Processor.Cutting(endPoint + Processing.Departure * cuttingDirection, wireDirection);
+            Processor.Cutting(endPoint + Processing.Departure * direction, wireDirection);
         }
 
         public void Execute1()
