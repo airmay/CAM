@@ -191,7 +191,7 @@ namespace CAM.MachineWireSaw
                 da -= 360 * da.GetSign();
 
             var daRad = da.ToRad();
-            var toolVector = Vector3d.XAxis.RotateBy(_toolAngle, Vector3d.ZAxis) * Tool.WireSawLength;
+            var toolVector = Vector3d.XAxis.RotateBy(_toolAngle, Vector3d.ZAxis) * ToolObject.WireSawLength;
             _toolAngle = newToolAngle;
 
             var duration = Math.Abs(da) / _processing.S * 60;
@@ -218,7 +218,7 @@ namespace CAM.MachineWireSaw
             if (gCode == 1)
                 commandText += $" F{Feed}";
 
-            var toolVector = Vector3d.XAxis.RotateBy(_toolAngle, Vector3d.ZAxis) * Tool.WireSawLength;
+            var toolVector = Vector3d.XAxis.RotateBy(_toolAngle, Vector3d.ZAxis) * ToolObject.WireSawLength;
             var newToolPoint = point.WithZ(v);
             var toolpath1 = CreateToolpath(toolVector);
             var toolpath2 = CreateToolpath(-toolVector);

@@ -331,7 +331,7 @@ namespace CAM
             Program.Processing?.Operations?.Select(p => p.ToolpathGroupId).Delete();
             Program.Processing?.Operations?.ForAll(p => p.ToolpathGroupId = null);
             Program.Clear();
-            ToolObject.Hide();
+            ToolObject.Delete();
         }
 
         private void processCommandBindingSource_CurrentChanged(object sender, EventArgs e)

@@ -1,7 +1,4 @@
-﻿using Autodesk.AutoCAD.DatabaseServices;
-using Autodesk.AutoCAD.Geometry;
-using CAM.Core;
-using System;
+﻿using System;
 
 namespace CAM
 {
@@ -36,53 +33,6 @@ namespace CAM
         /// </summary>
         public double? Thickness { get; set; }
 
-        public static double WireSawLength = 1500;
-
         public override string ToString() => $"№{Number} {Type.GetDescription()} Ø{Diameter}{(Thickness.HasValue ? " × " + Thickness.ToString() : null)} {Name}";
-
-        public Curve[] GetModel(Machine? machine)
-        {
-            var thickness = Thickness.Value;
-            switch (Type)
-            {
-                case ToolType.Disk:
-                    var frontY = Settings.Machines[machine.Value].IsFrontPlaneZero ? 0 : -thickness;
-                    var radius = Diameter / 2;
-                    var circle0 = new Circle(new Point3d(0, frontY, radius), Vector3d.YAxis, radius);
-                    var circle1 = new Circle(circle0.Center + Vector3d.YAxis * thickness, Vector3d.YAxis, radius);
-                    var axis = new Line(circle1.Center, circle1.Center + Vector3d.YAxis * radius / 4);
-                    return new Curve[] { circle0, circle1, axis };
-
-                case ToolType.Mill:
-                    return new Curve[]
-                    {
-                        new Circle(Point3d.Origin, Vector3d.ZAxis, 20),
-                        new Line(Point3d.Origin, Point3d.Origin + Vector3d.ZAxis * 100)
-                    };
-
-                case ToolType.WireSaw:
-                    var line = new Line(new Point3d(-WireSawLength, 0, 0), new Point3d(WireSawLength, 0, 0));
-                    return new Curve[]
-                    {
-                        line,
-                        new Circle(line.StartPoint, Vector3d.XAxis, thickness / 2),
-                        new Circle(line.EndPoint, Vector3d.XAxis, thickness / 2),
-                        new Circle(line.GetPointAtParameter(line.Length / 2), Vector3d.XAxis, thickness/ 2)
-                    };
-
-                default:
-                    return new Curve[] { new Line(Point3d.Origin, Point3d.Origin + Vector3d.ZAxis * 100) };
-            }
-        }
-
-        public Matrix3d GetTransformMatrix(ToolPosition from, ToolPosition to)
-        {
-            var displacement = Matrix3d.Displacement(from.Point.GetVectorTo(to.Point));
-            var rotationC = Matrix3d.Rotation(from.AngleC - to.AngleC, Vector3d.ZAxis, to.Point);
-            // todo ToRad()
-            var rotationA = Matrix3d.Rotation((from.AngleA - to.AngleA).ToRad(), Vector3d.XAxis.RotateBy(-to.AngleC.ToRad(), Vector3d.ZAxis), to.Point);
-
-            return rotationA * rotationC * displacement;
-        }
     }
 }
