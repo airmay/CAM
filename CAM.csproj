@@ -128,7 +128,7 @@
     <Compile Include="Core\CableSawingProcessor.cs" />
     <Compile Include="Core\Settings\MachineSettings.cs" />
     <Compile Include="Core\Settings\MachineType.cs" />
-    <Compile Include="Core\ToolLocationParams.cs" />
+    <Compile Include="Core\ToolPosition.cs" />
     <Compile Include="Core\ToolpathBuilder.cs" />
     <Compile Include="Core\Tool\ToolObject.cs" />
     <Compile Include="MachineWireSaw\CableSawingCommandGenerator.cs" />
@@ -171,7 +171,6 @@
     <Compile Include="MachineWireSaw\ProcessingWireSaw.cs" />
     <Compile Include="MachineWireSaw\ProcessorWireSaw.cs" />
     <Compile Include="MachineWireSaw\ToolWireSaw.cs" />
-    <Compile Include="MachineWireSaw\ToolLocationWireSaw.cs" />
     <Compile Include="MachineCncWorkCenter\Operations\Sawing\SawingModesView.cs">
       <SubType>UserControl</SubType>
     </Compile>

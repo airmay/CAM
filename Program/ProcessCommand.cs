@@ -12,7 +12,7 @@ namespace CAM
 
         public bool HasTool { get; set; }
 
-        public ToolPosition ToolLocation;
+        public ToolPositionOld ToolLocation;
 
         public ObjectId? ToolpathObjectId { get; set; }
 

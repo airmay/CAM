@@ -6,7 +6,7 @@ using Autodesk.AutoCAD.GraphicsInterface;
 
 namespace CAM
 {
-    public abstract class ToolPosition
+    public abstract class ToolPositionOld
     {
         public double? X { get; set; }
 
@@ -45,15 +45,15 @@ namespace CAM
 
         public bool IsDefined => X.HasValue && Y.HasValue && Z.HasValue;
 
-        public abstract Matrix3d GetTransformMatrixFrom(ToolPosition toolPosition);
+        public abstract Matrix3d GetTransformMatrixFrom(ToolPositionOld toolPosition);
 
-        public ToolPosition() { }
+        public ToolPositionOld() { }
 
-        public ToolPosition(Point3d point)
+        public ToolPositionOld(Point3d point)
         {
             Point = point;
         }
 
-        public ToolPosition Clone() => (ToolPosition)this.MemberwiseClone();
+        public ToolPositionOld Clone() => (ToolPositionOld)this.MemberwiseClone();
     }
 }

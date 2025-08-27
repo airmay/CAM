@@ -12,9 +12,9 @@ namespace CAM
     {
         public Curve[] Curves { get; set; }
         private Tool _tool;
-        private ToolPosition _toolPosition;
+        private ToolPositionOld _toolPosition;
 
-        public void SetToolPosition(Tool tool, ToolPosition toolPosition, Machine machine)
+        public void SetToolPosition(Tool tool, ToolPositionOld toolPosition, Machine machine)
         {
             if (Curves != null && (toolPosition == null || tool != _tool))
                 DeleteCurves();

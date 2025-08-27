@@ -1,8 +1,7 @@
 ﻿using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
-using System;
 using CAM.Core;
-using CAM.CncWorkCenter;
+using System;
 
 namespace CAM
 {
@@ -12,6 +11,8 @@ namespace CAM
     [Serializable]
     public class ToolWireSaw : ITool
     {
+        public const int Length = 1500;
+
         /// <summary>
         /// Толщина троса
         /// </summary>
@@ -21,7 +22,7 @@ namespace CAM
 
         public Curve[] GetModel(Machine? machine)
         {
-            var line = new Line(new Point3d(-1500, 0, 0), new Point3d(1500, 0, 0));
+            var line = new Line(new Point3d(-Length, 0, 0), new Point3d(Length, 0, 0));
             return new Curve[]
             {
                 line, 
@@ -31,15 +32,12 @@ namespace CAM
             };
         }
 
-        public Matrix3d GetTransformMatrix(ToolLocationParams? locationParamsFrom, ToolLocationParams locationParamsTo)
+        public Matrix3d GetTransformMatrix(ToolPosition from, ToolPosition to)
         {
-            var from = new ToolLocationWireSaw(locationParamsFrom);
-            var to = new ToolLocationWireSaw(locationParamsTo);
+            var displacement = Matrix3d.Displacement(from.Point.GetVectorTo(to.Point));
+            var rotation = Matrix3d.Rotation(-(from.Angle - to.Angle), Vector3d.ZAxis, to.Point);
 
-            var mat1 = Matrix3d.Displacement(from.Point.GetVectorTo(to.Point));
-            var mat2 = Matrix3d.Rotation(-(from.Angle - to.Angle), Vector3d.ZAxis, to.Point);
-
-            return mat2 * mat1;
+            return rotation * displacement;
         }
     }
 }

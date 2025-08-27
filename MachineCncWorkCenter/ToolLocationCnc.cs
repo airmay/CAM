@@ -12,13 +12,13 @@ namespace CAM.CncWorkCenter
         public double AngleC { get; set; }
 
         public ToolLocationCnc() { }
-        public ToolLocationCnc(ToolLocationParams? locationParams)
+        public ToolLocationCnc(ToolPosition? locationParams)
         {
-            X = locationParams?.Param1 ?? 0;
-            Y = locationParams?.Param2 ?? 0;
-            Z = locationParams?.Param3 ?? 0;
-            AngleC = locationParams?.Param4 ?? 0;
-            AngleA = locationParams?.Param5 ?? 0;
+            X = locationParams?.Point.X ?? 0;
+            Y = locationParams?.Point.Y ?? 0;
+            Z = locationParams?.Point.Z ?? 0;
+            AngleC = locationParams?.Angle ?? 0;
+            AngleA = locationParams?.Angle2 ?? 0;
         }
 
         public Point3d Point => new Point3d(X, Y, Z);
@@ -32,9 +32,9 @@ namespace CAM.CncWorkCenter
             AngleA = angleA ?? AngleA;
         }
 
-        public ToolLocationParams? GetParams()
+        public ToolPosition? GetParams()
         {
-            return IsDefined ? new ToolLocationParams(X, Y, Z, AngleC, AngleA) : (ToolLocationParams?)null;
+            return IsDefined ? new ToolPosition(Point, AngleC, AngleA) : (ToolPosition?)null;
         }
 
         public bool IsDefined => !double.IsNaN(X);

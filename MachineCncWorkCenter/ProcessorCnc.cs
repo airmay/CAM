@@ -96,9 +96,8 @@ namespace CAM.CncWorkCenter
 
             Program.AddCommand(new Command
             {
-                Name = name,
                 Text = text,
-                ToolLocationParams = Location.GetParams(),
+                //ToolLocationParams = Location.GetParams(),
                 ObjectId = toolpath,
                 Operation = _operation,
             });

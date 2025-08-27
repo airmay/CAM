@@ -11,21 +11,21 @@ namespace CAM
     {
         private static Curve[] _model;
         private static ITool _tool;
-        private static ToolLocationParams? _location;
+        private static ToolPosition _location;
         public static Machine Machine { get; set; }
 
-        public static void Set(ITool tool, ToolLocationParams? location)
+        public static void Set(ITool tool, ToolPosition location)
         {
-            if (tool == null || !location.HasValue || tool != _tool)
+            if (tool == null || tool != _tool)
                 Hide();
 
-            if (tool == null || !location.HasValue) 
+            if (tool == null) 
                 return;
 
             if (_model == null)
                 CreateModel(tool.GetModel(Machine));
 
-            TransformModel(tool.GetTransformMatrix(_location, location.Value));
+            TransformModel(tool.GetTransformMatrix(_location, location));
 
             _location = location;
             _tool = tool;
@@ -45,7 +45,6 @@ namespace CAM
                 }
 
             _model = null;
-            _location = null;
         }
 
         private static void CreateModel(Curve[] curves)
@@ -63,6 +62,7 @@ namespace CAM
                 tr.Commit();
             }
             _model = curves;
+            _location = new ToolPosition();
         }
 
         private static void TransformModel(Matrix3d matrix)

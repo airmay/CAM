@@ -49,6 +49,6 @@ namespace CAM
             };
         }
 
-        public override string Pause(double duration) => $"G4 F{duration}";
+        public override string Pause(double duration) => $"(DLY,{duration})";
     }
 }

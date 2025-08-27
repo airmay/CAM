@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace CAM
 {
-    public class MillToolPosition : ToolPosition
+    public class MillToolPosition : ToolPositionOld
     {
         public double AngleC { get; set; }
         public double AngleA { get; set; }
@@ -25,7 +25,7 @@ namespace CAM
             AngleA = angleA ?? AngleA;
         }
 
-        public override Matrix3d GetTransformMatrixFrom(ToolPosition toolPosition)
+        public override Matrix3d GetTransformMatrixFrom(ToolPositionOld toolPosition)
         {
             var millPosition = (MillToolPosition)toolPosition ?? new MillToolPosition(Point3d.Origin, 0, 0);
             var mat1 = Matrix3d.Displacement(millPosition.Point.GetVectorTo(Point));

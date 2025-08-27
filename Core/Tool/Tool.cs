@@ -9,7 +9,7 @@ namespace CAM
     public interface ITool
     {
         Curve[] GetModel(Machine? machine);
-        Matrix3d GetTransformMatrix(ToolLocationParams? locationFrom, ToolLocationParams locationTo);
+        Matrix3d GetTransformMatrix(ToolPosition locationFrom, ToolPosition locationTo);
     }
 
     /// <summary>
@@ -79,7 +79,7 @@ namespace CAM
             }
         }
 
-        public Matrix3d GetTransformMatrix(ToolLocationParams? locationParamsFrom, ToolLocationParams locationParamsTo)
+        public Matrix3d GetTransformMatrix(ToolPosition locationParamsFrom, ToolPosition locationParamsTo)
         {
             var from = new ToolLocationCnc(locationParamsFrom);
             var to = new ToolLocationCnc(locationParamsTo);
