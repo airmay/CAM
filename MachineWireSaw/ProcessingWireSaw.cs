@@ -39,6 +39,8 @@ namespace CAM.CncWorkCenter
             view.AddTextBox(nameof(ZSafety));
         }
 
+        public double Offset => ToolThickness / 2 + Delta;
+
         public ProcessingWireSaw()
         {
             Caption = "Обработка Тросовый станок";

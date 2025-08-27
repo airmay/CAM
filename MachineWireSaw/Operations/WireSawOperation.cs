@@ -3,8 +3,8 @@ using Autodesk.AutoCAD.Geometry;
 using Autodesk.AutoCAD.Runtime;
 using Dreambuild.AutoCAD;
 using System;
+using System.Collections.Generic;
 using System.Linq;
-using static Dreambuild.AutoCAD.Algorithms;
 using DbSurface = Autodesk.AutoCAD.DatabaseServices.Surface;
 using Exception = Autodesk.AutoCAD.Runtime.Exception;
 
@@ -13,18 +13,20 @@ namespace CAM
     [Serializable]
     public class WireSawOperation : OperationWireSawBase
     {
-
         public bool IsReverseDirection { get; set; }
         public bool Across { get; set; }
         public bool IsReverseOffset { get; set; }
         public double? Angle { get; set; }
-        public int? StepCount { get; set; }
+        public int StepCount { get; set; } = 100;
         public bool IsReverseU { get; set; }
         public bool IsReverseAngle { get; set; }
         //public double DU { get; set; }
         //public double Delay { get; set; } = 60;
         //public bool IsExtraMove { get; set; }
         //public bool IsExtraRotate { get; set; }
+
+        public double Offset => Processing.Offset * IsReverseOffset.GetSign(-1);
+
         public static void ConfigureParamsView(ParamsView view)
         {
             view.AddAcadObject();
@@ -47,9 +49,8 @@ namespace CAM
         {
             var entities = ProcessingArea.ObjectIds.QOpenForRead<Entity>();
             var extents = entities.GetExtents();
-            var offset = (Processing.ToolThickness / 2 + Processing.Delta) * IsReverseOffset.GetSign(-1);
 
-            Processor.StartOperation(extents.MaxPoint.Z + Processing.ZSafety);
+            Processor.StartOperation(extents.MaxPoint.Z);
 
             //var surface = dBObject as DbSurface;
             //var plane = surface.GetPlane();
@@ -60,9 +61,15 @@ namespace CAM
             //    Vector3d normal = plane.Normal;
             //}
 
+            // плоскость по области
             if (entities[0] is Region region)
             {
-                var normal = region.Normal;
+                if (region.Normal.IsParallelTo(Vector3d.ZAxis))
+                {
+                    HorizontalPlaneCutting();
+                    return;
+                }
+
                 Point3d point;
                 using (var exploded = new DBObjectCollection())
                 {
@@ -70,174 +77,165 @@ namespace CAM
                     point = ((Curve)exploded[0]).StartPoint;
                 }
 
-                PlaneCutting(extents, normal, point, offset);
+                PlaneCutting(extents, region.Normal, point);
+
+                return;
             }
-            else if (entities.Length > 1 && entities[0] is Line linе1 && entities[1] is Line linе2)
+
+            // плоскость по 2 отрезкам
+            if (entities.Length > 1 && entities[0] is Line linе1 && entities[1] is Line linе2)
             {
-                var vecBetween = linе1.StartPoint - (linе1.Delta.IsParallelTo(linе2.StartPoint - linе1.StartPoint) ? linе2.EndPoint : linе2.StartPoint);
-                var normal = linе1.Delta.CrossProduct(vecBetween);
-                // Если нормаль ненулевая (нормаль нулевая если отрезки коллинеарны или один из них - точка) 
-                if (normal.Length > Tolerance.Global.EqualPoint)
+                var normal = linе1.Delta.CrossProduct(linе2.StartPoint - linе1.StartPoint);
+                // Если нормаль нулевая (нормаль нулевая если отрезки коллинеарны или один из них - точка) 
+                if (normal.IsZeroLength())
+                    normal = linе1.Delta.CrossProduct(linе2.EndPoint - linе1.StartPoint);
+
+                if (!normal.IsZeroLength())
                 {
                     // Смешанное произведение
                     var tripleProduct = linе2.Delta.DotProduct(normal);
                     // Если смешанное произведение близко к нулю - отрезки компланарны
-                    if (Math.Abs(tripleProduct) < Tolerance.Global.EqualPoint)
-                        PlaneCutting(extents, normal, linе1.StartPoint, offset);
-                }
-            }
-            else if (entities[0] is DbSurface dbSurface)
-            {
-                using (var exploded = new DBObjectCollection())
-                {
-                    dbSurface.Explode(exploded);
-                    var railCurves = exploded.Cast<Curve>()
-                        .OrderByDescending(p => Math.Abs(p.EndPoint.Z - p.StartPoint.Z))
-                        .Take(2)
-                        .ToList();
-                    foreach (var curve in railCurves)
-                        if (curve.StartPoint.Z < curve.EndPoint.Z ^ IsReverseDirection)
-                            curve.ReverseCurve();
-
-                    var points = railCurves.Select(c =>
-                        c.GetGeCurve().GetSamplePoints(StepCount.Value).Select(p => p.Point).ToArray()).ToArray();
-
-                    if (Processing.Approach > 0)
+                    if (tripleProduct.IsZero())
                     {
-                        var v1 = railCurves[0].GetFirstDerivative(railCurves[0].StartParam);
-                        var v2 = railCurves[1].GetFirstDerivative(railCurves[1].StartParam);
-                        var v = (v1 + v2).GetNormal() * Processing.Approach;
-                        //var approachPoint = points[0][0] - Processing.Approach * v;
-                        //if (approachPoint.Z > Processor.UpperZ)
-                        //    approachPoint = GetPoint(Processor.UpperZ);
+                        if (normal.IsParallelTo(Vector3d.ZAxis))
+                            HorizontalPlaneCutting();
+                        else
+                            PlaneCutting(extents, normal, linе1.StartPoint);
 
-                        Processor.Move(points[0][0] - v, points[1][0] - v, IsReverseAngle, IsReverseU);
-                    }
-                    else
-                        Processor.Move(points[0][0], points[1][0], IsReverseAngle, IsReverseU);
-
-                    //var stepCurves = railCurves.ConvertAll(p => new
-                    //    { Curve = p, step = (p.EndParam - p.StartParam) / StepCount });
-                    for (var i = 0; i < StepCount; i++)
-                    {
-                        //var points = stepCurves.ConvertAll(p1 => p1.Curve.GetPointAtParameter(i * p.step.Value));
-
-                        Processor.Cutting(points[0][i], points[1][i]);
+                        return;
                     }
                 }
             }
-            else
-                throw new Exception(ErrorStatus.NotImplementedYet, "Нет реализации обработки для данной области");
-        }
 
-        private void PlaneCutting(Extents3d extents, Vector3d normal, Point3d point, double offset)
-        {
-            normal = normal.GetNormal();
-            var offsetVector = offset * normal;
-            var maxPoint = extents.MaxPoint + offsetVector;
-            var minPoint = extents.MinPoint + offsetVector;
-            point += offsetVector;
-            var (startPoint, endPoint) = IsReverseDirection ? (minPoint, maxPoint) : (maxPoint, minPoint);
-
-            Vector3d direction;
-            if (normal.IsParallelTo(Vector3d.ZAxis)) // горизонтальная плоскость
+            // плоскость по 1 отрезку
+            if (entities.Length == 1 && entities[0] is Line linе)
             {
-                var angle = Angle.GetValueOrDefault().ToRad();
-                if (Across)
-                    angle += Math.PI / 2;
-                if (IsReverseDirection)
-                    angle += Math.PI;
-                direction = -Vector3d.XAxis.RotateBy(angle, Vector3d.ZAxis);
-
-                var matrix = Matrix3d.Rotation(-angle, Vector3d.ZAxis, Processing.Origin.Point.ToPoint3d());
-
-                Extents3d? ext = null;
-                ProcessingArea.ObjectIds.ForEach<Entity>(p =>
+                if (linе.Delta.IsPerpendicularTo(Vector3d.ZAxis))
                 {
-                    var entity = p.GetTransformedCopy(matrix);
-                    if (!ext.HasValue)
-                        ext = entity.GeometricExtents;
-                    else
-                        ext.Value.AddExtents(entity.GeometricExtents);
-                });
-                matrix = matrix.Inverse();
-                startPoint = (ext.Value.MaxPoint + offsetVector).TransformBy(matrix);
-                endPoint = (ext.Value.MinPoint + offsetVector).TransformBy(matrix);
-            }
-            else
-            {
-                // Вычисляем проекцию оси Z на нормаль: (Z · n) * n
-                var projOnNormal = normal * Vector3d.ZAxis.DotProduct(normal);
-                // Вычитаем из оси Z её проекцию на нормаль → получаем проекцию на плоскость
-                direction = (Vector3d.ZAxis - projOnNormal).GetNormal() * IsReverseDirection.GetSign();
-                //wireDirection = new Vector3d(normal.Y, -normal.X, 0);
-
-                startPoint = point.GetPoint(direction, startPoint.Z);
-                endPoint = point.GetPoint(direction, endPoint.Z);
-            }
-
-            var wireDirection = direction.GetPerpendicularVector();
-            var approachPoint = startPoint - Processing.Approach * direction;
-            if (approachPoint.Z > Processor.UpperZ)
-                approachPoint = point.GetPoint(direction, Processor.UpperZ);
-            
-            Processor.Move(approachPoint, wireDirection, IsReverseAngle, IsReverseU);
-            Processor.Cutting(startPoint, wireDirection);
-            Processor.Cutting(endPoint, wireDirection);
-            Processor.Cutting(endPoint + Processing.Departure * direction, wireDirection);
-        }
-
-        public void Execute1()
-        {
-            var z0 = ProcessingArea.ObjectIds.GetExtents().MaxPoint.Z + Processing.ZSafety;
-                //Processor.StartOperation(0, 0, z0);
-            var offsetDistance = Processing.ToolThickness / 2 + Processing.Delta;
-
-            if (ProcessingArea.ObjectIds.Length == 1)
-            {
-                var dBObject = ProcessingArea.ObjectId.QOpenForRead();
-                var surface = dBObject as DbSurface;
-                if (dBObject is Region region)
-                {
-                    var planeSurface = new PlaneSurface();
-                    planeSurface.CreateFromRegion(region);
-                    surface = planeSurface;
+                    HorizontalPlaneCutting();
+                    return;
                 }
 
-                if (IsReverseOffset)
-                    offsetDistance *= -1;
-                var offsetSurface = DbSurface.CreateOffsetSurface(surface, offsetDistance);
+                var toolDirection = Angle.HasValue
+                    ? Vector3d.YAxis.RotateBy(Angle.Value.ToRad(), Vector3d.ZAxis)
+                    : linе.Delta.GetPerpendicularVector();
+                var normal = linе.Delta.CrossProduct(toolDirection).GetNormal();
 
-                //if (curves[0] is Region r)
-                //{
-                //    curves.Clear();
-                //    r.Explode(curves);
-                //}
-                //var plane = offsetSurface.GetPlane();
+                PlaneCutting(extents, normal, linе.StartPoint);
+                return;
+            }
 
-                var curves = new DBObjectCollection();
-                offsetSurface.Explode(curves);
-                var railCurves = curves.Cast<Curve>()
+            // поверхность
+            if (entities[0] is DbSurface surface)
+            {
+                var exploded = new DBObjectCollection();
+                surface.Explode(exploded);
+                var curves = exploded.Cast<Curve>()
                     .OrderByDescending(p => Math.Abs(p.EndPoint.Z - p.StartPoint.Z))
                     .Take(2)
                     .ToList();
-                foreach (var curve in railCurves)
-                    if (curve.StartPoint.Z < curve.EndPoint.Z ^ IsReverseDirection)
-                        curve.ReverseCurve();
+                SurfaceCutting(curves);
 
-                //if (Approach > 0)
-                //    points.Add(railCurves.Select(p => p.StartPoint + Vector3d.ZAxis * Approach).ToArray());
-                //Processor.GCommand(0, railCurves[0].StartPoint, railCurves[1].StartPoint, IsReverseAngle);
-
-                var stepCurves = railCurves.ConvertAll(p => new
-                    { Curve = p, step = (p.EndParam - p.StartParam) / StepCount });
-                for (var i = 0; i <= StepCount; i++)
-                {
-                    var points = stepCurves.ConvertAll(p => p.Curve.GetPointAtParameter(i * p.step.Value));
-
-                  //  Processor.GCommand(1, points[0], points[1]);
-                }
+                return;
             }
+
+            // поверхность по 2 направляющим
+            if (entities.Length > 1 && entities[0] is Curve curve0 && entities[1] is Curve curve1)
+            {
+                SurfaceCutting(new List<Curve> {curve0, curve1});
+                return;
+            }
+
+            // поверхность по 1 направляющей
+            if (entities[0] is Curve curve)
+            {
+                var toolDirection = Angle.HasValue
+                    ? Vector3d.YAxis.RotateBy(Angle.Value.ToRad(), Vector3d.ZAxis)
+                    : curve.GetFirstDerivative(curve.StartParam).GetNormal().GetPerpendicularVector();
+                var matrix = Matrix3d.Displacement(toolDirection);
+                var copy = curve.GetTransformedCopy(matrix) as Curve;
+                SurfaceCutting(new List<Curve> { curve, copy});
+                return;
+            }
+
+            throw new Exception(ErrorStatus.NotImplementedYet, "Нет реализации обработки для данной области");
+        }
+
+        private void HorizontalPlaneCutting()
+        {
+            var angle = Angle.GetValueOrDefault().ToRad();
+            if (Across)
+                angle += Math.PI / 2;
+            if (IsReverseDirection)
+                angle += Math.PI;
+
+            var extents = new Extents3d();
+            var matrix = Matrix3d.Rotation(-angle, Vector3d.ZAxis, Processing.Origin.Point.ToPoint3d());
+            ProcessingArea.ObjectIds.ForEach<Entity>(p => extents.AddExtents(p.GetTransformedCopy(matrix).GeometricExtents));
+            matrix = matrix.Inverse();
+            var startPoint = extents.MaxPoint.TransformBy(matrix) + Offset * Vector3d.ZAxis;
+            var endPoint = extents.MinPoint.TransformBy(matrix) + Offset * Vector3d.ZAxis;
+            var direction = -Vector3d.XAxis.RotateBy(angle, Vector3d.ZAxis);
+            var toolDirection = direction.GetPerpendicularVector();
+
+            Processor.Move(startPoint - Processing.Approach * direction, toolDirection, IsReverseAngle, IsReverseU);
+            Processor.Cutting(startPoint, toolDirection);
+            Processor.Cutting(endPoint, toolDirection);
+            Processor.Cutting(endPoint + Processing.Departure * direction, toolDirection);
+        }
+
+        private void PlaneCutting(Extents3d extents, Vector3d normal, Point3d point)
+        {
+            var offsetVector = Offset * normal;
+            point += offsetVector;
+            var maxPoint = extents.MaxPoint + offsetVector;
+            var minPoint = extents.MinPoint + offsetVector;
+            var (startPoint, endPoint) = IsReverseDirection ? (minPoint, maxPoint) : (maxPoint, minPoint);
+
+            // Вычисляем проекцию оси Z на нормаль: (Z · n) * n
+            var projOnNormal = normal * Vector3d.ZAxis.DotProduct(normal);
+            // Вычитаем из оси Z её проекцию на нормаль → получаем проекцию на плоскость
+            var direction = (Vector3d.ZAxis - projOnNormal).GetNormal() * IsReverseDirection.GetSign();
+            //wireDirection = new Vector3d(normal.Y, -normal.X, 0);
+
+            startPoint = point.GetPoint(direction, startPoint.Z);
+            endPoint = point.GetPoint(direction, endPoint.Z);
+
+            var toolDirection = direction.GetPerpendicularVector();
+            var approachPoint = startPoint - Processing.Approach * direction;
+            if (approachPoint.Z > Processor.UpperZ)
+                approachPoint = point.GetPoint(direction, Processor.UpperZ);
+
+            Processor.Move(approachPoint, toolDirection, IsReverseAngle, IsReverseU);
+            Processor.Cutting(startPoint, toolDirection);
+            Processor.Cutting(endPoint, toolDirection);
+            Processor.Cutting(endPoint + Processing.Departure * direction, toolDirection);
+        }
+
+        private void SurfaceCutting(List<Curve> railCurves)
+        {
+            foreach (var railCurve in railCurves.Where(p => p.StartPoint.Z < p.EndPoint.Z ^ IsReverseDirection))
+                railCurve.ReverseCurve();
+
+            var points = railCurves.ConvertAll(p => p.GetGeCurve().GetSamplePoints(StepCount).Select(x => x.Point).ToList());
+            var directions = points[0].ConvertAll(p => railCurves[0].GetFirstDerivative(p).GetNormal());
+            var offsets = points[0].Select((p, i) => directions[i].CrossProduct(points[1][i] - p).GetNormal() * Offset).ToArray();
+            points = points.ConvertAll(ps => ps.Select((p, i) => p + offsets[i]).ToList());
+
+            var approachPoints = points.ConvertAll(p =>
+            {
+                var pt = p[0] - Processing.Approach * directions[0];
+                return pt.Z > Processor.UpperZ
+                    ? p[0].GetPoint(directions[0], Processor.UpperZ)
+                    : pt;
+            });
+            Processor.Move(approachPoints[0],approachPoints[1], IsReverseAngle, IsReverseU);
+            for (var i = 0; i < points[0].Count; i++)
+                Processor.Cutting(points[0][i], points[1][i]);
+
+            var last = points[0].Count - 1;
+            var departure = Processing.Departure * directions[last];
+            Processor.Cutting(points[0][last] + departure, points[1][last] + departure);
         }
     }
 }

@@ -128,7 +128,8 @@ namespace CAM
 
         public static Point3d GetClosestPoint(this Point3d point, params Point3d[] points) => points.OrderBy(p => p.DistanceTo(point)).First();
 
-        public static bool IsEqual(this double value1, double value2) => Math.Abs(value1 - value2) < Consts.Epsilon;
+        public static bool IsZero(this double value) => Math.Abs(value) < Tolerance.Global.EqualPoint;
+        public static bool IsEqual(this double value1, double value2) => IsZero(value1 - value2);
         public static bool IsEqual(this Point3d point1, Point3d point2) => point1.X.IsEqual(point2.X) && point1.Y.IsEqual(point2.Y) && point1.Z.IsEqual(point2.Z);
 
         public static double GetAngle(Point3d p1, Point3d p2, Point3d p3) => p1.GetVectorTo(p2).GetAngleTo(p2.GetVectorTo(p3));

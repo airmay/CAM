@@ -76,13 +76,13 @@ namespace CAM.MachineWireSaw
         public bool IsEngineStarted;
         public double UpperZ;
 
-        public void StartOperation(double upperZ)
+        public void StartOperation(double zMax)
         {
             if (IsEngineStarted)
                 return;
 
-            V = UpperZ = upperZ;
-            _toolPoint = Center.WithZ(upperZ);
+            V = UpperZ = zMax + _processing.ZSafety;
+            _toolPoint = Center.WithZ(UpperZ);
 
             AddCommands(_postProcessor.StartMachine());
         }
