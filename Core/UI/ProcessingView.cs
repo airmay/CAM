@@ -66,7 +66,8 @@ namespace CAM
 #endif 
             ClearProgram();
 
-            processing.Execute();
+            if (!processing.Execute())
+                return;
 
             UpdateNodeText(processingNode);
             processingNode.Nodes.Cast<TreeNode>().ForAll(UpdateNodeText);
@@ -233,6 +234,7 @@ namespace CAM
             if (SelectedNode != null && MessageBox.Show($"Вы хотите удалить {SelectedNode.Text}?",
                     "Подтверждение", MessageBoxButtons.YesNo, MessageBoxIcon.Question, MessageBoxDefaultButton.Button1) == DialogResult.Yes)
             {
+                // удалить обработку
                 SelectedNode.Remove();
                 treeView.Focus();
                 RefreshToolButtonsState();

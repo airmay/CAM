@@ -1,22 +1,15 @@
 ﻿using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
-using System;
 using CAM.Core;
-using CAM.CncWorkCenter;
+using System;
 
 namespace CAM
 {
-    public interface ITool
-    {
-        Curve[] GetModel(Machine? machine);
-        Matrix3d GetTransformMatrix(ToolPosition locationFrom, ToolPosition locationTo);
-    }
-
     /// <summary>
     /// Инструмент
     /// </summary>
     [Serializable]
-    public class Tool: ITool
+    public class Tool
     {
         /// <summary>
         /// Номер
@@ -43,6 +36,8 @@ namespace CAM
         /// </summary>
         public double? Thickness { get; set; }
 
+        public static double WireSawLength = 1500;
+
         public override string ToString() => $"№{Number} {Type.GetDescription()} Ø{Diameter}{(Thickness.HasValue ? " × " + Thickness.ToString() : null)} {Name}";
 
         public Curve[] GetModel(Machine? machine)
@@ -65,13 +60,14 @@ namespace CAM
                         new Line(Point3d.Origin, Point3d.Origin + Vector3d.ZAxis * 100)
                     };
 
-                case ToolType.Cable:
-                    var line = new Line(new Point3d(0, -1500, 0), new Point3d(0, 1500, 0));
+                case ToolType.WireSaw:
+                    var line = new Line(new Point3d(-WireSawLength, 0, 0), new Point3d(WireSawLength, 0, 0));
                     return new Curve[]
                     {
-                        new Circle(line.StartPoint, Vector3d.YAxis, thickness / 2),
-                        new Circle(line.EndPoint, Vector3d.YAxis, thickness / 2),
-                        new Circle(line.GetPointAtParameter(line.Length / 2), Vector3d.YAxis, thickness / 2)
+                        line,
+                        new Circle(line.StartPoint, Vector3d.XAxis, thickness / 2),
+                        new Circle(line.EndPoint, Vector3d.XAxis, thickness / 2),
+                        new Circle(line.GetPointAtParameter(line.Length / 2), Vector3d.XAxis, thickness/ 2)
                     };
 
                 default:
@@ -79,16 +75,14 @@ namespace CAM
             }
         }
 
-        public Matrix3d GetTransformMatrix(ToolPosition locationParamsFrom, ToolPosition locationParamsTo)
+        public Matrix3d GetTransformMatrix(ToolPosition from, ToolPosition to)
         {
-            var from = new ToolLocationCnc(locationParamsFrom);
-            var to = new ToolLocationCnc(locationParamsTo);
+            var displacement = Matrix3d.Displacement(from.Point.GetVectorTo(to.Point));
+            var rotationC = Matrix3d.Rotation(from.AngleC - to.AngleC, Vector3d.ZAxis, to.Point);
+            // todo ToRad()
+            var rotationA = Matrix3d.Rotation((from.AngleA - to.AngleA).ToRad(), Vector3d.XAxis.RotateBy(-to.AngleC.ToRad(), Vector3d.ZAxis), to.Point);
 
-            var mat1 = Matrix3d.Displacement(from.Point.GetVectorTo(to.Point));
-            var mat2 = Matrix3d.Rotation((from.AngleC - to.AngleC).ToRad(), Vector3d.ZAxis, to.Point);
-            var mat3 = Matrix3d.Rotation((from.AngleA - to.AngleA).ToRad(), Vector3d.XAxis.RotateBy(-to.AngleC.ToRad(), Vector3d.ZAxis), to.Point);
-
-            return mat3 * mat2 * mat1;
+            return rotationA * rotationC * displacement;
         }
     }
 }

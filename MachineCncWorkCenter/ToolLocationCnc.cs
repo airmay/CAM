@@ -17,8 +17,8 @@ namespace CAM.CncWorkCenter
             X = locationParams?.Point.X ?? 0;
             Y = locationParams?.Point.Y ?? 0;
             Z = locationParams?.Point.Z ?? 0;
-            AngleC = locationParams?.Angle ?? 0;
-            AngleA = locationParams?.Angle2 ?? 0;
+            /*AngleC = locationParams?.Angle ?? 0;
+            AngleA = locationParams?.Angle2 ?? 0;*/
         }
 
         public Point3d Point => new Point3d(X, Y, Z);

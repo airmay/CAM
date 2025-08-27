@@ -9,11 +9,11 @@ namespace CAM.CncWorkCenter
         public override MachineType MachineType => MachineType.WireSawMachine;
         [NonSerialized] public ProcessorWireSaw Processor;
 
-        public ToolWireSaw Tool { get; } = new ToolWireSaw();
+        public Tool Tool { get; } = new Tool { Type = ToolType.WireSaw };
 
         public double ToolThickness
         {
-            get => Tool.Thickness;
+            get => Tool.Thickness.GetValueOrDefault();
             set => Tool.Thickness = value;
         }
         public int CuttingFeed { get; set; } = 10;
@@ -55,7 +55,7 @@ namespace CAM.CncWorkCenter
 
         protected override bool Validate()
         {
-            return ToolThickness.CheckNotNull("Толщина троса");
+            return Tool.Thickness.CheckNotNull("Толщина троса");
         }
     }
 }

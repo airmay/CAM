@@ -11,6 +11,6 @@ namespace CAM
         Mill,
 
         [Description("Трос")]
-        Cable
+        WireSaw
     }
 }

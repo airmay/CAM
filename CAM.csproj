@@ -170,7 +170,6 @@
     <Compile Include="MachineWireSaw\PostProcessorWireSawBase.cs" />
     <Compile Include="MachineWireSaw\ProcessingWireSaw.cs" />
     <Compile Include="MachineWireSaw\ProcessorWireSaw.cs" />
-    <Compile Include="MachineWireSaw\ToolWireSaw.cs" />
     <Compile Include="MachineCncWorkCenter\Operations\Sawing\SawingModesView.cs">
       <SubType>UserControl</SubType>
     </Compile>

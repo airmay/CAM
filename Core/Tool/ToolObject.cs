@@ -10,11 +10,11 @@ namespace CAM
     public static class ToolObject
     {
         private static Curve[] _model;
-        private static ITool _tool;
+        private static Tool _tool;
         private static ToolPosition _location;
         public static Machine Machine { get; set; }
 
-        public static void Set(ITool tool, ToolPosition location)
+        public static void Set(Tool tool, ToolPosition location)
         {
             if (tool == null || tool != _tool)
                 Hide();

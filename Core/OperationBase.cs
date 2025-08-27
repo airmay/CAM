@@ -7,7 +7,7 @@ namespace CAM
     {
         bool Enabled { get; set; }
         MachineType MachineType { get; }
-        ITool Tool { get; }
+        Tool Tool { get; }
         ObjectId? ToolpathGroupId { get; set; }
     }
 
@@ -27,7 +27,7 @@ namespace CAM
         }
 
         public AcadObject ProcessingArea { get; set; }
-        public abstract ITool Tool { get; }
+        public abstract Tool Tool { get; }
         
         public abstract void Execute();
 

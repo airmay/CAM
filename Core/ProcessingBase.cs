@@ -11,7 +11,7 @@ namespace CAM
         IOperation[] Operations { get; set; }
         MachineType MachineType { get; }
         Machine? Machine { get; set; }
-        void Execute();
+        bool Execute();
         void HideToolpath(IOperation operation);
     }
 
@@ -30,11 +30,11 @@ namespace CAM
 
         protected abstract bool Validate();
 
-        public void Execute()
+        public bool Execute()
         {
             var operations = Operations.Cast<OperationBase>().Where(p => p.Enabled).ToArray();
             if (!Validate() || operations.Length == 0 || operations.Any(p => !p.Validate()))
-                return;
+                return false;
 
             Acad.Editor.UpdateScreen();
             Acad.Write($"Выполняется расчет обработки {Caption}");
@@ -46,7 +46,7 @@ namespace CAM
                 stopwatch.Stop();
                 Acad.Write($"Расчет обработки завершен {stopwatch.Elapsed}");
 
-                return;
+                return true;
             }
             catch (Autodesk.AutoCAD.Runtime.Exception ex) when (ex.ErrorStatus == Autodesk.AutoCAD.Runtime.ErrorStatus.UserBreak)
             {
@@ -62,6 +62,7 @@ namespace CAM
             {
                 Acad.CloseProgressor();
             }
+                return false;
         }
 
         protected virtual void ProcessOperations(OperationBase[] operations)
