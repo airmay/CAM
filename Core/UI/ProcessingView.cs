@@ -17,7 +17,6 @@ namespace CAM
 
     public partial class ProcessingView : UserControl
     {
-        private Program _program;
         private TreeNode SelectedNode => treeView.SelectedNode;
         private TreeNode SelectedProcessingNode => treeView.SelectedNode?.Parent ?? treeView.SelectedNode;
         private Command SelectedCommand => processCommandBindingSource.Current as Command;
@@ -53,7 +52,7 @@ namespace CAM
         private void RefreshToolButtonsState()
         {
             bRemove.Enabled = bMoveUp.Enabled = bMoveDown.Enabled = bBuildProcessing.Enabled = SelectedNode != null;
-            bVisibility.Enabled = bSendProgramm.Enabled = bPartialProcessing.Enabled = bPlay.Enabled = _program != null;
+            bVisibility.Enabled = bSendProgramm.Enabled = bPartialProcessing.Enabled = bPlay.Enabled = !Program.IsEmpty;
         }
 
         private void bBuildProcessing_ButtonClick(object sender, EventArgs e)
@@ -67,13 +66,13 @@ namespace CAM
 #endif 
             ClearProgram();
 
-            _program = processing.Execute();
+            processing.Execute();
 
             UpdateNodeText(processingNode);
             processingNode.Nodes.Cast<TreeNode>().ForAll(UpdateNodeText);
                
-            _processingNode = _program != null ? processingNode : null;
-            processCommandBindingSource.DataSource = _program?.ArraySegment;
+            _processingNode = !Program.IsEmpty ? processingNode : null;
+            processCommandBindingSource.DataSource = Program.ArraySegment;
             
             toolStrip.Enabled = true;
             RefreshToolButtonsState();
@@ -89,7 +88,7 @@ namespace CAM
 
         private void bVisibility_Click(object sender, EventArgs e)
         {
-            _program?.Processing.HideToolpath(null);
+            Program.Processing.HideToolpath(null);
             Acad.Editor.UpdateScreen();
         }
 
@@ -113,7 +112,7 @@ namespace CAM
         private void bSend_Click(object sender, EventArgs e)
         {
             dataGridViewCommand.EndEdit();
-            _program.Export();
+            Program.Export();
         }
 
         private void bClose_Click(object sender, EventArgs e) => Acad.CloseAndDiscard();
@@ -291,7 +290,7 @@ namespace CAM
         private void treeView_AfterSelect(object sender, TreeViewEventArgs e)
         {
             RefreshParamsView();
-            if (_program?.TryGetCommandIndex(SelectedNode.Tag, out var commandIndex) == true)
+            if (Program.TryGetCommandIndex(SelectedNode.Tag, out var commandIndex) == true)
                 processCommandBindingSource.Position = commandIndex;
             SelectedNode.Tag.As<ITreeNode>().OnSelect();
             Acad.Editor.UpdateScreen();
@@ -327,9 +326,9 @@ namespace CAM
         {
             processCommandBindingSource.DataSource = null;
             Acad.DeleteProcessObjects();
-            _program?.Processing.Operations?.Select(p => p.ToolpathGroupId).Delete();
-            _program?.Processing.Operations?.ForAll(p => p.ToolpathGroupId = null);
-            _program = null;
+            Program.Processing?.Operations?.Select(p => p.ToolpathGroupId).Delete();
+            Program.Processing?.Operations?.ForAll(p => p.ToolpathGroupId = null);
+            Program.Clear();
             ToolObject.Hide();
         }
 
@@ -353,7 +352,7 @@ namespace CAM
 
         public void SelectCommand(ObjectId? objectId)
         {
-            if (objectId.HasValue && _program != null && _program.TryGetCommandIndex(objectId.Value, out var commandIndex))
+            if (objectId.HasValue && Program.TryGetCommandIndex(objectId.Value, out var commandIndex))
                 processCommandBindingSource.Position = commandIndex;
         }
         #endregion

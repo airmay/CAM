@@ -6,13 +6,6 @@ namespace CAM
     {
         public static readonly Dictionary<Machine, MachineSettings> Machines = new Dictionary<Machine, MachineSettings>
         {
-            [Machine.ScemaLogic] = new MachineSettings
-            {
-                MaxFrequency = 3000,
-                ProgramFileExtension = "csv",
-                ProgramLineNumberFormat = "{0}",
-                IsFrontPlaneZero = false
-            },
             [Machine.Donatoni] = new MachineSettings
             {
                 MaxFrequency = 5000,
@@ -38,7 +31,7 @@ namespace CAM
                 ProgramFileExtension = "txt",
                 ProgramLineNumberFormat = "N{0}"
             },
-            [Machine.CableSawing] = new MachineSettings
+            [Machine.WireSawMachine] = new MachineSettings
             {
                 MaxFrequency = 10000,
                 ProgramFileExtension = "txt",

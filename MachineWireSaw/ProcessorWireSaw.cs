@@ -59,7 +59,7 @@ namespace CAM.MachineWireSaw
 
         public void Start()
         {
-            ProcessingBase.Program.Init(_processing);
+            Program.Init(_processing);
             _toolpathBuilder = new ToolpathBuilder();
         }
 
@@ -68,7 +68,7 @@ namespace CAM.MachineWireSaw
             AddCommands(_postProcessor.StopEngine());
             AddCommands(_postProcessor.StopMachine());
 
-            ProcessingBase.Program.CreateProgram();
+            Program.CreateProgram();
             FinishOperation();
             _processing.Caption = GetCaption(_processing.Caption, _processDuration);
         }
@@ -109,7 +109,7 @@ namespace CAM.MachineWireSaw
             var toolLocationParams = new ToolLocationParams(_toolPoint.X, _toolPoint.Y, _toolPoint.Z, _toolAngle, 0);
             var timeSpan = duration.HasValue ? new TimeSpan(0, 0, 0, (int)Math.Round(duration.Value)).ToString() : null;
 
-            ProcessingBase.Program.AddCommand(new Command
+            Program.AddCommand(new Command
             {
                 Text = text,
                 Duration = timeSpan,

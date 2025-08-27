@@ -6,33 +6,44 @@ using System.Linq;
 
 namespace CAM.Core
 {
-    public class Program
+    public static class Program
     {
-        private Command[] _commands;
-        private int _capacity = 1_000;
-        private int _count;
-        public ArraySegment<Command> ArraySegment;
-        public IProcessing Processing { get; private set; }
-        private readonly Dictionary<ObjectId, int> _objectIdDict = new Dictionary<ObjectId, int>(1_000);
-        private readonly Dictionary<object, int> _operationDict = new Dictionary<object, int>();
+        private static Command[] _commands;
+        private static int _capacity = 1_000;
+        private static int _count;
+        public static ArraySegment<Command> ArraySegment;
+        public static IProcessing Processing { get; private set; }
+        public static bool IsEmpty => _count == 0;
 
-        public void CreateProgram()
+        private static Dictionary<ObjectId, int> _objectIdDict;
+        private static readonly Dictionary<object, int> _operationDict = new Dictionary<object, int>();
+
+        public static void CreateProgram()
         {
             ArraySegment = new ArraySegment<Command>(_commands, 0, _count);
         }
 
-        public void Init(IProcessing processing)
+        public static void Init(IProcessing processing)
         {
-            _count = 0;
-            _objectIdDict.Clear();
-            _operationDict.Clear();
+            Clear();
             Processing = processing;
         }
 
-        public void AddCommand(Command command)
+        public static void Clear()
+        {
+            _count = 0;
+            _objectIdDict?.Clear();
+            _operationDict.Clear();
+            Processing = null;
+        }
+
+        public static void AddCommand(Command command)
         {
             if (_commands == null)
+            {
                 _commands = new Command[_capacity];
+                _objectIdDict = new Dictionary<ObjectId, int>(1_000);
+            }
 
             if (_count == _capacity)
                 if (_capacity < 100_000)
@@ -59,21 +70,21 @@ namespace CAM.Core
             command.Number = _count;
         }
 
-        public bool TryGetCommandIndex(ObjectId objectId, out int commandIndex)
+        public static bool TryGetCommandIndex(ObjectId objectId, out int commandIndex)
         {
             var result = _objectIdDict.TryGetValue(objectId, out var index);
             commandIndex = index;
             return result;
         }
 
-        public bool TryGetCommandIndex(object operation, out int commandIndex)
+        public static bool TryGetCommandIndex(object operation, out int commandIndex)
         {
             var result = _operationDict.TryGetValue(operation, out var index);
             commandIndex = index;
             return result;
         }
 
-        public void Export()
+        public static void Export()
         {
             if (_count == 0)
             {

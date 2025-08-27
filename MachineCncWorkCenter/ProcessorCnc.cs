@@ -1,6 +1,7 @@
 ﻿using System;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
+using CAM.Core;
 using Dreambuild.AutoCAD;
 
 namespace CAM.CncWorkCenter
@@ -66,7 +67,7 @@ namespace CAM.CncWorkCenter
 
         public void Start()
         {
-            ProcessingBase.Program.Init(_processing);
+            Program.Init(_processing);
             _toolpathBuilder = new ToolpathBuilder();
 
             Location.Z = ZMax + ZSafety * 3;
@@ -81,7 +82,7 @@ namespace CAM.CncWorkCenter
         {
             AddCommands(_postProcessor.StopEngine());
             AddCommands(_postProcessor.StopMachine());
-            ProcessingBase.Program.CreateProgram();
+            Program.CreateProgram();
             FinishOperation();
             _processing.Caption = GetCaption(_processing.Caption, _processDuration);
         }
@@ -93,7 +94,7 @@ namespace CAM.CncWorkCenter
             if (text == null)
                 return;
 
-            ProcessingBase.Program.AddCommand(new Command
+            Program.AddCommand(new Command
             {
                 Name = name,
                 Text = text,
