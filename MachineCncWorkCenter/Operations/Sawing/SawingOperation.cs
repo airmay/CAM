@@ -46,8 +46,9 @@ namespace CAM.Operations.Sawing
 
         public override void Execute()
         {
-            var (curveSides, points, outerSide) = CalcСurveProcessingInfo();
-            foreach (var curve in ProcessingArea.GetCurves())
+            var curves = ProcessingArea.GetCurves();
+            var (curveSides, points, outerSide) = CalcСurveProcessingInfo(curves);
+            foreach (var curve in curves)
             {
                 if (curveSides.TryGetValue(curve, out var curveSide))
                     ProcessCurve(curve, (Side)curveSide, points[curve.StartPoint], points[curve.EndPoint]);
@@ -56,9 +57,8 @@ namespace CAM.Operations.Sawing
             Graph.CreateHatch(curveSides.Keys.ToList().ToPolyline(), outerSide, p => Processor.AddEntity(p));
         }
 
-        private (Dictionary<Curve, int>, Dictionary<Point3d, bool>, int) CalcСurveProcessingInfo()
+        private (Dictionary<Curve, int>, Dictionary<Point3d, bool>, int) CalcСurveProcessingInfo(Curve[] curves)
         {
-            var curves = ProcessingArea.GetCurves();
             var curveSides = new Dictionary<Curve, int>();
             var points = new Dictionary<Point3d, bool>(Graph.Point3dComparer);
 
@@ -103,14 +103,14 @@ namespace CAM.Operations.Sawing
         {
             var gashLength = GetGashLength(Depth);
             var indent = gashLength + CornerIndentIncrease;
-            AddGash(curve, isExactlyBegin, isExactlyEnd, outerSide, gashLength, indent);
-
             var sumIndent = indent * (Convert.ToInt32(isExactlyBegin) + Convert.ToInt32(isExactlyEnd));
             if (sumIndent >= curve.Length())
             {
                 Scheduling(Processor, curve, isExactlyBegin, isExactlyEnd, indent);
                 return;
             }
+            if (!isExactlyBegin || !isExactlyEnd)
+                AddGash(curve, isExactlyBegin, isExactlyEnd, outerSide, gashLength, indent);
 
             var engineSide = EngineSideCalculator.Calculate(curve, Machine);
             var compensation = 0D;
