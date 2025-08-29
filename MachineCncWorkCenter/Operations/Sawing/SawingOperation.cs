@@ -50,7 +50,7 @@ namespace CAM.Operations.Sawing
             foreach (var curve in ProcessingArea.GetCurves())
             {
                 if (curveSides.TryGetValue(curve, out var curveSide))
-                    ProcessCurve(Processor, curve, curveSide, points[curve.StartPoint], points[curve.EndPoint]);
+                    ProcessCurve(curve, curveSide, points[curve.StartPoint], points[curve.EndPoint]);
             }
 
             CreateHatch(curveSides, outerSide.Opposite());
@@ -75,6 +75,7 @@ namespace CAM.Operations.Sawing
             var startСurve = curve;
 
             var center = Graph.GetCenter(pointCurveDict.Select(p => p.Key));
+            //var s = center.GetSide(curve.StartPoint, curve.EndPoint) * direction * ChangeSide.GetSign(-1);
             var side = Graph.IsTurnRight(point, curve.NextPoint(point), center) ^ ChangeSide ? Side.Left : Side.Right;
             do
             {
@@ -109,7 +110,7 @@ namespace CAM.Operations.Sawing
             //    SupportGroup = SupportGroup.AppendToGroup(hatchId.Value);
         }
 
-        private void ProcessCurve(ProcessorCnc processor, Curve curve, Side outerSide, bool isExactlyBegin, bool isExactlyEnd)
+        private void ProcessCurve(Curve curve, Side outerSide, bool isExactlyBegin, bool isExactlyEnd)
         {
             var gashLength = GetGashLength(Depth);
             var indent = gashLength + CornerIndentIncrease;
@@ -118,7 +119,7 @@ namespace CAM.Operations.Sawing
             var sumIndent = indent * (Convert.ToInt32(isExactlyBegin) + Convert.ToInt32(isExactlyEnd));
             if (sumIndent >= curve.Length())
             {
-                Scheduling(processor, curve, isExactlyBegin, isExactlyEnd, indent);
+                Scheduling(Processor, curve, isExactlyBegin, isExactlyEnd, indent);
                 return;
             }
 
@@ -152,19 +153,19 @@ namespace CAM.Operations.Sawing
             var tip = engineSide == Side.Right ^ (passList.Count % 2 == 1)
                 ? CurveTip.End
                 : CurveTip.Start;
-            processor.EngineSide = engineSide;
+            Processor.EngineSide = engineSide;
+            Processor.StartOperation();
             foreach (var (depth, feed) in passList)
             {
                 indent = isExactlyBegin || isExactlyEnd ? GetGashLength(depth) + CornerIndentIncrease : 0;
-                processor.CuttingFeed = feed;
-                Cutting(depth);
+                Cutting(depth, feed);
                 tip = tip.Swap();
             }
-            processor.Uplifting();
+            Processor.Uplifting();
 
             return;
 
-            void Cutting(double depth)
+            void Cutting(double depth, int feed)
             {
                 var toolpath = baseCurve.GetTransformedCopy(Matrix3d.Displacement(-Vector3d.ZAxis * depth));
                 switch (toolpath)
@@ -172,20 +173,20 @@ namespace CAM.Operations.Sawing
                     case Line line:
                         if (isExactlyBegin) line.StartPoint = line.GetPointAtDist(indent);
                         if (isExactlyEnd) line.EndPoint = line.GetPointAtDist(line.Length - indent);
-                        processor.Cutting(line, tip);
+                        Processor.Cutting(line, tip, feed);
                         break;
 
                     case Arc toolpathArc:
                         var indentAngle = indent / toolpathArc.Radius;
                         if (isExactlyBegin) toolpathArc.StartAngle += indentAngle;
                         if (isExactlyEnd) toolpathArc.EndAngle -= indentAngle;
-                        processor.Cutting(toolpathArc, tip, аngleA);
+                        Processor.Cutting(toolpathArc, tip, аngleA, feed);
                         break;
 
                     case Polyline polyline:
                         if (isExactlyBegin) polyline.SetPointAt(0, polyline.GetPointAtDist(indent).ToPoint2d());
                         if (isExactlyEnd) polyline.SetPointAt(polyline.NumberOfVertices - 1, polyline.GetPointAtDist(polyline.Length - indent).ToPoint2d());
-                        processor.Cutting(polyline, tip);
+                        Processor.Cutting(polyline, tip, feed);
                         break;
 
                     default: throw new Exception();

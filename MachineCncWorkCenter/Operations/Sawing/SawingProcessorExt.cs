@@ -9,7 +9,7 @@ namespace CAM.Operations.Sawing
         private static void Approach(this ProcessorCnc processor, Curve curve, CurveTip tip, double angleA = 0)
         {
             var point = curve.GetPoint(tip);
-            if (processor.Location.Z > processor.ZMax)
+            if (processor.IsUpperTool)
             {
                 var angleC = BuilderUtils.CalcToolAngle(curve, point, processor.EngineSide);
                 processor.Move(point, angleC, angleA);
@@ -19,17 +19,17 @@ namespace CAM.Operations.Sawing
             processor.Penetration(point);
         }
 
-        public static void Cutting(this ProcessorCnc processor, Arc arc, CurveTip tip, double angleA)
+        public static void Cutting(this ProcessorCnc processor, Arc arc, CurveTip tip, double angleA, int? feed = null)
         {
             processor.Approach(arc, tip, angleA);
 
             var point = arc.GetPoint(tip.Swap());
             var angleC = BuilderUtils.CalcToolAngle(arc, point, processor.EngineSide);
             var gCode = point == arc.StartPoint ? 3 : 2;
-            processor.GCommand(CommandNames.Cutting, gCode, processor.CuttingFeed, arc, point, angleC, arcCenter: arc.Center.ToPoint2d());
+            processor.GCommand(CommandNames.Cutting, gCode, feed, arc, point, angleC, arcCenter: arc.Center.ToPoint2d());
         }
 
-        public static void Cutting(this ProcessorCnc processor, Polyline polyline, CurveTip tip)
+        public static void Cutting(this ProcessorCnc processor, Polyline polyline, CurveTip tip, int? feed = null)
         {
             processor.Approach(polyline, tip);
 
@@ -47,10 +47,10 @@ namespace CAM.Operations.Sawing
                     var arcSeg = polyline.GetArcSegment2dAt(i);
                     var gCode = arcSeg.IsClockWise ? 2 : 3;
                     var angleC = BuilderUtils.CalcToolAngle(polyline, point, processor.EngineSide);
-                    processor.GCommand(CommandNames.Cutting, gCode, processor.CuttingFeed, polyline, point, angleC, arcCenter: arcSeg.Center);
+                    processor.GCommand(CommandNames.Cutting, gCode, feed, polyline, point, angleC, arcCenter: arcSeg.Center);
                 }
                 else
-                    processor.GCommand(CommandNames.Cutting, 1, processor.CuttingFeed, polyline, point);
+                    processor.GCommand(CommandNames.Cutting, 1, feed, polyline, point);
             }
         }
     }

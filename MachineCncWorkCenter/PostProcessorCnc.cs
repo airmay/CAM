@@ -32,5 +32,27 @@ namespace CAM.CncWorkCenter
 
         public abstract string[] SetTool(int toolNo, double angleA, double angleC, int originCellNumber);
 
+
+        public string GCommand(int gCode, Point3d point, double angleC, double angleA, int? feed, Point2d? arcCenter)
+        {
+            var @params = GetParams(gCode, point, angleC, angleA, feed, arcCenter);
+            return GCommand(@params);
+        }
+
+        public Dictionary<char, string> GetParams(int gCode, Point3d point, double angleC, double angleA, int? feed, Point2d? arcCenter)
+        {
+            return new Dictionary<char, string>
+            {
+                ['G'] = gCode.ToString(),
+                ['F'] = feed?.ToString(),
+                ['X'] = (point.X - Origin.X).ToStringParam(),
+                ['Y'] = (point.Y - Origin.Y).ToStringParam(),
+                ['Z'] = WithThick ? $"({point.Z.ToStringParam()} + THICK)" : point.Z.ToStringParam(),
+                ['A'] = angleA.ToStringParam(),
+                ['C'] = angleC.ToStringParam(),
+                ['I'] = arcCenter.HasValue ? (arcCenter.Value.X - Origin.X).ToStringParam() : null,
+                ['J'] = arcCenter.HasValue ? (arcCenter.Value.Y - Origin.Y).ToStringParam() : null,
+            };
+        }
     }
 }

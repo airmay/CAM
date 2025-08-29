@@ -5,6 +5,7 @@ using Dreambuild.AutoCAD;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography;
 
 namespace CAM
 {
@@ -140,6 +141,23 @@ namespace CAM
             num = ((pz.Y - py.Y) * (py.X - px.X)) - ((py.Y - px.Y) * (pz.X - py.X));
             return (num < 0f);
         }
+
+        /// <summary>
+        /// Рассчитывает с какой стороны находится точка относительно вектора заданного начальной и конечно точками
+        /// </summary>
+        /// <param name="point"></param>
+        /// <param name="start"></param>
+        /// <param name="end"></param>
+        /// <returns>1 если точка слева от вектора<br/>-1 если точка справа от вектора</returns>
+        public static int GetSide(this Point3d point, Point3d start, Point3d end) => (end - start).GetSide(point - start);
+
+        /// <summary>
+        /// Рассчитывает сторону вектора v2 относительно вектора v1
+        /// </summary>
+        /// <param name="v1"></param>
+        /// <param name="v2"></param>
+        /// <returns>1 если v2 слева от v1</returns>
+        public static int GetSide(this Vector3d v1, Vector3d v2) => Math.Sign(v1.DotProduct(v2));
 
         public static bool IsTurnRight(this Line line, Point3d point) => IsTurnRight(line.StartPoint, line.EndPoint, point);
 

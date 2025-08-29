@@ -112,6 +112,7 @@
     <Compile Include="Acad\AutoCADCommands\QuickSelection.cs" />
     <Compile Include="Acad\AutoCADCommands\SymbolPack.cs" />
     <Compile Include="MachineCncWorkCenter\PostProcessorCnc.cs" />
+    <Compile Include="MachineCncWorkCenter\ProcessorBase.cs" />
     <Compile Include="MachineCncWorkCenter\ToolLocationCnc.cs" />
     <Compile Include="Core\ICommand.cs" />
     <Compile Include="MachineCncWorkCenter\OperationCnc.cs" />

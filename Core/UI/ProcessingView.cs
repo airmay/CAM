@@ -73,6 +73,7 @@ namespace CAM
             processingNode.Nodes.Cast<TreeNode>().ForAll(UpdateNodeText);
                
             _processingNode = !Program.IsEmpty ? processingNode : null;
+            ToolObject.Machine = processing.Machine.Value;
             processCommandBindingSource.DataSource = Program.ArraySegment;
             
             toolStrip.Enabled = true;
@@ -80,7 +81,6 @@ namespace CAM
             treeView_AfterSelect(sender, null);
 
             Acad.DocumentManager.DocumentActivationEnabled = true;
-            ToolObject.Machine = processing.Machine.Value;
 
             return;
 
