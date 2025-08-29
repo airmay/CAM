@@ -103,6 +103,7 @@ namespace CAM
 
         public static bool HasPoint(this Curve curve, Point3d point) => point.IsEqualTo(curve.StartPoint) || point.IsEqualTo(curve.EndPoint);
         public static bool IsStartPoint(this Curve curve, Point3d point) => point.IsEqualTo(curve.StartPoint);
+        public static int GetDirection(this Curve curve, Point3d point) => point.IsEqualTo(curve.StartPoint).GetSign();
 
         public static Point3d NextPoint(this Curve curve, Point3d point) =>
             point == curve.StartPoint ? curve.EndPoint : (point == curve.EndPoint ? curve.StartPoint : throw new ArgumentException($"Ошибка NextPoint: Точка {point} не принадлежит кривой {curve}"));
@@ -143,21 +144,22 @@ namespace CAM
         }
 
         /// <summary>
+        /// Рассчитывает с какой стороны находится точка относительно кривой
+        /// </summary>
+        /// <returns>1 если точка слева от кривой<br/>-1 если точка справа от кривой</returns>
+        public static int GetSide(this Curve curve, Point3d point) => (curve.EndPoint - curve.StartPoint).GetSide(point - curve.StartPoint);
+
+        /// <summary>
         /// Рассчитывает с какой стороны находится точка относительно вектора заданного начальной и конечно точками
         /// </summary>
-        /// <param name="point"></param>
-        /// <param name="start"></param>
-        /// <param name="end"></param>
         /// <returns>1 если точка слева от вектора<br/>-1 если точка справа от вектора</returns>
         public static int GetSide(this Point3d point, Point3d start, Point3d end) => (end - start).GetSide(point - start);
 
         /// <summary>
-        /// Рассчитывает сторону вектора v2 относительно вектора v1
+        /// Рассчитывает в какую сторону направлен полученный вектор относительно заданного
         /// </summary>
-        /// <param name="v1"></param>
-        /// <param name="v2"></param>
-        /// <returns>1 если v2 слева от v1</returns>
-        public static int GetSide(this Vector3d v1, Vector3d v2) => Math.Sign(v1.DotProduct(v2));
+        /// <returns>1 если вектор направлен налево<br/>-1 если вектор направлен направо</returns>
+        public static int GetSide(this Vector3d vector0, Vector3d vector) => Math.Sign(vector0.ToVector2d().Kross(vector.ToVector2d()));
 
         public static bool IsTurnRight(this Line line, Point3d point) => IsTurnRight(line.StartPoint, line.EndPoint, point);
 
@@ -247,13 +249,13 @@ namespace CAM
             return polyline;
         }
 
-        public static ObjectId? CreateHatch(Polyline polyline, Side side, Func<Entity, ObjectId> addEntity)
+        public static ObjectId? CreateHatch(Polyline polyline, int side, Func<Entity, ObjectId> addEntity)
         {
             const int hatchSize = 40;
             try
             {
                 addEntity(polyline);
-                var offsetPolyline = polyline.GetOffsetCurves(-hatchSize * (int)side)[0] as Polyline;
+                var offsetPolyline = polyline.GetOffsetCurves(hatchSize * side)[0] as Polyline;
                 if (!polyline.Closed)
                 {
                     offsetPolyline.ReverseCurve();

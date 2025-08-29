@@ -50,16 +50,16 @@ namespace CAM.Operations.Sawing
             foreach (var curve in ProcessingArea.GetCurves())
             {
                 if (curveSides.TryGetValue(curve, out var curveSide))
-                    ProcessCurve(curve, curveSide, points[curve.StartPoint], points[curve.EndPoint]);
+                    ProcessCurve(curve, (Side)curveSide, points[curve.StartPoint], points[curve.EndPoint]);
             }
 
-            CreateHatch(curveSides, outerSide.Opposite());
+            Graph.CreateHatch(curveSides.Keys.ToList().ToPolyline(), outerSide, p => Processor.AddEntity(p));
         }
 
-        private (Dictionary<Curve, Side>, Dictionary<Point3d, bool>, Side) CalcСurveProcessingInfo()
+        private (Dictionary<Curve, int>, Dictionary<Point3d, bool>, int) CalcСurveProcessingInfo()
         {
             var curves = ProcessingArea.GetCurves();
-            var curveSides = new Dictionary<Curve, Side>();
+            var curveSides = new Dictionary<Curve, int>();
             var points = new Dictionary<Point3d, bool>(Graph.Point3dComparer);
 
             var pointCurveDict = curves
@@ -71,17 +71,16 @@ namespace CAM.Operations.Sawing
                 : (curves.First(), curves.First().StartPoint);
             if (corner != null)
                 points[point] = IsExactlyBegin;
-            var direction = curve.IsStartPoint(point).GetSign();
+            var direction = curve.GetDirection(point);
             var startСurve = curve;
-
             var center = Graph.GetCenter(pointCurveDict.Select(p => p.Key));
-            //var s = center.GetSide(curve.StartPoint, curve.EndPoint) * direction * ChangeSide.GetSign(-1);
-            var side = Graph.IsTurnRight(point, curve.NextPoint(point), center) ^ ChangeSide ? Side.Left : Side.Right;
+            var outerSide = -curve.GetSide(center) * direction * ChangeSide.GetSign(-1);
+
             do
             {
-                curveSides[curve] = side.Set(direction);
+                curveSides[curve] = outerSide * direction;
                 point = curve.NextPoint(point);
-                var endTangent = curve.GetTangent(point) * direction;
+                var endTangent = curve.GetFirstDerivative(point) * direction;
 
                 curve = pointCurveDict[point].SingleOrDefault(p => p != curve);
                 if (curve == null)
@@ -91,23 +90,13 @@ namespace CAM.Operations.Sawing
                 }
 
                 point = point.IsEqualTo(curve.StartPoint) ? curve.StartPoint : curve.EndPoint;
-                direction = curve.IsStartPoint(point).GetSign();
-                var startTangent = curve.GetTangent(point) * direction;
-
-                var angle = endTangent.MinusPiToPiAngleTo(startTangent);
-                points[point] = side.IsLeft() ^ angle < 0;  // angle < 0 - поворот направо
+                direction = curve.GetDirection(point);
+                var startTangent = curve.GetFirstDerivative(point) * direction;
+                points[point] = endTangent.GetSide(startTangent) * outerSide > 0;
             } 
             while (curve != startСurve);
 
-            return (curveSides, points, side);
-        }
-
-        private void CreateHatch(Dictionary<Curve, Side> curveSides, Side side)
-        {
-            var poilyline = curveSides.Keys.ToList().ToPolyline();
-            Graph.CreateHatch(poilyline, side, p => Processor.AddEntity(p));
-            //if (hatchId.HasValue)
-            //    SupportGroup = SupportGroup.AppendToGroup(hatchId.Value);
+            return (curveSides, points, outerSide);
         }
 
         private void ProcessCurve(Curve curve, Side outerSide, bool isExactlyBegin, bool isExactlyEnd)
@@ -217,6 +206,7 @@ namespace CAM.Operations.Sawing
         }
 
         private const int CornerIndentIncrease = 5;
+
         private double GetGashLength(double depth) => Math.Sqrt(depth * (ToolDiameter - depth));
 
         private void AddGash(Curve curve, bool isExactlyBegin, bool isExactlyEnd, Side side, double gashLength, double indent)

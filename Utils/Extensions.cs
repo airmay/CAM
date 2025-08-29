@@ -29,7 +29,6 @@ namespace CAM
         /// <param name="value"></param>
         /// <returns></returns>
         public static int GetSign(this bool value, int sign = 1) => (value ? 1 : -1) * sign;
-        public static int GetSign(this int value) => value >= 0 ? 1 : -1;
 
         /// <summary>
         /// value >= 0 ? 1 : -1
