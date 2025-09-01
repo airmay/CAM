@@ -19,6 +19,19 @@ namespace CAM.Operations.Sawing
             processor.Penetration(point);
         }
 
+        public static void Cutting(this ProcessorCnc processor, Line line, CurveTip tip, int? feed = null)
+        {
+            var point = line.GetPoint(tip);
+            if (processor.IsUpperTool)
+            {
+                var angleC = BuilderUtils.CalcToolAngle(line.Angle, processor.EngineSide);
+                processor.Move(point, angleC);
+                //Cycle();
+            }
+            processor.Penetration(point);
+            processor.GCommand(1, feed, line, line.NextPoint(point), feed);
+        }
+
         public static void Cutting(this ProcessorCnc processor, Arc arc, CurveTip tip, double angleA, int? feed = null)
         {
             processor.Approach(arc, tip, angleA);
@@ -26,7 +39,7 @@ namespace CAM.Operations.Sawing
             var point = arc.GetPoint(tip.Swap());
             var angleC = BuilderUtils.CalcToolAngle(arc, point, processor.EngineSide);
             var gCode = point == arc.StartPoint ? 3 : 2;
-            processor.GCommand(CommandNames.Cutting, gCode, feed, arc, point, angleC, arcCenter: arc.Center.ToPoint2d());
+            processor.GCommand(gCode, feed, arc, point, angleC: angleC, arcCenter: arc.Center.ToPoint2d());
         }
 
         public static void Cutting(this ProcessorCnc processor, Polyline polyline, CurveTip tip, int? feed = null)
@@ -47,10 +60,10 @@ namespace CAM.Operations.Sawing
                     var arcSeg = polyline.GetArcSegment2dAt(i);
                     var gCode = arcSeg.IsClockWise ? 2 : 3;
                     var angleC = BuilderUtils.CalcToolAngle(polyline, point, processor.EngineSide);
-                    processor.GCommand(CommandNames.Cutting, gCode, feed, polyline, point, angleC, arcCenter: arcSeg.Center);
+                    processor.GCommand(gCode, feed, polyline, point, angleC: angleC, arcCenter: arcSeg.Center);
                 }
                 else
-                    processor.GCommand(CommandNames.Cutting, 1, feed, polyline, point);
+                    processor.GCommand(1, feed, polyline, point);
             }
         }
     }

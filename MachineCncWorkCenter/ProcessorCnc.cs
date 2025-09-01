@@ -16,24 +16,31 @@ namespace CAM.CncWorkCenter
 
         #region GCommands
 
-        public void Cutting(Line line, CurveTip tip, int? feed = null)
+        public void Cutting(Point3d startPoint, Point3d endPoint)
         {
-            var point = line.GetPoint(tip);
             if (IsUpperTool)
             {
-                var angleC = BuilderUtils.CalcToolAngle(line.Angle, EngineSide);
-                Move(point, angleC);
-                //Cycle();
+                var angleC = BuilderUtils.CalcToolAngle((endPoint - startPoint).ToVector2d().Angle);
+                Move(startPoint, angleC);
             }
-            Penetration(point);
-            Cutting(line, line.NextPoint(point), feed);
+
+            Penetration(startPoint);
+            Cutting(endPoint);
         }
 
+        public void Cutting(Point3d point) => GCommandTo(1, point, _processing.CuttingFeed);
+
+        /// <summary>
+        /// Быстрое перемещение по верху к точке над заданной
+        /// </summary>
         public void Move(Point3d point, double? angleC = null, double? angleA = null)
         {
-            GCommandTo(CommandNames.Fast, 0, point.WithZ(ToolPoint.Z));
-            if (IsUpperTool)
-                GCommandTo(CommandNames.InitialMove, 0, point.WithZ(UpperZ));
+            if (!IsUpperTool)
+                Uplifting();
+
+            GCommandTo(0, point.WithZ(ToolPoint.Z));
+            if (ToolPoint.Z - UpperZ > 1)
+                GCommandTo(0, point.WithZ(UpperZ));
             if (angleC.HasValue)
                 TurnC(angleC.Value);
             if (angleA.HasValue && !angleA.Value.IsEqual(AngleA))
@@ -46,31 +53,24 @@ namespace CAM.CncWorkCenter
             }
         }
 
-        public void TurnC(double angleC) => GCommand("Поворот", 0, angleC: angleC);
+        public void TurnC(double angleC) => GCommand(0, angleC: angleC);
 
-        public void TurnA(double angleA) => GCommand("Наклон", 1, feed: 500, angleA: angleA);
+        public void TurnA(double angleA) => GCommand(1, feed: 500, angleA: angleA);
 
-        public void Uplifting() => GCommandTo(CommandNames.Uplifting, 0, ToolPoint.WithZ(UpperZ));
+        public void Uplifting() => GCommandTo(0, ToolPoint.WithZ(UpperZ));
 
-        public void Penetration(Point3d point) => GCommandTo(CommandNames.Penetration, 1, point, _processing.PenetrationFeed);
+        public void Penetration(Point3d point) => GCommandTo(1, point, _processing.PenetrationFeed);
 
-        public void Penetration(double z) => Penetration(ToolPoint.WithZ(z));
-
-        //public void Cutting(Point3d point) => GCommandTo(CommandNames.Cutting, 1, point, CuttingFeed);
-
-        private void Cutting(Line line, Point3d point, int? feed = null) => GCommand(CommandNames.Cutting, 1, feed, line, point);
-
-        public void GCommandTo(string name, int gCode, Point3d point, int? feed = null)
+        public void GCommandTo(int gCode, Point3d point, int? feed = null)
         {
             if (point.IsEqualTo(ToolPoint))
                 return;
             var line = NoDraw.Line(ToolPoint, point);
 
-            GCommand(name, gCode, feed, line, point);
+            GCommand(gCode, feed, line, point);
         }
 
-        public void GCommand(string name, int gCode, int? feed = null, Curve curve = null, Point3d? point = null,
-            double? angleC = null, double? angleA = null, Point2d? arcCenter = null)
+        public void GCommand(int gCode, int? feed = null, Curve curve = null, Point3d? point = null, double? angleC = null, double? angleA = null, Point2d? arcCenter = null)
         {
             ToolPoint = point ?? ToolPoint;
             AngleC = angleC ?? AngleC;
@@ -85,7 +85,7 @@ namespace CAM.CncWorkCenter
                     duration = curve.Length() / (feed ?? 10000) * 60;
 
                 if (curve.Length() > 1)
-                    toolpath = _toolpathBuilder.AddToolpath(curve, name);
+                    toolpath = _toolpathBuilder.AddToolpath(curve, gCode);
             }
 
             AddCommand(commandText, duration, toolpath);

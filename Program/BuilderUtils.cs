@@ -9,14 +9,14 @@ namespace CAM
 {
     public static class BuilderUtils
     {
-        public static IEnumerable<KeyValuePair<double, int>> GetPassList(IEnumerable<CuttingMode> modes, double DepthAll, bool isZeroPass)
+        public static IEnumerable<KeyValuePair<double, int>> GetPassList(IEnumerable<SawingMode> modes, double DepthAll, bool isZeroPass)
         {
             var passList = new List<KeyValuePair<double, int>>();
             var enumerator = modes.OrderBy(p => p.Depth ?? double.MaxValue).GetEnumerator();
             if (!enumerator.MoveNext())
                 throw new InvalidOperationException("Не заданы режимы обработки");
             var mode = enumerator.Current;
-            CuttingMode nextMode = null;
+            SawingMode nextMode = null;
             if (enumerator.MoveNext())
                 nextMode = enumerator.Current;
             var depth = isZeroPass ? -mode.DepthStep : 0;

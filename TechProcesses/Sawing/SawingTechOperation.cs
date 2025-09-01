@@ -124,7 +124,7 @@ namespace CAM.TechProcesses.Sawing
                 return;
             }
             
-            var modes = SawingModes.ConvertAll(p => new CuttingMode { Depth = p.Depth, DepthStep = p.DepthStep, Feed = p.Feed });
+            var modes = SawingModes.ConvertAll(p => new CAM.SawingMode { Depth = p.Depth, DepthStep = p.DepthStep, Feed = p.Feed });
             var passList = BuilderUtils.GetPassList(modes, thickness, !ProcessingArea.ObjectId.IsLine()).ToList();
 
             Curve toolpathCurve = null;

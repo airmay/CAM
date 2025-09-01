@@ -21,7 +21,7 @@ namespace CAM.Operations.Sawing
 
         public double Depth { get; set; }
         public double? Penetration { get; set; }
-        public List<CuttingMode> SawingModes { get; set; } = new List<CuttingMode>();
+        public List<SawingMode> SawingModes { get; set; } = new List<SawingMode>();
 
         public static void ConfigureParamsView(ParamsView view)
         {
@@ -112,13 +112,15 @@ namespace CAM.Operations.Sawing
             if (!isExactlyBegin || !isExactlyEnd)
                 AddGash(curve, isExactlyBegin, isExactlyEnd, outerSide, gashLength, indent);
 
+
+
             var engineSide = EngineSideCalculator.Calculate(curve, Machine);
             var compensation = 0D;
             var аngleA = 0D;
 
             if (curve is Arc arc && outerSide == Side.Left) // внутренний рез дуги
             {
-                if (Machine == Machine.Donatoni && !(arc.StartAngle.CosSign() == 1 && arc.EndAngle.CosSign() == -1)) //  дуга не пересекает угол 90 градусов
+                if (!(arc.StartAngle.CosSign() == 1 && arc.EndAngle.CosSign() == -1)) //  дуга не пересекает угол 90 градусов
                 {
                     // подворот диска при вн. резе дуги
                     engineSide = Side.Right;
@@ -132,12 +134,11 @@ namespace CAM.Operations.Sawing
                     compensation = arc.Radius - Math.Sqrt(arc.Radius * arc.Radius - Thickness * (ToolDiameter - Thickness));
             }
 
-            var isFrontPlaneZero = Settings.Machines[Machine].IsFrontPlaneZero;
-            if (engineSide == outerSide ^ isFrontPlaneZero)
+            if (engineSide != outerSide)
                 compensation += ToolThickness;
             var offsetSign = outerSide == Side.Left ^ curve is Line ? -1 : 1;
             var baseCurve = curve.GetOffsetCurves(compensation * offsetSign)[0] as Curve;
-
+            
             var passList = GetPassList(curve is Arc);
             var tip = engineSide == Side.Right ^ (passList.Count % 2 == 1)
                 ? CurveTip.End
@@ -187,20 +188,21 @@ namespace CAM.Operations.Sawing
         {
             var modes = isArc && SawingModes.Any()
                 ? SawingModes.OrderByDescending(p => p.Depth.HasValue).ThenBy(p => p.Depth).ToList()
-                : new List<CuttingMode> { new CuttingMode { DepthStep = Penetration.Value, Feed = CuttingFeed } };
+                : new List<SawingMode> { new SawingMode { DepthStep = Penetration.Value, Feed = CuttingFeed } };
             var index = 0;
-            var mode = modes[index];
+            var mode = modes[0];
             var depth = isArc ? -mode.DepthStep : 0;
             var passList = new List<(double, int)>();
             do
             {
                 depth += mode.DepthStep;
-                if (depth >= mode.Depth && index < modes.Count - 1)
+                if (index < modes.Count - 1 && depth >= mode.Depth)
                     mode = modes[++index];
                 if (depth > Depth)
                     depth = Depth;
                 passList.Add((depth, mode.Feed));
-            } while (depth < Depth);
+            } 
+            while (depth < Depth);
 
             return passList;
         }
@@ -237,7 +239,7 @@ namespace CAM.Operations.Sawing
             var (point, depth) = CalcSchedulingPoint();
             var angle = BuilderUtils.CalcToolAngle(vector.ToVector2d().Angle);
             processor.Move(point, angle);
-            processor.Penetration(-depth);
+            processor.Penetration(point.WithZ(-depth));
             processor.Uplifting();
             return;
 

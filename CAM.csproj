@@ -226,7 +226,7 @@
     <Compile Include="TechProcesses\Disk3D\Disk3DTechProcess.cs" />
     <Compile Include="TechProcesses\Disk3D\LongCleaningTechOperation.cs" />
     <Compile Include="TechProcesses\Drilling\DrillingTechProcess.cs" />
-    <Compile Include="Core\Settings\CuttingMode.cs" />
+    <Compile Include="Core\Settings\SawingMode.cs" />
     <Compile Include="TechProcesses\Polishing\PolishingTechProcess.cs" />
     <Compile Include="TechProcesses\RotationProfileBody\RotationProfileBodyTechProcess.cs" />
     <Compile Include="TechProcesses\Sawing\Border.cs" />

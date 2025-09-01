@@ -26,13 +26,13 @@ namespace CAM.Utils
             var endSide = arc.EndAngle.CosSign();
             var cornersOneSide = Math.Sign(startSide * endSide);
 
-            if (arc.TotalAngle.Round(3) > Math.PI && cornersOneSide > 0)
+            if (arc.TotalAngle.ToRoundDeg() > 180 && cornersOneSide > 0)
                 throw new InvalidOperationException("Обработка дуги невозможна - дуга пересекает углы 90 и 270 градусов.");
 
             if (cornersOneSide < 0) //  дуга пересекает углы 90 или 270 градусов
             {
-                if (machine == Machine.ScemaLogic)
-                    throw new InvalidOperationException("Обработка дуги на ScemaLogic невозможна - дуга пересекает угол 90 или 270 градусов.");
+                //if (machine == Machine.ScemaLogic)
+                //    throw new InvalidOperationException("Обработка дуги на ScemaLogic невозможна - дуга пересекает угол 90 или 270 градусов.");
 
                 return startSide > 0 ? Side.Left : Side.Right;
             }
@@ -55,7 +55,7 @@ namespace CAM.Utils
             for (var i = 0; i < polyline.NumberOfVertices; i++)
             {
                 var point = polyline.GetPoint3dAt(i);
-                var s = Math.Sign(Math.Sin(polyline.GetTangent(point).Angle.Round(6)));
+                var s = Math.Sign(Math.Sin(polyline.GetTangent(point).Angle.Round(3)));
                 if (s == 0)
                     continue;
                 if (sign == 0)

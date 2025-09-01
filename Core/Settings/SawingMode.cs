@@ -3,10 +3,10 @@
 namespace CAM
 {
     [Serializable]
-    public class CuttingMode
+    public class SawingMode
     {
         /// <summary>
-        /// Глубина
+        /// Глубина до которой действуют параметры шага и подачи
         /// </summary>
         public double? Depth { get; set; }
 
