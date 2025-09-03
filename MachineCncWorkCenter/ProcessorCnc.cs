@@ -6,8 +6,6 @@ namespace CAM.CncWorkCenter
 {
     public class ProcessorCnc : ProcessorBase
     {
-        public Side EngineSide { get; set; }
-
         public ProcessorCnc(ProcessingCnc processing, PostProcessorCnc postProcessor)
         {
             _processing = processing;

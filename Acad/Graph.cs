@@ -76,12 +76,7 @@ namespace CAM
             yield return curve.EndPoint;
         }
 
-        public static Point3d GetPoint(this Curve curve, int index) => index == 0 ? curve.StartPoint : curve.EndPoint;
-
-        public static Point3d GetPoint(this Curve curve, CurveTip tip) => tip == CurveTip.Start ? curve.StartPoint : curve.EndPoint;
-
-        public static CurveTip Swap(this CurveTip tip) => (CurveTip)(1 - (int)tip);
-
+        public static Point3d GetPoint(this Curve curve, bool isStart) => isStart ? curve.StartPoint : curve.EndPoint;
         public static Point3d GetPoint(this Curve curve, Corner corner) => corner == Corner.Start ? curve.StartPoint : curve.EndPoint;
 
         /// <summary>
@@ -398,11 +393,5 @@ namespace CAM
         {
             return points.Aggregate(Point3d.Origin, (sum, point) => sum.Add(point.GetAsVector())) / points.Count();
         }
-    }
-
-    public enum CurveTip
-    {
-        Start,
-        End
     }
 }

@@ -112,8 +112,6 @@ namespace CAM.Operations.Sawing
             if (!isExactlyBegin || !isExactlyEnd)
                 AddGash(curve, isExactlyBegin, isExactlyEnd, outerSide, gashLength, indent);
 
-
-
             var engineSide = EngineSideCalculator.Calculate(curve, Machine);
             var compensation = 0D;
             var аngleA = 0D;
@@ -140,16 +138,14 @@ namespace CAM.Operations.Sawing
             var baseCurve = curve.GetOffsetCurves(compensation * offsetSign)[0] as Curve;
             
             var passList = GetPassList(curve is Arc);
-            var tip = engineSide == Side.Right ^ (passList.Count % 2 == 1)
-                ? CurveTip.End
-                : CurveTip.Start;
-            Processor.EngineSide = engineSide;
+            var fromStart = engineSide == Side.Left ^ (passList.Count % 2 == 1);
+
             Processor.StartOperation();
             foreach (var (depth, feed) in passList)
             {
                 indent = isExactlyBegin || isExactlyEnd ? GetGashLength(depth) + CornerIndentIncrease : 0;
                 Cutting(depth, feed);
-                tip = tip.Swap();
+                fromStart = !fromStart;
             }
             Processor.Uplifting();
 
@@ -163,20 +159,20 @@ namespace CAM.Operations.Sawing
                     case Line line:
                         if (isExactlyBegin) line.StartPoint = line.GetPointAtDist(indent);
                         if (isExactlyEnd) line.EndPoint = line.GetPointAtDist(line.Length - indent);
-                        Processor.Cutting(line, tip, feed);
+                        Processor.Cutting(line, fromStart, feed, engineSide);
                         break;
 
                     case Arc toolpathArc:
                         var indentAngle = indent / toolpathArc.Radius;
                         if (isExactlyBegin) toolpathArc.StartAngle += indentAngle;
                         if (isExactlyEnd) toolpathArc.EndAngle -= indentAngle;
-                        Processor.Cutting(toolpathArc, tip, аngleA, feed);
+                        Processor.Cutting(toolpathArc, fromStart, аngleA, feed, engineSide);
                         break;
 
                     case Polyline polyline:
                         if (isExactlyBegin) polyline.SetPointAt(0, polyline.GetPointAtDist(indent).ToPoint2d());
                         if (isExactlyEnd) polyline.SetPointAt(polyline.NumberOfVertices - 1, polyline.GetPointAtDist(polyline.Length - indent).ToPoint2d());
-                        Processor.Cutting(polyline, tip, feed);
+                        Processor.Cutting(polyline, fromStart, feed, engineSide);
                         break;
 
                     default: throw new Exception();

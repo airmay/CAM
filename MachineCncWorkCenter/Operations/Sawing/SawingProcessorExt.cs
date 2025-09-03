@@ -6,47 +6,47 @@ namespace CAM.Operations.Sawing
 {
     public static class SawingProcessorExt
     {
-        private static void Approach(this ProcessorCnc processor, Curve curve, CurveTip tip, double angleA = 0)
+        private static void Approach(this ProcessorCnc processor, Curve curve, bool fromStart, Side engineSide, double angleA = 0)
         {
-            var point = curve.GetPoint(tip);
+            var point = curve.GetPoint(fromStart);
             if (processor.IsUpperTool)
             {
-                var angleC = BuilderUtils.CalcToolAngle(curve, point, processor.EngineSide);
+                var angleC = BuilderUtils.CalcToolAngle(curve, point, engineSide);
                 processor.Move(point, angleC, angleA);
-                processor.Cycle();
+                //processor.Cycle();
             }
 
             processor.Penetration(point);
         }
 
-        public static void Cutting(this ProcessorCnc processor, Line line, CurveTip tip, int? feed = null)
+        public static void Cutting(this ProcessorCnc processor, Line line, bool fromStart, int feed, Side engineSide)
         {
-            var point = line.GetPoint(tip);
+            var point = line.GetPoint(fromStart);
             if (processor.IsUpperTool)
             {
-                var angleC = BuilderUtils.CalcToolAngle(line.Angle, processor.EngineSide);
+                var angleC = BuilderUtils.CalcToolAngle(line.Angle, engineSide);
                 processor.Move(point, angleC);
                 //Cycle();
             }
             processor.Penetration(point);
-            processor.GCommand(1, feed, line, line.NextPoint(point), feed);
+            processor.GCommand(1, feed, line, line.GetPoint(!fromStart));
         }
 
-        public static void Cutting(this ProcessorCnc processor, Arc arc, CurveTip tip, double angleA, int? feed = null)
+        public static void Cutting(this ProcessorCnc processor, Arc arc, bool fromStart, double angleA, int feed, Side engineSide)
         {
-            processor.Approach(arc, tip, angleA);
+            processor.Approach(arc, fromStart, engineSide, angleA);
 
-            var point = arc.GetPoint(tip.Swap());
-            var angleC = BuilderUtils.CalcToolAngle(arc, point, processor.EngineSide);
+            var point = arc.GetPoint(!fromStart);
+            var angleC = BuilderUtils.CalcToolAngle(arc, point, engineSide);
             var gCode = point == arc.StartPoint ? 3 : 2;
             processor.GCommand(gCode, feed, arc, point, angleC: angleC, arcCenter: arc.Center.ToPoint2d());
         }
 
-        public static void Cutting(this ProcessorCnc processor, Polyline polyline, CurveTip tip, int? feed = null)
+        public static void Cutting(this ProcessorCnc processor, Polyline polyline, bool fromStart, int feed, Side engineSide)
         {
-            processor.Approach(polyline, tip);
+            processor.Approach(polyline, fromStart, engineSide);
 
-            var isReverse = tip == CurveTip.End;
+            var isReverse = !fromStart;
             var count = polyline.NumberOfVertices - 1;
             var firstIndex = isReverse ? count - 1 : 0;
             var sign = isReverse ? -1 : 1;
@@ -59,7 +59,7 @@ namespace CAM.Operations.Sawing
                 {
                     var arcSeg = polyline.GetArcSegment2dAt(i);
                     var gCode = arcSeg.IsClockWise ? 2 : 3;
-                    var angleC = BuilderUtils.CalcToolAngle(polyline, point, processor.EngineSide);
+                    var angleC = BuilderUtils.CalcToolAngle(polyline, point, engineSide);
                     processor.GCommand(gCode, feed, polyline, point, angleC: angleC, arcCenter: arcSeg.Center);
                 }
                 else
