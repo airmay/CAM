@@ -74,7 +74,7 @@ namespace CAM.CncWorkCenter
             AngleC = angleC ?? AngleC;
             AngleA = angleA ?? AngleA;
 
-            var commandText = _postProcessor.GCommand(gCode, ToolPoint, AngleC, AngleA, feed, arcCenter);
+            var commandText = _postProcessor.GCommand(gCode, ToolPoint, AngleC.ToRoundDeg(), AngleA.ToRoundDeg(), feed, arcCenter);
             ObjectId? toolpath = null;
             double? duration = null;
             if (curve != null)

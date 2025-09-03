@@ -50,7 +50,7 @@ namespace CAM
         {
             if (engineSide == Side.None)
                 engineSide = CalcEngineSide(angle);
-            return ((engineSide == Side.Right ? 180 : 360) + 360 - angle.ToRoundDeg()) % 360;
+            return ((engineSide == Side.Right ? 1 : 2) * Math.PI + 2 * Math.PI - angle) % (2 * Math.PI);
         }
 
         public static List<Point2d> GetProcessPoints1(Curve profile, int index, double step, double shift, bool isMinToolCoord, double? begin, double? end, bool isProfileStep = false) //, bool isExactlyBegin, bool isExactlyEnd)

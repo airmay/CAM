@@ -96,7 +96,7 @@ namespace CAM.CncWorkCenter
             var command = new Command
             {
                 Text = text,
-                ToolPosition = new ToolPosition(ToolPoint, AngleC.ToRad(), AngleA),
+                ToolPosition = new ToolPosition(ToolPoint, AngleC, AngleA),
                 ObjectId = toolpath1,
                 ObjectId2 = toolpath2,
                 Operation = _operation,

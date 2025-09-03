@@ -126,7 +126,7 @@ namespace CAM.Operations.Sawing
                     var t = Thickness;
                     var d = ToolDiameter;
                     var comp = (2*R*t*t - Math.Sqrt(-d*d*d*d * t*t + 4 * d*d * R*R * t*t + d*d * t*t*t*t)) / (d*d - 4*R*R);
-                    аngleA = -Math.Atan2(comp, Thickness).ToDeg();
+                    аngleA = -Math.Atan2(comp, Thickness);
                 }
                 else
                     compensation = arc.Radius - Math.Sqrt(arc.Radius * arc.Radius - Thickness * (ToolDiameter - Thickness));
