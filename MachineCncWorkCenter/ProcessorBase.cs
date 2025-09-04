@@ -7,33 +7,26 @@ namespace CAM.CncWorkCenter
 {
     public abstract class ProcessorBase : IProcessor
     {
-        protected ToolpathBuilder _toolpathBuilder;
-        protected PostProcessorCnc _postProcessor;
-        protected ProcessingCnc _processing;
+        protected ToolpathBuilder ToolpathBuilder;
+        protected abstract ProcessingBase Processing { get; }
+        protected abstract PostProcessorBase PostProcessor { get; }
 
-        protected IOperation _operation;
+        private IOperation _operation;
         private double _processDuration;
         private double _operationDuration;
+
         protected bool IsEngineStarted;
+        protected double UpperZ;
+        public bool IsUpperTool => ToolPoint.Z + 0.1 > UpperZ;
 
         public Point3d ToolPoint;
         public double AngleC;
         public double AngleA;
 
-        protected double UpperZ;
-        public bool IsUpperTool => ToolPoint.Z + 0.1 > UpperZ;
-
-        //protected ProcessorBase(ProcessingCnc processing, PostProcessorCnc postProcessor)
-        //{
-        //    _processing = processing;
-        //    _postProcessor = postProcessor;
-        //    CuttingFeed = _processing.CuttingFeed;
-        //}
-
         public void Start()
         {
-            Program.Init(_processing);
-            _toolpathBuilder = new ToolpathBuilder();
+            Program.Init(Processing);
+            ToolpathBuilder = new ToolpathBuilder();
         }
 
         public void SetOperation(IOperation operation)
@@ -41,24 +34,23 @@ namespace CAM.CncWorkCenter
             if (_operation != null)
                 FinishOperation();
             _operation = operation;
-            _toolpathBuilder.CreateGroup();
+            ToolpathBuilder.CreateGroup();
         }
 
-        public void StartOperation(double zMax = 0)
+        public virtual void StartOperation(double zMax = 0)
         {
             if (IsEngineStarted)
                 return;
 
-            UpperZ = zMax + _processing.ZSafety;
-            ToolPoint = _processing.Origin.Point.WithZ(UpperZ);
+            UpperZ = zMax + Processing.ZSafety;
+            ToolPoint = Processing.Origin.Point.WithZ(UpperZ);
 
-            AddCommands(_postProcessor.StartMachine());
-            AddCommands(_postProcessor.SetTool(_processing.Tool.Number, 0, 0, 0));
+            AddCommands(PostProcessor.StartMachine());
         }
 
         private void FinishOperation()
         {
-            _operation.ToolpathGroupId = _toolpathBuilder.AddGroup(_operation.Caption);
+            _operation.ToolpathGroupId = ToolpathBuilder.AddGroup(_operation.Caption);
             _operation.Caption = GetCaption(_operation.Caption, _operationDuration);
             _processDuration += _operationDuration;
             _operationDuration = 0;
@@ -66,11 +58,11 @@ namespace CAM.CncWorkCenter
 
         public void Finish()
         {
-            AddCommands(_postProcessor.StopEngine());
-            AddCommands(_postProcessor.StopMachine());
+            AddCommands(PostProcessor.StopEngine());
+            AddCommands(PostProcessor.StopMachine());
             Program.CreateProgram();
             FinishOperation();
-            _processing.Caption = GetCaption(_processing.Caption, _processDuration);
+            Processing.Caption = GetCaption(Processing.Caption, _processDuration);
         }
 
         private static string GetCaption(string caption, double duration)
@@ -82,14 +74,14 @@ namespace CAM.CncWorkCenter
 
         public void Dispose()
         {
-            _toolpathBuilder.Dispose();
+            ToolpathBuilder.Dispose();
         }
 
-        public ObjectId AddEntity(Entity curve) => _toolpathBuilder.AddEntity(curve);
+        public ObjectId AddEntity(Entity curve) => ToolpathBuilder.AddEntity(curve);
 
-        public void Pause(double duration) => AddCommand(_postProcessor.Pause(duration));
+        public void Pause(double duration) => AddCommand(PostProcessor.Pause(duration));
 
-        public void Cycle() => AddCommand(_postProcessor.Cycle());
+        public void Cycle() => AddCommand(PostProcessor.Cycle());
 
         public void AddCommand(string text, Point3d? point = null, double? angleC = null, double? angleA = null, double? duration = null, ObjectId? toolpath1 = null, ObjectId? toolpath2 = null)
         {
