@@ -201,7 +201,10 @@ namespace CAM.MachineWireSaw
 
             return;
 
-            ObjectId CreateToolpath(Vector3d vector1) => _toolpathBuilder.AddToolpath(NoDraw.ArcSCA(_toolPoint + vector1, Center.WithZ(_toolPoint.Z), daRad));
+            ObjectId? CreateToolpath(Vector3d vector1)
+            {
+                return _toolpathBuilder.AddToolpath(NoDraw.ArcSCA(_toolPoint + vector1, Center.WithZ(_toolPoint.Z), daRad));
+            }
         }
 
         private void GCommandUV(int gCode, double u, double v, Point2d point)
@@ -229,7 +232,10 @@ namespace CAM.MachineWireSaw
             
             return;
 
-            ObjectId CreateToolpath(Vector3d vector) => _toolpathBuilder.AddToolpath(NoDraw.Line(_toolPoint + vector, newToolPoint + vector));
+            ObjectId? CreateToolpath(Vector3d vector)
+            {
+                return _toolpathBuilder.AddToolpath(NoDraw.Line(_toolPoint + vector, newToolPoint + vector));
+            }
         }
     }
 }

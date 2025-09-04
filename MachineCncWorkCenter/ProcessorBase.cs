@@ -1,7 +1,7 @@
-﻿using System;
-using Autodesk.AutoCAD.DatabaseServices;
+﻿using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
 using CAM.Core;
+using System;
 
 namespace CAM.CncWorkCenter
 {
@@ -91,8 +91,12 @@ namespace CAM.CncWorkCenter
 
         public void Cycle() => AddCommand(_postProcessor.Cycle());
 
-        public void AddCommand(string text, double? duration = null, ObjectId? toolpath1 = null, ObjectId? toolpath2 = null)
+        public void AddCommand(string text, Point3d? point = null, double? angleC = null, double? angleA = null, double? duration = null, ObjectId? toolpath1 = null, ObjectId? toolpath2 = null)
         {
+            ToolPoint = point ?? ToolPoint;
+            AngleC = angleC ?? AngleC;
+            AngleA = angleA ?? AngleA;
+
             var command = new Command
             {
                 Text = text,

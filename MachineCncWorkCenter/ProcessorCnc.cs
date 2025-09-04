@@ -12,8 +12,6 @@ namespace CAM.CncWorkCenter
             _postProcessor = postProcessor;
         }
 
-        #region GCommands
-
         public void Cutting(Point3d startPoint, Point3d endPoint)
         {
             if (IsUpperTool)
@@ -70,11 +68,10 @@ namespace CAM.CncWorkCenter
 
         public void GCommand(int gCode, int? feed = null, Curve curve = null, Point3d? point = null, double? angleC = null, double? angleA = null, Point2d? arcCenter = null)
         {
-            ToolPoint = point ?? ToolPoint;
-            AngleC = angleC ?? AngleC;
-            AngleA = angleA ?? AngleA;
+            var commandText = _postProcessor.GCommand(gCode, point, angleC?.ToRoundDeg(), angleA?.ToRoundDeg(), feed, arcCenter);
+            if (commandText == null)
+                return;
 
-            var commandText = _postProcessor.GCommand(gCode, ToolPoint, AngleC.ToRoundDeg(), AngleA.ToRoundDeg(), feed, arcCenter);
             ObjectId? toolpath = null;
             double? duration = null;
             if (curve != null)
@@ -82,13 +79,10 @@ namespace CAM.CncWorkCenter
                 if (curve.IsNewObject)
                     duration = curve.Length() / (feed ?? 10000) * 60;
 
-                if (curve.Length() > 1)
-                    toolpath = _toolpathBuilder.AddToolpath(curve, gCode);
+                toolpath = _toolpathBuilder.AddToolpath(curve, gCode);
             }
 
-            AddCommand(commandText, duration, toolpath);
+            AddCommand(commandText, point, angleC, angleA, duration, toolpath);
         }
-
-        #endregion
     }
 }

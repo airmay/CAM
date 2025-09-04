@@ -37,10 +37,13 @@ namespace CAM
             _groupDict = (DBDictionary)_transaction.GetObject(Acad.Database.GroupDictionaryId, OpenMode.ForWrite);
         }
 
-        public ObjectId AddToolpath(Curve curve, int? gCode = null)
+        public ObjectId? AddToolpath(Curve curve, int? gCode = null)
         {
             if (!curve.IsNewObject) 
                 return curve.ObjectId;
+            
+            if (curve.Length() < 1)
+                return null;
 
             curve.Color = gCode.HasValue
                 ? _colors[gCode == 0 ? CommandNames.Fast : CommandNames.Cutting]

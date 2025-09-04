@@ -9,24 +9,31 @@ namespace CAM.CncWorkCenter
 
         public bool WithThick { get; set; }
 
-        public string GCommand(int gCode, Point3d point, double angleC, double angleA, int? feed, Point2d? arcCenter)
+        public string GCommand(int gCode, Point3d? point, double? angleC, double? angleA, int? feed, Point2d? arcCenter)
         {
             var @params = GetParams(gCode, point, angleC, angleA, feed, arcCenter);
             return GetGCommand(@params);
         }
 
-        protected List<CommandParam> GetParams(int gCode, Point3d point, double angleC, double angleA, int? feed, Point2d? arcCenter)
+        protected List<CommandParam> GetParams(int gCode, Point3d? point, double? angleC, double? angleA, int? feed, Point2d? arcCenter)
         {
             var commandParams = new List<CommandParam>
             {
                 new CommandParam('G', gCode.ToString()),
                 new CommandParam('F', feed?.ToString()),
-                new CommandParam('X', (point.X - Origin.X).ToStringParam()),
-                new CommandParam('Y', (point.Y - Origin.Y).ToStringParam()),
-                new CommandParam('Z', WithThick ? $"({point.Z.ToStringParam()} + THICK)" : point.Z.ToStringParam()),
-                new CommandParam('A', angleA.ToStringParam()),
-                new CommandParam('C', angleC.ToStringParam())
+                new CommandParam('A', angleA?.ToStringParam()),
+                new CommandParam('C', angleC?.ToStringParam())
             };
+
+            if (point.HasValue)
+            {
+                commandParams.Add(new CommandParam('X', (point.Value.X - Origin.X).ToStringParam()));
+                commandParams.Add(new CommandParam('Y', (point.Value.Y - Origin.Y).ToStringParam()));
+                var zParam = point.Value.Z.ToStringParam();
+                if (WithThick)
+                    zParam = $"({zParam} + THICK)";
+                commandParams.Add(new CommandParam('Z', zParam));
+            }
 
             if (arcCenter.HasValue)
             {
