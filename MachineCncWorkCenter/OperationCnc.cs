@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using Autodesk.AutoCAD.DatabaseServices;
-using Autodesk.AutoCAD.Geometry;
 using CAM.CncWorkCenter;
 
 namespace CAM
@@ -18,7 +15,5 @@ namespace CAM
         public double ToolDiameter => Processing.Tool.Diameter;
         public double ToolThickness => Processing.Tool.Thickness.Value;
         public int CuttingFeed => Processing.CuttingFeed;
-        public int PenetrationFeed => Processing.PenetrationFeed;
-        public double ZSafety => Processing.ZSafety;
     }
 }

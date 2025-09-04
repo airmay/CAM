@@ -45,7 +45,7 @@ namespace CAM
                 ProcessOperations(operations);
                 stopwatch.Stop();
                 Acad.Write($"Расчет обработки завершен {stopwatch.Elapsed}");
-
+                //throw new Exception("test");
                 return true;
             }
             catch (Autodesk.AutoCAD.Runtime.Exception ex) when (ex.ErrorStatus == Autodesk.AutoCAD.Runtime.ErrorStatus.UserBreak)
