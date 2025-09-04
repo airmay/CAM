@@ -11,7 +11,7 @@ namespace CAM.CncWorkCenter
         public virtual string GCommand(int gCode, ToolLocationCnc location, int? feed, Point2d? arcCenter)
         {
             var @params = GetParams(gCode, location, feed, arcCenter);
-            return GCommand(@params);
+            return GetGCommand(null);
         }
 
         public virtual Dictionary<char, string> GetParams(int gCode, ToolLocationCnc location, int? feed, Point2d? arcCenter)

@@ -1,36 +1,51 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿using Autodesk.AutoCAD.Geometry;
+using System.Collections.Generic;
 
 namespace CAM
 {
     public abstract class PostProcessorBase
     {
+        public Point2d Origin { get; set; }
+
+        public struct CommandParam
+        {
+            public readonly char Code;
+            public readonly string Value;
+
+            public CommandParam(char code, string value)
+            {
+                Code = code;
+                Value = value;
+            }
+
+            public override string ToString() => $"{Code}{Value}";
+        }
+
         #region GCommand
         public Dictionary<char, string> Params { get; } = new Dictionary<char, string>();
 
-        protected virtual string GCommand(Dictionary<char, string> @params)
+        protected virtual string GetGCommand(List<CommandParam> commandParams)
         {
-            var changedParams = GetChangedParams(@params);
-            var command = CreateCommand(changedParams);
-            ApplyParams(@params);
+            var changed = GetChangedParams(commandParams);
+            ApplyParams(changed);
+            var command = CreateCommand(changed);
             return command;
         }
 
-        protected virtual IEnumerable<KeyValuePair<char, string>> GetChangedParams(Dictionary<char, string> @params)
+        protected virtual List<CommandParam> GetChangedParams(List<CommandParam> commandParams)
         {
-            return @params
-                .Where(p => p.Value != null && (!Params.TryGetValue(p.Key, out var value) || value != p.Value));
+            return commandParams.FindAll(p => p.Value != null && (!Params.TryGetValue(p.Code, out var value) || value != p.Value));
         }
 
-        protected virtual string CreateCommand(IEnumerable<KeyValuePair<char, string>> @params)
+        protected virtual string CreateCommand(List<CommandParam> changed)
         {
-            return string.Join(" ", @params.Select(p => $"{p.Key}{p.Value}"));
+            return string.Join(" ", changed);
         }
 
-        protected virtual void ApplyParams(Dictionary<char, string> @params)
+        protected virtual void ApplyParams(List<CommandParam> changed)
         {
-            foreach (var param in @params)
-                Params[param.Key] = param.Value;
+            foreach (var param in changed)
+                Params[param.Code] = param.Value;
         }
         #endregion
 

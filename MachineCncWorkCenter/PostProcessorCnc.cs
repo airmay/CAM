@@ -5,54 +5,36 @@ namespace CAM.CncWorkCenter
 {
     public abstract class PostProcessorCnc : PostProcessorBase
     {
-        public Point2d Origin { get; set; }
-        public bool WithThick { get; set; }
-
-        public virtual string GCommand(int gCode, ToolLocationCnc location, int? feed, Point2d? arcCenter)
-        {
-            var @params = GetParams(gCode, location, feed, arcCenter);
-            return GCommand(@params);
-        }
-
-        public virtual Dictionary<char, string> GetParams(int gCode, ToolLocationCnc location, int? feed, Point2d? arcCenter)
-        {
-            return new Dictionary<char, string>
-            {
-                ['G'] = gCode.ToString(),
-                ['F'] = feed?.ToString(),
-                ['X'] = !double.IsNaN(location.X) ? (location.X - Origin.X).ToStringParam() : null,
-                ['Y'] = !double.IsNaN(location.Y) ? (location.Y - Origin.Y).ToStringParam() : null,
-                ['Z'] = WithThick ? $"({location.Z.ToStringParam()} + THICK)" : location.Z.ToStringParam(),
-                ['A'] = location.AngleA.ToStringParam(),
-                ['C'] = location.AngleC.ToStringParam(),
-                ['I'] = arcCenter.HasValue ? (arcCenter.Value.X - Origin.X).ToStringParam() : null,
-                ['J'] = arcCenter.HasValue ? (arcCenter.Value.Y - Origin.Y).ToStringParam() : null,
-            };
-        }
-
         public abstract string[] SetTool(int toolNo, double angleA, double angleC, int originCellNumber);
 
+        public bool WithThick { get; set; }
 
         public string GCommand(int gCode, Point3d point, double angleC, double angleA, int? feed, Point2d? arcCenter)
         {
             var @params = GetParams(gCode, point, angleC, angleA, feed, arcCenter);
-            return GCommand(@params);
+            return GetGCommand(@params);
         }
 
-        public Dictionary<char, string> GetParams(int gCode, Point3d point, double angleC, double angleA, int? feed, Point2d? arcCenter)
+        protected List<CommandParam> GetParams(int gCode, Point3d point, double angleC, double angleA, int? feed, Point2d? arcCenter)
         {
-            return new Dictionary<char, string>
+            var commandParams = new List<CommandParam>
             {
-                ['G'] = gCode.ToString(),
-                ['F'] = feed?.ToString(),
-                ['X'] = (point.X - Origin.X).ToStringParam(),
-                ['Y'] = (point.Y - Origin.Y).ToStringParam(),
-                ['Z'] = WithThick ? $"({point.Z.ToStringParam()} + THICK)" : point.Z.ToStringParam(),
-                ['A'] = angleA.ToStringParam(),
-                ['C'] = angleC.ToStringParam(),
-                ['I'] = arcCenter.HasValue ? (arcCenter.Value.X - Origin.X).ToStringParam() : null,
-                ['J'] = arcCenter.HasValue ? (arcCenter.Value.Y - Origin.Y).ToStringParam() : null,
+                new CommandParam('G', gCode.ToString()),
+                new CommandParam('F', feed?.ToString()),
+                new CommandParam('X', (point.X - Origin.X).ToStringParam()),
+                new CommandParam('Y', (point.Y - Origin.Y).ToStringParam()),
+                new CommandParam('Z', WithThick ? $"({point.Z.ToStringParam()} + THICK)" : point.Z.ToStringParam()),
+                new CommandParam('A', angleA.ToStringParam()),
+                new CommandParam('C', angleC.ToStringParam())
             };
+
+            if (arcCenter.HasValue)
+            {
+                commandParams.Add(new CommandParam('I', (arcCenter.Value.X - Origin.X).ToStringParam()));
+                commandParams.Add(new CommandParam('J', (arcCenter.Value.Y - Origin.Y).ToStringParam()));
+            }
+
+            return commandParams;
         }
     }
 }
