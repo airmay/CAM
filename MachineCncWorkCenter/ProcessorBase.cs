@@ -11,12 +11,12 @@ namespace CAM.CncWorkCenter
         protected abstract ProcessingBase Processing { get; }
         protected abstract PostProcessorBase PostProcessor { get; }
 
-        private IOperation _operation;
+        public IOperation _operation;
         private double _processDuration;
         private double _operationDuration;
 
         protected bool IsEngineStarted;
-        protected double UpperZ;
+        public double UpperZ;
         public bool IsUpperTool => ToolPoint.Z + 0.1 > UpperZ;
 
         public Point3d ToolPoint;

@@ -1,124 +1,37 @@
 ﻿using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
 using CAM.CncWorkCenter;
-using CAM.Core;
 using Dreambuild.AutoCAD;
 using System;
 
 namespace CAM.MachineWireSaw
 {
-    public class ProcessorWireSaw : IProcessor
+    public class ProcessorWireSaw : ProcessorBase
     {
-        private readonly PostProcessorWireSaw _postProcessor;
-        private readonly ProcessingWireSaw _processing;
-        private IOperation _operation;
-        private ToolpathBuilder _toolpathBuilder;
-        private double _processDuration;
-        private double _operationDuration;
+        private readonly PostProcessorWireSaw _postProcessorWireSaw;
+        private readonly ProcessingWireSaw _processingWireSaw;
+        protected override ProcessingBase Processing => _processingWireSaw;
+        protected override PostProcessorBase PostProcessor => _postProcessorWireSaw;
+
+        private Vector2d _uAxis;
+        private double _u, _v;
+        private Point2d Center => _processingWireSaw.Origin.Point;
 
         public ProcessorWireSaw(ProcessingWireSaw processing, PostProcessorWireSaw postProcessor)
         {
-            _processing = processing;
-            _postProcessor = postProcessor;
+            _processingWireSaw = processing;
+            _postProcessorWireSaw = postProcessor;
 
             _uAxis = -Vector2d.XAxis;
-            _toolAngle = Math.PI / 2;
-            U = 0;
+            AngleC = Math.PI / 2;
+            _u = 0;
         }
 
-        public void SetOperation(IOperation operation)
+        public override void StartOperation(double zMax = 0)
         {
-            if (_operation != null)
-                FinishOperation();
-            _operation = operation;
-            _toolpathBuilder.CreateGroup();
+            base.StartOperation(zMax);
+            _v = UpperZ;
         }
-
-        private void FinishOperation()
-        {
-            _operation.ToolpathGroupId = _toolpathBuilder.AddGroup(_operation.Caption);
-            _operation.Caption = GetCaption(_operation.Caption, _operationDuration);
-            _processDuration += _operationDuration;
-            _operationDuration = 0;
-        }
-
-        private static string GetCaption(string caption, double duration)
-        {
-            var ind = caption.IndexOf('(');
-            var timeSpan = new TimeSpan(0, 0, 0, (int)duration);
-            return $"{(ind > 0 ? caption.Substring(0, ind).Trim() : caption)} ({timeSpan})";
-        }
-
-        public void Dispose()
-        {
-            _toolpathBuilder.Dispose();
-        }
-
-        public void Start()
-        {
-            Program.Init(_processing);
-            _toolpathBuilder = new ToolpathBuilder();
-        }
-
-        public void Finish()
-        {
-            AddCommands(_postProcessor.StopEngine());
-            AddCommands(_postProcessor.StopMachine());
-
-            Program.CreateProgram();
-            FinishOperation();
-            _processing.Caption = GetCaption(_processing.Caption, _processDuration);
-        }
-
-        public bool IsEngineStarted;
-        public double UpperZ;
-
-        public void StartOperation(double zMax)
-        {
-            if (IsEngineStarted)
-                return;
-
-            V = UpperZ = zMax + _processing.ZSafety;
-            _toolPoint = Center.WithZ(UpperZ);
-
-            AddCommands(_postProcessor.StartMachine());
-        }
-
-        public void Pause(double duration)
-        {
-            AddCommand(_postProcessor.Pause(duration));
-        }
-
-        //----------------------------------------------------------------------------------------------------------------------------------------------
-        private Vector2d _uAxis;
-        private Point3d _toolPoint;
-        private double _toolAngle;
-
-        public double U { get; set; }
-        public double V { get; set; }
-
-        public int Feed => _processing.CuttingFeed;
-        private Point2d Center => _processing.Origin.Point;
-
-        public void AddCommand(string text, double? duration = null, ObjectId? toolpath1 = null, ObjectId? toolpath2 = null)
-        {
-            var command = new Command
-            {
-                Text = text,
-                ToolPosition = new ToolPosition(_toolPoint, -_toolAngle),
-                ObjectId = toolpath1,
-                ObjectId2 = toolpath2,
-                Operation = _operation,
-            };
-            if (duration.HasValue)
-                command.Duration = new TimeSpan(0, 0, 0, (int)Math.Round(duration.Value)).ToString();
-
-            Program.AddCommand(command);
-            _operationDuration += duration.GetValueOrDefault();
-        }
-
-        private void AddCommands(string[] commands) => Array.ForEach(commands, p => AddCommand(p));
-
         #region public
 
         public void Move(Point3d point, Vector3d direction, bool isReverseAngle = false, bool isReverseU = false)
@@ -128,7 +41,7 @@ namespace CAM.MachineWireSaw
 
         public void Move(Point3d point1, Point3d point2, bool isReverseAngle = false, bool isReverseU = false)
         {
-            if (UpperZ - V > 0.1)
+            if (!IsUpperTool)
                 return;
 
             var z = (point1.Z + point2.Z) / 2;
@@ -152,7 +65,7 @@ namespace CAM.MachineWireSaw
         {
             if (!IsEngineStarted)
             {
-                AddCommands(_postProcessor.StartEngine());
+                AddCommands(_postProcessorWireSaw.StartEngine());
                 IsEngineStarted = true;
             }
             GCommands(1, point1, point2, false, false);
@@ -191,11 +104,9 @@ namespace CAM.MachineWireSaw
                 da -= 360 * da.GetSign();
 
             var daRad = da.ToRad();
-            var toolVector = Vector3d.XAxis.RotateBy(_toolAngle, Vector3d.ZAxis) * ToolObject.WireSawLength;
-            _toolAngle = newToolAngle;
-
-            var duration = Math.Abs(da) / _processing.S * 60;
-            AddCommand($"G05 A{da} S{_processing.S}", duration, CreateToolpath(toolVector), CreateToolpath(-toolVector));
+            var toolVector = Vector3d.XAxis.RotateBy(AngleC, Vector3d.ZAxis) * ToolObject.WireSawLength;
+            var duration = Math.Abs(da) / _processingWireSaw.S * 60;
+            AddCommand($"G05 A{da} S{_processingWireSaw.S}", angleC: newToolAngle, duration: duration, toolpath1: CreateToolpath(toolVector), toolpath2: CreateToolpath(-toolVector));
 
             _uAxis = _uAxis.RotateBy(daRad);
 
@@ -203,38 +114,37 @@ namespace CAM.MachineWireSaw
 
             ObjectId? CreateToolpath(Vector3d vector1)
             {
-                return _toolpathBuilder.AddToolpath(NoDraw.ArcSCA(_toolPoint + vector1, Center.WithZ(_toolPoint.Z), daRad));
+                return ToolpathBuilder.AddToolpath(NoDraw.ArcSCA(ToolPoint + vector1, Center.WithZ(ToolPoint.Z), daRad), 1);
             }
         }
 
         private void GCommandUV(int gCode, double u, double v, Point2d point)
         {
-            var du = (u - U).Round(3);
-            var dv = (v - V).Round(3);
+            var du = (u - _u).Round(3);
+            var dv = (v - _v).Round(3);
             if (du == 0 && dv == 0)
                 return;
 
-            U += du;
-            V += dv;
+            _u += du;
+            _v += dv;
 
             var commandText = $"G0{gCode} U{du} V{dv}";
             if (gCode == 1)
-                commandText += $" F{Feed}";
+                commandText += $" F{_processingWireSaw.CuttingFeed}";
 
-            var toolVector = Vector3d.XAxis.RotateBy(_toolAngle, Vector3d.ZAxis) * ToolObject.WireSawLength;
+            var toolVector = Vector3d.XAxis.RotateBy(AngleC, Vector3d.ZAxis) * ToolObject.WireSawLength;
             var newToolPoint = point.WithZ(v);
             var toolpath1 = CreateToolpath(toolVector);
             var toolpath2 = CreateToolpath(-toolVector);
-            _toolPoint = newToolPoint;
 
-            var duration = Math.Sqrt(du * du + dv * dv) / (gCode == 0 ? 500 : Feed) * 60;
-            AddCommand(commandText, duration, toolpath1, toolpath2);
+            var duration = Math.Sqrt(du * du + dv * dv) / (gCode == 0 ? 500 : _processingWireSaw.CuttingFeed) * 60;
+            AddCommand(commandText, point: newToolPoint, duration: duration, toolpath1: toolpath1, toolpath2: toolpath2);
             
             return;
 
             ObjectId? CreateToolpath(Vector3d vector)
             {
-                return _toolpathBuilder.AddToolpath(NoDraw.Line(_toolPoint + vector, newToolPoint + vector));
+                return ToolpathBuilder.AddToolpath(NoDraw.Line(ToolPoint + vector, newToolPoint + vector), gCode);
             }
         }
     }

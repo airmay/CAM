@@ -105,7 +105,7 @@ namespace CAM
         private static void TransformModel(ToolPosition from, ToolPosition to)
         {
             var displacement = Matrix3d.Displacement(from.Point.GetVectorTo(to.Point));
-            var rotationC = Matrix3d.Rotation(from.AngleC - to.AngleC, Vector3d.ZAxis, to.Point);
+            var rotationC = Matrix3d.Rotation(to.AngleC - from.AngleC, Vector3d.ZAxis, to.Point);
             // todo ToRad()
             var rotationA = Matrix3d.Rotation((from.AngleA - to.AngleA).ToRad(), Vector3d.XAxis.RotateBy(-to.AngleC.ToRad(), Vector3d.ZAxis), to.Point);
             var matrix = rotationA * rotationC * displacement;
