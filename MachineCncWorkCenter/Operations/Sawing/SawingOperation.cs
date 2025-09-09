@@ -48,6 +48,7 @@ namespace CAM.Operations.Sawing
         {
             var curves = ProcessingArea.GetCurves();
             var (curveSides, points, outerSide) = CalcСurveProcessingInfo(curves);
+            Processor.StartOperation();
             foreach (var curve in curves)
             {
                 if (curveSides.TryGetValue(curve, out var curveSide))
@@ -140,7 +141,6 @@ namespace CAM.Operations.Sawing
             var passList = GetPassList(curve is Arc);
             var fromStart = engineSide == Side.Left ^ (passList.Count % 2 == 1);
 
-            Processor.StartOperation();
             foreach (var (depth, feed) in passList)
             {
                 indent = isExactlyBegin || isExactlyEnd ? GetGashLength(depth) + CornerIndentIncrease : 0;

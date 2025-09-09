@@ -93,7 +93,7 @@ namespace CAM.CncWorkCenter
                 toolpath = ToolpathBuilder.AddToolpath(curve, gCode);
             }
 
-            AddCommand(commandText, point, angleC, angleA, duration, toolpath);
+            AddCommand(commandText, point, -angleC, angleA, duration, toolpath);
         }
     }
 }
