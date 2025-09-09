@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Linq;
-using Autodesk.AutoCAD.DatabaseServices;
-using Autodesk.AutoCAD.Geometry;
-using CAM.Core;
 
 namespace CAM.CncWorkCenter
 {
@@ -10,12 +6,18 @@ namespace CAM.CncWorkCenter
     public class ProcessingCnc : ProcessingBase
     {
         public override MachineType MachineType => MachineType.CncWorkCenter;
+
         [NonSerialized] public ProcessorCnc Processor;
+        protected override IProcessor GetProcessor() => Processor ?? (Processor = new ProcessorCnc(this));
 
         public Material? Material { get; set; }
+
         public Tool Tool { get; set; }
+
         public int Frequency { get; set; }
+
         public int CuttingFeed { get; set; }
+
         public int PenetrationFeed { get; set; }
 
         public static void ConfigureParamsView(ParamsView view)
@@ -38,35 +40,23 @@ namespace CAM.CncWorkCenter
             Caption = "Обработка ЧПУ";
         }
 
-        protected override IProcessor CreateProcessor()
+        public PostProcessorCnc GetPostProcessor()
         {
-            PostProcessorCnc postProcessor;
             switch (Machine.Value)
             {
-                case CAM.Machine.ScemaLogic:
-                    postProcessor = new DonatoniPostProcessor();
-                    break;
                 case CAM.Machine.Donatoni:
-                    postProcessor = new DonatoniPostProcessor();
-                    break;
+                    return new DonatoniPostProcessor();
                 case CAM.Machine.Krea:
-                    postProcessor = new DonatoniPostProcessor();
-                    break;
+                    return new DonatoniPostProcessor();
                 case CAM.Machine.CableSawing:
-                    postProcessor = new DonatoniPostProcessor();
-                    break;
+                    return new DonatoniPostProcessor();
                 case CAM.Machine.Forma:
-                    postProcessor = new DonatoniPostProcessor();
-                    break;
+                    return new DonatoniPostProcessor();
                 case CAM.Machine.Champion:
-                    postProcessor = new DonatoniPostProcessor();
-                    break;
+                    return new DonatoniPostProcessor();
                 default:
                     throw new ArgumentOutOfRangeException();
             }
-
-            Processor = new ProcessorCnc(this, postProcessor);
-            return Processor;
         }
 
         protected override bool Validate()

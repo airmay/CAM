@@ -6,21 +6,23 @@ namespace CAM.CncWorkCenter
 {
     public class ProcessorCnc : ProcessorBase
     {
-        private readonly PostProcessorCnc _postProcessorCnc;
-        private readonly ProcessingCnc _processingCnc;
-        protected override ProcessingBase Processing => _processingCnc;
-        protected override PostProcessorBase PostProcessor => _postProcessorCnc;
+        private readonly ProcessingCnc _processing;
+        private PostProcessorCnc _postProcessor;
+        protected override ProcessingBase Processing => _processing;
+        protected override PostProcessorBase PostProcessor => _postProcessor;
 
-        public ProcessorCnc(ProcessingCnc processingCnc, PostProcessorCnc postProcessorCnc)
+        public ProcessorCnc(ProcessingCnc processing) => _processing = processing;
+
+        public override void Start()
         {
-            _processingCnc = processingCnc;
-            _postProcessorCnc = postProcessorCnc;
+            base.Start();
+            _postProcessor = _processing.GetPostProcessor();
         }
 
-        public override void StartOperation(double zMax = 0)
+        public override void StartOperation(double? zMax = null)
         {
             base.StartOperation(zMax);
-            AddCommands(_postProcessorCnc.SetTool(_processingCnc.Tool.Number, 0, 0, 0));
+            AddCommands(_postProcessor.SetTool(_processing.Tool.Number, 0, 0, 0));
         }
 
         public void Cutting(Point3d startPoint, Point3d endPoint)
@@ -35,7 +37,7 @@ namespace CAM.CncWorkCenter
             Cutting(endPoint);
         }
 
-        public void Cutting(Point3d point) => GCommandTo(1, point, _processingCnc.CuttingFeed);
+        public void Cutting(Point3d point) => GCommandTo(1, point, _processing.CuttingFeed);
 
         /// <summary>
         /// Быстрое перемещение по верху к точке над заданной
@@ -55,7 +57,7 @@ namespace CAM.CncWorkCenter
 
             if (!IsEngineStarted)
             {
-                AddCommands(_postProcessorCnc.StartEngine(_processingCnc.Frequency, true));
+                AddCommands(_postProcessor.StartEngine(_processing.Frequency, true));
                 IsEngineStarted = true;
             }
         }
@@ -66,7 +68,7 @@ namespace CAM.CncWorkCenter
 
         public void Uplifting() => GCommandTo(0, ToolPoint.WithZ(UpperZ));
 
-        public void Penetration(Point3d point) => GCommandTo(1, point, _processingCnc.PenetrationFeed);
+        public void Penetration(Point3d point) => GCommandTo(1, point, _processing.PenetrationFeed);
 
         public void GCommandTo(int gCode, Point3d point, int? feed = null)
         {
@@ -79,7 +81,7 @@ namespace CAM.CncWorkCenter
 
         public void GCommand(int gCode, int? feed = null, Curve curve = null, Point3d? point = null, double? angleC = null, double? angleA = null, Point2d? arcCenter = null)
         {
-            var commandText = _postProcessorCnc.GCommand(gCode, point, angleC?.ToRoundDeg(), angleA?.ToRoundDeg(), feed, arcCenter);
+            var commandText = _postProcessor.GCommand(gCode, point, angleC?.ToRoundDeg(), angleA?.ToRoundDeg(), feed, arcCenter);
             if (commandText == null)
                 return;
 

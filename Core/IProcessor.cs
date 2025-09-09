@@ -2,7 +2,7 @@
 
 namespace CAM
 {
-    public interface IProcessor : IDisposable
+    public interface IProcessor
     {
         void Start();
         void Finish();

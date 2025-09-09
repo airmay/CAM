@@ -48,7 +48,7 @@ namespace CAM.Operations.Sawing
         {
             var curves = ProcessingArea.GetCurves();
             var (curveSides, points, outerSide) = CalcСurveProcessingInfo(curves);
-            Processor.StartOperation();
+            Processor.StartOperation(0);
             foreach (var curve in curves)
             {
                 if (curveSides.TryGetValue(curve, out var curveSide))

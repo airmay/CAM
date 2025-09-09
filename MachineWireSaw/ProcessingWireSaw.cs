@@ -8,6 +8,7 @@ namespace CAM.CncWorkCenter
     {
         public override MachineType MachineType => MachineType.WireSawMachine;
         [NonSerialized] public ProcessorWireSaw Processor;
+        protected override IProcessor GetProcessor() => Processor ?? (Processor = new ProcessorWireSaw(this));
 
         public Tool Tool { get; } = new Tool { Type = ToolType.WireSaw };
 
@@ -45,12 +46,6 @@ namespace CAM.CncWorkCenter
         {
             Caption = "Обработка Тросовый станок";
             Machine = CAM.Machine.WireSawMachine;
-        }
-
-        protected override IProcessor CreateProcessor()
-        {
-            Processor = new ProcessorWireSaw(this, new PostProcessorWireSaw());
-            return Processor;
         }
 
         protected override bool Validate()

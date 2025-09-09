@@ -20,10 +20,9 @@ namespace CAM.CncWorkCenter
         public bool IsUpperTool => ToolPoint.Z + 0.1 > UpperZ;
 
         public Point3d ToolPoint;
-        public double AngleC;
-        public double AngleA;
+        public double AngleC, AngleA;
 
-        public void Start()
+        public virtual void Start()
         {
             Program.Init(Processing);
             ToolpathBuilder = new ToolpathBuilder();
@@ -37,15 +36,19 @@ namespace CAM.CncWorkCenter
             ToolpathBuilder.CreateGroup();
         }
 
-        public virtual void StartOperation(double zMax = 0)
+        public virtual void StartOperation(double? zMax = null)
         {
             if (IsEngineStarted)
                 return;
 
-            UpperZ = zMax + Processing.ZSafety;
+            if (zMax.HasValue)
+                UpperZ = zMax.Value + Processing.ZSafety;
             ToolPoint = Processing.Origin.Point.WithZ(UpperZ);
+            AngleC = 0;
+            AngleA = 0;
 
             AddCommands(PostProcessor.StartMachine());
+            IsEngineStarted = true;
         }
 
         private void FinishOperation()
@@ -54,15 +57,20 @@ namespace CAM.CncWorkCenter
             _operation.Caption = GetCaption(_operation.Caption, _operationDuration);
             _processDuration += _operationDuration;
             _operationDuration = 0;
+            _operation = null;
         }
 
         public void Finish()
         {
+            IsEngineStarted = false;
             AddCommands(PostProcessor.StopEngine());
             AddCommands(PostProcessor.StopMachine());
+
             Program.CreateProgram();
             FinishOperation();
             Processing.Caption = GetCaption(Processing.Caption, _processDuration);
+            ToolpathBuilder.Dispose();
+            ToolpathBuilder = null;
         }
 
         private static string GetCaption(string caption, double duration)
@@ -70,11 +78,6 @@ namespace CAM.CncWorkCenter
             var ind = caption.IndexOf('(');
             var timeSpan = new TimeSpan(0, 0, 0, (int)duration);
             return $"{(ind > 0 ? caption.Substring(0, ind).Trim() : caption)} ({timeSpan})";
-        }
-
-        public void Dispose()
-        {
-            ToolpathBuilder.Dispose();
         }
 
         public ObjectId AddEntity(Entity curve) => ToolpathBuilder.AddEntity(curve);

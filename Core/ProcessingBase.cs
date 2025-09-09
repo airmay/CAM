@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using CAM.Core;
 using System.Diagnostics;
@@ -26,7 +25,7 @@ namespace CAM
         public double ZSafety { get; set; } = 20;
         public abstract MachineType MachineType { get; }
 
-        protected abstract IProcessor CreateProcessor();
+        protected abstract IProcessor GetProcessor();
 
         protected abstract bool Validate();
 
@@ -67,19 +66,17 @@ namespace CAM
 
         protected virtual void ProcessOperations(OperationBase[] operations)
         {
-            using (var processor = CreateProcessor())
+            var processor = GetProcessor();
+            processor.Start();
+            foreach (var operation in operations)
             {
-                processor.Start();
-                foreach (var operation in operations)
-                {
-                    Acad.Write($"расчет операции {operation.Caption}");
-                    processor.SetOperation(operation);
-                    operation.ProcessingBase = this;
-                    operation.Execute();
-                }
-
-                processor.Finish();
+                Acad.Write($"расчет операции {operation.Caption}");
+                processor.SetOperation(operation);
+                operation.ProcessingBase = this;
+                operation.Execute();
             }
+
+            processor.Finish();
         }
 
         public void OnSelect()
