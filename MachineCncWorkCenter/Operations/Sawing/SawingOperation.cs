@@ -75,7 +75,10 @@ namespace CAM.Operations.Sawing
             var direction = curve.GetDirection(point);
             var startСurve = curve;
             var center = Graph.GetCenter(pointCurveDict.Select(p => p.Key));
-            var outerSide = -curve.GetSide(center) * direction * ChangeSide.GetSign(-1);
+            var outerSide = -curve.GetSide(center) * direction;
+            if (outerSide == 0)
+                outerSide = 1;
+            outerSide *= ChangeSide.GetSign(-1);
 
             do
             {

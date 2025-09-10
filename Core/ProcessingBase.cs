@@ -19,6 +19,7 @@ namespace CAM
     {
         public string Caption { get; set; }
         public IOperation[] Operations { get; set; }
+        public Tool Tool { get; set; }
         public int LastOperationNumber { get; set; }
         public Machine? Machine { get; set; }
         public Origin Origin { get; set; } = new Origin();

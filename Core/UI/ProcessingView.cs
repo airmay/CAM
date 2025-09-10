@@ -345,7 +345,7 @@ namespace CAM
                 Acad.SelectObjectIds(SelectedCommand.ObjectId.Value);
             }
 
-            ToolObject.Set(SelectedCommand.Operation?.Tool, SelectedCommand.ToolPosition);
+            ToolObject.Set(SelectedCommand.Operation?.GetTool(), SelectedCommand.ToolPosition);
 
             var node = _processingNode.Nodes.Cast<TreeNode>().FirstOrDefault(p => p.Tag == SelectedCommand.Operation);
             if (node != null)
@@ -358,5 +358,16 @@ namespace CAM
                 processCommandBindingSource.Position = commandIndex;
         }
         #endregion
+
+        private void bPartialProcessing_Click(object sender, EventArgs e)
+        {
+            if (processCommandBindingSource?.Position != null &&
+                MessageBox.Show($"Сформировать программу со строки {processCommandBindingSource?.Position}?",
+                    "Подтверждение", MessageBoxButtons.YesNo, MessageBoxIcon.Question,
+                    MessageBoxDefaultButton.Button1) == DialogResult.Yes)
+            {
+                //processCommandBindingSource.Position
+            }
+        }
     }
 }

@@ -15,7 +15,7 @@ namespace CAM.Core
         public static IProcessing Processing { get; private set; }
         public static bool IsEmpty => _count == 0;
 
-        private static Dictionary<ObjectId, int> _objectIdDict;
+        private static Dictionary<ObjectId, int> _objectIdDict = new Dictionary<ObjectId, int>();
         private static readonly Dictionary<object, int> _operationDict = new Dictionary<object, int>();
 
         public static void CreateProgram()

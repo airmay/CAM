@@ -11,9 +11,10 @@ namespace CAM.CncWorkCenter
         protected abstract ProcessingBase Processing { get; }
         protected abstract PostProcessorBase PostProcessor { get; }
 
-        public IOperation _operation;
+        protected IOperation Operation;
         private double _processDuration;
         private double _operationDuration;
+        protected Tool Tool;
 
         protected bool IsEngineStarted;
         public double UpperZ;
@@ -30,9 +31,9 @@ namespace CAM.CncWorkCenter
 
         public void SetOperation(IOperation operation)
         {
-            if (_operation != null)
+            if (Operation != null)
                 FinishOperation();
-            _operation = operation;
+            Operation = operation;
             ToolpathBuilder.CreateGroup();
         }
 
@@ -53,22 +54,24 @@ namespace CAM.CncWorkCenter
 
         private void FinishOperation()
         {
-            _operation.ToolpathGroupId = ToolpathBuilder.AddGroup(_operation.Caption);
-            _operation.Caption = GetCaption(_operation.Caption, _operationDuration);
+            Operation.ToolpathGroupId = ToolpathBuilder.AddGroup(Operation.Caption);
+            Operation.Caption = GetCaption(Operation.Caption, _operationDuration);
             _processDuration += _operationDuration;
             _operationDuration = 0;
-            _operation = null;
+            Operation = null;
         }
 
         public void Finish()
         {
-            IsEngineStarted = false;
-            AddCommands(PostProcessor.StopEngine());
-            AddCommands(PostProcessor.StopMachine());
-
-            Program.CreateProgram();
             FinishOperation();
             Processing.Caption = GetCaption(Processing.Caption, _processDuration);
+
+            AddCommands(PostProcessor.StopEngine());
+            AddCommands(PostProcessor.StopMachine());
+            IsEngineStarted = false;
+            Tool = null;
+            Program.CreateProgram();
+
             ToolpathBuilder.Dispose();
             ToolpathBuilder = null;
         }
@@ -98,7 +101,7 @@ namespace CAM.CncWorkCenter
                 ToolPosition = new ToolPosition(ToolPoint, AngleC, AngleA),
                 ObjectId = toolpath1,
                 ObjectId2 = toolpath2,
-                Operation = _operation,
+                Operation = Operation,
             };
             if (duration.HasValue)
                 command.Duration = new TimeSpan(0, 0, 0, (int)Math.Round(duration.Value)).ToString();

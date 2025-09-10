@@ -33,6 +33,6 @@ namespace CAM
         /// </summary>
         public double? Thickness { get; set; }
 
-        public override string ToString() => $"№{Number} {Type.GetDescription()} Ø{Diameter}{(Thickness.HasValue ? " × " + Thickness.ToString() : null)} {Name}";
+        public override string ToString() => $"№{Number} {Type.GetDescription()} Ø{Diameter}{(Thickness.HasValue ? " × " + Thickness : null)} {Name}";
     }
 }

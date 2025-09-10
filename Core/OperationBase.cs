@@ -1,4 +1,5 @@
 ﻿using Autodesk.AutoCAD.DatabaseServices;
+using Autodesk.AutoCAD.Windows.ToolPalette;
 using System;
 
 namespace CAM
@@ -7,7 +8,7 @@ namespace CAM
     {
         bool Enabled { get; set; }
         MachineType MachineType { get; }
-        Tool Tool { get; }
+        Tool GetTool();
         ObjectId? ToolpathGroupId { get; set; }
     }
 
@@ -17,7 +18,7 @@ namespace CAM
         public string Caption { get; set; }
         public bool Enabled { get; set; }
         public abstract MachineType MachineType { get; }
-        [NonSerialized] public IProcessing ProcessingBase;
+        [NonSerialized] public ProcessingBase ProcessingBase;
 
         [NonSerialized] private ObjectId? _toolpathGroupId;
         public ObjectId? ToolpathGroupId
@@ -27,8 +28,12 @@ namespace CAM
         }
 
         public AcadObject ProcessingArea { get; set; }
-        public abstract Tool Tool { get; }
-        
+
+        public Tool Tool { get; set; }
+        public Tool GetTool() => Tool ?? ProcessingBase.Tool;
+        public double ToolDiameter => GetTool().Diameter;
+        public double ToolThickness => GetTool().Thickness.Value;
+
         public abstract void Execute();
 
         public virtual bool Validate()

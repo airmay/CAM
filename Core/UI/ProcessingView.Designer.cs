@@ -36,6 +36,10 @@
             this.tabPageParams = new System.Windows.Forms.TabPage();
             this.tabPageCommands = new System.Windows.Forms.TabPage();
             this.dataGridViewCommand = new System.Windows.Forms.DataGridView();
+            this.dataGridViewTextBoxColumn1 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.dataGridViewTextBoxColumn3 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Duration = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.processCommandBindingSource = new System.Windows.Forms.BindingSource(this.components);
             this.panel1 = new System.Windows.Forms.Panel();
             this.toolStrip = new System.Windows.Forms.ToolStrip();
             this.bCreateTechOperation = new System.Windows.Forms.ToolStripDropDownButton();
@@ -52,10 +56,6 @@
             this.bSendProgramm = new System.Windows.Forms.ToolStripButton();
             this.bClose = new System.Windows.Forms.ToolStripButton();
             this.panel2 = new System.Windows.Forms.Panel();
-            this.processCommandBindingSource = new System.Windows.Forms.BindingSource(this.components);
-            this.dataGridViewTextBoxColumn1 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.dataGridViewTextBoxColumn3 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Duration = new System.Windows.Forms.DataGridViewTextBoxColumn();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
@@ -63,10 +63,10 @@
             this.tabControl.SuspendLayout();
             this.tabPageCommands.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridViewCommand)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.processCommandBindingSource)).BeginInit();
             this.panel1.SuspendLayout();
             this.toolStrip.SuspendLayout();
             this.panel2.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.processCommandBindingSource)).BeginInit();
             this.SuspendLayout();
             // 
             // splitContainer1
@@ -169,6 +169,35 @@
             this.dataGridViewCommand.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
             this.dataGridViewCommand.Size = new System.Drawing.Size(322, 486);
             this.dataGridViewCommand.TabIndex = 0;
+            // 
+            // dataGridViewTextBoxColumn1
+            // 
+            this.dataGridViewTextBoxColumn1.DataPropertyName = "Number";
+            this.dataGridViewTextBoxColumn1.HeaderText = "Number";
+            this.dataGridViewTextBoxColumn1.Name = "dataGridViewTextBoxColumn1";
+            this.dataGridViewTextBoxColumn1.ReadOnly = true;
+            this.dataGridViewTextBoxColumn1.Width = 5;
+            // 
+            // dataGridViewTextBoxColumn3
+            // 
+            this.dataGridViewTextBoxColumn3.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
+            this.dataGridViewTextBoxColumn3.DataPropertyName = "Text";
+            this.dataGridViewTextBoxColumn3.HeaderText = "Text";
+            this.dataGridViewTextBoxColumn3.Name = "dataGridViewTextBoxColumn3";
+            // 
+            // Duration
+            // 
+            this.Duration.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells;
+            this.Duration.DataPropertyName = "Duration";
+            this.Duration.HeaderText = "Duration";
+            this.Duration.Name = "Duration";
+            this.Duration.ReadOnly = true;
+            this.Duration.Width = 5;
+            // 
+            // processCommandBindingSource
+            // 
+            this.processCommandBindingSource.DataSource = typeof(CAM.Command);
+            this.processCommandBindingSource.CurrentChanged += new System.EventHandler(this.processCommandBindingSource_CurrentChanged);
             // 
             // panel1
             // 
@@ -280,7 +309,7 @@
             this.bPartialProcessing.Size = new System.Drawing.Size(193, 22);
             this.bPartialProcessing.Text = "Частичная обработка";
             this.bPartialProcessing.ToolTipText = "Формирование программы обработки с текущей команды";
-            this.bPartialProcessing.Click += new System.EventHandler(this.bBuildProcessing_ButtonClick);
+            this.bPartialProcessing.Click += new System.EventHandler(this.bPartialProcessing_Click);
             // 
             // bVisibility
             // 
@@ -342,35 +371,6 @@
             this.panel2.Size = new System.Drawing.Size(336, 673);
             this.panel2.TabIndex = 3;
             // 
-            // processCommandBindingSource
-            // 
-            this.processCommandBindingSource.DataSource = typeof(CAM.Command);
-            this.processCommandBindingSource.CurrentChanged += new System.EventHandler(this.processCommandBindingSource_CurrentChanged);
-            // 
-            // dataGridViewTextBoxColumn1
-            // 
-            this.dataGridViewTextBoxColumn1.DataPropertyName = "Number";
-            this.dataGridViewTextBoxColumn1.HeaderText = "Number";
-            this.dataGridViewTextBoxColumn1.Name = "dataGridViewTextBoxColumn1";
-            this.dataGridViewTextBoxColumn1.ReadOnly = true;
-            this.dataGridViewTextBoxColumn1.Width = 5;
-            // 
-            // dataGridViewTextBoxColumn3
-            // 
-            this.dataGridViewTextBoxColumn3.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
-            this.dataGridViewTextBoxColumn3.DataPropertyName = "Text";
-            this.dataGridViewTextBoxColumn3.HeaderText = "Text";
-            this.dataGridViewTextBoxColumn3.Name = "dataGridViewTextBoxColumn3";
-            // 
-            // Duration
-            // 
-            this.Duration.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells;
-            this.Duration.DataPropertyName = "Duration";
-            this.Duration.HeaderText = "Duration";
-            this.Duration.Name = "Duration";
-            this.Duration.ReadOnly = true;
-            this.Duration.Width = 5;
-            // 
             // ProcessingView
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -386,12 +386,12 @@
             this.tabControl.ResumeLayout(false);
             this.tabPageCommands.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.dataGridViewCommand)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.processCommandBindingSource)).EndInit();
             this.panel1.ResumeLayout(false);
             this.panel1.PerformLayout();
             this.toolStrip.ResumeLayout(false);
             this.toolStrip.PerformLayout();
             this.panel2.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.processCommandBindingSource)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 

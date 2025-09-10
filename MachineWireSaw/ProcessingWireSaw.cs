@@ -10,8 +10,6 @@ namespace CAM.CncWorkCenter
         [NonSerialized] public ProcessorWireSaw Processor;
         protected override IProcessor GetProcessor() => Processor ?? (Processor = new ProcessorWireSaw(this));
 
-        public Tool Tool { get; } = new Tool { Type = ToolType.WireSaw };
-
         public double ToolThickness
         {
             get => Tool.Thickness.GetValueOrDefault();
@@ -46,6 +44,7 @@ namespace CAM.CncWorkCenter
         {
             Caption = "Обработка Тросовый станок";
             Machine = CAM.Machine.WireSawMachine;
+            Tool = new Tool { Type = ToolType.WireSaw };
         }
 
         protected override bool Validate()

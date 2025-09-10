@@ -12,8 +12,6 @@ namespace CAM.CncWorkCenter
 
         public Material? Material { get; set; }
 
-        public Tool Tool { get; set; }
-
         public int Frequency { get; set; }
 
         public int CuttingFeed { get; set; }

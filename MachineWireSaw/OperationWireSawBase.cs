@@ -9,8 +9,6 @@ namespace CAM
     {
         protected ProcessingWireSaw Processing => (ProcessingWireSaw)ProcessingBase;
         protected ProcessorWireSaw Processor => Processing.Processor;
-
         public override MachineType MachineType => MachineType.WireSawMachine;
-        public override Tool Tool => Processing.Tool;
     }
 }

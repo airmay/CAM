@@ -22,7 +22,12 @@ namespace CAM.CncWorkCenter
         public override void StartOperation(double? zMax = null)
         {
             base.StartOperation(zMax);
-            AddCommands(_postProcessor.SetTool(_processing.Tool.Number, 0, 0, 0));
+            var tool = Operation.GetTool();
+            if (tool != Tool)
+            {
+                AddCommands(_postProcessor.SetTool(tool.Number, 0, 0, 0));
+                Tool = tool;
+            }
         }
 
         public void Cutting(Point3d startPoint, Point3d endPoint)
