@@ -6,20 +6,18 @@ using System;
 
 namespace CAM.MachineWireSaw
 {
-    public class ProcessorWireSaw : ProcessorBase
+    public class ProcessorWireSaw : ProcessorBase<ProcessingWireSaw, ProcessorWireSaw>
     {
         private readonly PostProcessorWireSaw _postProcessor;
         private readonly ProcessingWireSaw _processing;
-        protected override ProcessingBase Processing => _processing;
         protected override PostProcessorBase PostProcessor => _postProcessor;
 
         private Vector2d _uAxis;
         private double _u, _v;
         private Point2d Center => _processing.Origin.Point;
 
-        public ProcessorWireSaw(ProcessingWireSaw processing)
+        public ProcessorWireSaw()
         {
-            _processing = processing;
             _postProcessor = new PostProcessorWireSaw();
 
             _uAxis = -Vector2d.XAxis;

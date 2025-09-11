@@ -16,24 +16,29 @@ namespace CAM.Core
         public static bool IsEmpty => _count == 0;
 
         private static Dictionary<ObjectId, int> _objectIdDict = new Dictionary<ObjectId, int>();
-        private static readonly Dictionary<object, int> _operationDict = new Dictionary<object, int>();
+        private static Dictionary<short, int> _operationNumberToCommandIndexDict = new Dictionary<short, int>();
+        private static Dictionary<short, IOperation> _operations;
 
         public static void CreateProgram()
         {
             ArraySegment = new ArraySegment<Command>(_commands, 0, _count);
+            _operationNumberToCommandIndexDict = ArraySegment.Select((p, index) => new { p.OperationNumber, index })
+                .GroupBy(x => x.OperationNumber)
+                .ToDictionary(g => g.Key, g => g.Min(x => x.index));
         }
 
         public static void Init(IProcessing processing)
         {
             Clear();
             Processing = processing;
+            _operations = Processing.Operations.ToDictionary(p => p.Number);
         }
 
         public static void Clear()
         {
             _count = 0;
             _objectIdDict?.Clear();
-            _operationDict.Clear();
+            _operationNumberToCommandIndexDict.Clear();
             Processing = null;
         }
 
@@ -63,9 +68,6 @@ namespace CAM.Core
             if (command.ObjectId2.HasValue && !_objectIdDict.ContainsKey(command.ObjectId2.Value))
                 _objectIdDict[command.ObjectId2.Value] = _count;
 
-            if (command.Operation != null && !_operationDict.ContainsKey(command.Operation))
-                _operationDict[command.Operation] = _count;
-
             _commands[_count++] = command;
             command.Number = _count;
         }
@@ -77,11 +79,16 @@ namespace CAM.Core
             return result;
         }
 
-        public static bool TryGetCommandIndex(object operation, out int commandIndex)
+        public static bool TryGetCommandIndex(short operationNumber, out int commandIndex)
         {
-            var result = _operationDict.TryGetValue(operation, out var index);
+            var result = _operationNumberToCommandIndexDict.TryGetValue(operationNumber, out var index);
             commandIndex = index;
             return result;
+        }
+
+        public static IOperation GetOperation(int index)
+        {
+            return _operations.TryGetAndReturn(_commands[index].OperationNumber);
         }
 
         public static void Export()

@@ -3,13 +3,8 @@
 namespace CAM.CncWorkCenter
 {
     [Serializable]
-    public class ProcessingCnc : ProcessingBase
+    public class ProcessingCnc : ProcessingBase<ProcessingCnc, ProcessorCnc>
     {
-        public override MachineType MachineType => MachineType.CncWorkCenter;
-
-        [NonSerialized] public ProcessorCnc Processor;
-        protected override IProcessor GetProcessor() => Processor ?? (Processor = new ProcessorCnc(this));
-
         public Material? Material { get; set; }
 
         public int Frequency { get; set; }

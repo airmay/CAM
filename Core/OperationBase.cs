@@ -1,24 +1,28 @@
 ﻿using Autodesk.AutoCAD.DatabaseServices;
-using Autodesk.AutoCAD.Windows.ToolPalette;
 using System;
+using CAM.CncWorkCenter;
 
 namespace CAM
 {
     public interface IOperation : ITreeNode
     {
         bool Enabled { get; set; }
-        MachineType MachineType { get; }
         Tool GetTool();
         ObjectId? ToolpathGroupId { get; set; }
+        short Number { get; set; }
     }
 
     [Serializable]
-    public abstract class OperationBase : IOperation
+    public abstract class OperationBase<TTechProcess, TProcessor> : IOperation
+        where TTechProcess : ProcessingBase<TTechProcess, TProcessor>
+        where TProcessor : ProcessorBase<TTechProcess, TProcessor>, new()
     {
+        [NonSerialized] public TTechProcess Processing;
+        protected TProcessor Processor => Processing.Processor;
+
         public string Caption { get; set; }
         public bool Enabled { get; set; }
-        public abstract MachineType MachineType { get; }
-        [NonSerialized] public ProcessingBase ProcessingBase;
+        public short Number { get; set; }
 
         [NonSerialized] private ObjectId? _toolpathGroupId;
         public ObjectId? ToolpathGroupId
@@ -30,7 +34,7 @@ namespace CAM
         public AcadObject ProcessingArea { get; set; }
 
         public Tool Tool { get; set; }
-        public Tool GetTool() => Tool ?? ProcessingBase.Tool;
+        public Tool GetTool() => Tool ?? Processing.Tool;
         public double ToolDiameter => GetTool().Diameter;
         public double ToolThickness => GetTool().Thickness.Value;
 
@@ -43,7 +47,7 @@ namespace CAM
 
         void ITreeNode.OnSelect()
         {
-            ProcessingBase?.HideToolpath(this);
+            Processing?.HideToolpath(this);
             Acad.SelectObjectIds(ProcessingArea?.ObjectIds);
         }
     }

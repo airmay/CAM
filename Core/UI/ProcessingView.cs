@@ -4,6 +4,7 @@ using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
 using Autodesk.AutoCAD.DatabaseServices;
+using CAM.CncWorkCenter;
 using CAM.Core;
 using Font = System.Drawing.Font;
 
@@ -190,27 +191,29 @@ namespace CAM
 
         private void bCreateProcessing_Click(object sender, EventArgs e)
         {
-            treeView.SelectedNode = AddProcessingNode(MachineType.CncWorkCenter);
+            treeView.SelectedNode = AddProcessingNode(typeof(ProcessingCnc));
             RefreshToolButtonsState();
         }
 
-        private TreeNode AddProcessingNode(MachineType machineType)
+        private TreeNode AddProcessingNode(Type techProcessType)
         {
-            var processing = ProcessingFactory.CreateProcessing(machineType);
+            var processing = (IProcessing)Activator.CreateInstance(techProcessType);
             var node = CreateProcessingNode(processing);
             treeView.Nodes.Add(node);
             return node;
         }
 
-        private void bCreateTechOperation_Click(string caption, Type type)
+        private void bCreateTechOperation_Click(string caption, Type operationType)
         {
-            var operation = OperationFactory.CreateOperation(caption, type, SelectedNode?.Tag);
+            var techProcessType = operationType.BaseType.BaseType.GetGenericArguments()[0];
             var processingNode = treeView.Nodes.Count > 0
                 ? SelectedProcessingNode ?? treeView.Nodes[treeView.Nodes.Count - 1]
                 : null;
-            if (processingNode == null || processingNode.Tag.As<IProcessing>().MachineType != operation.MachineType)
-                processingNode = AddProcessingNode(operation.MachineType);
-            operation.Caption += ++processingNode.Tag.As<ProcessingBase>().LastOperationNumber;
+            if (processingNode == null || processingNode.Tag.GetType() != techProcessType)
+                processingNode = AddProcessingNode(techProcessType);
+            var operationNumber = ++processingNode.Tag.As<IProcessing>().LastOperationNumber;
+            var operation = OperationFactory.CreateOperation(caption, operationType, operationNumber, SelectedNode?.Tag);
+
             var node = CreateOperationNode(operation);
             processingNode.Nodes.Add(node);
             treeView.SelectedNode = node;
@@ -292,7 +295,7 @@ namespace CAM
         private void treeView_AfterSelect(object sender, TreeViewEventArgs e)
         {
             RefreshParamsView();
-            if (Program.TryGetCommandIndex(SelectedNode.Tag, out var commandIndex) == true)
+            if (SelectedNode.Tag is IOperation operation && Program.TryGetCommandIndex(operation.Number, out var commandIndex))
                 processCommandBindingSource.Position = commandIndex;
             SelectedNode.Tag.As<ITreeNode>().OnSelect();
             Acad.Editor.UpdateScreen();
@@ -345,9 +348,10 @@ namespace CAM
                 Acad.SelectObjectIds(SelectedCommand.ObjectId.Value);
             }
 
-            ToolObject.Set(SelectedCommand.Operation?.GetTool(), SelectedCommand.ToolPosition);
+            var operation = Program.GetOperation(processCommandBindingSource.Position);
+            ToolObject.Set(operation?.GetTool(), SelectedCommand.ToolPosition);
 
-            var node = _processingNode.Nodes.Cast<TreeNode>().FirstOrDefault(p => p.Tag == SelectedCommand.Operation);
+            var node = _processingNode.Nodes.Cast<TreeNode>().FirstOrDefault(p => p.Tag == operation);
             if (node != null)
                 treeView.SelectedNode = node;
         }

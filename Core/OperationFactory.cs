@@ -7,12 +7,13 @@ namespace CAM.Core
 {
     public static class OperationFactory
     {
-        public static IOperation CreateOperation(string caption, Type operationType, object prototype)
+        public static IOperation CreateOperation(string caption, Type operationType, short number, object prototype)
         {
             var operation = (IOperation)Activator.CreateInstance(operationType);
             prototype?.CopyPropertiesTo(operation);
-            operation.Caption = caption;
+            operation.Caption = caption + number;
             operation.Enabled = true;
+            operation.Number = number;
 
             return operation;
         }

@@ -1,38 +1,41 @@
-﻿using System;
-using System.Linq;
+﻿using CAM.CncWorkCenter;
 using CAM.Core;
+using System;
 using System.Diagnostics;
+using System.Linq;
 
 namespace CAM
 {
     public interface IProcessing : ITreeNode
     {
         IOperation[] Operations { get; set; }
-        MachineType MachineType { get; }
         Machine? Machine { get; set; }
         bool Execute();
         void HideToolpath(IOperation operation);
+        Origin Origin { get; set; }
+        short LastOperationNumber { get; set; }
     }
 
     [Serializable]
-    public abstract class ProcessingBase : IProcessing
+    public abstract class ProcessingBase<TTechProcess, TProcessor> : IProcessing
+        where TTechProcess : ProcessingBase<TTechProcess, TProcessor>
+        where TProcessor : ProcessorBase<TTechProcess, TProcessor>, new()
     {
+        [NonSerialized] public TProcessor Processor;
+
         public string Caption { get; set; }
         public IOperation[] Operations { get; set; }
         public Tool Tool { get; set; }
-        public int LastOperationNumber { get; set; }
+        public short LastOperationNumber { get; set; }
         public Machine? Machine { get; set; }
         public Origin Origin { get; set; } = new Origin();
         public double ZSafety { get; set; } = 20;
-        public abstract MachineType MachineType { get; }
-
-        protected abstract IProcessor GetProcessor();
 
         protected abstract bool Validate();
 
         public bool Execute()
         {
-            var operations = Operations.Cast<OperationBase>().Where(p => p.Enabled).ToArray();
+            var operations = Operations.Cast<OperationBase<TTechProcess, TProcessor>>().Where(p => p.Enabled).ToArray();
             if (!Validate() || operations.Length == 0 || operations.Any(p => !p.Validate()))
                 return false;
 
@@ -48,7 +51,8 @@ namespace CAM
                 //throw new Exception("test");
                 return true;
             }
-            catch (Autodesk.AutoCAD.Runtime.Exception ex) when (ex.ErrorStatus == Autodesk.AutoCAD.Runtime.ErrorStatus.UserBreak)
+            catch (Autodesk.AutoCAD.Runtime.Exception ex) when (ex.ErrorStatus ==
+                                                                Autodesk.AutoCAD.Runtime.ErrorStatus.UserBreak)
             {
                 Acad.Write("Расчет прерван");
             }
@@ -62,22 +66,30 @@ namespace CAM
             {
                 Acad.CloseProgressor();
             }
-                return false;
+
+            return false;
         }
 
-        protected virtual void ProcessOperations(OperationBase[] operations)
+        private void ProcessOperations(OperationBase<TTechProcess, TProcessor>[] operations)
         {
-            var processor = GetProcessor();
-            processor.Start();
+            if (Processor == null)
+            {
+                Processor = new TProcessor
+                {
+                    Processing = this as TTechProcess,
+                };
+            }
+
+            Processor.Start();
             foreach (var operation in operations)
             {
                 Acad.Write($"расчет операции {operation.Caption}");
-                processor.SetOperation(operation);
-                operation.ProcessingBase = this;
+                Processor.SetOperation(operation);
+                operation.Processing = this as TTechProcess;
                 operation.Execute();
             }
 
-            processor.Finish();
+            Processor.Finish();
         }
 
         public void OnSelect()
@@ -86,6 +98,7 @@ namespace CAM
             Acad.SelectObjectIds();
         }
 
-        public void HideToolpath(IOperation operationToShow) => Operations?.ForAll(p => p.ToolpathGroupId?.SetGroupVisibility(p == operationToShow));
+        public void HideToolpath(IOperation operationToShow) =>
+            Operations?.ForAll(p => p.ToolpathGroupId?.SetGroupVisibility(p == operationToShow));
     }
 }

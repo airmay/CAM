@@ -5,11 +5,13 @@ using System;
 
 namespace CAM.CncWorkCenter
 {
-    public abstract class ProcessorBase : IProcessor
+    public abstract class ProcessorBase<TTechProcess, TProcessor>
+        where TTechProcess : ProcessingBase<TTechProcess, TProcessor>
+        where TProcessor : ProcessorBase<TTechProcess, TProcessor>, new()
     {
-        protected ToolpathBuilder ToolpathBuilder;
-        protected abstract ProcessingBase Processing { get; }
+        public TTechProcess Processing { get; set; }
         protected abstract PostProcessorBase PostProcessor { get; }
+        protected ToolpathBuilder ToolpathBuilder;
 
         protected IOperation Operation;
         private double _processDuration;
@@ -63,11 +65,11 @@ namespace CAM.CncWorkCenter
 
         public void Finish()
         {
+            AddCommands(PostProcessor.StopEngine());
+            AddCommands(PostProcessor.StopMachine());
             FinishOperation();
             Processing.Caption = GetCaption(Processing.Caption, _processDuration);
 
-            AddCommands(PostProcessor.StopEngine());
-            AddCommands(PostProcessor.StopMachine());
             IsEngineStarted = false;
             Tool = null;
             Program.CreateProgram();
@@ -89,7 +91,8 @@ namespace CAM.CncWorkCenter
 
         public void Cycle() => AddCommand(PostProcessor.Cycle());
 
-        public void AddCommand(string text, Point3d? point = null, double? angleC = null, double? angleA = null, double? duration = null, ObjectId? toolpath1 = null, ObjectId? toolpath2 = null)
+        public void AddCommand(string text, Point3d? point = null, double? angleC = null, double? angleA = null,
+            double? duration = null, ObjectId? toolpath1 = null, ObjectId? toolpath2 = null)
         {
             ToolPoint = point ?? ToolPoint;
             AngleC = angleC ?? AngleC;
@@ -101,7 +104,7 @@ namespace CAM.CncWorkCenter
                 ToolPosition = new ToolPosition(ToolPoint, AngleC, AngleA),
                 ObjectId = toolpath1,
                 ObjectId2 = toolpath2,
-                Operation = Operation,
+                OperationNumber = Operation.Number,
             };
             if (duration.HasValue)
                 command.Duration = new TimeSpan(0, 0, 0, (int)Math.Round(duration.Value)).ToString();

@@ -4,19 +4,15 @@ using Dreambuild.AutoCAD;
 
 namespace CAM.CncWorkCenter
 {
-    public class ProcessorCnc : ProcessorBase
+    public class ProcessorCnc : ProcessorBase<ProcessingCnc, ProcessorCnc>
     {
-        private readonly ProcessingCnc _processing;
         private PostProcessorCnc _postProcessor;
-        protected override ProcessingBase Processing => _processing;
         protected override PostProcessorBase PostProcessor => _postProcessor;
-
-        public ProcessorCnc(ProcessingCnc processing) => _processing = processing;
 
         public override void Start()
         {
             base.Start();
-            _postProcessor = _processing.GetPostProcessor();
+            _postProcessor = Processing.GetPostProcessor();
         }
 
         public override void StartOperation(double? zMax = null)
@@ -42,7 +38,7 @@ namespace CAM.CncWorkCenter
             Cutting(endPoint);
         }
 
-        public void Cutting(Point3d point) => GCommandTo(1, point, _processing.CuttingFeed);
+        public void Cutting(Point3d point) => GCommandTo(1, point, Processing.CuttingFeed);
 
         /// <summary>
         /// Быстрое перемещение по верху к точке над заданной
@@ -62,7 +58,7 @@ namespace CAM.CncWorkCenter
 
             if (!IsEngineStarted)
             {
-                AddCommands(_postProcessor.StartEngine(_processing.Frequency, true));
+                AddCommands(_postProcessor.StartEngine(Processing.Frequency, true));
                 IsEngineStarted = true;
             }
         }
@@ -73,7 +69,7 @@ namespace CAM.CncWorkCenter
 
         public void Uplifting() => GCommandTo(0, ToolPoint.WithZ(UpperZ));
 
-        public void Penetration(Point3d point) => GCommandTo(1, point, _processing.PenetrationFeed);
+        public void Penetration(Point3d point) => GCommandTo(1, point, Processing.PenetrationFeed);
 
         public void GCommandTo(int gCode, Point3d point, int? feed = null)
         {

@@ -4,12 +4,8 @@ using CAM.MachineWireSaw;
 namespace CAM.CncWorkCenter
 {
     [Serializable]
-    public class ProcessingWireSaw : ProcessingBase
+    public class ProcessingWireSaw : ProcessingBase<ProcessingWireSaw, ProcessorWireSaw>
     {
-        public override MachineType MachineType => MachineType.WireSawMachine;
-        [NonSerialized] public ProcessorWireSaw Processor;
-        protected override IProcessor GetProcessor() => Processor ?? (Processor = new ProcessorWireSaw(this));
-
         public double ToolThickness
         {
             get => Tool.Thickness.GetValueOrDefault();

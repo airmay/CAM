@@ -46,7 +46,7 @@ namespace CAM
         private readonly Type _type;
 
         public object ParamsObject => BindingSource.DataSource;
-        public ProcessingBase Processing => (ProcessingBase)BindingSource.DataSource;
+        public IProcessing Processing => BindingSource.DataSource as IProcessing;
 
         public T GetParams<T>() => BindingSource.GetSource<T>();
 

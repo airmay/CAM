@@ -5,10 +5,7 @@ using CAM.MachineWireSaw;
 namespace CAM
 {
     [Serializable]
-    public abstract class OperationWireSawBase : OperationBase
+    public abstract class OperationWireSawBase : OperationBase<ProcessingWireSaw, ProcessorWireSaw>
     {
-        protected ProcessingWireSaw Processing => (ProcessingWireSaw)ProcessingBase;
-        protected ProcessorWireSaw Processor => Processing.Processor;
-        public override MachineType MachineType => MachineType.WireSawMachine;
     }
 }
