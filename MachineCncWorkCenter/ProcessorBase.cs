@@ -107,7 +107,7 @@ namespace CAM.CncWorkCenter
                 OperationNumber = Operation.Number,
             };
             if (duration.HasValue)
-                command.Duration = new TimeSpan(0, 0, 0, (int)Math.Round(duration.Value)).ToString();
+                command.Duration = new TimeSpan(0, 0, 0, (int)Math.Round(duration.Value));
 
             Program.AddCommand(command);
             _operationDuration += duration.GetValueOrDefault();

@@ -295,7 +295,7 @@ namespace CAM
         private void treeView_AfterSelect(object sender, TreeViewEventArgs e)
         {
             RefreshParamsView();
-            if (SelectedNode.Tag is IOperation operation && Program.TryGetCommandIndex(operation.Number, out var commandIndex))
+            if (SelectedNode.Tag is IOperation operation && Program.TryGetCommandIndexByOperationNumber(operation.Number, out var commandIndex))
                 processCommandBindingSource.Position = commandIndex;
             SelectedNode.Tag.As<ITreeNode>().OnSelect();
             Acad.Editor.UpdateScreen();
@@ -348,17 +348,17 @@ namespace CAM
                 Acad.SelectObjectIds(SelectedCommand.ObjectId.Value);
             }
 
-            var operation = Program.GetOperation(processCommandBindingSource.Position);
-            ToolObject.Set(operation?.GetTool(), SelectedCommand.ToolPosition);
+            var node = _processingNode.Nodes.Cast<TreeNode>().FirstOrDefault(p => ((IOperation)p.Tag).Number == SelectedCommand.OperationNumber);
+            if (node == null) 
+                return;
 
-            var node = _processingNode.Nodes.Cast<TreeNode>().FirstOrDefault(p => p.Tag == operation);
-            if (node != null)
-                treeView.SelectedNode = node;
+            treeView.SelectedNode = node;
+            ToolObject.Set(((IOperation)node.Tag).GetTool(), SelectedCommand.ToolPosition);
         }
 
         public void SelectCommand(ObjectId? objectId)
         {
-            if (objectId.HasValue && Program.TryGetCommandIndex(objectId.Value, out var commandIndex))
+            if (objectId.HasValue && Program.TryGetCommandIndexByObjectId(objectId.Value, out var commandIndex))
                 processCommandBindingSource.Position = commandIndex;
         }
         #endregion
