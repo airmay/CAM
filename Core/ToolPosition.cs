@@ -1,7 +1,9 @@
 ﻿using Autodesk.AutoCAD.Geometry;
+using System;
 
 namespace CAM.Core
 {
+    [Serializable]
     public struct ToolPosition
     {
         public ToolPosition(Point3d point, double angleC, double angleA = 0)

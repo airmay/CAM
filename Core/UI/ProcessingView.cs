@@ -164,7 +164,11 @@ namespace CAM
             };
         }
 
-        public void SaveCamDocument() => _camDocument.Save(GetProcessings());
+        public void SaveCamDocument() => _camDocument.Save(GetProcessings(), GetProgramProcessingIndex(), _program?.GetCommands());
+
+        private int? GetProgramProcessingIndex() => _program == null
+            ? null
+            : treeView.Nodes.Cast<TreeNode>().FirstOrDefault(p => p.Tag == _program.Processing)?.Index;
 
         private IProcessing[] GetProcessings() => treeView.Nodes.Cast<TreeNode>().Select(GetProcessing).ToArray();
 

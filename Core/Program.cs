@@ -36,8 +36,6 @@ namespace CAM.Core
                 .ToDictionary(p => p.Item2.Value, p => p.ind);
         }
 
-        public void Reset() => Count = 0;
-
         public void AddCommand(Command command)
         {
             if (_commands == null)
@@ -57,6 +55,13 @@ namespace CAM.Core
             command.Number = Count;
         }
 
+        public Command[] GetCommands()
+        {
+            var copy = new Command[Count];
+            Array.Copy(_commands, 0, copy, 0, Count);
+            return copy;
+        }
+
         public bool TryGetCommandIndexByObjectId(ObjectId objectId, out int commandIndex)
         {
             var result = _objectIdDict.TryGetValue(objectId, out var index);
@@ -70,6 +75,7 @@ namespace CAM.Core
             commandIndex = index;
             return result;
         }
+
 
         public void Export()
         {

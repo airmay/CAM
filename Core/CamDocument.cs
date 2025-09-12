@@ -1,9 +1,14 @@
-﻿namespace CAM
+﻿using System;
+
+namespace CAM
 {
     public class CamDocument
     {
-        public int Hash;
+        [NonSerialized] private int _hash;
+
         public IProcessing[] Processings { get; set; }
+        public int? ProcessingIndex { get; set; }
+        public Command[] Commands { get; set; }
 
         public static CamDocument Create()
         {
@@ -12,7 +17,7 @@
             if (value is IProcessing[] processings)
             {
                 document.Processings = processings;
-                document.Hash = hash;
+                document._hash = hash;
             }
             else if (value != null)
             {
@@ -22,10 +27,13 @@
             return document;
         }
 
-        public void Save(IProcessing[] processings)
+        public void Save(IProcessing[] processings, int? processingIndex, Command[] commands)
         {
             Processings = processings;
-            DataLoader.Save(Processings, Hash);
+            ProcessingIndex = processingIndex;
+            Commands = commands;
+
+            DataLoader.Save(this, _hash);
         }
     }
 }
