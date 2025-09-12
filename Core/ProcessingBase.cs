@@ -10,7 +10,7 @@ namespace CAM
     {
         IOperation[] Operations { get; set; }
         Machine? Machine { get; set; }
-        bool Execute();
+        Program Execute();
         void HideToolpath(IOperation operation);
         Origin Origin { get; set; }
         short LastOperationNumber { get; set; }
@@ -33,11 +33,11 @@ namespace CAM
 
         protected abstract bool Validate();
 
-        public bool Execute()
+        public Program Execute()
         {
             var operations = Operations.Cast<OperationBase<TTechProcess, TProcessor>>().Where(p => p.Enabled).ToArray();
             if (!Validate() || operations.Length == 0 || operations.Any(p => !p.Validate()))
-                return false;
+                return null;
 
             Acad.Editor.UpdateScreen();
             Acad.Write($"Выполняется расчет обработки {Caption}");
@@ -45,11 +45,12 @@ namespace CAM
             try
             {
                 var stopwatch = Stopwatch.StartNew();
+
                 ProcessOperations(operations);
                 stopwatch.Stop();
                 Acad.Write($"Расчет обработки завершен {stopwatch.Elapsed}");
-                //throw new Exception("test");
-                return true;
+
+                return Processor.Program;
             }
             catch (Autodesk.AutoCAD.Runtime.Exception ex) when (ex.ErrorStatus ==
                                                                 Autodesk.AutoCAD.Runtime.ErrorStatus.UserBreak)
@@ -67,7 +68,7 @@ namespace CAM
                 Acad.CloseProgressor();
             }
 
-            return false;
+            return null;
         }
 
         private void ProcessOperations(OperationBase<TTechProcess, TProcessor>[] operations)
@@ -79,6 +80,8 @@ namespace CAM
                     Processing = this as TTechProcess,
                 };
             }
+            //if (operations.Length == 3)
+            //    throw new Exception("test");
 
             Processor.Start();
             foreach (var operation in operations)
@@ -86,6 +89,7 @@ namespace CAM
                 Acad.Write($"расчет операции {operation.Caption}");
                 Processor.SetOperation(operation);
                 operation.Processing = this as TTechProcess;
+
                 operation.Execute();
             }
 

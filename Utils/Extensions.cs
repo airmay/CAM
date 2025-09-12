@@ -70,21 +70,6 @@ namespace CAM
             return collection?.Where(p => p.HasValue).Select(p => p.Value);
         }
 
-        public static void WriteToFile(this Exception ex, string message)
-        {
-            var builder = new StringBuilder();
-            while (ex != null)
-            {
-                builder.AppendFormat("{0}{1}", ex, Environment.NewLine);
-                ex = ex.InnerException;
-            }
-            try
-            {
-                File.WriteAllText($@"\\US-CATALINA3\public\Программы станок\CodeRepository\Logs\error_{DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss")}.log", $"{Acad.ActiveDocument.Name}\n\n{message}\n\n{builder}");
-            }
-            catch { }
-        }
-
         #region IList
         public static bool Swap(this IList list, int firstIndex, int secondIndex)
         {

@@ -6,105 +6,88 @@ using System.Linq;
 
 namespace CAM.Core
 {
-    public static class Program
+    public class Program
     {
         private static Command[] _commands;
-        private static int _capacity = 1_000;
-        private static int _count;
-        public static ArraySegment<Command> ArraySegment;
-        public static bool IsEmpty => _count == 0;
-        public static IProcessing Processing { get; private set; }
 
-        private static Dictionary<ObjectId, int> _objectIdDict;
-        private static Dictionary<short, int> _operationNumberDict;
+        public int Count { get; set; }
+        public ArraySegment<Command> ArraySegment { get; private set; }
+        public IProcessing Processing { get; }
 
-        public static void CreateProgram()
+        private readonly string _programFileExtension;
+        private Dictionary<short, int> _operationNumberDict;
+        private Dictionary<ObjectId, int> _objectIdDict;
+
+        public Program(IProcessing processing, string programFileExtension)
         {
-            ArraySegment = new ArraySegment<Command>(_commands, 0, _count);
+            Processing = processing;
+            _programFileExtension = programFileExtension;
+        }
+
+        public void CreateProgram()
+        {
+            ArraySegment = new ArraySegment<Command>(_commands, 0, Count);
             _operationNumberDict = ArraySegment.Select((p, index) => new { p.OperationNumber, index })
                 .GroupBy(x => x.OperationNumber)
                 .ToDictionary(g => g.Key, g => g.Min(x => x.index));
+            _objectIdDict = ArraySegment.Take(100)
+                .SelectMany((p, ind) => new[] { (ind, p.ObjectId), (ind, p.ObjectId2) })
+                .Where(p => p.Item2.HasValue)
+                .ToDictionary(p => p.Item2.Value, p => p.ind);
         }
 
-        public static void Init(IProcessing processing)
-        {
-            Clear();
-            Processing = processing;
-        }
+        public void Reset() => Count = 0;
 
-        public static void Clear()
-        {
-            _count = 0;
-            _objectIdDict?.Clear();
-            _operationNumberDict?.Clear();
-            Processing = null;
-        }
-
-        public static void AddCommand(Command command)
+        public void AddCommand(Command command)
         {
             if (_commands == null)
+                _commands = new Command[1000];
+
+            if (Count == _commands.Length)
             {
-                _commands = new Command[_capacity];
-                _objectIdDict = new Dictionary<ObjectId, int>(1_000);
+                if (Count == 100_000)
+                    throw new Exception("Количество команд программы превысило 100 тысяч");
+
+                var newArray = new Command[_commands.Length * 10];
+                Array.Copy(_commands, 0, newArray, 0, _commands.Length);
+                _commands = newArray;
             }
 
-            if (_count == _capacity)
-                if (_capacity < 100_000)
-                {
-                    _capacity *= 10;
-                    var newArray = new Command[_capacity];
-                    Array.Copy(_commands, 0, newArray, 0, _commands.Length);
-                    _commands = newArray;
-                }
-                else
-                {
-                    throw new Exception("Количество команд программы превысило 100 тысяч");
-                }
-
-            if (command.ObjectId.HasValue && !_objectIdDict.ContainsKey(command.ObjectId.Value))
-                _objectIdDict[command.ObjectId.Value] = _count;
-            if (command.ObjectId2.HasValue && !_objectIdDict.ContainsKey(command.ObjectId2.Value))
-                _objectIdDict[command.ObjectId2.Value] = _count;
-
-            _commands[_count++] = command;
-            command.Number = _count;
+            _commands[Count++] = command;
+            command.Number = Count;
         }
 
-        public static bool TryGetCommandIndexByObjectId(ObjectId objectId, out int commandIndex)
+        public bool TryGetCommandIndexByObjectId(ObjectId objectId, out int commandIndex)
         {
             var result = _objectIdDict.TryGetValue(objectId, out var index);
             commandIndex = index;
             return result;
         }
 
-        public static bool TryGetCommandIndexByOperationNumber(short operationNumber, out int commandIndex)
+        public bool TryGetCommandIndexByOperationNumber(short operationNumber, out int commandIndex)
         {
             var result = _operationNumberDict.TryGetValue(operationNumber, out var index);
             commandIndex = index;
             return result;
         }
 
-        public static void Export()
+        public void Export()
         {
-            if (_count == 0)
+            if (Count == 0)
             {
                 Acad.Alert("Программа не сформирована");
                 return;
             }
 
-            var settings = Settings.Machines[Processing.Machine.Value];
-            var fileName = Acad.SaveFileDialog("Программа", settings.ProgramFileExtension, Processing.Machine.ToString());
+            var fileName = Acad.SaveFileDialog("program", _programFileExtension, "Экспорт программы в файл");
             if (fileName == null)
                 return;
+
+            var contents = ArraySegment.Select(p => $"N{p.Number} {p.Text}").ToArray();
             try
             {
-                var lines = ArraySegment
-                    .Select(p => $"{string.Format(settings.ProgramLineNumberFormat, p.Number)}{p.Text}")
-                    .ToArray();
-                File.WriteAllLines(fileName, lines);
+                File.WriteAllLines(fileName, contents);
                 Acad.Write($"Создан файл {fileName}");
-                //if (machineType == Machine.CableSawing)
-                //    CreateImitationProgramm(contents, fileName);
             }
             catch (Exception ex)
             {

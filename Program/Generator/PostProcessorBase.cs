@@ -7,6 +7,8 @@ namespace CAM
     {
         public Point2d Origin { get; set; }
 
+        public virtual string ProgramFileExtension => "txt";
+
         public struct CommandParam
         {
             public readonly char Code;

@@ -11,8 +11,8 @@ namespace CAM.CncWorkCenter
 
         public override void Start()
         {
-            base.Start();
             _postProcessor = Processing.GetPostProcessor();
+            base.Start();
         }
 
         public override void StartOperation(double? zMax = null)

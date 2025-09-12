@@ -32,10 +32,15 @@ namespace CAM
 
         public static void Write(string message, Exception ex = null)
         {
+            Interaction.WriteLine($"{message}. {ex?.Message}\n");
 #if !DEBUG
-            var text = ex == null ? message : $"{message}: {ex.Message}";
-            Interaction.WriteLine($"{text}\n");
-            ex?.WriteToFile(message);
+            if (ex != null)
+                try
+                {
+                    // @"\\US-CATALINA3\public\Программы станок\CodeRepository\Logs\
+                    File.WriteAllText($@"error_{DateTime.Now:yyyy-MM-dd_HH-mm-ss}.log", $"{Acad.ActiveDocument.Name}\n{message}\n{ex}");
+                }
+                catch { }
 #endif
         }
         public static void CloseAndDiscard()
@@ -49,7 +54,7 @@ namespace CAM
         public static void Alert(string message, Exception ex = null)
         {
             Write(message, ex);
-            Autodesk.AutoCAD.ApplicationServices.Core.Application.ShowAlertDialog(ex == null ? message : $"{message}: {ex}");
+            Application.ShowAlertDialog(ex == null ? message : $"{message}: {ex}");
         }
 
         public static void Alert(Exception ex) => Alert("Ошибка", ex);

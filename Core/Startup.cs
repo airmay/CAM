@@ -65,7 +65,7 @@ namespace CAM
             {
                 // TODO сохранять все
                 _processingView.SaveCamDocument();
-                _processingView.ClearProgram();
+                _processingView.ClearProcessing();
             }
         }
 

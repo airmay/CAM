@@ -10,6 +10,8 @@ namespace CAM.CncWorkCenter
         where TProcessor : ProcessorBase<TTechProcess, TProcessor>, new()
     {
         public TTechProcess Processing { get; set; }
+        public Program Program { get; private set; }
+
         protected abstract PostProcessorBase PostProcessor { get; }
         protected ToolpathBuilder ToolpathBuilder;
 
@@ -27,8 +29,9 @@ namespace CAM.CncWorkCenter
 
         public virtual void Start()
         {
-            Program.Init(Processing);
+            Program = new Program(Processing, PostProcessor.ProgramFileExtension);
             ToolpathBuilder = new ToolpathBuilder();
+            Operation = null;
         }
 
         public void SetOperation(IOperation operation)
@@ -60,7 +63,6 @@ namespace CAM.CncWorkCenter
             Operation.Caption = GetCaption(Operation.Caption, _operationDuration);
             _processDuration += _operationDuration;
             _operationDuration = 0;
-            Operation = null;
         }
 
         public void Finish()
