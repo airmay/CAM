@@ -14,14 +14,29 @@ namespace CAM.Core
         public ArraySegment<Command> ArraySegment { get; private set; }
         public IProcessing Processing { get; }
 
-        private readonly string _programFileExtension;
+        public readonly string ProgramFileExtension;
         private Dictionary<short, int> _operationNumberDict;
         private Dictionary<ObjectId, int> _objectIdDict;
 
         public Program(IProcessing processing, string programFileExtension)
         {
             Processing = processing;
-            _programFileExtension = programFileExtension;
+            ProgramFileExtension = programFileExtension;
+        }
+
+        public Program(IProcessing processing, string programFileExtension, Command[] commands) : this(processing, programFileExtension)
+        {
+            var count = 1000;
+            Count = commands.Length;
+            if (Count >= 1000)
+            {
+                var digits = (int)Math.Floor(Math.Log10(Count)) + 1;
+                count = (int)Math.Pow(10, digits);
+            }
+
+            _commands = new Command[count];
+            Array.Copy(commands, 0, _commands, 0, Count);
+            CreateProgram();
         }
 
         public void CreateProgram()
@@ -85,7 +100,7 @@ namespace CAM.Core
                 return;
             }
 
-            var fileName = Acad.SaveFileDialog("program", _programFileExtension, "Экспорт программы в файл");
+            var fileName = Acad.SaveFileDialog("program", ProgramFileExtension, "Экспорт программы в файл");
             if (fileName == null)
                 return;
 

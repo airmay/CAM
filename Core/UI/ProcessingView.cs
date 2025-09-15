@@ -23,7 +23,6 @@ namespace CAM
         private TreeNode SelectedNode => treeView.SelectedNode;
         private TreeNode SelectedProcessingNode => treeView.SelectedNode?.Parent ?? treeView.SelectedNode;
         private Command SelectedCommand => processCommandBindingSource.Current as Command;
-        private TreeNode _processingNode;
 
         public ProcessingView()
         {
@@ -61,8 +60,8 @@ namespace CAM
         {
             SelectNextControl(ActiveControl, true, true, true, true);
             Acad.DocumentManager.DocumentActivationEnabled = false;
-            _processingNode = SelectedProcessingNode ?? treeView.Nodes[0];
-            var processing = GetProcessing(_processingNode);
+            var processingNode = SelectedProcessingNode ?? treeView.Nodes[0];
+            var processing = GetProcessing(processingNode);
 #if !DEBUG
             toolStrip.Enabled = false;
 #endif
@@ -71,10 +70,9 @@ namespace CAM
             _program = processing.Execute();
             if (_program != null)
             {
-                UpdateNodeText(_processingNode);
-                _processingNode.Nodes.Cast<TreeNode>().ForAll(UpdateNodeText);
+                UpdateNodeText(processingNode);
+                processingNode.Nodes.Cast<TreeNode>().ForAll(UpdateNodeText);
 
-                ToolObject.Machine = processing.Machine.Value;
                 processCommandBindingSource.DataSource = _program.ArraySegment;
 
                 RefreshToolButtonsState();
@@ -140,6 +138,12 @@ namespace CAM
                 treeView.ExpandAll();
                 treeView.SelectedNode = treeView.Nodes[0];
             }
+
+            if (_camDocument.Commands != null)
+            {
+                _program = new Program(_camDocument.Processings[_camDocument.ProcessingIndex.Value], _camDocument.ProgramFileExtension, _camDocument.Commands);
+                processCommandBindingSource.DataSource = _camDocument.Commands;
+            }
             RefreshToolButtonsState();
         }
 
@@ -164,11 +168,15 @@ namespace CAM
             };
         }
 
-        public void SaveCamDocument() => _camDocument.Save(GetProcessings(), GetProgramProcessingIndex(), _program?.GetCommands());
+        public void SaveCamDocument()
+        {
+            _camDocument.Save(GetProcessings(), _program);
+            _program?.Processing.Operations?.ForAll(p => p.ToolpathGroupId?.SetGroupVisibility(true));
+        }
 
-        private int? GetProgramProcessingIndex() => _program == null
+        private TreeNode GetProgramProcessingNode() => _program == null
             ? null
-            : treeView.Nodes.Cast<TreeNode>().FirstOrDefault(p => p.Tag == _program.Processing)?.Index;
+            : treeView.Nodes.Cast<TreeNode>().FirstOrDefault(p => p.Tag == _program.Processing);
 
         private IProcessing[] GetProcessings() => treeView.Nodes.Cast<TreeNode>().Select(GetProcessing).ToArray();
 
@@ -354,7 +362,7 @@ namespace CAM
                 Acad.SelectObjectIds(SelectedCommand.ObjectId.Value);
             }
 
-            var node = _processingNode.Nodes.Cast<TreeNode>().FirstOrDefault(p => ((IOperation)p.Tag).Number == SelectedCommand.OperationNumber);
+            var node = GetProgramProcessingNode()?.Nodes.Cast<TreeNode>().FirstOrDefault(p => ((IOperation)p.Tag).Number == SelectedCommand.OperationNumber);
             if (node == null) 
                 return;
 

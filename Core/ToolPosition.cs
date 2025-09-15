@@ -8,12 +8,17 @@ namespace CAM.Core
     {
         public ToolPosition(Point3d point, double angleC, double angleA = 0)
         {
-            Point = point;
+            X = point.X;
+            Y = point.Y;
+            Z = point.Z;
             AngleC = angleC;
             AngleA = angleA;
         }
 
-        public Point3d Point { get; }
+        public double X { get; }
+        public double Y { get; }
+        public double Z { get; }
+        public Point3d Point => new Point3d(X, Y, Z);
         public double AngleC { get; }
         public double AngleA { get; }
     }

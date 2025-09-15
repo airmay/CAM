@@ -14,7 +14,6 @@ namespace CAM
         private static Curve[] _model;
         private static Tool _tool;
         private static ToolPosition _position;
-        public static Machine Machine { get; set; }
 
         public static void Set(Tool tool, ToolPosition position)
         {
@@ -56,9 +55,8 @@ namespace CAM
             switch (_tool.Type)
             {
                 case ToolType.Disk:
-                    var frontY = Settings.Machines[Machine].IsFrontPlaneZero ? 0 : -thickness;
                     var radius = _tool.Diameter / 2;
-                    var circle0 = new Circle(new Point3d(0, frontY, radius), Vector3d.YAxis, radius);
+                    var circle0 = new Circle(new Point3d(0, 0, radius), Vector3d.YAxis, radius);
                     var circle1 = new Circle(circle0.Center + Vector3d.YAxis * thickness, Vector3d.YAxis, radius);
                     var axis = new Line(circle1.Center, circle1.Center + Vector3d.YAxis * radius / 4);
                     _model = new Curve[] { circle0, circle1, axis };

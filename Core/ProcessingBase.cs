@@ -88,7 +88,7 @@ namespace CAM
             {
                 Acad.Write($"расчет операции {operation.Caption}");
                 Processor.SetOperation(operation);
-                operation.Processing = this as TTechProcess;
+                operation.SetProcessing(this);
 
                 operation.Execute();
             }

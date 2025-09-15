@@ -10,6 +10,7 @@ namespace CAM
         Tool GetTool();
         ObjectId? ToolpathGroupId { get; set; }
         short Number { get; set; }
+        void SetProcessing(IProcessing processing);
     }
 
     [Serializable]
@@ -23,6 +24,7 @@ namespace CAM
         public string Caption { get; set; }
         public bool Enabled { get; set; }
         public short Number { get; set; }
+        public void SetProcessing(IProcessing processing) => Processing = processing as TTechProcess;
 
         [NonSerialized] private ObjectId? _toolpathGroupId;
         public ObjectId? ToolpathGroupId
