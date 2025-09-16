@@ -76,6 +76,7 @@ namespace CAM
         {
             ((Document)sender).CommandWillStart -= Document_CommandWillStart;
             ((Document)sender).BeginDocumentClose -= Document_BeginDocumentClose;
+            ((Document)sender).ImpliedSelectionChanged -= DocumentOnImpliedSelectionChanged;
 
             _processingView.Clear();
         }
