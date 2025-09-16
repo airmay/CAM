@@ -19,10 +19,21 @@ namespace CAM
         private const string DataKey = nameof(CamDocument);
         [NonSerialized] private int _hash;
 
-        public IProcessing[] Processings { get; set; }
-        public int? ProcessingIndex { get; set; }
-        public string ProgramFileExtension { get; set; }
-        public Command[] Commands { get; set; }
+        public IProcessing[] Processings { get; private set; }
+        public int? ProcessingIndex { get; private set; }
+        public string ProgramFileExtension { get; private set; }
+        public Command[] Commands { get; private set; }
+
+        public void Set(IProcessing[] processings, Program program)
+        {
+            Processings = processings;
+            if (program != null)
+            {
+                ProcessingIndex = Array.IndexOf(processings, program.Processing);
+                Commands = program.GetCommands();
+                ProgramFileExtension = program.ProgramFileExtension;
+            }
+        }
 
         public static CamDocument Create()
         {
@@ -61,16 +72,8 @@ namespace CAM
             return new CamDocument();
         }
 
-        public void Save(IProcessing[] processings, Program program)
+        public void Save()
         {
-            Processings = processings;
-            if (program != null)
-            {
-                ProcessingIndex = Array.IndexOf(processings, program.Processing);
-                Commands = program.GetCommands();
-                ProgramFileExtension = program.ProgramFileExtension;
-            }
-
             try
             {
                 const int kMaxChunkSize = 127;

@@ -36,17 +36,20 @@ namespace CAM
 #endif
         }
 
-        public void ClearAll()
-        {
-            if (_camDocument != null)
-                _camDocument.Processings = GetProcessings();
-            _camDocument = null;
+        public void UpdateCamDocument() => _camDocument?.Set(GetProcessings(), _program);
 
+        public void Clear()
+        {
+            _camDocument = null;
             toolStrip.Enabled = false;
             treeView.Nodes.Clear();
-            ClearProcessing();
             foreach (Control control in tabPageParams.Controls)
                 control.Hide();
+            processCommandBindingSource.DataSource = null;
+            _program?.Processing?.Operations?.ForAll(p => p.ToolpathGroupId = null);
+            _program = null;
+            Acad.ClearHighlighted();
+            ToolObject.Delete();
         }
 
         #region Tool buttons
@@ -65,7 +68,10 @@ namespace CAM
 #if !DEBUG
             toolStrip.Enabled = false;
 #endif
-            ClearProcessing();
+            processCommandBindingSource.DataSource = null;
+            Acad.DeleteProcessObjects();
+            Acad.ClearHighlighted();
+            ToolObject.Delete();
 
             _program = processing.Execute();
             if (_program != null)
@@ -170,7 +176,8 @@ namespace CAM
 
         public void SaveCamDocument()
         {
-            _camDocument.Save(GetProcessings(), _program);
+            _camDocument.Set(GetProcessings(), _program);
+            _camDocument.Save();
             _program?.Processing.Operations?.ForAll(p => p.ToolpathGroupId?.SetGroupVisibility(true));
         }
 
@@ -339,17 +346,6 @@ namespace CAM
         #endregion
 
         #region Program view
-
-        public void ClearProcessing()
-        {
-            processCommandBindingSource.DataSource = null;
-            Acad.DeleteProcessObjects();
-            Acad.ClearHighlighted();
-            //_program.Processing?.Operations?.Select(p => p.ToolpathGroupId).Delete();
-            //_program.Processing?.Operations?.ForAll(p => p.ToolpathGroupId = null);
-            //_program.Clear();
-            ToolObject.Delete();
-        }
 
         private void processCommandBindingSource_CurrentChanged(object sender, EventArgs e)
         {

@@ -50,8 +50,6 @@ namespace CAM.CncWorkCenter
             if (zMax.HasValue)
                 UpperZ = zMax.Value + Processing.ZSafety;
             ToolPoint = Processing.Origin.Point.WithZ(UpperZ);
-            AngleC = 0;
-            AngleA = 0;
 
             AddCommands(PostProcessor.StartMachine());
             IsEngineStarted = true;

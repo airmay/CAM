@@ -9,27 +9,26 @@ namespace CAM.MachineWireSaw
     public class ProcessorWireSaw : ProcessorBase<ProcessingWireSaw, ProcessorWireSaw>
     {
         private readonly PostProcessorWireSaw _postProcessor;
-        private readonly ProcessingWireSaw _processing;
         protected override PostProcessorBase PostProcessor => _postProcessor;
 
         private Vector2d _uAxis;
         private double _u, _v;
-        private Point2d Center => _processing.Origin.Point;
-
-        public ProcessorWireSaw()
-        {
-            _postProcessor = new PostProcessorWireSaw();
-
-            _uAxis = -Vector2d.XAxis;
-            AngleC = Math.PI / 2;
-            _u = 0;
-        }
+        private Point2d Center => Processing.Origin.Point;
 
         public override void StartOperation(double? zMax = null)
         {
             base.StartOperation(zMax);
             _v = UpperZ;
         }
+
+        public ProcessorWireSaw()
+        {
+            _postProcessor = new PostProcessorWireSaw();
+            AngleC = Math.PI / 2;
+            _uAxis = -Vector2d.XAxis;
+            _u = 0;
+        }
+
         #region public
 
         public void Move(Point3d point, Vector3d direction, bool isReverseAngle = false, bool isReverseU = false)
@@ -103,8 +102,8 @@ namespace CAM.MachineWireSaw
 
             var daRad = da.ToRad();
             var toolVector = Vector3d.XAxis.RotateBy(AngleC, Vector3d.ZAxis) * ToolObject.WireSawLength;
-            var duration = Math.Abs(da) / _processing.S * 60;
-            AddCommand($"G05 A{da} S{_processing.S}", angleC: newToolAngle, duration: duration, toolpath1: CreateToolpath(toolVector), toolpath2: CreateToolpath(-toolVector));
+            var duration = Math.Abs(da) / Processing.S * 60;
+            AddCommand($"G05 A{da} S{Processing.S}", angleC: newToolAngle, duration: duration, toolpath1: CreateToolpath(toolVector), toolpath2: CreateToolpath(-toolVector));
 
             _uAxis = _uAxis.RotateBy(daRad);
 
@@ -128,14 +127,14 @@ namespace CAM.MachineWireSaw
 
             var commandText = $"G0{gCode} U{du} V{dv}";
             if (gCode == 1)
-                commandText += $" F{_processing.CuttingFeed}";
+                commandText += $" F{Processing.CuttingFeed}";
 
             var toolVector = Vector3d.XAxis.RotateBy(AngleC, Vector3d.ZAxis) * ToolObject.WireSawLength;
             var newToolPoint = point.WithZ(v);
             var toolpath1 = CreateToolpath(toolVector);
             var toolpath2 = CreateToolpath(-toolVector);
 
-            var duration = Math.Sqrt(du * du + dv * dv) / (gCode == 0 ? 500 : _processing.CuttingFeed) * 60;
+            var duration = Math.Sqrt(du * du + dv * dv) / (gCode == 0 ? 500 : Processing.CuttingFeed) * 60;
             AddCommand(commandText, point: newToolPoint, duration: duration, toolpath1: toolpath1, toolpath2: toolpath2);
             
             return;

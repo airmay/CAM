@@ -35,7 +35,11 @@ namespace CAM
             paletteSet.Add("Обработка", _processingView);
             paletteSet.Add("Инструменты", new UtilsView());
 
-            Acad.DocumentManager.DocumentToBeDeactivated += (sender, args) => _processingView.ClearAll();
+            Acad.DocumentManager.DocumentToBeDeactivated += (sender, args) =>
+            {
+                _processingView.UpdateCamDocument();
+                _processingView.Clear();
+            };
             Acad.DocumentManager.DocumentBecameCurrent += (sender, args) => SetActiveDocument(args.Document);
 
             SetActiveDocument(Acad.ActiveDocument);
@@ -62,11 +66,9 @@ namespace CAM
 
         private void Document_CommandWillStart(object sender, CommandEventArgs e)
         {
-            if (e.GlobalCommandName == "CLOSE" || e.GlobalCommandName == "QUIT" || e.GlobalCommandName == "QSAVE" || e.GlobalCommandName == "SAVEAS")
+            if (e.GlobalCommandName.IsIn("CLOSE", "QUIT", "QSAVE", "SAVEAS"))
             {
-                // TODO сохранять все
                 _processingView.SaveCamDocument();
-                //_processingView.ClearProcessing();
             }
         }
 
@@ -74,6 +76,8 @@ namespace CAM
         {
             ((Document)sender).CommandWillStart -= Document_CommandWillStart;
             ((Document)sender).BeginDocumentClose -= Document_BeginDocumentClose;
+
+            _processingView.Clear();
         }
 
         public void Terminate()
