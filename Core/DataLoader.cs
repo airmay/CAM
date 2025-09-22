@@ -6,7 +6,7 @@ using System.Runtime.Serialization.Formatters.Binary;
 
 namespace CAM
 {
-    //
+    //..
     static class DataLoader
     {
         private const string DataKey = "ProcessItems";
