@@ -88,6 +88,11 @@ namespace CAM
             toolStrip.Enabled = true;
             Acad.DocumentManager.DocumentActivationEnabled = true;
 
+            if (Program.DwgFileCommands != null)
+                Acad.Write(_program.ArraySegment.SequenceEqual(Program.DwgFileCommands, Command.Comparer)
+                    ? "Программа не изменилась"
+                    : "Внимание! Программа изменена!");
+
             return;
 
             void UpdateNodeText(TreeNode node) => node.Text = node.Tag.As<ITreeNode>().Caption;

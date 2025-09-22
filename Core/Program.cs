@@ -8,6 +8,7 @@ namespace CAM.Core
 {
     public class Program
     {
+        public static Command[] DwgFileCommands { get; set; }
         private static Command[] _commands;
 
         public int Count { get; set; }

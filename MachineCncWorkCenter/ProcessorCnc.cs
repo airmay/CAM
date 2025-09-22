@@ -13,6 +13,9 @@ namespace CAM.CncWorkCenter
         {
             _postProcessor = Processing.GetPostProcessor();
             base.Start();
+
+            AngleA = 0;
+            AngleC = 0;
         }
 
         public override void StartOperation(double? zMax = null)

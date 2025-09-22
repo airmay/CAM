@@ -4,6 +4,7 @@ using System;
 using System.IO;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.ToolTip;
 
 namespace CAM
 {
@@ -58,9 +59,11 @@ namespace CAM
 
                             var camDocument = (CamDocument)formatter.Deserialize(stream);
                             camDocument._hash = resultBuffer.ToString().GetHashCode();
-                            Array.ForEach(camDocument.Processings,
-                                p => Array.ForEach(p.Operations, op => op.SetProcessing(p)));
 
+                            Array.ForEach(camDocument.Processings, p => Array.ForEach(p.Operations, op => op.SetProcessing(p)));
+#if DEBUG
+                            Program.DwgFileCommands = camDocument.Commands;
+#endif
                             return camDocument;
                         }
             }

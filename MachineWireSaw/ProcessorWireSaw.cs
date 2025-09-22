@@ -8,25 +8,27 @@ namespace CAM.MachineWireSaw
 {
     public class ProcessorWireSaw : ProcessorBase<ProcessingWireSaw, ProcessorWireSaw>
     {
-        private readonly PostProcessorWireSaw _postProcessor;
+        private PostProcessorWireSaw _postProcessor;
         protected override PostProcessorBase PostProcessor => _postProcessor;
 
         private Vector2d _uAxis;
         private double _u, _v;
         private Point2d Center => Processing.Origin.Point;
 
+        public override void Start()
+        {
+            _postProcessor = new PostProcessorWireSaw();
+            base.Start();
+
+            AngleC = Math.PI / 2;
+            _uAxis = -Vector2d.XAxis;
+            _u = 0; 
+        }
+
         public override void StartOperation(double? zMax = null)
         {
             base.StartOperation(zMax);
             _v = UpperZ;
-        }
-
-        public ProcessorWireSaw()
-        {
-            _postProcessor = new PostProcessorWireSaw();
-            AngleC = Math.PI / 2;
-            _uAxis = -Vector2d.XAxis;
-            _u = 0;
         }
 
         #region public
