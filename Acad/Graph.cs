@@ -9,6 +9,7 @@ using System.Security.Cryptography;
 
 namespace CAM
 {
+    //
     public class Point3dComparer : IEqualityComparer<Point3d>
     {
         public bool Equals(Point3d point1, Point3d point2) => point1.IsEqualTo(point2);
