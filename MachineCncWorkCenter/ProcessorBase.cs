@@ -2,6 +2,7 @@
 using Autodesk.AutoCAD.Geometry;
 using CAM.Core;
 using System;
+using System.Linq;
 
 namespace CAM.CncWorkCenter
 {
@@ -32,12 +33,14 @@ namespace CAM.CncWorkCenter
             Program = new Program(Processing, PostProcessor.ProgramFileExtension);
             ToolpathBuilder = new ToolpathBuilder();
             Operation = null;
+            Tool = null;
+            IsEngineStarted = false;
         }
 
         public void SetOperation(IOperation operation)
         {
             if (Operation != null)
-                FinishOperation();
+                FinishOperation();  // TODO move
             Operation = operation;
             ToolpathBuilder.CreateGroup();
         }
@@ -49,10 +52,9 @@ namespace CAM.CncWorkCenter
 
             if (zMax.HasValue)
                 UpperZ = zMax.Value + Processing.ZSafety;
-            ToolPoint = Processing.Origin.Point.WithZ(UpperZ);
+            ToolPoint = Processing.Origin.Point.WithZ(UpperZ + Processing.ZSafety * 5);
 
             AddCommands(PostProcessor.StartMachine());
-            IsEngineStarted = true;
         }
 
         private void FinishOperation()
@@ -114,5 +116,31 @@ namespace CAM.CncWorkCenter
         }
 
         protected void AddCommands(string[] commands) => Array.ForEach(commands, p => AddCommand(p));
+
+        public void PartialProgram(int programPosition)
+        {
+
+            var command = Program.GetCommand(programPosition-1);
+            Operation = Program.Processing.Operations.FirstOrDefault(p => p.Number == command.OperationNumber);
+            if (Operation == null) 
+                return;
+
+            var count = Program.Count;
+            Program.Count = 0;
+            AngleA = 0;
+            AngleC = 0;
+
+            using (ToolpathBuilder = new ToolpathBuilder())
+            {
+                ToolpathBuilder.CreateGroup();
+                StartOperation();
+                MoveToPosition(command.ToolPosition);
+            }
+
+            Program.AddCommandsFromPosition(programPosition, count - programPosition);
+            Program.CreateProgram();
+        }
+
+        protected abstract void MoveToPosition(ToolPosition position);
     }
 }

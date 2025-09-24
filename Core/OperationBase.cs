@@ -49,8 +49,8 @@ namespace CAM
 
         void ITreeNode.OnSelect()
         {
-            Processing?.HideToolpath(this);
-            Acad.SelectObjectIds(ProcessingArea?.ObjectIds);
+            //Processing?.HideToolpath(this);
+            //Acad.SelectObjectIds(ProcessingArea?.ObjectIds);
         }
     }
 }

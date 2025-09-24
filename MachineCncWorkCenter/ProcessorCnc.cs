@@ -1,5 +1,6 @@
 ﻿using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
+using CAM.Core;
 using Dreambuild.AutoCAD;
 
 namespace CAM.CncWorkCenter
@@ -52,18 +53,24 @@ namespace CAM.CncWorkCenter
                 Uplifting();
 
             GCommandTo(0, point.WithZ(ToolPoint.Z));
-            if (ToolPoint.Z - UpperZ > 1)
-                GCommandTo(0, point.WithZ(UpperZ));
             if (angleC.HasValue)
                 TurnC(angleC.Value);
             if (angleA.HasValue && !angleA.Value.IsEqual(AngleA))
                 TurnA(angleA.Value);
+            if (ToolPoint.Z - UpperZ > 1)
+                GCommandTo(0, point.WithZ(UpperZ));
 
             if (!IsEngineStarted)
             {
                 AddCommands(_postProcessor.StartEngine(Processing.Frequency, true));
                 IsEngineStarted = true;
             }
+        }
+
+        protected override void MoveToPosition(ToolPosition position)
+        {
+            Move(position.Point, position.AngleC, position.AngleA);
+            Penetration(position.Point);
         }
 
         public void TurnC(double angleC) => GCommand(0, angleC: angleC);
@@ -99,7 +106,7 @@ namespace CAM.CncWorkCenter
                 toolpath = ToolpathBuilder.AddToolpath(curve, gCode);
             }
 
-            AddCommand(commandText, point, -angleC, angleA, duration, toolpath);
+            AddCommand(commandText, point, angleC, angleA, duration, toolpath);
         }
     }
 }

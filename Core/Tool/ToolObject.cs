@@ -102,8 +102,12 @@ namespace CAM
 
         private static void TransformModel(ToolPosition from, ToolPosition to)
         {
+            // знак поворота по углу C = +1 если поворачивается стол, -1 если поворачивается инструмент
+            // TODO
+            var signAngleC = (_tool.Type == ToolType.WireSaw).GetSign();
+
             var displacement = Matrix3d.Displacement(from.Point.GetVectorTo(to.Point));
-            var rotationC = Matrix3d.Rotation(to.AngleC - from.AngleC, Vector3d.ZAxis, to.Point);
+            var rotationC = Matrix3d.Rotation((to.AngleC - from.AngleC) * signAngleC, Vector3d.ZAxis, to.Point);
             // todo ToRad()
             var rotationA = Matrix3d.Rotation((from.AngleA - to.AngleA).ToRad(), Vector3d.XAxis.RotateBy(-to.AngleC.ToRad(), Vector3d.ZAxis), to.Point);
             var matrix = rotationA * rotationC * displacement;

@@ -14,6 +14,7 @@ namespace CAM
         void HideToolpath(IOperation operation);
         Origin Origin { get; set; }
         short LastOperationNumber { get; set; }
+        void ExecutePartial(int programPosition);
     }
 
     [Serializable]
@@ -27,8 +28,11 @@ namespace CAM
         public IOperation[] Operations { get; set; }
         public Tool Tool { get; set; }
         public short LastOperationNumber { get; set; }
+
         public Machine? Machine { get; set; }
+
         public Origin Origin { get; set; } = new Origin();
+
         public double ZSafety { get; set; } = 20;
 
         protected abstract bool Validate();
@@ -94,6 +98,14 @@ namespace CAM
             }
 
             Processor.Finish();
+        }
+
+        public void ExecutePartial(int programPosition)
+        {
+            Operations.Select(p => p.ToolpathGroupId).Delete();
+            Processor.Program.ArraySegment.Take(programPosition).SelectMany(p => new[] { p.ObjectId, p.ObjectId2 }).Delete();
+
+            Processor.PartialProgram(programPosition);
         }
 
         public void OnSelect()

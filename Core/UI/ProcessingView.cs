@@ -381,12 +381,24 @@ namespace CAM
         private void bPartialProcessing_Click(object sender, EventArgs e)
         {
             if (processCommandBindingSource?.Position != null &&
-                MessageBox.Show($"Сформировать программу со строки {processCommandBindingSource?.Position}?",
+                MessageBox.Show($"Сформировать программу со строки {SelectedCommand?.Number}?",
                     "Подтверждение", MessageBoxButtons.YesNo, MessageBoxIcon.Question,
                     MessageBoxDefaultButton.Button1) == DialogResult.Yes)
             {
-                //processCommandBindingSource.Position
+                _program.Processing.ExecutePartial(processCommandBindingSource.Position);
+                
+                var processingNode = GetProgramProcessingNode();
+                UpdateNodeText(processingNode);
+                processingNode.Nodes.Cast<TreeNode>().ForAll(UpdateNodeText);
+
+                processCommandBindingSource.DataSource = _program.ArraySegment;
+
+                treeView_AfterSelect(sender, null);
             }
+
+            return;
+
+            void UpdateNodeText(TreeNode node) => node.Text = node.Tag.As<ITreeNode>().Caption;
         }
     }
 }

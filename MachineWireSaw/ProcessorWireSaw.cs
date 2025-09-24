@@ -3,6 +3,7 @@ using Autodesk.AutoCAD.Geometry;
 using CAM.CncWorkCenter;
 using Dreambuild.AutoCAD;
 using System;
+using CAM.Core;
 
 namespace CAM.MachineWireSaw
 {
@@ -56,8 +57,13 @@ namespace CAM.MachineWireSaw
             GCommands(0, line, z, isReverseAngle, isReverseU);
         }
 
+        protected override void MoveToPosition(ToolPosition position)
+        {
+            throw new NotImplementedException();
+        }
+
         public void Cutting(Point3d point, Vector3d direction) => Cutting(point, point + direction);
-        
+
         public void Cutting(Line3d line) => Cutting(line.StartPoint, line.EndPoint);
 
         public void Cutting(Point3d point1, Point3d point2)

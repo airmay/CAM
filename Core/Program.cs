@@ -40,6 +40,8 @@ namespace CAM.Core
             CreateProgram();
         }
 
+        public static Command GetCommand(int index) => _commands[index];
+
         public void CreateProgram()
         {
             ArraySegment = new ArraySegment<Command>(_commands, 0, Count);
@@ -67,8 +69,14 @@ namespace CAM.Core
                 _commands = newArray;
             }
 
-            _commands[Count++] = command;
-            command.Number = Count;
+            _commands[Count] = command;
+            command.Number = ++Count;
+        }
+
+        public void AddCommandsFromPosition(int position, int count)
+        {
+            Array.Copy(_commands, position, _commands, Count, count);
+            Count += count;
         }
 
         public Command[] GetCommands()
@@ -91,7 +99,6 @@ namespace CAM.Core
             commandIndex = index;
             return result;
         }
-
 
         public void Export()
         {

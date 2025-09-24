@@ -48,6 +48,8 @@ namespace CAM
         {
             foreach (var param in changed)
                 Params[param.Code] = param.Value;
+
+            Params['G'] = null;
         }
         #endregion
 
