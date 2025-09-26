@@ -77,13 +77,8 @@ namespace CAM
 
         private void ProcessOperations(OperationBase<TTechProcess, TProcessor>[] operations)
         {
-            if (Processor == null)
-            {
-                Processor = new TProcessor
-                {
-                    Processing = this as TTechProcess,
-                };
-            }
+            Processor ??= new TProcessor { Processing = this as TTechProcess };
+            
             //if (operations.Length == 3)
             //    throw new Exception("test");
 
