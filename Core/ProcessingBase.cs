@@ -6,12 +6,12 @@ using System.Linq;
 
 namespace CAM
 {
-    public interface IProcessing : ITreeNode
+    public interface IProcessing
     {
+        string Caption { get; set; }
         IOperation[] Operations { get; set; }
         Machine? Machine { get; set; }
         Program Execute();
-        void HideToolpath(IOperation operation);
         Origin Origin { get; set; }
         short LastOperationNumber { get; set; }
         void ExecutePartial(int programPosition);
@@ -91,7 +91,7 @@ namespace CAM
             foreach (var operation in operations)
             {
                 Acad.Write($"расчет операции {operation.Caption}");
-                Processor.SetOperation(operation);
+                Processor.Operation = operation;
                 operation.SetProcessing(this);
 
                 operation.Execute();
@@ -100,21 +100,6 @@ namespace CAM
             Processor.Finish();
         }
 
-        public void ExecutePartial(int programPosition)
-        {
-            Operations.Select(p => p.ToolpathGroupId).Delete();
-            Processor.Program.ArraySegment.Take(programPosition).SelectMany(p => new[] { p.ObjectId, p.ObjectId2 }).Delete();
-
-            Processor.PartialProgram(programPosition);
-        }
-
-        public void OnSelect()
-        {
-            Operations?.ForAll(p => p.ToolpathGroupId?.SetGroupVisibility(true));
-            Acad.SelectObjectIds();
-        }
-
-        public void HideToolpath(IOperation operationToShow) =>
-            Operations?.ForAll(p => p.ToolpathGroupId?.SetGroupVisibility(p == operationToShow));
+        public void ExecutePartial(int programPosition) => Processor.PartialProgram(programPosition);
     }
 }

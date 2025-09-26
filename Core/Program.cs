@@ -14,10 +14,12 @@ namespace CAM.Core
         public int Count { get; set; }
         public ArraySegment<Command> ArraySegment { get; private set; }
         public IProcessing Processing { get; }
+        public Dictionary<short, IOperation> Operations { get; } = new Dictionary<short, IOperation>();
 
         public readonly string ProgramFileExtension;
         private Dictionary<short, int> _operationNumberDict;
         private Dictionary<ObjectId, int> _objectIdDict;
+        private Dictionary<short, ObjectId> _operationToolpath;
 
         public Program(IProcessing processing, string programFileExtension)
         {
@@ -42,16 +44,56 @@ namespace CAM.Core
 
         public static Command GetCommand(int index) => _commands[index];
 
-        public void CreateProgram()
+        public void CreateProgram(ToolpathBuilder toolpathBuilder = null)
         {
             ArraySegment = new ArraySegment<Command>(_commands, 0, Count);
+
             _operationNumberDict = ArraySegment.Select((p, index) => new { p.OperationNumber, index })
                 .GroupBy(x => x.OperationNumber)
                 .ToDictionary(g => g.Key, g => g.Min(x => x.index));
+
             _objectIdDict = ArraySegment.Take(100)
                 .SelectMany((p, ind) => new[] { (ind, p.ObjectId), (ind, p.ObjectId2) })
                 .Where(p => p.Item2.HasValue)
                 .ToDictionary(p => p.Item2.Value, p => p.ind);
+
+            var operationCommands = ArraySegment.ToLookup(p => p.OperationNumber);
+
+            if (toolpathBuilder != null)
+                _operationToolpath = operationCommands.ToDictionary(p => p.Key,
+                    p => toolpathBuilder.CreateGroup(p.Key.ToString(),
+                        p.SelectMany(c => new[] { c.ObjectId, c.ObjectId2 }).Where(c => c.HasValue).Select(c => c.Value).ToArray()));
+
+            var operationDurations = operationCommands.Select(p =>
+                    (OperationNumber: p.Key, Duration: p.Aggregate(TimeSpan.Zero, (current, command) => current.Add(command.Duration)))).ToList();
+            operationDurations.ForEach(p =>
+                Operations[p.OperationNumber].Caption = GetCaption(Operations[p.OperationNumber].Caption, p.Duration));
+            Processing.Caption = GetCaption(Processing.Caption,
+                operationDurations.Aggregate(TimeSpan.Zero, (current, p) => current.Add(p.Duration)));
+
+            return;
+
+            string GetCaption(string caption, TimeSpan duration)
+            {
+                var ind = caption.IndexOf('(');
+                return $"{(ind > 0 ? caption.Substring(0, ind).Trim() : caption)} ({duration})";
+            }
+        }
+
+        public void AddCommand(IOperation operation, string text, ToolPosition toolPosition, double? duration = null, ObjectId? toolpath1 = null, ObjectId? toolpath2 = null)
+        {
+            AddCommand(new Command
+            {
+                Text = text,
+                ToolPosition = toolPosition,
+                Duration = new TimeSpan(0, 0, 0, (int)Math.Round(duration.GetValueOrDefault())),
+                ObjectId = toolpath1,
+                ObjectId2 = toolpath2,
+                OperationNumber = operation.Number,
+            });
+
+            if (!Operations.ContainsKey(operation.Number))
+                Operations.Add(operation.Number, operation);
         }
 
         public void AddCommand(Command command)
@@ -99,6 +141,10 @@ namespace CAM.Core
             commandIndex = index;
             return result;
         }
+
+        public void SetToolpathVisibility(bool value) => _operationToolpath?.ForAll(p => p.Value.SetGroupVisibility(value));
+
+        public void ShowOperationToolpath(IOperation operation) => _operationToolpath?.ForAll(p => p.Value.SetGroupVisibility(p.Key == operation.Number));
 
         public void Export()
         {

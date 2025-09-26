@@ -10,15 +10,13 @@ namespace CAM.CncWorkCenter
         where TTechProcess : ProcessingBase<TTechProcess, TProcessor>
         where TProcessor : ProcessorBase<TTechProcess, TProcessor>, new()
     {
-        public TTechProcess Processing { get; set; }
         public Program Program { get; private set; }
+        public TTechProcess Processing { get; set; }
+        public IOperation Operation { get; set; }
 
         protected abstract PostProcessorBase PostProcessor { get; }
         protected ToolpathBuilder ToolpathBuilder;
 
-        protected IOperation Operation;
-        private double _processDuration;
-        private double _operationDuration;
         protected Tool Tool;
 
         protected bool IsEngineStarted;
@@ -37,14 +35,6 @@ namespace CAM.CncWorkCenter
             IsEngineStarted = false;
         }
 
-        public void SetOperation(IOperation operation)
-        {
-            if (Operation != null)
-                FinishOperation();  // TODO move
-            Operation = operation;
-            ToolpathBuilder.CreateGroup();
-        }
-
         public virtual void StartOperation(double? zMax = null)
         {
             if (IsEngineStarted)
@@ -57,34 +47,17 @@ namespace CAM.CncWorkCenter
             AddCommands(PostProcessor.StartMachine());
         }
 
-        private void FinishOperation()
-        {
-            Operation.ToolpathGroupId = ToolpathBuilder.AddGroup(Operation.Caption);
-            Operation.Caption = GetCaption(Operation.Caption, _operationDuration);
-            _processDuration += _operationDuration;
-            _operationDuration = 0;
-        }
-
         public void Finish()
         {
             AddCommands(PostProcessor.StopEngine());
             AddCommands(PostProcessor.StopMachine());
-            FinishOperation();
-            Processing.Caption = GetCaption(Processing.Caption, _processDuration);
 
             IsEngineStarted = false;
             Tool = null;
-            Program.CreateProgram();
+            Program.CreateProgram(ToolpathBuilder);
 
             ToolpathBuilder.Dispose();
             ToolpathBuilder = null;
-        }
-
-        private static string GetCaption(string caption, double duration)
-        {
-            var ind = caption.IndexOf('(');
-            var timeSpan = new TimeSpan(0, 0, 0, (int)duration);
-            return $"{(ind > 0 ? caption.Substring(0, ind).Trim() : caption)} ({timeSpan})";
         }
 
         public ObjectId AddEntity(Entity curve) => ToolpathBuilder.AddEntity(curve);
@@ -100,45 +73,28 @@ namespace CAM.CncWorkCenter
             AngleC = angleC ?? AngleC;
             AngleA = angleA ?? AngleA;
 
-            var command = new Command
-            {
-                Text = text,
-                ToolPosition = new ToolPosition(ToolPoint, AngleC, AngleA),
-                ObjectId = toolpath1,
-                ObjectId2 = toolpath2,
-                OperationNumber = Operation.Number,
-            };
-            if (duration.HasValue)
-                command.Duration = new TimeSpan(0, 0, 0, (int)Math.Round(duration.Value));
-
-            Program.AddCommand(command);
-            _operationDuration += duration.GetValueOrDefault();
+            Program.AddCommand(Operation, text, new ToolPosition(ToolPoint, AngleC, AngleA), duration, toolpath1, toolpath2);
         }
 
         protected void AddCommands(string[] commands) => Array.ForEach(commands, p => AddCommand(p));
 
         public void PartialProgram(int programPosition)
         {
-
             var command = Program.GetCommand(programPosition-1);
-            Operation = Program.Processing.Operations.FirstOrDefault(p => p.Number == command.OperationNumber);
-            if (Operation == null) 
-                return;
-
+            Operation = Program.Operations[command.OperationNumber];
             var count = Program.Count;
             Program.Count = 0;
             AngleA = 0;
             AngleC = 0;
 
+            Program.ArraySegment.Take(programPosition).SelectMany(p => new[] { p.ObjectId, p.ObjectId2 }).Delete();
             using (ToolpathBuilder = new ToolpathBuilder())
             {
-                ToolpathBuilder.CreateGroup();
                 StartOperation();
                 MoveToPosition(command.ToolPosition);
+                Program.AddCommandsFromPosition(programPosition, count - programPosition);
+                Program.CreateProgram(ToolpathBuilder);
             }
-
-            Program.AddCommandsFromPosition(programPosition, count - programPosition);
-            Program.CreateProgram();
         }
 
         protected abstract void MoveToPosition(ToolPosition position);

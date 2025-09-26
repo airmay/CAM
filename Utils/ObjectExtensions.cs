@@ -22,7 +22,7 @@ namespace CAM
         public static T As<T>(this object obj)
             where T : class
         {
-            return (T)obj;
+            return obj as T;
         }
 
         /// <summary>

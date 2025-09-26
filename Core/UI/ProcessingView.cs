@@ -10,12 +10,6 @@ using Font = System.Drawing.Font;
 
 namespace CAM
 {
-    public interface ITreeNode
-    {
-        string Caption { get; set; }
-        void OnSelect();
-    }
-
     public partial class ProcessingView : UserControl
     {
         private Program _program;
@@ -46,7 +40,6 @@ namespace CAM
             foreach (Control control in tabPageParams.Controls)
                 control.Hide();
             processCommandBindingSource.DataSource = null;
-            _program?.Processing?.Operations?.ForAll(p => p.ToolpathGroupId = null);
             _program = null;
             Acad.ClearHighlighted();
             ToolObject.Delete();
@@ -77,12 +70,8 @@ namespace CAM
             if (_program != null)
             {
                 UpdateNodeText(processingNode);
-                processingNode.Nodes.Cast<TreeNode>().ForAll(UpdateNodeText);
-
                 processCommandBindingSource.DataSource = _program.ArraySegment;
-
                 RefreshToolButtonsState();
-                treeView_AfterSelect(sender, null);
             }
 
             toolStrip.Enabled = true;
@@ -92,15 +81,17 @@ namespace CAM
                 Acad.Write(_program.ArraySegment.SequenceEqual(Program.DwgFileCommands, Command.Comparer)
                     ? "Программа не изменилась"
                     : "Внимание! Программа изменена!");
+        }
 
-            return;
-
-            void UpdateNodeText(TreeNode node) => node.Text = node.Tag.As<ITreeNode>().Caption;
+        private void UpdateNodeText(TreeNode processingNode)
+        {
+            processingNode.Text = processingNode.Tag.As<IProcessing>().Caption;
+            processingNode.Nodes.Cast<TreeNode>().ForAll(p => p.Text = p.Tag.As<IOperation>().Caption);
         }
 
         private void bVisibility_Click(object sender, EventArgs e)
         {
-            _program.Processing.HideToolpath(null);
+            _program.SetToolpathVisibility(false);
             Acad.Editor.UpdateScreen();
         }
 
@@ -183,7 +174,7 @@ namespace CAM
         {
             _camDocument.Set(GetProcessings(), _program);
             _camDocument.Save();
-            _program?.Processing.Operations?.ForAll(p => p.ToolpathGroupId?.SetGroupVisibility(true));
+            _program?.SetToolpathVisibility(true);
         }
 
         private TreeNode GetProgramProcessingNode() => _program == null
@@ -320,10 +311,15 @@ namespace CAM
         private void treeView_AfterSelect(object sender, TreeViewEventArgs e)
         {
             RefreshParamsView();
-            if (SelectedNode.Tag is IOperation operation && _program?.TryGetCommandIndexByOperationNumber(operation.Number, out var commandIndex) == true)
-                processCommandBindingSource.Position = commandIndex;
-            SelectedNode.Tag.As<ITreeNode>().OnSelect();
-            Acad.Editor.UpdateScreen();
+            if (SelectedNode.Tag is IOperation operation)
+            {
+                if (e.Action != TreeViewAction.Unknown && _program?.TryGetCommandIndexByOperationNumber(operation.Number, out var commandIndex) == true)
+                    processCommandBindingSource.Position = commandIndex;
+
+                _program?.ShowOperationToolpath(operation);
+                Acad.SelectObjectIds(operation.ProcessingArea.ObjectIds);
+                Acad.Editor.UpdateScreen();
+            }
         }
 
         #endregion
@@ -363,12 +359,11 @@ namespace CAM
                 Acad.SelectObjectIds(SelectedCommand.ObjectId.Value);
             }
 
+            ToolObject.Set(_program.Operations[SelectedCommand.OperationNumber].GetTool(), SelectedCommand.ToolPosition);
+            
             var node = GetProgramProcessingNode()?.Nodes.Cast<TreeNode>().FirstOrDefault(p => ((IOperation)p.Tag).Number == SelectedCommand.OperationNumber);
-            if (node == null) 
-                return;
-
-            treeView.SelectedNode = node;
-            ToolObject.Set(((IOperation)node.Tag).GetTool(), SelectedCommand.ToolPosition);
+            if (node != null) 
+                treeView.SelectedNode = node;
         }
 
         public void SelectCommand(ObjectId? objectId)
@@ -386,19 +381,10 @@ namespace CAM
                     MessageBoxDefaultButton.Button1) == DialogResult.Yes)
             {
                 _program.Processing.ExecutePartial(processCommandBindingSource.Position);
-                
-                var processingNode = GetProgramProcessingNode();
-                UpdateNodeText(processingNode);
-                processingNode.Nodes.Cast<TreeNode>().ForAll(UpdateNodeText);
-
+                UpdateNodeText(GetProgramProcessingNode());
                 processCommandBindingSource.DataSource = _program.ArraySegment;
-
-                treeView_AfterSelect(sender, null);
+                processCommandBindingSource.Position = 0;
             }
-
-            return;
-
-            void UpdateNodeText(TreeNode node) => node.Text = node.Tag.As<ITreeNode>().Caption;
         }
     }
 }

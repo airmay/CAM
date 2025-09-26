@@ -4,7 +4,6 @@ using System;
 using System.Collections.Generic;
 using Autodesk.AutoCAD.Colors;
 using Dreambuild.AutoCAD;
-using System.Xml.Linq;
 
 namespace CAM
 {
@@ -15,8 +14,6 @@ namespace CAM
         private readonly BlockTableRecord _currentSpace;
         private readonly ObjectId _layerId;
         private readonly DBDictionary _groupDict;
-        private Group _group;
-
 
         private readonly Dictionary<string, Color> _colors = new Dictionary<string, Color>
         {
@@ -33,7 +30,7 @@ namespace CAM
             _transaction = Acad.Database.TransactionManager.StartTransaction();
             _currentSpace = (BlockTableRecord)_transaction.GetObject(Acad.Database.CurrentSpaceId, OpenMode.ForWrite, false);
 
-            _layerId = DbHelper.GetLayerId(Acad.ProcessLayerName);
+            _layerId = DbHelper.GetLayerId("Обработка");
             _groupDict = (DBDictionary)_transaction.GetObject(Acad.Database.GroupDictionaryId, OpenMode.ForWrite);
         }
 
@@ -49,10 +46,7 @@ namespace CAM
                 ? _colors[gCode == 0 ? CommandNames.Fast : CommandNames.Cutting]
                 : Color.FromColor(System.Drawing.Color.DarkOliveGreen);
 
-            var id = AddEntity(curve);
-            _group.Append(id);
-            
-            return id;
+            return AddEntity(curve);
         }
 
         public ObjectId AddEntity(Entity entity)
@@ -64,13 +58,14 @@ namespace CAM
             return entity.ObjectId;
         }
 
-        public void CreateGroup() => _group = new Group("*", false);
-
-        public ObjectId AddGroup(string name)
+        public ObjectId CreateGroup(string name, ObjectId[] entityIds)
         {
-            _group.SetLayer(_layerId);
-            var groupId = _groupDict.SetAt("*", _group);
-            _transaction.AddNewlyCreatedDBObject(_group, true);
+            var group = new Group(name, false);
+            group.Append(new ObjectIdCollection(entityIds));
+            group.SetLayer(_layerId);
+            var groupId = _groupDict.SetAt("*", group);
+            _transaction.AddNewlyCreatedDBObject(group, true);
+
             return groupId;
         }
 

@@ -4,13 +4,14 @@ using CAM.CncWorkCenter;
 
 namespace CAM
 {
-    public interface IOperation : ITreeNode
+    public interface IOperation
     {
+        string Caption { get; set; }
         bool Enabled { get; set; }
         Tool GetTool();
-        ObjectId? ToolpathGroupId { get; set; }
         short Number { get; set; }
         void SetProcessing(IProcessing processing);
+        AcadObject ProcessingArea { get; set; }
     }
 
     [Serializable]
@@ -45,12 +46,6 @@ namespace CAM
         public virtual bool Validate()
         {
             return ProcessingArea.CheckNotNull("Объекты автокада");
-        }
-
-        void ITreeNode.OnSelect()
-        {
-            //Processing?.HideToolpath(this);
-            //Acad.SelectObjectIds(ProcessingArea?.ObjectIds);
         }
     }
 }
