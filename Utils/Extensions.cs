@@ -156,5 +156,30 @@ namespace CAM
             return result;
         }
 
+        #region Array
+
+        public static void ForEach<T>(this T[] array, Action<T> action)
+        {
+            if (array == null) throw new ArgumentNullException(nameof(array));
+            if (action == null) throw new ArgumentNullException(nameof(action));
+
+            for (int i = 0; i < array.Length; i++)
+            {
+                action(array[i]);
+            }
+        }
+
+        public static void ForEach<T>(this T[] array, Action<T, int> action)
+        {
+            if (array == null) throw new ArgumentNullException(nameof(array));
+            if (action == null) throw new ArgumentNullException(nameof(action));
+
+            for (int i = 0; i < array.Length; i++)
+            {
+                action(array[i], i);
+            }
+        }
+
+        #endregion
     }
 }

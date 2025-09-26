@@ -14,7 +14,7 @@ namespace CAM
         Program Execute();
         Origin Origin { get; set; }
         short LastOperationNumber { get; set; }
-        void ExecutePartial(int programPosition);
+        Program ExecutePartial(int position, int count, short operationNumber, ToolPosition toolPosition);
     }
 
     [Serializable]
@@ -36,6 +36,7 @@ namespace CAM
         public double ZSafety { get; set; } = 20;
 
         protected abstract bool Validate();
+        public IOperation GetOperation(short number) => Operations.FirstOrDefault(p => p.Number == number);
 
         public Program Execute()
         {
@@ -54,7 +55,7 @@ namespace CAM
                 stopwatch.Stop();
                 Acad.Write($"Расчет обработки завершен {stopwatch.Elapsed}");
 
-                return Processor.Program;
+                return Processor.CreateProgram();
             }
             catch (Autodesk.AutoCAD.Runtime.Exception ex) when (ex.ErrorStatus ==
                                                                 Autodesk.AutoCAD.Runtime.ErrorStatus.UserBreak)
@@ -91,10 +92,10 @@ namespace CAM
 
                 operation.Execute();
             }
-
-            Processor.Finish();
+            Processor.Stop();
         }
 
-        public void ExecutePartial(int programPosition) => Processor.PartialProgram(programPosition);
+        public Program ExecutePartial(int position, int count, short operationNumber, ToolPosition toolPosition) =>
+            Processor.PartialProgram(position, count, operationNumber, toolPosition);
     }
 }

@@ -180,7 +180,7 @@ namespace CAM
 
         public static ObjectId? GetSelectedObjectId()
         {
-            return Editor.SelectImplied().Value?.GetObjectIds()[0];
+            return Editor.SelectImplied().Value?.GetObjectIds().LastOrDefault();
         }
         public static ObjectId[] GetSelectedObjectIds()
         {

@@ -69,7 +69,7 @@ namespace CAM
             _program = processing.Execute();
             if (_program != null)
             {
-                UpdateNodeText(processingNode);
+                UpdateProcessingNodesText();
                 processCommandBindingSource.DataSource = _program.ArraySegment;
                 RefreshToolButtonsState();
             }
@@ -83,8 +83,9 @@ namespace CAM
                     : "Внимание! Программа изменена!");
         }
 
-        private void UpdateNodeText(TreeNode processingNode)
+        private void UpdateProcessingNodesText()
         {
+            var processingNode = GetProgramProcessingNode();
             processingNode.Text = processingNode.Tag.As<IProcessing>().Caption;
             processingNode.Nodes.Cast<TreeNode>().ForAll(p => p.Text = p.Tag.As<IOperation>().Caption);
         }
@@ -143,7 +144,8 @@ namespace CAM
 
             if (_camDocument.Commands != null)
             {
-                _program = new Program(_camDocument.Processings[_camDocument.ProcessingIndex.Value], _camDocument.ProgramFileExtension, _camDocument.Commands);
+                var programBuilder = new ProgramBuilder(_camDocument.Commands);
+                _program = programBuilder.CreateProgram(_camDocument.Processings[_camDocument.ProcessingIndex.Value], _camDocument.ProgramFileExtension);
                 processCommandBindingSource.DataSource = _camDocument.Commands;
             }
             RefreshToolButtonsState();
@@ -316,7 +318,7 @@ namespace CAM
                 if (e.Action != TreeViewAction.Unknown && _program?.TryGetCommandIndexByOperationNumber(operation.Number, out var commandIndex) == true)
                     processCommandBindingSource.Position = commandIndex;
 
-                _program?.ShowOperationToolpath(operation);
+                _program?.ShowOperationToolpath(operation.Number);
                 Acad.SelectObjectIds(operation.ProcessingArea.ObjectIds);
                 Acad.Editor.UpdateScreen();
             }
@@ -359,7 +361,7 @@ namespace CAM
                 Acad.SelectObjectIds(SelectedCommand.ObjectId.Value);
             }
 
-            ToolObject.Set(_program.Operations[SelectedCommand.OperationNumber].GetTool(), SelectedCommand.ToolPosition);
+            ToolObject.Set(_program.Processing.Operations.FirstOrDefault(p => p.Number == SelectedCommand.OperationNumber)?.GetTool(), SelectedCommand.ToolPosition);
             
             var node = GetProgramProcessingNode()?.Nodes.Cast<TreeNode>().FirstOrDefault(p => ((IOperation)p.Tag).Number == SelectedCommand.OperationNumber);
             if (node != null) 
@@ -377,13 +379,14 @@ namespace CAM
         {
             if (processCommandBindingSource?.Position != null &&
                 MessageBox.Show($"Сформировать программу со строки {SelectedCommand?.Number}?",
-                    "Подтверждение", MessageBoxButtons.YesNo, MessageBoxIcon.Question,
-                    MessageBoxDefaultButton.Button1) == DialogResult.Yes)
+                    "Подтверждение", MessageBoxButtons.YesNo, MessageBoxIcon.Question, MessageBoxDefaultButton.Button1) == DialogResult.Yes)
             {
-                _program.Processing.ExecutePartial(processCommandBindingSource.Position);
-                UpdateNodeText(GetProgramProcessingNode());
+                _program.ArraySegment.Take(processCommandBindingSource.Position).SelectMany(p => new[] { p.ObjectId, p.ObjectId2 }).Delete();
+                var command = processCommandBindingSource[processCommandBindingSource.Position - 1].As<Command>();
+                _program = _program.Processing.ExecutePartial(processCommandBindingSource.Position, _program.ArraySegment.Count, command.OperationNumber, command.ToolPosition);
                 processCommandBindingSource.DataSource = _program.ArraySegment;
                 processCommandBindingSource.Position = 0;
+                UpdateProcessingNodesText();
             }
         }
     }

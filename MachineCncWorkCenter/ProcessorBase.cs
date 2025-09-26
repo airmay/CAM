@@ -2,7 +2,6 @@
 using Autodesk.AutoCAD.Geometry;
 using CAM.Core;
 using System;
-using System.Linq;
 
 namespace CAM.CncWorkCenter
 {
@@ -10,7 +9,7 @@ namespace CAM.CncWorkCenter
         where TTechProcess : ProcessingBase<TTechProcess, TProcessor>
         where TProcessor : ProcessorBase<TTechProcess, TProcessor>, new()
     {
-        public Program Program { get; private set; }
+        public ProgramBuilder ProgramBuilder { get; private set; }
         public TTechProcess Processing { get; set; }
         public IOperation Operation { get; set; }
 
@@ -28,7 +27,7 @@ namespace CAM.CncWorkCenter
 
         public virtual void Start()
         {
-            Program = new Program(Processing, PostProcessor.ProgramFileExtension);
+            ProgramBuilder = new ProgramBuilder();
             ToolpathBuilder = new ToolpathBuilder();
             Operation = null;
             Tool = null;
@@ -47,17 +46,22 @@ namespace CAM.CncWorkCenter
             AddCommands(PostProcessor.StartMachine());
         }
 
-        public void Finish()
+        public void Stop()
         {
             AddCommands(PostProcessor.StopEngine());
             AddCommands(PostProcessor.StopMachine());
+        }
+
+        public Program CreateProgram()
+        {
+            var program = ProgramBuilder.CreateProgram(Processing, PostProcessor.ProgramFileExtension, ToolpathBuilder);
 
             IsEngineStarted = false;
             Tool = null;
-            Program.CreateProgram(ToolpathBuilder);
-
             ToolpathBuilder.Dispose();
             ToolpathBuilder = null;
+
+            return program;
         }
 
         public ObjectId AddEntity(Entity curve) => ToolpathBuilder.AddEntity(curve);
@@ -73,28 +77,20 @@ namespace CAM.CncWorkCenter
             AngleC = angleC ?? AngleC;
             AngleA = angleA ?? AngleA;
 
-            Program.AddCommand(Operation, text, new ToolPosition(ToolPoint, AngleC, AngleA), duration, toolpath1, toolpath2);
+            ProgramBuilder.AddCommand(Operation.Number, text, new ToolPosition(ToolPoint, AngleC, AngleA), duration, toolpath1, toolpath2);
         }
 
         protected void AddCommands(string[] commands) => Array.ForEach(commands, p => AddCommand(p));
 
-        public void PartialProgram(int programPosition)
+        public Program PartialProgram(int programPosition, int count, short operationNumber, ToolPosition toolPosition)
         {
-            var command = Program.GetCommand(programPosition-1);
-            Operation = Program.Operations[command.OperationNumber];
-            var count = Program.Count;
-            Program.Count = 0;
-            AngleA = 0;
-            AngleC = 0;
+            Start();
+            Operation = Processing.GetOperation(operationNumber);
+            StartOperation();
+            MoveToPosition(toolPosition);
+            ProgramBuilder.AddCommandsFromPosition(programPosition, count - programPosition);
 
-            Program.ArraySegment.Take(programPosition).SelectMany(p => new[] { p.ObjectId, p.ObjectId2 }).Delete();
-            using (ToolpathBuilder = new ToolpathBuilder())
-            {
-                StartOperation();
-                MoveToPosition(command.ToolPosition);
-                Program.AddCommandsFromPosition(programPosition, count - programPosition);
-                Program.CreateProgram(ToolpathBuilder);
-            }
+            return CreateProgram();
         }
 
         protected abstract void MoveToPosition(ToolPosition position);
