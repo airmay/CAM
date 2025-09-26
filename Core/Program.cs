@@ -14,10 +14,7 @@ namespace CAM.Core
         public IProcessing Processing { get; } = processing;
         public string ProgramFileExtension { get; } = programFileExtension;
 
-        public Dictionary<short, int> OperationNumbers { get; set; }
         public Dictionary<ObjectId, int> ObjectIds { get; set; }
-        public Dictionary<short, ObjectId> OperationToolpath { get; set; }
-
         public bool TryGetCommandIndexByObjectId(ObjectId objectId, out int commandIndex)
         {
             var result = ObjectIds.TryGetValue(objectId, out var index);
@@ -25,6 +22,7 @@ namespace CAM.Core
             return result;
         }
 
+        public Dictionary<short, int> OperationNumbers { get; set; }
         public bool TryGetCommandIndexByOperationNumber(short operationNumber, out int commandIndex)
         {
             var result = OperationNumbers.TryGetValue(operationNumber, out var index);
@@ -32,8 +30,8 @@ namespace CAM.Core
             return result;
         }
 
+        public Dictionary<short, ObjectId> OperationToolpath { get; set; }
         public void SetToolpathVisibility(bool value) => OperationToolpath?.ForAll(p => p.Value.SetGroupVisibility(value));
-
         public void ShowOperationToolpath(short operationNumber) => OperationToolpath?.ForAll(p => p.Value.SetGroupVisibility(p.Key == operationNumber));
 
         public void Export()

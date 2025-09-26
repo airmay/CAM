@@ -25,6 +25,37 @@ public class ProgramBuilder
         Array.Copy(commands, 0, _commands, 0, _count);
     }
 
+    public void AddCommand(short operationNumber, string text, ToolPosition toolPosition, double? duration = null, ObjectId? toolpath1 = null, ObjectId? toolpath2 = null)
+    {
+        _commands ??= new Command[1000];
+        if (_count == _commands.Length)
+        {
+            if (_count == 100_000)
+                throw new Exception("Количество команд программы превысило 100 тысяч");
+
+            var newArray = new Command[_commands.Length * 10];
+            Array.Copy(_commands, 0, newArray, 0, _commands.Length);
+            _commands = newArray;
+        }
+
+        _commands[_count++] = new Command
+        {
+            Number = _count + 1,
+            Text = text,
+            ToolPosition = toolPosition,
+            Duration = new TimeSpan(0, 0, 0, (int)Math.Round(duration.GetValueOrDefault())),
+            ObjectId = toolpath1,
+            ObjectId2 = toolpath2,
+            OperationNumber = operationNumber,
+        };
+    }
+
+    public void AddCommandsFromPosition(int position, int count)
+    {
+        Array.Copy(_commands, position, _commands, _count, count);
+        _count += count;
+    }
+
     public Program CreateProgram(IProcessing processing, string programFileExtension, ToolpathBuilder toolpathBuilder = null)
     {
         if (_count == 0)
@@ -56,43 +87,5 @@ public class ProgramBuilder
         return program;
 
         static string GetCaption(string caption, TimeSpan duration) => $"{(caption.IndexOf('(') > 0 ? caption.Substring(0, caption.IndexOf('(')).Trim() : caption)} ({duration})";
-    }
-
-    public static Command GetCommand(int index) => _commands[index];
-
-    public void AddCommandsFromPosition(int position, int count)
-    {
-        Array.Copy(_commands, position, _commands, _count, count);
-        _count += count;
-    }
-
-    public void AddCommand(short operationNumber, string text, ToolPosition toolPosition, double? duration = null, ObjectId? toolpath1 = null, ObjectId? toolpath2 = null)
-    {
-        AddCommand(new Command
-        {
-            Number = _count + 1,
-            Text = text,
-            ToolPosition = toolPosition,
-            Duration = new TimeSpan(0, 0, 0, (int)Math.Round(duration.GetValueOrDefault())),
-            ObjectId = toolpath1,
-            ObjectId2 = toolpath2,
-            OperationNumber = operationNumber,
-        });
-    }
-
-    private void AddCommand(Command command)
-    {
-        _commands ??= new Command[1000];
-        if (_count == _commands.Length)
-        {
-            if (_count == 100_000)
-                throw new Exception("Количество команд программы превысило 100 тысяч");
-
-            var newArray = new Command[_commands.Length * 10];
-            Array.Copy(_commands, 0, newArray, 0, _commands.Length);
-            _commands = newArray;
-        }
-
-        _commands[_count++] = command;
     }
 }
