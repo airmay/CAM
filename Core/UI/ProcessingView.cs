@@ -70,17 +70,17 @@ namespace CAM
             if (_program != null)
             {
                 UpdateProcessingNodesText();
-                processCommandBindingSource.DataSource = _program.ArraySegment;
+                processCommandBindingSource.DataSource = _program.Commands;
                 RefreshToolButtonsState();
+
+                if (Program.DwgFileCommands != null)
+                    Acad.Write(_program.Commands.SequenceEqual(Program.DwgFileCommands, Command.Comparer)
+                        ? "Программа не изменилась"
+                        : "Внимание! Программа изменена!");
             }
 
             toolStrip.Enabled = true;
             Acad.DocumentManager.DocumentActivationEnabled = true;
-
-            if (Program.DwgFileCommands != null)
-                Acad.Write(_program.ArraySegment.SequenceEqual(Program.DwgFileCommands, Command.Comparer)
-                    ? "Программа не изменилась"
-                    : "Внимание! Программа изменена!");
         }
 
         private void UpdateProcessingNodesText()
@@ -153,8 +153,7 @@ namespace CAM
 
         private TreeNode CreateProcessingNode(IProcessing processing)
         {
-            var children = processing.Operations?.Select(CreateOperationNode).ToArray()
-                           ?? Array.Empty<TreeNode>();
+            var children = processing.Operations?.Select(CreateOperationNode).ToArray() ?? [];
             return new TreeNode(processing.Caption, 0, 0, children)
             {
                 Checked = true,
@@ -381,10 +380,10 @@ namespace CAM
                 MessageBox.Show($"Сформировать программу со строки {SelectedCommand?.Number}?",
                     "Подтверждение", MessageBoxButtons.YesNo, MessageBoxIcon.Question, MessageBoxDefaultButton.Button1) == DialogResult.Yes)
             {
-                _program.ArraySegment.Take(processCommandBindingSource.Position).SelectMany(p => new[] { p.ObjectId, p.ObjectId2 }).Delete();
+                _program.Commands.Take(processCommandBindingSource.Position).SelectMany(p => new[] { p.ObjectId, p.ObjectId2 }).Delete();
                 var command = processCommandBindingSource[processCommandBindingSource.Position - 1].As<Command>();
-                _program = _program.Processing.ExecutePartial(processCommandBindingSource.Position, _program.ArraySegment.Count, command.OperationNumber, command.ToolPosition);
-                processCommandBindingSource.DataSource = _program.ArraySegment;
+                _program = _program.Processing.ExecutePartial(processCommandBindingSource.Position, _program.Commands.Count, command.OperationNumber, command.ToolPosition);
+                processCommandBindingSource.DataSource = _program.Commands;
                 processCommandBindingSource.Position = 0;
                 UpdateProcessingNodesText();
             }

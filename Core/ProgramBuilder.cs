@@ -6,31 +6,31 @@ namespace CAM.Core;
 
 public class ProgramBuilder
 {
-    public static Command[] _commands;
-    public int Count { get; set; }
+    private static Command[] _commands;
+    private int _count;
 
     public ProgramBuilder() { }
 
     public ProgramBuilder(Command[] commands)
     {
         var count = 1000;
-        Count = commands.Length;
-        if (Count >= count)
+        _count = commands.Length;
+        if (_count >= count)
         {
-            var digits = (int)Math.Floor(Math.Log10(Count)) + 1;
+            var digits = (int)Math.Floor(Math.Log10(_count)) + 1;
             count = (int)Math.Pow(10, digits);
         }
 
         _commands = new Command[count];
-        Array.Copy(commands, 0, _commands, 0, Count);
+        Array.Copy(commands, 0, _commands, 0, _count);
     }
 
     public Program CreateProgram(IProcessing processing, string programFileExtension, ToolpathBuilder toolpathBuilder = null)
     {
-        if (Count == 0)
+        if (_count == 0)
             return null;
 
-        var arraySegment = new ArraySegment<Command>(_commands, 0, Count);
+        var arraySegment = new ArraySegment<Command>(_commands, 0, _count);
         var program = new Program(arraySegment, processing, programFileExtension);
 
         program.OperationNumbers = arraySegment.Select((p, index) => new { p.OperationNumber, index })
@@ -62,15 +62,15 @@ public class ProgramBuilder
 
     public void AddCommandsFromPosition(int position, int count)
     {
-        Array.Copy(_commands, position, _commands, Count, count);
-        Count += count;
+        Array.Copy(_commands, position, _commands, _count, count);
+        _count += count;
     }
 
     public void AddCommand(short operationNumber, string text, ToolPosition toolPosition, double? duration = null, ObjectId? toolpath1 = null, ObjectId? toolpath2 = null)
     {
         AddCommand(new Command
         {
-            Number = Count + 1,
+            Number = _count + 1,
             Text = text,
             ToolPosition = toolPosition,
             Duration = new TimeSpan(0, 0, 0, (int)Math.Round(duration.GetValueOrDefault())),
@@ -80,12 +80,12 @@ public class ProgramBuilder
         });
     }
 
-    public void AddCommand(Command command)
+    private void AddCommand(Command command)
     {
         _commands ??= new Command[1000];
-        if (Count == _commands.Length)
+        if (_count == _commands.Length)
         {
-            if (Count == 100_000)
+            if (_count == 100_000)
                 throw new Exception("Количество команд программы превысило 100 тысяч");
 
             var newArray = new Command[_commands.Length * 10];
@@ -93,6 +93,6 @@ public class ProgramBuilder
             _commands = newArray;
         }
 
-        _commands[Count++] = command;
+        _commands[_count++] = command;
     }
 }

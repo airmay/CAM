@@ -2,9 +2,9 @@
 using CAM.Core;
 using System;
 using System.IO;
+using System.Linq;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement.ToolTip;
 
 namespace CAM
 {
@@ -31,7 +31,7 @@ namespace CAM
             if (program != null)
             {
                 ProcessingIndex = Array.IndexOf(processings, program.Processing);
-                Commands = program.GetCommands();
+                Commands = program.Commands.ToArray();
                 ProgramFileExtension = program.ProgramFileExtension;
             }
         }
@@ -41,8 +41,7 @@ namespace CAM
             try
             {
                 using (var tr = Acad.Database.TransactionManager.StartTransaction())
-                using (var dict = tr.GetObject(Acad.Database.NamedObjectsDictionaryId,
-                           OpenMode.ForRead) as DBDictionary)
+                using (var dict = tr.GetObject(Acad.Database.NamedObjectsDictionaryId, OpenMode.ForRead) as DBDictionary)
                     if (dict.Contains(DataKey))
                         using (var xRecord = tr.GetObject(dict.GetAt(DataKey), OpenMode.ForRead) as Xrecord)
                         using (var resultBuffer = xRecord.Data)
@@ -60,7 +59,8 @@ namespace CAM
                             var camDocument = (CamDocument)formatter.Deserialize(stream);
                             camDocument._hash = resultBuffer.ToString().GetHashCode();
 
-                            Array.ForEach(camDocument.Processings, p => Array.ForEach(p.Operations, op => op.SetProcessing(p)));
+                            Array.ForEach(camDocument.Processings,
+                                p => Array.ForEach(p.Operations, op => op.SetProcessing(p)));
 #if DEBUG
                             Program.DwgFileCommands = camDocument.Commands;
 #endif

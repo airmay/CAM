@@ -6,24 +6,17 @@ using System.Linq;
 
 namespace CAM.Core
 {
-    public class Program(ICollection<Command> arraySegment, IProcessing processing, string programFileExtension)
+    public class Program(ICollection<Command> commands, IProcessing processing, string programFileExtension)
     {
-        public static ICollection<Command> DwgFileCommands { get; set; }
+        public static Command[] DwgFileCommands { get; set; }
 
-        public ICollection<Command> ArraySegment { get; } = arraySegment;
+        public ICollection<Command> Commands { get; } = commands;
         public IProcessing Processing { get; } = processing;
-        public readonly string ProgramFileExtension = programFileExtension;
+        public string ProgramFileExtension { get; } = programFileExtension;
 
         public Dictionary<short, int> OperationNumbers { get; set; }
         public Dictionary<ObjectId, int> ObjectIds { get; set; }
         public Dictionary<short, ObjectId> OperationToolpath { get; set; }
-
-        public Command[] GetCommands()
-        {
-            var target = ArraySegment.ToArray();
-            //ArraySegment.CopyTo(target, ArraySement.Count);
-            return target;
-        }
 
         public bool TryGetCommandIndexByObjectId(ObjectId objectId, out int commandIndex)
         {
@@ -49,7 +42,7 @@ namespace CAM.Core
             if (fileName == null)
                 return;
 
-            var contents = ArraySegment.Select(p => $"N{p.Number} {p.Text}").ToArray();
+            var contents = Commands.Select(p => $"N{p.Number} {p.Text}").ToArray();
             try
             {
                 File.WriteAllLines(fileName, contents);
