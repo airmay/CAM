@@ -40,7 +40,7 @@ namespace CAM
             using (Acad.Database.TransactionManager.StartTransaction())
                 foreach (var item in _model)
                 {
-                    TransientManager.CurrentTransientManager.EraseTransient(item, new IntegerCollection());
+                    TransientManager.CurrentTransientManager.EraseTransient(item, []);
                     item.Dispose();
                 }
 
@@ -59,41 +59,41 @@ namespace CAM
                     var circle0 = new Circle(new Point3d(0, 0, radius), Vector3d.YAxis, radius);
                     var circle1 = new Circle(circle0.Center + Vector3d.YAxis * thickness, Vector3d.YAxis, radius);
                     var axis = new Line(circle1.Center, circle1.Center + Vector3d.YAxis * radius / 4);
-                    _model = new Curve[] { circle0, circle1, axis };
+                    _model = [circle0, circle1, axis];
                     break;
 
                 case ToolType.Mill:
-                    _model = new Curve[]
-                    {
+                    _model =
+                    [
                         new Circle(Point3d.Origin, Vector3d.ZAxis, 20),
                         new Line(Point3d.Origin, Point3d.Origin + Vector3d.ZAxis * 100)
-                    };
+                    ];
                     break;
 
                 case ToolType.WireSaw:
                     var line = new Line(new Point3d(-WireSawLength, 0, 0), new Point3d(WireSawLength, 0, 0));
-                    _model = new Curve[]
-                    {
+                    _model =
+                    [
                         line,
                         new Circle(line.StartPoint, Vector3d.XAxis, thickness / 2),
                         new Circle(line.EndPoint, Vector3d.XAxis, thickness / 2),
                         new Circle(line.GetPointAtParameter(line.Length / 2), Vector3d.XAxis, thickness/ 2)
-                    };
+                    ];
                     break;
 
                 default:
-                    _model = new Curve[] { new Line(Point3d.Origin, Point3d.Origin + Vector3d.ZAxis * 100) };
+                    _model = [new Line(Point3d.Origin, Point3d.Origin + Vector3d.ZAxis * 100)];
                     break;
             }
 
             using (Application.DocumentManager.MdiActiveDocument.LockDocument())
             using (var tr = Acad.Database.TransactionManager.StartTransaction())
             {
+                var color = Color.FromColorIndex(ColorMethod.ByColor, 131);
                 foreach (var item in _model)
                 {
-                    item.Color = Color.FromColorIndex(ColorMethod.ByColor, 131);
-                    TransientManager.CurrentTransientManager.AddTransient(item, TransientDrawingMode.Main, 128,
-                        new IntegerCollection());
+                    item.Color = color;
+                    TransientManager.CurrentTransientManager.AddTransient(item, TransientDrawingMode.Main, 128, []);
                 }
 
                 tr.Commit();
