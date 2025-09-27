@@ -11,30 +11,18 @@ public class ProgramBuilder
 
     public ProgramBuilder() { }
 
-    public ProgramBuilder(Command[] commands)
-    {
-        var count = 1000;
-        _count = commands.Length;
-        if (_count >= count)
-        {
-            var digits = (int)Math.Floor(Math.Log10(_count)) + 1;
-            count = (int)Math.Pow(10, digits);
-        }
-
-        _commands = new Command[count];
-        Array.Copy(commands, 0, _commands, 0, _count);
-    }
+    public ProgramBuilder(Command[] commands) => _commands = commands;
 
     public void AddCommand(short operationNumber, string text, ToolPosition toolPosition, double? duration = null, ObjectId? toolpath1 = null, ObjectId? toolpath2 = null)
     {
-        _commands ??= new Command[1000];
+        _commands ??= new Command[100];
         if (_count == _commands.Length)
         {
-            if (_count == 100_000)
+            if (_count > 100_000)
                 throw new Exception("Количество команд программы превысило 100 тысяч");
 
-            var newArray = new Command[_commands.Length * 10];
-            Array.Copy(_commands, 0, newArray, 0, _commands.Length);
+            var newArray = new Command[_commands.Length * 5];
+            Array.Copy(_commands, newArray, _commands.Length);
             _commands = newArray;
         }
 

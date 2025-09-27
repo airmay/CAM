@@ -33,7 +33,7 @@ namespace CAM
 #if DEBUG
             @"C:\Catalina\Tools";
 #else
-        @"\\Catalina\Tools";
+        @"\\192.168.1.230\public\Программы станок\CAM 2.0\Tools";
 #endif
         private static string GetToolFileName(Machine machine) => Path.Combine(ToolsFilePath, $"{machine}.csv");
 
