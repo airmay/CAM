@@ -180,6 +180,36 @@ namespace CAM
             }
         }
 
+        public static TResult[] ConvertAll<T, TResult>(
+            this T[] array,
+            Func<T, TResult> converter)
+        {
+            if (array == null) throw new ArgumentNullException(nameof(array));
+            if (converter == null) throw new ArgumentNullException(nameof(converter));
+
+            TResult[] result = new TResult[array.Length];
+            for (int i = 0; i < array.Length; i++)
+            {
+                result[i] = converter(array[i]);
+            }
+            return result;
+        }
+
+        public static TResult[] ConvertAll<T, TResult>(
+            this T[] array,
+            Func<T, int, TResult> converter)
+        {
+            if (array == null) throw new ArgumentNullException(nameof(array));
+            if (converter == null) throw new ArgumentNullException(nameof(converter));
+
+            TResult[] result = new TResult[array.Length];
+            for (int i = 0; i < array.Length; i++)
+            {
+                result[i] = converter(array[i], i);
+            }
+            return result;
+        }
+
         #endregion
     }
 }

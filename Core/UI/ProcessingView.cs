@@ -22,7 +22,7 @@ namespace CAM
         {
             InitializeComponent();
 
-            imageList.Images.AddRange(new System.Drawing.Image[] { Properties.Resources.folder, Properties.Resources.drive_download });
+            imageList.Images.AddRange([Properties.Resources.folder, Properties.Resources.drive_download]);
             bCreateTechOperation.DropDownItems.AddRange(OperationItemsContainer.GetMenuItems(bCreateTechOperation_Click));
             //RefreshToolButtonsState();
 #if DEBUG
@@ -318,7 +318,7 @@ namespace CAM
                     processCommandBindingSource.Position = commandIndex;
 
                 _program?.ShowOperationToolpath(operation.Number);
-                Acad.SelectObjectIds(operation.ProcessingArea.ObjectIds);
+                Acad.SelectObjectIds(operation.ProcessingArea?.ObjectIds);
                 Acad.Editor.UpdateScreen();
             }
         }

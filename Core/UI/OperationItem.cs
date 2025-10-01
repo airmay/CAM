@@ -1,33 +1,26 @@
 ﻿using System;
-using System.Linq;
 using System.Windows.Forms;
 
-namespace CAM
+namespace CAM;
+
+public abstract class OperationItemBase(string caption)
 {
-    public abstract class OperationItemBase
-    {
-        protected readonly string Caption;
-        protected OperationItemBase(string caption) => Caption = caption;
-        public abstract ToolStripMenuItem GetMenuItem(Action<string, Type> onClick);
-    } 
+    protected readonly string Caption = caption;
+    public abstract ToolStripItem GetMenuItem(Action<string, Type> onClick);
+} 
 
-    public class OperationItem : OperationItemBase
+public class OperationItem(string caption, Type type) : OperationItemBase(caption)
+{
+    public override ToolStripItem GetMenuItem(Action<string, Type> onClick)
     {
-        private readonly Type _type;
-        public OperationItem(string caption, Type type) : base(caption) => _type = type;
-        public override ToolStripMenuItem GetMenuItem(Action<string, Type> onClick)
-        {
-            return new ToolStripMenuItem(Caption, null, (o, args) => onClick(Caption, _type));
-        }
+        return new ToolStripMenuItem(Caption, null, (_, _) => onClick(Caption, type));
     }
+}
 
-    public class OperationGroupItem : OperationItemBase
+public class OperationGroupItem(string caption, OperationItem[] items) : OperationItemBase(caption)
+{
+    public override ToolStripItem GetMenuItem(Action<string, Type> onClick)
     {
-        private readonly OperationItem[] _items;
-        public OperationGroupItem(string caption, OperationItem[] items) : base(caption) => _items = items;
-        public override ToolStripMenuItem GetMenuItem(Action<string, Type> onClick)
-        {
-            return new ToolStripMenuItem(Caption, null, _items.Select(p => p.GetMenuItem(onClick)).ToArray());
-        }
+        return new ToolStripMenuItem(Caption, null, items.ConvertAll(p => p.GetMenuItem(onClick)));
     }
 }
