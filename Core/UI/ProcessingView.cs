@@ -16,7 +16,7 @@ namespace CAM
 
         private TreeNode SelectedNode => treeView.SelectedNode;
         private TreeNode SelectedProcessingNode => treeView.SelectedNode?.Parent ?? treeView.SelectedNode;
-        private Command SelectedCommand => processCommandBindingSource.Current as Command;
+        private Command SelectedCommand => (Command)processCommandBindingSource.Current;
 
         public ProcessingView()
         {
@@ -351,7 +351,7 @@ namespace CAM
 
         private void processCommandBindingSource_CurrentChanged(object sender, EventArgs e)
         {
-            if (SelectedCommand == null)
+            if (processCommandBindingSource.Current == null)
                 return;
 
             if (SelectedCommand.ObjectId.HasValue)
@@ -377,11 +377,11 @@ namespace CAM
         private void bPartialProcessing_Click(object sender, EventArgs e)
         {
             if (processCommandBindingSource?.Position != null &&
-                MessageBox.Show($"Сформировать программу со строки {SelectedCommand?.Number}?",
+                MessageBox.Show($"Сформировать программу со строки {SelectedCommand.Number}?",
                     "Подтверждение", MessageBoxButtons.YesNo, MessageBoxIcon.Question, MessageBoxDefaultButton.Button1) == DialogResult.Yes)
             {
                 _program.Commands.Take(processCommandBindingSource.Position).SelectMany(p => new[] { p.ObjectId, p.ObjectId2 }).Delete();
-                var command = processCommandBindingSource[processCommandBindingSource.Position - 1].As<Command>();
+                var command = (Command)processCommandBindingSource[processCommandBindingSource.Position - 1];
                 _program = _program.Processing.ExecutePartial(processCommandBindingSource.Position, _program.Commands.Count, command.OperationNumber, command.ToolPosition);
                 processCommandBindingSource.DataSource = _program.Commands;
                 processCommandBindingSource.Position = 0;

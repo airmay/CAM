@@ -6,7 +6,7 @@ using CAM.Core;
 namespace CAM
 {
     [Serializable]
-    public class Command
+    public struct Command
     {
         public int Number { get; set; }
         public TimeSpan Duration { get; set; }

@@ -62,7 +62,7 @@ namespace CAM
                             Array.ForEach(camDocument.Processings,
                                 p => Array.ForEach(p.Operations, op => op.SetProcessing(p)));
 #if DEBUG
-                            Program.DwgFileCommands = camDocument.Commands;
+                            Program.DwgFileCommands = (Command[])camDocument.Commands.Clone();
 #endif
                             return camDocument;
                         }

@@ -11,7 +11,11 @@ public class ProgramBuilder
 
     public ProgramBuilder() { }
 
-    public ProgramBuilder(Command[] commands) => _commands = commands;
+    public ProgramBuilder(Command[] commands)
+    {
+        _commands = commands;
+        _count = commands.Length;
+    }
 
     public void AddCommand(short operationNumber, string text, ToolPosition toolPosition, double? duration = null, ObjectId? toolpath1 = null, ObjectId? toolpath2 = null)
     {
@@ -26,16 +30,15 @@ public class ProgramBuilder
             _commands = newArray;
         }
 
-        _commands[_count++] = new Command
-        {
-            Number = _count + 1,
-            Text = text,
-            ToolPosition = toolPosition,
-            Duration = new TimeSpan(0, 0, 0, (int)Math.Round(duration.GetValueOrDefault())),
-            ObjectId = toolpath1,
-            ObjectId2 = toolpath2,
-            OperationNumber = operationNumber,
-        };
+        _commands[_count].Number = _count + 1;
+        _commands[_count].Text = text;
+        _commands[_count].ToolPosition = toolPosition;
+        _commands[_count].Duration = new TimeSpan(0, 0, 0, (int)Math.Round(duration.GetValueOrDefault()));
+        _commands[_count].ObjectId = toolpath1;
+        _commands[_count].ObjectId2 = toolpath2;
+        _commands[_count].OperationNumber = operationNumber;
+
+        ++_count;
     }
 
     public void AddCommandsFromPosition(int position, int count)
