@@ -161,7 +161,7 @@ namespace CAM
             if (_camDocument.Commands != null)
             {
                 var programBuilder = new ProgramBuilder(_camDocument.Commands);
-                _program = programBuilder.CreateProgram(_camDocument.Processings[_camDocument.ProcessingIndex.Value], _camDocument.ProgramFileExtension);
+                _program = programBuilder.CreateProgram(_camDocument.Processings[_camDocument.ProcessingIndex.Value]);
                 processCommandBindingSource.DataSource = _camDocument.Commands;
             }
             RefreshToolButtonsState();

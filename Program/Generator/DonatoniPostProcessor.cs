@@ -4,8 +4,6 @@ namespace CAM
 {
     public class DonatoniPostProcessor : PostProcessorCnc
     {
-        public override string ProgramFileExtension => "pgm";
-
         public override string[] StartMachine()
         {
             return new[]

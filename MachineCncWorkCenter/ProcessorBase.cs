@@ -54,7 +54,7 @@ namespace CAM.CncWorkCenter
 
         public Program CreateProgram()
         {
-            var program = ProgramBuilder.CreateProgram(Processing, PostProcessor.ProgramFileExtension, ToolpathBuilder);
+            var program = ProgramBuilder.CreateProgram(Processing, ToolpathBuilder);
 
             IsEngineStarted = false;
             Tool = null;

@@ -7,18 +7,10 @@ namespace CAM
     {
         public Point2d Origin { get; set; }
 
-        public virtual string ProgramFileExtension => "txt";
-
-        public struct CommandParam
+        protected readonly record struct CommandParam(char Code, string Value)
         {
-            public readonly char Code;
-            public readonly string Value;
-
-            public CommandParam(char code, string value)
-            {
-                Code = code;
-                Value = value;
-            }
+            public readonly char Code = Code;
+            public readonly string Value = Value;
 
             public override string ToString() => $"{Code}{Value}";
         }

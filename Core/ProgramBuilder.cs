@@ -17,7 +17,8 @@ public class ProgramBuilder
         _count = commands.Length;
     }
 
-    public void AddCommand(short operationNumber, string text, ToolPosition toolPosition, double? duration = null, ObjectId? toolpath1 = null, ObjectId? toolpath2 = null)
+    public void AddCommand(short operationNumber, string text, ToolPosition toolPosition, double? duration = null,
+        ObjectId? toolpath1 = null, ObjectId? toolpath2 = null)
     {
         _commands ??= new Command[100];
         if (_count == _commands.Length)
@@ -47,35 +48,33 @@ public class ProgramBuilder
         _count += count;
     }
 
-    public Program CreateProgram(IProcessing processing, string programFileExtension, ToolpathBuilder toolpathBuilder = null)
+    public Program CreateProgram(IProcessing processing, ToolpathBuilder toolpathBuilder = null)
     {
         if (_count == 0)
             return null;
 
         var arraySegment = new ArraySegment<Command>(_commands, 0, _count);
-        var program = new Program(arraySegment, processing, programFileExtension);
-
-        program.OperationNumbers = arraySegment.Select((p, index) => new { p.OperationNumber, index })
-            .GroupBy(x => x.OperationNumber)
-            .ToDictionary(g => g.Key, g => g.Min(x => x.index));
-
-        program.ObjectIds = arraySegment.Take(100)
-            .SelectMany((p, ind) => new[] { (ind, p.ObjectId), (ind, p.ObjectId2) })
-            .Where(p => p.Item2.HasValue)
-            .ToDictionary(p => p.Item2.Value, p => p.ind);
 
         var operationCommands = arraySegment.ToLookup(p => p.OperationNumber);
-
-        if (toolpathBuilder != null)
-            program.OperationToolpath = operationCommands.ToDictionary(p => p.Key,
-                p => toolpathBuilder.CreateGroup(p.Key.ToString(),
-                    p.SelectMany(c => new[] { c.ObjectId, c.ObjectId2 }).Where(c => c.HasValue).Select(c => c.Value).ToArray()));
-
         var operationDurations = operationCommands.ToDictionary(p => p.Key, v => v.Aggregate(TimeSpan.Zero, (current, command) => current.Add(command.Duration)));
         processing.Operations.ForEach(p => p.Caption = GetCaption(p.Caption, operationDurations.TryGetAndReturn(p.Number)));
         processing.Caption = GetCaption(processing.Caption, operationDurations.Aggregate(TimeSpan.Zero, (current, p) => current.Add(p.Value)));
 
-        return program;
+        var operationNumbers = arraySegment.Select((p, index) => new { p.OperationNumber, index })
+            .GroupBy(x => x.OperationNumber)
+            .ToDictionary(g => g.Key, g => g.Min(x => x.index));
+
+        var objectIds = arraySegment.Take(100)
+            .SelectMany((p, ind) => new[] { (ind, p.ObjectId), (ind, p.ObjectId2) })
+            .Where(p => p.Item2.HasValue)
+            .ToDictionary(p => p.Item2.Value, p => p.ind);
+
+        var operationToolpath = toolpathBuilder != null
+            ? operationCommands.ToDictionary(p => p.Key,
+                p => toolpathBuilder.CreateGroup(p.Key.ToString(), p.SelectMany(c => new[] { c.ObjectId, c.ObjectId2 }).Where(c => c.HasValue).Select(c => c.Value).ToArray()))
+            : null;
+
+        return new Program(arraySegment, processing, operationNumbers, objectIds, operationToolpath);
 
         static string GetCaption(string caption, TimeSpan duration) => $"{(caption.IndexOf('(') > 0 ? caption.Substring(0, caption.IndexOf('(')).Trim() : caption)} ({duration})";
     }

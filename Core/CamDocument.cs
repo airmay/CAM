@@ -22,7 +22,6 @@ namespace CAM
 
         public IProcessing[] Processings { get; private set; }
         public int? ProcessingIndex { get; private set; }
-        public string ProgramFileExtension { get; private set; }
         public Command[] Commands { get; private set; }
 
         public void Set(IProcessing[] processings, Program program)
@@ -32,7 +31,6 @@ namespace CAM
             {
                 ProcessingIndex = Array.IndexOf(processings, program.Processing);
                 Commands = program.Commands.ToArray();
-                ProgramFileExtension = program.ProgramFileExtension;
             }
         }
 
