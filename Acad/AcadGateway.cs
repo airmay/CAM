@@ -290,13 +290,25 @@ namespace CAM
 
         public static void DeleteProcessObjects()
         {
-            App.LockAndExecute(() => 
+            var ids = QuickSelection.SelectAll(FilterList.Create().Layer(ProcessLayerName));
+            ids.UpdateAll(p => p.Erase());
+        }
+
+        public static void UpdateAll(this IEnumerable<ObjectId> ids, Action<DBObject> action) => ids?.ToArray().UpdateAll(action);
+
+        public static void UpdateAll(this ObjectId[] ids, Action<DBObject> action)
+        {
+            if (ids.Length == 0)
+                return;
+
+            App.LockAndExecute(() =>
             {
-                var ids = QuickSelection.SelectAll(FilterList.Create().Layer(ProcessLayerName));
-                if (ids.Any())
-                    ids.QForEach(entity => entity.Erase());
+                using var trans = DbHelper.GetDatabase(ids).TransactionManager.StartTransaction();
+                ids.Select(id => trans.GetObject(id, OpenMode.ForWrite)).ToList().ForEach(action);
+                trans.Commit();
             });
         }
+
         #endregion
 
         #region Progressor

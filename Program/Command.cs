@@ -21,11 +21,7 @@ namespace CAM
         {
             public bool Equals(Command x, Command y)
             {
-                if (ReferenceEquals(x, y)) return true;
-                if (ReferenceEquals(x, null)) return false;
-                if (ReferenceEquals(y, null)) return false;
-                if (x.GetType() != y.GetType()) return false;
-                return x.Number == y.Number && x.Duration.Equals(y.Duration) && x.Text == y.Text && x.ToolPosition.Equals(y.ToolPosition);
+                return x.Number == y.Number && x.Duration.Equals(y.Duration) && x.Text == y.Text && x.ToolPosition.Equals(y.ToolPosition) && Nullable.Equals(x.ObjectId2, y.ObjectId2);
             }
 
             public int GetHashCode(Command obj)
@@ -34,8 +30,9 @@ namespace CAM
                 {
                     var hashCode = obj.Number;
                     hashCode = (hashCode * 397) ^ obj.Duration.GetHashCode();
-                    hashCode = (hashCode * 397) ^ obj.Text.GetHashCode();
+                    hashCode = (hashCode * 397) ^ (obj.Text != null ? obj.Text.GetHashCode() : 0);
                     hashCode = (hashCode * 397) ^ obj.ToolPosition.GetHashCode();
+                    hashCode = (hashCode * 397) ^ obj.ObjectId2.GetHashCode();
                     return hashCode;
                 }
             }

@@ -52,24 +52,25 @@ namespace CAM
             bVisibility.Enabled = bSendProgramm.Enabled = bPartialProcessing.Enabled = bPlay.Enabled = _program != null;
         }
 
+        #region Execute
+
         private void bBuildProcessing_ButtonClick(object sender, EventArgs e)
         {
-            SelectNextControl(ActiveControl, true, true, true, true);
-            Acad.DocumentManager.DocumentActivationEnabled = false;
-            var processingNode = SelectedProcessingNode ?? treeView.Nodes[0];
-            var processing = GetProcessing(processingNode);
-#if !DEBUG
+#if RELEASE
             toolStrip.Enabled = false;
 #endif
+            SelectNextControl(ActiveControl, true, true, true, true);
             processCommandBindingSource.DataSource = null;
+            Acad.DocumentManager.DocumentActivationEnabled = false;
             Acad.DeleteProcessObjects();
             Acad.ClearHighlighted();
             ToolObject.Delete();
 
+            var processing = GetProcessing(SelectedProcessingNode);
             _program = processing.Execute();
             if (_program != null)
             {
-                UpdateProcessingNodesText();
+                UpdateTechProcessNodesText(SelectedProcessingNode);
                 processCommandBindingSource.DataSource = _program.Commands;
                 RefreshToolButtonsState();
 
@@ -79,16 +80,31 @@ namespace CAM
                         : "Внимание! Программа изменена!");
             }
 
-            toolStrip.Enabled = true;
             Acad.DocumentManager.DocumentActivationEnabled = true;
+            toolStrip.Enabled = true;
         }
 
-        private void UpdateProcessingNodesText()
+        private void bPartialProcessing_Click(object sender, EventArgs e)
         {
-            var processingNode = GetProgramProcessingNode();
-            processingNode.Text = processingNode.Tag.As<IProcessing>().Caption;
-            processingNode.Nodes.Cast<TreeNode>().ForAll(p => p.Text = p.Tag.As<IOperation>().Caption);
+            if (processCommandBindingSource?.Position == null || MessageBox.Show($"Сформировать программу со строки {SelectedCommand.Number}?", 
+                    "Подтверждение", MessageBoxButtons.YesNo, MessageBoxIcon.Question, MessageBoxDefaultButton.Button1) != DialogResult.Yes)
+                return;
+
+            _program.Commands.Take(processCommandBindingSource.Position).SelectMany(p => new[] { p.ObjectId, p.ObjectId2 }).Delete();
+            var command = (Command)processCommandBindingSource[processCommandBindingSource.Position - 1];
+            _program = _program.Processing.ExecutePartial(processCommandBindingSource.Position, _program.Commands.Count, command.OperationNumber, command.ToolPosition);
+            processCommandBindingSource.DataSource = _program.Commands;
+            processCommandBindingSource.Position = 0;
+            UpdateTechProcessNodesText(GetProgramProcessingNode());
         }
+
+        private static void UpdateTechProcessNodesText(TreeNode techProcessNode)
+        {
+            techProcessNode.Text = techProcessNode.Tag.As<IProcessing>().Caption;
+            techProcessNode.Nodes.Cast<TreeNode>().ForAll(p => p.Text = p.Tag.As<IOperation>().Caption);
+        }
+
+        #endregion
 
         private void bVisibility_Click(object sender, EventArgs e)
         {
@@ -374,19 +390,5 @@ namespace CAM
         }
         #endregion
 
-        private void bPartialProcessing_Click(object sender, EventArgs e)
-        {
-            if (processCommandBindingSource?.Position != null &&
-                MessageBox.Show($"Сформировать программу со строки {SelectedCommand.Number}?",
-                    "Подтверждение", MessageBoxButtons.YesNo, MessageBoxIcon.Question, MessageBoxDefaultButton.Button1) == DialogResult.Yes)
-            {
-                _program.Commands.Take(processCommandBindingSource.Position).SelectMany(p => new[] { p.ObjectId, p.ObjectId2 }).Delete();
-                var command = (Command)processCommandBindingSource[processCommandBindingSource.Position - 1];
-                _program = _program.Processing.ExecutePartial(processCommandBindingSource.Position, _program.Commands.Count, command.OperationNumber, command.ToolPosition);
-                processCommandBindingSource.DataSource = _program.Commands;
-                processCommandBindingSource.Position = 0;
-                UpdateProcessingNodesText();
-            }
-        }
     }
 }
