@@ -34,7 +34,7 @@ namespace CAM.Operations.Tactile
         //    ProcessingAngle = TechProcess.ProcessingAngle1.Value;
         //}
 
-        public static void ConfigureParamsView(ParamsView view)
+        public static void ConfigureParamsView(ParamsControl view)
         {
             view.AddTextBox(nameof(ProcessingAngle), "Угол полосы");
             view.AddTextBox(nameof(CuttingFeed));

@@ -53,7 +53,7 @@ namespace CAM.Operations.Tactile
         //    IsEdgeProcessing = true;
         //}
 
-        public static void ConfigureParamsView(ParamsView view)
+        public static void ConfigureParamsView(ParamsControl view)
         {
             view.AddTextBox(nameof(ProcessingAngle), "Угол полосы");
             view.AddTextBox(nameof(CuttingFeed), "Подача гребенка");
@@ -66,7 +66,7 @@ namespace CAM.Operations.Tactile
             view.AddIndent();
             view.AddTextBox(nameof(MaxCrestWidth), "Макс.шир.гребня");
             view.AddTextBox(nameof(IsEdgeProcessing), "Обработка краев");
-            view.AddControl(new PassListControl(view.BindingSource, true), 10);
+            //view.AddControl(new PassListControl(view.BindingSource, true), 10);
         }
 
         //public void CalcPassList()

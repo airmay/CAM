@@ -13,7 +13,7 @@ namespace CAM.CncWorkCenter
 
         public int PenetrationFeed { get; set; }
 
-        public static void ConfigureParamsView(ParamsView view)
+        public static void ConfigureParamsView(ParamsControl view)
         {
             view.AddMachine(CAM.Machine.Donatoni, CAM.Machine.ScemaLogic, CAM.Machine.Forma);
             view.AddMaterial();

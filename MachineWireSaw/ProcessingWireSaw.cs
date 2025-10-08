@@ -17,12 +17,11 @@ namespace CAM.CncWorkCenter
         public double Departure { get; set; } = 50;
         public double Delta { get; set; } = 5;
 
-        public static void ConfigureParamsView(ParamsView view)
+        public static void ConfigureParamsView(ParamsControl view)
         {
             view.AddOrigin();
             view.AddTextBox(nameof(CuttingFeed));
-            view.AddTextBox(nameof(S), "Угловая скорость",
-                toolTipText: "Z безопасности отсчитывается от верха выбранных объектов техпроцесса");
+            view.AddTextBox(nameof(S), "Угловая скорость", hint: "Z безопасности отсчитывается от верха выбранных объектов техпроцесса");
             
             view.AddIndent();
             view.AddTextBox(nameof(ToolThickness), "Толщина троса");

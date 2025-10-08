@@ -14,21 +14,23 @@ namespace CAM
         private AcadObject(ObjectId[] objectIds)
         {
             _objectIds = objectIds;
-            Handles = Array.ConvertAll(objectIds, p => p.Handle.Value);
+            Handles = objectIds.ConvertAll(p => p.Handle.Value);
         }
 
-        public static AcadObject Create(ObjectId id) => new AcadObject(new[] { id });
-        public static AcadObject Create(IEnumerable<ObjectId> ids) => new AcadObject(ids.ToArray());
+        public static AcadObject Create(ObjectId id) => new([id]);
+        public static AcadObject Create(IEnumerable<ObjectId> ids) => new(ids.ToArray());
 
         public ObjectId[] ObjectIds =>
-            _objectIds ?? (_objectIds = Handles
+            _objectIds ??= Handles
                 .Select(p => Acad.Database.TryGetObjectId(new Handle(p), out var id) ? id : ObjectId.Null)
                 .Where(p => p != ObjectId.Null)
-                .ToArray());
+                .ToArray();
 
         public ObjectId ObjectId => ObjectIds[0];
         public Curve GetCurve() => Acad.OpenForRead(ObjectId);
         public Curve[] GetCurves() => Acad.OpenForRead(ObjectIds);
+
+        public string Description => ObjectIds.GetDesc();
 
         public override string ToString() => ObjectIds.GetDesc();
     }

@@ -27,7 +27,7 @@ namespace CAM
 
         public double Offset => Processing.Offset * IsReverseOffset.GetSign(-1);
 
-        public static void ConfigureParamsView(ParamsView view)
+        public static void ConfigureParamsView(ParamsControl view)
         {
             view.AddAcadObject();
             view.AddCheckBox(nameof(IsReverseDirection), "Обратное направление");

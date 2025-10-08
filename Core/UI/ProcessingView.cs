@@ -344,20 +344,20 @@ namespace CAM
         #endregion
 
         #region Params view
-        private readonly Dictionary<Type, ParamsView> _paramsViews = new Dictionary<Type, ParamsView>();
+        private readonly Dictionary<Type, ParamsControl> _paramsViews = [];
 
         private void RefreshParamsView()
         {
             var type = SelectedNode.Tag.GetType();
             if (!_paramsViews.TryGetValue(type, out var paramsView))
             {
-                paramsView = new ParamsView(type);
+                paramsView = new ParamsControl(type);
                 paramsView.Dock = DockStyle.Fill;
                 tabPageParams.Controls.Add(paramsView);
                 _paramsViews[type] = paramsView;
             }
 
-            paramsView.BindingSource.DataSource = SelectedNode.Tag;
+            paramsView.SetData(SelectedNode.Tag);
             paramsView.Show();
             paramsView.BringToFront();
         }

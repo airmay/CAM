@@ -23,7 +23,7 @@ namespace CAM.Operations.Sawing
         public double? Penetration { get; set; }
         public List<SawingMode> SawingModes { get; set; } = new List<SawingMode>();
 
-        public static void ConfigureParamsView(ParamsView view)
+        public static void ConfigureParamsView(ParamsControl view)
         {
             var thicknessTextBox = view.AddTextBox(nameof(Thickness));
             view.AddCheckBox(nameof(IsExactlyBegin), "Начало точно");
@@ -33,14 +33,14 @@ namespace CAM.Operations.Sawing
             view.AddAcadObject(allowedTypes: $"{AcadObjectNames.Line},{AcadObjectNames.Arc},{AcadObjectNames.Lwpolyline}");
             view.AddCheckBox(nameof(ChangeSide), "Сменить сторону", "Поменять обрабатываемою сторону");
             var depthTextBox = view.AddTextBox(nameof(Depth));
-            view.AddTextBox(nameof(Penetration), toolTipText: "Шаг заглубления для прямой и если не заданы Режимы для криволинейных траекторий то для всех кривых");
+            view.AddTextBox(nameof(Penetration), hint: "Шаг заглубления для прямой и если не заданы Режимы для криволинейных траекторий то для всех кривых");
             view.AddText("Режимы для криволинейных траекторий", "Режимы применяются для дуги и полилинии");
             view.AddControl(new SawingModesView(), 6, nameof(SawingModesView.DataSource), nameof(SawingModes));
 
             thicknessTextBox.Validated += (sender, args) =>
             {
                 if (depthTextBox.Text == "0")
-                    depthTextBox.Text = (view.GetParams<SawingOperation>().Thickness + 2).ToString();
+                    depthTextBox.Text = (view.GetData<SawingOperation>().Thickness + 2).ToString();
             };
         }
 

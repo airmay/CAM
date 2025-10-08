@@ -141,7 +141,15 @@ namespace CAM
             var f400 = material == Material.Granite ? 1900 : 2500;
             var df = material == Material.Granite ? 1900 - 1500 : 2500 - 2000;
             var frequency = f400 - (tool.Diameter - 400) * df / 200;
-            return Math.Min((int)frequency, Settings.Machines[machine].MaxFrequency);
+
+            var maxFrequency = machine switch
+            {
+                Machine.Donatoni => 5000,
+                Machine.Forma or Machine.Champion => 1200,
+                _ => 10000
+            };
+
+            return Math.Min((int)frequency, maxFrequency);
         }
 
         public static bool Validate(Tool tool, ToolType toolType)
