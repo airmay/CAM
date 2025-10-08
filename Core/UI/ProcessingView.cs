@@ -38,7 +38,7 @@ public partial class ProcessingView : UserControl
         processCommandBindingSource.DataSource = null;
         _program = null;
         Acad.ClearHighlighted();
-        ToolObject.Delete();
+        ToolModel.Delete();
     }
 
     private void RefreshToolButtonsState()
@@ -61,7 +61,7 @@ public partial class ProcessingView : UserControl
         Acad.DocumentManager.DocumentActivationEnabled = false;
         Acad.DeleteProcessObjects();
         Acad.ClearHighlighted();
-        ToolObject.Delete();
+        ToolModel.Delete();
 
         var techProcess = FillTechProcess(SelectedTechProcessNode);
         _program = techProcess.Execute();
@@ -350,7 +350,7 @@ public partial class ProcessingView : UserControl
             Acad.SelectObjectIds(SelectedCommand.ObjectId.Value);
         }
 
-        ToolObject.Set(_program.Processing.GetOperation(SelectedCommand.OperationNumber)?.GetTool(), SelectedCommand.ToolPosition);
+        ToolModel.Set(_program.Processing.GetOperation(SelectedCommand.OperationNumber)?.GetTool(), SelectedCommand.ToolPosition);
             
         var node = GetProgramProcessingNode()?.Nodes.Cast<TreeNode>().FirstOrDefault(p => ((IOperation)p.Tag).Number == SelectedCommand.OperationNumber);
         if (node != null) 

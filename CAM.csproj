@@ -133,7 +133,7 @@
     <Compile Include="Core\Settings\MachineSettings.cs" />
     <Compile Include="Core\ToolPosition.cs" />
     <Compile Include="Core\ToolpathBuilder.cs" />
-    <Compile Include="Core\Tool\ToolObject.cs" />
+    <Compile Include="Core\Tool\ToolModel.cs" />
     <Compile Include="MachineWireSaw\CableSawingCommandGenerator.cs" />
     <Compile Include="Core\ProcessingBase.cs" />
     <Compile Include="Core\MillingTechProcess.cs" />
