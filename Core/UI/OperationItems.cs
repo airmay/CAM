@@ -5,15 +5,15 @@ using System.Windows.Forms;
 
 namespace CAM;
 
-public static class OperationItemsContainer
+public static class OperationItems
 {
     public static ToolStripItem[] GetMenuItems(Action<string, Type> onClick)
     {
-        return OperationItems.ConvertAll(p => p.GetMenuItem(onClick));
+        return Items.ConvertAll(p => p.GetMenuItem(onClick));
     }
 
-    private static readonly OperationItemBase[] OperationItems =
-    {
+    private static readonly OperationItemBase[] Items =
+    [
         new OperationItem("Распиловка", typeof(SawingOperation)),
         new OperationGroupItem("Тактилка", 
         [
@@ -24,5 +24,5 @@ public static class OperationItemsContainer
         [
             new OperationItem("Распиловка", typeof(WireSawOperation)),
         ]),
-    };
+    ];
 }

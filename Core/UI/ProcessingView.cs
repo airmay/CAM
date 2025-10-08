@@ -23,7 +23,7 @@ namespace CAM
             InitializeComponent();
 
             imageList.Images.AddRange([Properties.Resources.folder, Properties.Resources.drive_download]);
-            bCreateTechOperation.DropDownItems.AddRange(OperationItemsContainer.GetMenuItems(bCreateTechOperation_Click));
+            bCreateTechOperation.DropDownItems.AddRange(OperationItems.GetMenuItems(bCreateTechOperation_Click));
             //RefreshToolButtonsState();
 #if DEBUG
             bClose.Visible = true;
