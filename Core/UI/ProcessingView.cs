@@ -15,7 +15,7 @@ namespace CAM
         private Program _program;
 
         private TreeNode SelectedNode => treeView.SelectedNode;
-        private TreeNode SelectedProcessingNode => treeView.SelectedNode?.Parent ?? treeView.SelectedNode;
+        private TreeNode SelectedTechProcessNode => treeView.SelectedNode?.Parent ?? treeView.SelectedNode;
         private Command SelectedCommand => (Command)processCommandBindingSource.Current;
 
         public ProcessingView()
@@ -24,13 +24,12 @@ namespace CAM
 
             imageList.Images.AddRange([Properties.Resources.folder, Properties.Resources.drive_download]);
             bCreateTechOperation.DropDownItems.AddRange(OperationItems.GetMenuItems(bCreateTechOperation_Click));
-            //RefreshToolButtonsState();
 #if DEBUG
             bClose.Visible = true;
 #endif
         }
 
-        public void UpdateCamDocument() => _camDocument?.Set(GetProcessings(), _program);
+        public void UpdateCamDocument() => _camDocument?.Set(GetTechProcesses(), _program);
 
         public void Clear()
         {
@@ -66,11 +65,11 @@ namespace CAM
             Acad.ClearHighlighted();
             ToolObject.Delete();
 
-            var processing = GetProcessing(SelectedProcessingNode);
-            _program = processing.Execute();
+            var techProcess = GetTechProcess(SelectedTechProcessNode);
+            _program = techProcess.Execute();
             if (_program != null)
             {
-                UpdateTechProcessNodesText(SelectedProcessingNode);
+                UpdateTechProcessNodesText(SelectedTechProcessNode);
                 processCommandBindingSource.DataSource = _program.Commands;
                 RefreshToolButtonsState();
 
@@ -189,7 +188,7 @@ namespace CAM
 
         public void SaveCamDocument()
         {
-            _camDocument.Set(GetProcessings(), _program);
+            _camDocument.Set(GetTechProcesses(), _program);
             _camDocument.Save();
             _program?.SetToolpathVisibility(true);
         }
@@ -198,13 +197,13 @@ namespace CAM
             ? null
             : treeView.Nodes.Cast<TreeNode>().FirstOrDefault(p => p.Tag == _program.Processing);
 
-        private IProcessing[] GetProcessings() => treeView.Nodes.Cast<TreeNode>().Select(GetProcessing).ToArray();
+        private IProcessing[] GetTechProcesses() => treeView.Nodes.Cast<TreeNode>().Select(GetTechProcess).ToArray();
 
-        private static IProcessing GetProcessing(TreeNode node)
+        private static IProcessing GetTechProcess(TreeNode node)
         {
-            var processing = (IProcessing)node.Tag;
-            processing.Caption = node.Text;
-            processing.Operations = node.Nodes.Cast<TreeNode>()
+            var techProcess = (IProcessing)node.Tag;
+            techProcess.Caption = node.Text;
+            techProcess.Operations = node.Nodes.Cast<TreeNode>()
                 .Select(p =>
                 {
                     var operation = (IOperation)p.Tag;
@@ -213,7 +212,7 @@ namespace CAM
                     return operation;
                 })
                 .ToArray();
-            return processing;
+            return techProcess;
         }
 
         #endregion
@@ -240,7 +239,7 @@ namespace CAM
         {
             var techProcessType = operationType.BaseType.BaseType.GetGenericArguments()[0];
             var processingNode = treeView.Nodes.Count > 0
-                ? SelectedProcessingNode ?? treeView.Nodes[treeView.Nodes.Count - 1]
+                ? SelectedTechProcessNode ?? treeView.Nodes[treeView.Nodes.Count - 1]
                 : null;
             if (processingNode == null || processingNode.Tag.GetType() != techProcessType)
                 processingNode = AddProcessingNode(techProcessType);
