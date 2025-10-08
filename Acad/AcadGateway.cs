@@ -60,6 +60,13 @@ namespace CAM
 
         public static void Alert(Exception ex) => Alert("Ошибка", ex);
 
+        public static bool Confirm(string text)
+        {
+            return System.Windows.Forms.MessageBox.Show(text, "Подтверждение",
+                System.Windows.Forms.MessageBoxButtons.YesNo, System.Windows.Forms.MessageBoxIcon.Question,
+                System.Windows.Forms.MessageBoxDefaultButton.Button1) == System.Windows.Forms.DialogResult.Yes;
+        }
+
         public static ObjectId Add(this Curve curve) => App.LockAndExecute(() => curve.AddToCurrentSpace());
         public static ObjectId[] Add(this IEnumerable<Curve> curves) => App.LockAndExecute(() => curves.AddToCurrentSpace());
 

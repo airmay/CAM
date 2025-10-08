@@ -15,6 +15,7 @@ namespace CAM
         Origin Origin { get; set; }
         short LastOperationNumber { get; set; }
         Program ExecutePartial(int position, int count, short operationNumber, ToolPosition toolPosition);
+        IOperation GetOperation(short number);
     }
 
     [Serializable]
@@ -22,7 +23,8 @@ namespace CAM
         where TTechProcess : ProcessingBase<TTechProcess, TProcessor>
         where TProcessor : ProcessorBase<TTechProcess, TProcessor>, new()
     {
-        [NonSerialized] public TProcessor Processor;
+        [NonSerialized] private TProcessor _processor;
+        public TProcessor Processor => _processor ??= new TProcessor { Processing = this as TTechProcess };
 
         public string Caption { get; set; }
         public IOperation[] Operations { get; set; }
@@ -78,17 +80,11 @@ namespace CAM
 
         private void ProcessOperations(OperationBase<TTechProcess, TProcessor>[] operations)
         {
-            Processor ??= new TProcessor { Processing = this as TTechProcess };
-            
-            //if (operations.Length == 3)
-            //    throw new Exception("test");
-
             Processor.Start();
             foreach (var operation in operations)
             {
                 Acad.Write($"расчет операции {operation.Caption}");
                 Processor.Operation = operation;
-                operation.SetProcessing(this);
 
                 operation.Execute();
             }

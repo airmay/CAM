@@ -220,7 +220,7 @@ namespace CAM
 
         public ComboBox AddMaterial() => AddComboBox<Material>("Material", "Материал");
 
-        public ComboBox AddMachine(params Machine[] values) => AddComboBox("Machine", "Станок", values);
+        public ComboBox AddMachine() => AddComboBox<Machine>("Machine", "Станок");
 
         #endregion
 
@@ -289,8 +289,7 @@ namespace CAM
             var (textbox, button) = CreateSelector(paramName, displayName, "۞", hint);
 
             var prop = _type.GetProperty(paramName);
-            textbox.Enter += (s, e) =>
-                Acad.SelectObjectIds(prop.GetValue(_bindingSource.DataSource).As<AcadObject>()?.ObjectIds);
+            textbox.Enter += (s, e) => prop.GetValue(_bindingSource.DataSource).As<AcadObject>()?.Select();
             button.Click += (s, e) =>
             {
                 Interaction.SetActiveDocFocus();
@@ -314,7 +313,7 @@ namespace CAM
         {
             var (textbox, button) = CreateSelector("Origin", "Начало координат", "۞");
             
-            textbox.Enter += (s, e) => Acad.SelectObjectIds(GetData<IProcessing>().Origin.OriginObject?.ObjectIds);
+            textbox.Enter += (s, e) => GetData<IProcessing>().Origin.OriginObject?.Select();
             button.Click += (s, e) =>
             {
                 GetData<IProcessing>().Origin.CreateOriginObject();

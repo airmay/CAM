@@ -70,8 +70,11 @@ public class ProgramBuilder
             .ToDictionary(p => p.Item2.Value, p => p.ind);
 
         var operationToolpath = toolpathBuilder != null
-            ? operationCommands.ToDictionary(p => p.Key,
-                p => toolpathBuilder.CreateGroup(p.Key.ToString(), p.SelectMany(c => new[] { c.ObjectId, c.ObjectId2 }).Where(c => c.HasValue).Select(c => c.Value).ToArray()))
+            ? operationCommands.Where(p => p.Any(c => c.ObjectId.HasValue))
+                .ToDictionary(p => p.Key,
+                    p => toolpathBuilder.CreateGroup(p.Key.ToString(),
+                        p.SelectMany(c => new[] { c.ObjectId, c.ObjectId2 }).Where(c => c.HasValue).Select(c => c.Value)
+                            .ToArray()))
             : null;
 
         return new Program(arraySegment, processing, operationNumbers, objectIds, operationToolpath);

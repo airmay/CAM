@@ -15,7 +15,7 @@ namespace CAM.CncWorkCenter
 
         public static void ConfigureParamsView(ParamsControl view)
         {
-            view.AddMachine(CAM.Machine.Donatoni, CAM.Machine.ScemaLogic, CAM.Machine.Forma);
+            view.AddMachine();
             view.AddMaterial();
             view.AddIndent();
             view.AddTool();

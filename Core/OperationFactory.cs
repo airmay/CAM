@@ -7,13 +7,15 @@ namespace CAM.Core
 {
     public static class OperationFactory
     {
-        public static IOperation CreateOperation(string caption, Type operationType, short number, object prototype)
+        public static IOperation CreateOperation(string caption, Type operationType, IProcessing techProcess, object prototype)
         {
+            techProcess.LastOperationNumber++;
             var operation = (IOperation)Activator.CreateInstance(operationType);
             prototype?.CopyPropertiesTo(operation);
-            operation.Caption = caption + number;
+            operation.Caption = caption + techProcess.LastOperationNumber;
             operation.Enabled = true;
-            operation.Number = number;
+            operation.Number = techProcess.LastOperationNumber;
+            operation.SetProcessing(techProcess);
 
             return operation;
         }

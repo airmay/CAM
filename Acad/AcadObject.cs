@@ -33,5 +33,7 @@ namespace CAM
         public string Description => ObjectIds.GetDesc();
 
         public override string ToString() => ObjectIds.GetDesc();
+
+        public void Select() => Acad.SelectObjectIds(ObjectIds);
     }
 }
