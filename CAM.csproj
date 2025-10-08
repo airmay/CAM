@@ -142,7 +142,6 @@
     <Compile Include="Core\TechProcessBase.cs" />
     <Compile Include="Core\Tool\MillToolPosition.cs" />
     <Compile Include="Core\Tool\CableToolPosition.cs" />
-    <Compile Include="Core\Tool\ToolModel.cs" />
     <Compile Include="Core\Tool\ToolPosition.cs" />
     <Compile Include="Core\Tool\ToolTypeAttribute.cs" />
     <Compile Include="Core\UI\OperationItem.cs" />

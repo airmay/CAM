@@ -9,9 +9,9 @@ namespace CAM
 {
     public static class ToolObject
     {
-        public static double WireSawLength = 1500;
+        public const double WireSawLength = 1500;
 
-        private static Curve[] _model;
+        private static Curve[] _curves;
         private static Tool _tool;
         private static ToolPosition _position;
 
@@ -24,7 +24,7 @@ namespace CAM
             if (tool == null) 
                 return;
 
-            if (_model == null)
+            if (_curves == null)
                 CreateModel();
 
             TransformModel(_position, position);
@@ -33,18 +33,18 @@ namespace CAM
 
         public static void Delete()
         {
-            if (_model == null || Acad.ActiveDocument == null)
+            if (_curves == null || Acad.ActiveDocument == null)
                 return;
 
             using (Application.DocumentManager.MdiActiveDocument.LockDocument())
             using (Acad.Database.TransactionManager.StartTransaction())
-                foreach (var item in _model)
+                foreach (var item in _curves)
                 {
                     TransientManager.CurrentTransientManager.EraseTransient(item, []);
                     item.Dispose();
                 }
 
-            _model = null;
+            _curves = null;
         }
 
         private static void CreateModel()
@@ -59,11 +59,11 @@ namespace CAM
                     var circle0 = new Circle(new Point3d(0, 0, radius), Vector3d.YAxis, radius);
                     var circle1 = new Circle(circle0.Center + Vector3d.YAxis * thickness, Vector3d.YAxis, radius);
                     var axis = new Line(circle1.Center, circle1.Center + Vector3d.YAxis * radius / 4);
-                    _model = [circle0, circle1, axis];
+                    _curves = [circle0, circle1, axis];
                     break;
 
                 case ToolType.Mill:
-                    _model =
+                    _curves =
                     [
                         new Circle(Point3d.Origin, Vector3d.ZAxis, 20),
                         new Line(Point3d.Origin, Point3d.Origin + Vector3d.ZAxis * 100)
@@ -72,7 +72,7 @@ namespace CAM
 
                 case ToolType.WireSaw:
                     var line = new Line(new Point3d(-WireSawLength, 0, 0), new Point3d(WireSawLength, 0, 0));
-                    _model =
+                    _curves =
                     [
                         line,
                         new Circle(line.StartPoint, Vector3d.XAxis, thickness / 2),
@@ -82,7 +82,7 @@ namespace CAM
                     break;
 
                 default:
-                    _model = [new Line(Point3d.Origin, Point3d.Origin + Vector3d.ZAxis * 100)];
+                    _curves = [new Line(Point3d.Origin, Point3d.Origin + Vector3d.ZAxis * 100)];
                     break;
             }
 
@@ -90,7 +90,7 @@ namespace CAM
             using (var tr = Acad.Database.TransactionManager.StartTransaction())
             {
                 var color = Color.FromColorIndex(ColorMethod.ByColor, 131);
-                foreach (var item in _model)
+                foreach (var item in _curves)
                 {
                     item.Color = color;
                     TransientManager.CurrentTransientManager.AddTransient(item, TransientDrawingMode.Main, 128, []);
@@ -112,7 +112,7 @@ namespace CAM
             var rotationA = Matrix3d.Rotation((from.AngleA - to.AngleA).ToRad(), Vector3d.XAxis.RotateBy(-to.AngleC.ToRad(), Vector3d.ZAxis), to.Point);
             var matrix = rotationA * rotationC * displacement;
 
-            foreach (var item in _model)
+            foreach (var item in _curves)
             {
                 item.TransformBy(matrix);
                 TransientManager.CurrentTransientManager.UpdateTransient(item, new IntegerCollection());
