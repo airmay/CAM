@@ -158,52 +158,38 @@ namespace CAM
 
         #region Array
 
+        public static bool IsNotNullOrEmpty<T>(this T[] array) => array is { Length: > 0 };
+
         public static void ForEach<T>(this T[] array, Action<T> action)
         {
-            if (array == null) throw new ArgumentNullException(nameof(array));
-            if (action == null) throw new ArgumentNullException(nameof(action));
-
-            for (int i = 0; i < array.Length; i++)
+            foreach (var t in array)
             {
-                action(array[i]);
+                action(t);
             }
         }
 
         public static void ForEach<T>(this T[] array, Action<T, int> action)
         {
-            if (array == null) throw new ArgumentNullException(nameof(array));
-            if (action == null) throw new ArgumentNullException(nameof(action));
-
-            for (int i = 0; i < array.Length; i++)
+            for (var i = 0; i < array.Length; i++)
             {
                 action(array[i], i);
             }
         }
 
-        public static TResult[] ConvertAll<T, TResult>(
-            this T[] array,
-            Func<T, TResult> converter)
+        public static TResult[] ConvertAll<T, TResult>(this T[] array, Func<T, TResult> converter)
         {
-            if (array == null) throw new ArgumentNullException(nameof(array));
-            if (converter == null) throw new ArgumentNullException(nameof(converter));
-
-            TResult[] result = new TResult[array.Length];
-            for (int i = 0; i < array.Length; i++)
+            var result = new TResult[array.Length];
+            for (var i = 0; i < array.Length; i++)
             {
                 result[i] = converter(array[i]);
             }
             return result;
         }
 
-        public static TResult[] ConvertAll<T, TResult>(
-            this T[] array,
-            Func<T, int, TResult> converter)
+        public static TResult[] ConvertAll<T, TResult>(this T[] array, Func<T, int, TResult> converter)
         {
-            if (array == null) throw new ArgumentNullException(nameof(array));
-            if (converter == null) throw new ArgumentNullException(nameof(converter));
-
-            TResult[] result = new TResult[array.Length];
-            for (int i = 0; i < array.Length; i++)
+            var result = new TResult[array.Length];
+            for (var i = 0; i < array.Length; i++)
             {
                 result[i] = converter(array[i], i);
             }

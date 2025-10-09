@@ -20,9 +20,9 @@ namespace CAM
         private const string DataKey = nameof(CamDocument);
         [NonSerialized] private int _hash;
 
-        public IProcessing[] Processings { get; private set; }
-        public int? ProcessingIndex { get; private set; }
-        public Command[] Commands { get; private set; }
+        public IProcessing[] Processings { get; set; }
+        public int? ProcessingIndex { get; set; }
+        public Command[] Commands { get; set; }
 
         public void Set(IProcessing[] processings, Program program)
         {
@@ -56,9 +56,7 @@ namespace CAM
 
                             var camDocument = (CamDocument)formatter.Deserialize(stream);
                             camDocument._hash = resultBuffer.ToString().GetHashCode();
-
-                            Array.ForEach(camDocument.Processings,
-                                p => Array.ForEach(p.Operations, op => op.SetProcessing(p)));
+                            camDocument.Processings.ForEach(t => t.Operations.ForEach(op => op.SetProcessing(t)));
 #if DEBUG
                             Program.DwgFileCommands = (Command[])camDocument.Commands.Clone();
 #endif
@@ -97,8 +95,8 @@ namespace CAM
                     if (hash == _hash)
                         return;
 
-                    using (var acLckDoc = Acad.ActiveDocument.LockDocument())
-                    using (var tr = Acad.Database.TransactionManager.StartTransaction())
+                    using (var _ = Acad.LockDocument())
+                    using (var tr = Acad.StartTransaction())
                     using (var dict = tr.GetObject(Acad.Database.NamedObjectsDictionaryId, OpenMode.ForWrite) as DBDictionary)
                     {
                         if (dict.Contains(DataKey))

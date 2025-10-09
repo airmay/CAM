@@ -30,7 +30,8 @@ namespace CAM
         public static Database Database => Autodesk.AutoCAD.ApplicationServices.Core.Application.DocumentManager.MdiActiveDocument.Database;
 
         public static Editor Editor => Autodesk.AutoCAD.ApplicationServices.Core.Application.DocumentManager.MdiActiveDocument.Editor;
-
+        public static DocumentLock LockDocument() => ActiveDocument.LockDocument();
+        public static Transaction StartTransaction() => Database.TransactionManager.StartTransaction();
         public static void Write(string message, Exception ex = null)
         {
             Interaction.WriteLine($"{message}. {ex?.Message}\n");

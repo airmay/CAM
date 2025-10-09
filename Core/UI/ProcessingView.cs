@@ -11,7 +11,7 @@ namespace CAM;
 
 public partial class ProcessingView : UserControl
 {
-    private Program _program;
+    public Program Program { get; private set; }
 
     private TreeNode SelectedNode => treeView.SelectedNode;
     private TreeNode SelectedTechProcessNode => treeView.SelectedNode?.Parent ?? treeView.SelectedNode;
@@ -28,15 +28,35 @@ public partial class ProcessingView : UserControl
 #endif
     }
 
+    public void SetCamData(IProcessing[] techProcesses, Command[] commands, int? techProcessIndex)
+    {
+        if (techProcesses.IsNotNullOrEmpty())
+        {
+            var nodes = techProcesses.ConvertAll(CreateTechProcessNode);
+            treeView.Nodes.AddRange(nodes);
+            treeView.ExpandAll();
+            treeView.SelectedNode = treeView.Nodes[0];
+        }
+
+        if (commands != null)
+        {
+            var programBuilder = new ProgramBuilder(commands);
+            Program = programBuilder.CreateProgram(techProcesses[techProcessIndex.Value]);
+            processCommandBindingSource.DataSource = commands;
+        }
+
+        toolStrip.Enabled = true;
+        RefreshToolButtonsState();
+    }
+
     public void Clear()
     {
-        _camDocument = null;
         toolStrip.Enabled = false;
         treeView.Nodes.Clear();
         foreach (Control control in tabPageParams.Controls)
             control.Hide();
         processCommandBindingSource.DataSource = null;
-        _program = null;
+        Program = null;
         Acad.ClearHighlighted();
         ToolModel.Delete();
     }
@@ -44,7 +64,7 @@ public partial class ProcessingView : UserControl
     private void RefreshToolButtonsState()
     {
         bRemove.Enabled = bMoveUp.Enabled = bMoveDown.Enabled = bBuildProcessing.Enabled = SelectedNode != null;
-        bVisibility.Enabled = bSendProgramm.Enabled = bPartialProcessing.Enabled = bPlay.Enabled = _program != null;
+        bVisibility.Enabled = bSendProgramm.Enabled = bPartialProcessing.Enabled = bPlay.Enabled = Program != null;
     }
 
     private void bClose_Click(object sender, EventArgs e) => Acad.CloseAndDiscard();
@@ -64,15 +84,15 @@ public partial class ProcessingView : UserControl
         ToolModel.Delete();
 
         var techProcess = FillTechProcess(SelectedTechProcessNode);
-        _program = techProcess.Execute();
-        if (_program != null)
+        Program = techProcess.Execute();
+        if (Program != null)
         {
             UpdateTechProcessNodesText(SelectedTechProcessNode);
-            processCommandBindingSource.DataSource = _program.Commands;
+            processCommandBindingSource.DataSource = Program.Commands;
             RefreshToolButtonsState();
 
             if (Program.DwgFileCommands != null)
-                Acad.Write(_program.Commands.SequenceEqual(Program.DwgFileCommands, Command.Comparer)
+                Acad.Write(Program.Commands.SequenceEqual(Program.DwgFileCommands, Command.Comparer)
                     ? "Программа не изменилась"
                     : "Внимание! Программа изменена!");
         }
@@ -85,10 +105,10 @@ public partial class ProcessingView : UserControl
     {
         if (Acad.Confirm($"Сформировать программу со строки {SelectedCommand.Number}?"))
         {
-            _program.Commands.Take(processCommandBindingSource.Position).SelectMany(p => new[] { p.ObjectId, p.ObjectId2 }).Delete();
+            Program.Commands.Take(processCommandBindingSource.Position).SelectMany(p => new[] { p.ObjectId, p.ObjectId2 }).Delete();
             var command = (Command)processCommandBindingSource[processCommandBindingSource.Position - 1];
-            _program = _program.Processing.ExecutePartial(processCommandBindingSource.Position, _program.Commands.Count, command.OperationNumber, command.ToolPosition);
-            processCommandBindingSource.DataSource = _program.Commands;
+            Program = Program.Processing.ExecutePartial(processCommandBindingSource.Position, Program.Commands.Count, command.OperationNumber, command.ToolPosition);
+            processCommandBindingSource.DataSource = Program.Commands;
             processCommandBindingSource.Position = 0;
             UpdateTechProcessNodesText(GetProgramProcessingNode());
         }
@@ -102,48 +122,11 @@ public partial class ProcessingView : UserControl
 
     #endregion
 
-    #region CamDocument
-
-    private CamDocument _camDocument;
-
-    public void SetCamDocument(CamDocument camDocument)
-    {
-        if (camDocument == _camDocument)
-            return;
-
-        _camDocument = camDocument;
-        toolStrip.Enabled = true;
-
-        if (_camDocument.Processings?.Any() == true)
-        {
-            var nodes = _camDocument.Processings.ConvertAll(CreateTechProcessNode);
-            treeView.Nodes.AddRange(nodes);
-            treeView.ExpandAll();
-            treeView.SelectedNode = treeView.Nodes[0];
-        }
-
-        if (_camDocument.Commands != null)
-        {
-            var programBuilder = new ProgramBuilder(_camDocument.Commands);
-            _program = programBuilder.CreateProgram(_camDocument.Processings[_camDocument.ProcessingIndex.Value]);
-            processCommandBindingSource.DataSource = _camDocument.Commands;
-        }
-        RefreshToolButtonsState();
-    }
-
-    public void UpdateCamDocument() => _camDocument?.Set(treeView.Nodes.Cast<TreeNode>().Select(FillTechProcess).ToArray(), _program);
-
-    public void SaveCamDocument()
-    {
-        UpdateCamDocument();
-        _camDocument.Save();
-        _program?.SetToolpathVisibility(true);
-    }
-
-    #endregion
-
     #region TechProcess
-    private TreeNode GetProgramProcessingNode() => treeView.Nodes.Cast<TreeNode>().FirstOrDefault(p => p.Tag == _program?.Processing);
+
+    public IProcessing[] GetTechProcesses() => treeView.Nodes.Cast<TreeNode>().Select(FillTechProcess).ToArray();
+
+    private TreeNode GetProgramProcessingNode() => treeView.Nodes.Cast<TreeNode>().FirstOrDefault(p => p.Tag == Program?.Processing);
 
     private static IProcessing FillTechProcess(TreeNode node)
     {
@@ -301,10 +284,10 @@ public partial class ProcessingView : UserControl
 
         if (SelectedNode.Tag is IOperation operation)
         {
-            if (e.Action != TreeViewAction.Unknown && _program?.TryGetCommandIndexByOperationNumber(operation.Number, out var commandIndex) == true)
+            if (e.Action != TreeViewAction.Unknown && Program?.TryGetCommandIndexByOperationNumber(operation.Number, out var commandIndex) == true)
                 processCommandBindingSource.Position = commandIndex;
 
-            _program?.ShowOperationToolpath(operation.Number);
+            Program?.ShowOperationToolpath(operation.Number);
             operation.ProcessingArea?.Select();
         }
     }
@@ -313,7 +296,7 @@ public partial class ProcessingView : UserControl
     #region Program
     private void bVisibility_Click(object sender, EventArgs e)
     {
-        _program.SetToolpathVisibility(false);
+        Program.SetToolpathVisibility(false);
         Acad.Editor.UpdateScreen();
     }
 
@@ -336,7 +319,7 @@ public partial class ProcessingView : UserControl
     private void bSend_Click(object sender, EventArgs e)
     {
         dataGridViewCommand.EndEdit();
-        _program.Export();
+        Program.Export();
     }
 
     private void processCommandBindingSource_CurrentChanged(object sender, EventArgs e)
@@ -350,7 +333,7 @@ public partial class ProcessingView : UserControl
             Acad.SelectObjectIds(SelectedCommand.ObjectId.Value);
         }
 
-        ToolModel.Set(_program.Processing.GetOperation(SelectedCommand.OperationNumber)?.GetTool(), SelectedCommand.ToolPosition);
+        ToolModel.Set(Program.Processing.GetOperation(SelectedCommand.OperationNumber)?.GetTool(), SelectedCommand.ToolPosition);
             
         var node = GetProgramProcessingNode()?.Nodes.Cast<TreeNode>().FirstOrDefault(p => ((IOperation)p.Tag).Number == SelectedCommand.OperationNumber);
         if (node != null) 
@@ -359,7 +342,7 @@ public partial class ProcessingView : UserControl
 
     public void SelectCommand(ObjectId? objectId)
     {
-        if (objectId.HasValue && _program?.TryGetCommandIndexByObjectId(objectId.Value, out var commandIndex) == true)
+        if (objectId.HasValue && Program?.TryGetCommandIndexByObjectId(objectId.Value, out var commandIndex) == true)
             processCommandBindingSource.Position = commandIndex;
     }
     #endregion

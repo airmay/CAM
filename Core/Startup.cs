@@ -1,14 +1,17 @@
 ﻿// test /b "C:\Catalina\CAM\bin\Debug\netload.scr"
 
-using System;
 using Autodesk.AutoCAD.ApplicationServices;
-using Autodesk.AutoCAD.Runtime;
-using System.IO;
-using System.Reflection;
 using Autodesk.AutoCAD.Geometry;
-using Dreambuild.AutoCAD;
+using Autodesk.AutoCAD.Runtime;
 using Autodesk.AutoCAD.Windows;
+using CAM.Core;
+using Dreambuild.AutoCAD;
+using System;
 using System.Drawing;
+using System.IO;
+using System.Linq;
+using System.Reflection;
+using System.Xml.Linq;
 
 namespace CAM
 {
@@ -35,17 +38,13 @@ namespace CAM
             paletteSet.Add("Обработка", _processingView);
             paletteSet.Add("Инструменты", new UtilsView());
 
-            Acad.DocumentManager.DocumentToBeDeactivated += (sender, args) =>
-            {
-                _processingView.UpdateCamDocument();
-                _processingView.Clear();
-            };
-            Acad.DocumentManager.DocumentBecameCurrent += (sender, args) => SetActiveDocument(args.Document);
+            Acad.DocumentManager.DocumentActivated += (sender, args) => ActivateDocument(args.Document);
+            Acad.DocumentManager.DocumentToBeDeactivated += (sender, args) => DeactivateDocument(args.Document);
 
-            SetActiveDocument(Acad.ActiveDocument);
+            ActivateDocument(Acad.ActiveDocument);
         }
 
-        private void SetActiveDocument(Document document)
+        private void ActivateDocument(Document document)
         {
             if (document == null || !document.IsActive)
                 return;
@@ -59,18 +58,35 @@ namespace CAM
                 document.UserData[CamDocumentKey] = CamDocument.Create();
             }
 
-            _processingView.SetCamDocument((CamDocument)document.UserData[CamDocumentKey]);
+            var camData = (CamDocument)document.UserData[CamDocumentKey];
+            _processingView.SetCamData(camData.Processings, camData.Commands, camData.ProcessingIndex);
         }
 
-        private void DocumentOnImpliedSelectionChanged(object sender, EventArgs e) => _processingView.SelectCommand(Acad.GetSelectedObjectId());
+        private void DeactivateDocument(Document document)
+        {
+            UpdateCamData(document);
+            _processingView.Clear();
+        }
 
         private void Document_CommandWillStart(object sender, CommandEventArgs e)
         {
             if (e.GlobalCommandName.IsIn("CLOSE", "QUIT", "QSAVE", "SAVEAS"))
             {
-                _processingView.SaveCamDocument();
+                var camData = UpdateCamData((Document)sender);
+                camData.Save();
+                _processingView.Program?.SetToolpathVisibility(true);
             }
         }
+
+        private CamDocument UpdateCamData(Document document)
+        {
+            var camData = (CamDocument)document.UserData[CamDocumentKey];
+            camData.Set(_processingView.GetTechProcesses(), _processingView.Program);
+
+            return camData;
+        }
+
+        private void DocumentOnImpliedSelectionChanged(object sender, EventArgs e) => _processingView.SelectCommand(Acad.GetSelectedObjectId());
 
         private void Document_BeginDocumentClose(object sender, DocumentBeginCloseEventArgs e)
         {
