@@ -6,16 +6,23 @@ using CAM.Core;
 namespace CAM
 {
     [Serializable]
-    public struct Command
+    public readonly struct Command(
+        int number,
+        string text,
+        ToolPosition toolPosition,
+        TimeSpan duration,
+        ObjectId? objectId,
+        ObjectId? objectId2,
+        short operationNumber)
     {
-        public int Number { get; set; }
-        public TimeSpan Duration { get; set; }
-        public string Text { get; set; }
-        public short OperationNumber { get; set; }
-        public ToolPosition ToolPosition { get; set; }
+        public int Number { get; } = number;
+        public TimeSpan Duration { get; } = duration;
+        public string Text { get; } = text;
+        public short OperationNumber { get; } = operationNumber;
+        public ToolPosition ToolPosition { get; } = toolPosition;
 
-        [NonSerialized] public ObjectId? ObjectId;
-        [NonSerialized] public ObjectId? ObjectId2;
+        [NonSerialized] public readonly ObjectId? ObjectId = objectId;
+        [NonSerialized] public readonly ObjectId? ObjectId2 = objectId2;
 
         private sealed class CommandEqualityComparer : IEqualityComparer<Command>
         {

@@ -8,7 +8,6 @@ using CAM.Core;
 using Dreambuild.AutoCAD;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using static Autodesk.AutoCAD.Windows.SaveFileDialog;
 using Application = Autodesk.AutoCAD.ApplicationServices.Core.Application;
@@ -20,10 +19,6 @@ namespace CAM
     /// </summary>
     public static class Acad
     {
-        public static Dictionary<Document, CamDocument> Documents = new Dictionary<Document, CamDocument>();
-
-        public static CamDocument CamDocument => ActiveDocument != null ? Documents.TryGetAndReturn(ActiveDocument) : null;
-
         public static DocumentCollection DocumentManager => Autodesk.AutoCAD.ApplicationServices.Core.Application.DocumentManager;
         public static Document ActiveDocument => Autodesk.AutoCAD.ApplicationServices.Core.Application.DocumentManager.MdiActiveDocument;
 

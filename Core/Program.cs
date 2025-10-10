@@ -7,16 +7,15 @@ using System.Linq;
 namespace CAM.Core;
 
 public class Program(
-    ICollection<Command> commands,
+    List<Command> commands,
     IProcessing processing,
     Dictionary<short, int> operationNumbers,
     Dictionary<ObjectId, int> objectIds,
     Dictionary<short, ObjectId> operationToolpath)
 {
-    public static Command[] DwgFileCommands { get; set; }
-
-    public ICollection<Command> Commands { get; } = commands;
+    public List<Command> Commands { get; } = commands;
     public IProcessing Processing { get; } = processing;
+    public void ClearTechProcessCommands() => Processing.Commands = null;
 
     public bool TryGetCommandIndexByObjectId(ObjectId objectId, out int index) => objectIds.TryGetValue(objectId, out index);
 

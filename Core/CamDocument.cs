@@ -1,15 +1,14 @@
-﻿using Autodesk.AutoCAD.DatabaseServices;
-using CAM.Core;
+﻿using Autodesk.AutoCAD.ApplicationServices;
+using Autodesk.AutoCAD.DatabaseServices;
 using System;
 using System.IO;
-using System.Linq;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
 
 namespace CAM
 {
     [Serializable]
-    public class CamDocument
+    public static class CamDocument
     {
         // https://adn-cis.org/serilizacziya-klassa-.net-v-bazu-chertezha-autocad.html или  https://www.rsdn.org/forum/dotnet/2900485.all
         private sealed class MyBinder : SerializationBinder
@@ -17,50 +16,40 @@ namespace CAM
             public override Type BindToType(string assemblyName, string typeName) => Type.GetType(string.Format("{0}, {1}", typeName, assemblyName));
         }
 
-        private const string DataKey = nameof(CamDocument);
-        [NonSerialized] private int _hash;
+        private const string DataKey = "CAM";
+        private const string HashKey = "Hash";
 
-        public IProcessing[] Processings { get; set; }
-        public int? ProcessingIndex { get; set; }
-        public Command[] Commands { get; set; }
+        public static bool HasUserData(this Document document) => document.UserData.ContainsKey(DataKey);
 
-        public void Set(IProcessing[] processings, Program program)
+        public static object GetUserData(this Document document) => document.UserData[DataKey];
+
+        public static void SetUserData(this Document document, object data) => document.UserData[DataKey] = data;
+
+        public static object LoadFromXrecord(this Document document)
         {
-            Processings = processings;
-            if (program != null)
-            {
-                ProcessingIndex = Array.IndexOf(processings, program.Processing);
-                Commands = program.Commands.ToArray();
-            }
-        }
-
-        public static CamDocument Create()
-        {
+            object data = null;
+            var hash = 0;
             try
             {
-                using (var tr = Acad.Database.TransactionManager.StartTransaction())
-                using (var dict = tr.GetObject(Acad.Database.NamedObjectsDictionaryId, OpenMode.ForRead) as DBDictionary)
+                using (var tr = document.Database.TransactionManager.StartTransaction())
+                using (var dict = tr.GetObject(document.Database.NamedObjectsDictionaryId, OpenMode.ForRead) as DBDictionary)
                     if (dict.Contains(DataKey))
                         using (var xRecord = tr.GetObject(dict.GetAt(DataKey), OpenMode.ForRead) as Xrecord)
                         using (var resultBuffer = xRecord.Data)
-                        using (var stream = new MemoryStream())
                         {
-                            foreach (var typedValue in resultBuffer)
+                            using (var stream = new MemoryStream())
                             {
-                                var datachunk = Convert.FromBase64String((string)typedValue.Value);
-                                stream.Write(datachunk, 0, datachunk.Length);
+                                foreach (var typedValue in resultBuffer)
+                                {
+                                    var datachunk = Convert.FromBase64String((string)typedValue.Value);
+                                    stream.Write(datachunk, 0, datachunk.Length);
+                                }
+
+                                stream.Position = 0;
+                                var formatter = new BinaryFormatter { Binder = new MyBinder() };
+                                data = formatter.Deserialize(stream);
+                                hash = resultBuffer.ToString().GetHashCode();
                             }
-
-                            stream.Position = 0;
-                            var formatter = new BinaryFormatter { Binder = new MyBinder() };
-
-                            var camDocument = (CamDocument)formatter.Deserialize(stream);
-                            camDocument._hash = resultBuffer.ToString().GetHashCode();
-                            camDocument.Processings.ForEach(t => t.Operations.ForEach(op => op.SetProcessing(t)));
-#if DEBUG
-                            Program.DwgFileCommands = (Command[])camDocument.Commands.Clone();
-#endif
-                            return camDocument;
                         }
             }
             catch (Exception e)
@@ -68,11 +57,15 @@ namespace CAM
                 Acad.Alert("Ошибка при загрузке данных обработки", e);
             }
 
-            return new CamDocument();
+            document.UserData[DataKey] = data;
+            document.UserData[HashKey] = hash;
+
+            return data;
         }
 
-        public void Save()
+        public static void SaveToXrecord(this Document document, object data)
         {
+            document.UserData[DataKey] = data;
             try
             {
                 const int kMaxChunkSize = 127;
@@ -81,7 +74,7 @@ namespace CAM
                     using (var stream = new MemoryStream())
                     {
                         var formatter = new BinaryFormatter();
-                        formatter.Serialize(stream, this);
+                        formatter.Serialize(stream, document.UserData[DataKey]);
                         stream.Position = 0;
                         for (var i = 0; i < stream.Length; i += kMaxChunkSize)
                         {
@@ -92,12 +85,13 @@ namespace CAM
                         }
                     }
                     var hash = resultBuffer.ToString().GetHashCode();
-                    if (hash == _hash)
+                    if (hash == (int)document.UserData[HashKey])
                         return;
 
-                    using (var _ = Acad.LockDocument())
-                    using (var tr = Acad.StartTransaction())
-                    using (var dict = tr.GetObject(Acad.Database.NamedObjectsDictionaryId, OpenMode.ForWrite) as DBDictionary)
+                    document.UserData[HashKey] = hash;
+                    using (var _ = document.LockDocument())
+                    using (var tr = document.Database.TransactionManager.StartTransaction())
+                    using (var dict = tr.GetObject(document.Database.NamedObjectsDictionaryId, OpenMode.ForWrite) as DBDictionary)
                     {
                         if (dict.Contains(DataKey))
                             using (var xrec = tr.GetObject(dict.GetAt(DataKey), OpenMode.ForWrite) as Xrecord)

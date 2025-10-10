@@ -2,6 +2,7 @@
 using Autodesk.AutoCAD.Geometry;
 using CAM.Core;
 using System;
+using System.Linq;
 
 namespace CAM.CncWorkCenter
 {
@@ -9,7 +10,6 @@ namespace CAM.CncWorkCenter
         where TTechProcess : ProcessingBase<TTechProcess, TProcessor>
         where TProcessor : ProcessorBase<TTechProcess, TProcessor>, new()
     {
-        public ProgramBuilder ProgramBuilder { get; private set; }
         public TTechProcess Processing { get; set; }
         public IOperation Operation { get; set; }
 
@@ -27,7 +27,7 @@ namespace CAM.CncWorkCenter
 
         public virtual void Start()
         {
-            ProgramBuilder = new ProgramBuilder();
+            ProgramBuilder.ClearCommands();
             ToolpathBuilder = new ToolpathBuilder();
             Operation = null;
             Tool = null;
@@ -84,11 +84,12 @@ namespace CAM.CncWorkCenter
 
         public Program PartialProgram(int programPosition, int count, short operationNumber, ToolPosition toolPosition)
         {
+            var commands = ProgramBuilder.GetCommands().Skip(programPosition).ToArray();
             Start();
             Operation = Processing.GetOperation(operationNumber);
             StartOperation();
             MoveToPosition(toolPosition);
-            ProgramBuilder.AddCommandsFromPosition(programPosition, count - programPosition);
+            ProgramBuilder.GetCommands().AddRange(commands);
 
             return CreateProgram();
         }
