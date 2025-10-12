@@ -129,7 +129,7 @@
     <Compile Include="Core\Origin.cs" />
     <Compile Include="Core\Program.cs" />
     <Compile Include="Core\OperationFactory.cs" />
-    <Compile Include="Core\CamDocument.cs" />
+    <Compile Include="Core\DocumentExtensions.cs" />
     <Compile Include="Core\CableSawingProcessor.cs" />
     <Compile Include="Core\Settings\MachineSettings.cs" />
     <Compile Include="Core\ToolPosition.cs" />

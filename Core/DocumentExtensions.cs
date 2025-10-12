@@ -8,7 +8,7 @@ using System.Runtime.Serialization.Formatters.Binary;
 namespace CAM
 {
     [Serializable]
-    public static class CamDocument
+    public static class DocumentExtensions
     {
         // https://adn-cis.org/serilizacziya-klassa-.net-v-bazu-chertezha-autocad.html или  https://www.rsdn.org/forum/dotnet/2900485.all
         private sealed class MyBinder : SerializationBinder
