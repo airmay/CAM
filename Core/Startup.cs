@@ -1,14 +1,15 @@
 ﻿// test /b "C:\Catalina\CAM\bin\Debug\netload.scr"
 
-using Autodesk.AutoCAD.ApplicationServices;
-using Autodesk.AutoCAD.Geometry;
-using Autodesk.AutoCAD.Runtime;
-using Autodesk.AutoCAD.Windows;
-using Dreambuild.AutoCAD;
 using System;
 using System.Drawing;
 using System.IO;
 using System.Reflection;
+using Autodesk.AutoCAD.ApplicationServices;
+using Autodesk.AutoCAD.Geometry;
+using Autodesk.AutoCAD.Runtime;
+using Autodesk.AutoCAD.Windows;
+using CAM.Core;
+using Dreambuild.AutoCAD;
 
 namespace CAM;
 
@@ -35,7 +36,7 @@ public class Startup : IExtensionApplication
         paletteSet.Add("Инструменты", new UtilsView());
 
         Acad.DocumentManager.DocumentActivated += (sender, args) => ActivateDocument(args.Document);
-        Acad.DocumentManager.DocumentToBeDeactivated += (sender, args) => args.Document.SetUserData(_camView.GetData());
+        Acad.DocumentManager.DocumentToBeDeactivated += (sender, args) => args.Document.SetUserData(_camView.GetCamData());
 
         ActivateDocument(Acad.ActiveDocument);
     }
@@ -52,17 +53,23 @@ public class Startup : IExtensionApplication
             document.BeginDocumentClose += Document_BeginDocumentClose;
             document.ImpliedSelectionChanged += DocumentOnImpliedSelectionChanged;
 
-            var data = document.LoadFromXrecord();
-            data?.As<IProcessing[]>().ForEach(t => t.Setup());
+            document.LoadFromXrecord();
         }
 
-        _camView.SetData(document.GetUserData());
+        var camData = document.GetUserData() as CamData;
+        _camView.SetCamData(camData);
+
+        camData?.TechProcesses.ForEach(tp => tp.Operations.ForEach(op => op.SetProcessing(tp)));
+        ProgramBuilder.Commands = camData?.Commands;
+#if DEBUG
+        ProgramBuilder.DwgFileCommands ??= camData?.Commands?.Clone();
+#endif
     }
 
     private void Document_CommandWillStart(object sender, CommandEventArgs e)
     {
         if (e.GlobalCommandName.IsIn("CLOSE", "QUIT", "QSAVE", "SAVEAS"))
-            ((Document)sender).SaveToXrecord(_camView.GetData());
+            ((Document)sender).SaveToXrecord(_camView.GetCamData());
     }
 
     private void DocumentOnImpliedSelectionChanged(object sender, EventArgs e) => _camView.SelectCommand(Acad.GetSelectedObjectId());

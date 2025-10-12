@@ -25,7 +25,7 @@ namespace CAM
 
         public static void SetUserData(this Document document, object data) => document.UserData[DataKey] = data;
 
-        public static object LoadFromXrecord(this Document document)
+        public static void LoadFromXrecord(this Document document)
         {
             object data = null;
             var hash = 0;
@@ -59,8 +59,6 @@ namespace CAM
 
             document.UserData[DataKey] = data;
             document.UserData[HashKey] = hash;
-
-            return data;
         }
 
         public static void SaveToXrecord(this Document document, object data)

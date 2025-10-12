@@ -17,8 +17,6 @@ namespace CAM
         short LastOperationNumber { get; set; }
         Program ExecutePartial(int position, int count, short operationNumber, ToolPosition toolPosition);
         IOperation GetOperation(short number);
-        List<Command> Commands { get; set; }
-        void Setup();
     }
 
     [Serializable]
@@ -28,14 +26,6 @@ namespace CAM
     {
         [NonSerialized] private TProcessor _processor;
         public TProcessor Processor => _processor ??= new TProcessor { Processing = this as TTechProcess };
-        public List<Command> Commands { get; set; }
-        public void Setup()
-        {
-            Operations.ForEach(op => op.SetProcessing(this));
-#if DEBUG
-            ProgramBuilder.DwgFileCommands ??= Commands?.Clone();
-#endif
-        }
 
         public string Caption { get; set; }
         public IOperation[] Operations { get; set; }
@@ -53,7 +43,6 @@ namespace CAM
 
         public Program Execute()
         {
-            Commands = ProgramBuilder.GetCommands();
             var operations = Operations.Cast<OperationBase<TTechProcess, TProcessor>>().Where(p => p.Enabled).ToArray();
             if (!Validate() || operations.Length == 0 || operations.Any(p => !p.Validate()))
                 return null;
@@ -86,8 +75,6 @@ namespace CAM
             {
                 Acad.CloseProgressor();
             }
-
-            ProgramBuilder.ClearCommands();
 
             return null;
         }

@@ -28,28 +28,6 @@ public partial class ProcessingView : UserControl
 #endif
     }
 
-    public void SetData(object data)
-    {
-        ProgramBuilder.SetCommands(null);
-        if (data is IProcessing[] { Length: > 0 } techProcesses)
-        {
-            var nodes = techProcesses.ConvertAll(CreateTechProcessNode);
-            treeView.Nodes.AddRange(nodes);
-            treeView.ExpandAll();
-            treeView.SelectedNode = treeView.Nodes[0];
-
-            var techProcess = techProcesses.SingleOrDefault(p => p.Commands != null);
-            ProgramBuilder.SetCommands(techProcess?.Commands);
-            _program = techProcess != null ? ProgramBuilder.CreateProgram(techProcess) : null;
-            processCommandBindingSource.DataSource = techProcess?.Commands;
-        }
-
-        RefreshToolButtonsState();
-        toolStrip.Enabled = true;
-    }
-
-    public object GetData() => treeView.Nodes.Cast<TreeNode>().Select(GetTechProcess).ToArray();
-
     public void Clear()
     {
         toolStrip.Enabled = false;
@@ -70,6 +48,36 @@ public partial class ProcessingView : UserControl
 
     private void bClose_Click(object sender, EventArgs e) => Acad.CloseAndDiscard();
 
+    #region CamData
+    public void SetCamData(CamData camData)
+    {
+        if (camData != null && camData.TechProcesses != null && camData.TechProcesses.Length > 0)
+        {
+            var nodes = camData.TechProcesses.ConvertAll(CreateTechProcessNode);
+            treeView.Nodes.AddRange(nodes);
+            treeView.ExpandAll();
+            treeView.SelectedNode = treeView.Nodes[0];
+
+            if (camData.Commands != null && camData.Commands.Count > 0 && camData.Index.HasValue)
+                _program = ProgramBuilder.CreateProgram(camData.TechProcesses[camData.Index.Value]);
+        }
+
+        RefreshToolButtonsState();
+        toolStrip.Enabled = true;
+        processCommandBindingSource.DataSource = _program?.Commands;
+    }
+
+    public CamData GetCamData()
+    {
+        var techProcesses = treeView.Nodes.Cast<TreeNode>().Select(GetTechProcess).ToArray();
+        return new CamData
+        {
+            TechProcesses = techProcesses,
+            Commands = ProgramBuilder.Commands,
+            Index = _program != null ? Array.IndexOf(techProcesses, _program.Processing) : null
+        };
+    }
+    #endregion
 
     #region Execute
 
@@ -78,7 +86,6 @@ public partial class ProcessingView : UserControl
 #if RELEASE
             toolStrip.Enabled = false;
 #endif
-        _program?.ClearTechProcessCommands();
         processCommandBindingSource.DataSource = null;
         Acad.DocumentManager.DocumentActivationEnabled = false;
         Acad.DeleteProcessObjects();
@@ -86,11 +93,12 @@ public partial class ProcessingView : UserControl
         ToolModel.Delete();
         SelectNextControl(ActiveControl, true, true, true, true);
 
-        var techProcess = GetTechProcess(SelectedTechProcessNode);
+        var techProcessNode = SelectedTechProcessNode;
+        var techProcess = GetTechProcess(techProcessNode);
         _program = techProcess.Execute();
         if (_program != null)
         {
-            UpdateTechProcessNodesText(SelectedTechProcessNode);
+            UpdateTechProcessNodesText(techProcessNode);
             processCommandBindingSource.DataSource = _program.Commands;
             RefreshToolButtonsState();
         }

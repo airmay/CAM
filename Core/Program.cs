@@ -15,7 +15,6 @@ public class Program(
 {
     public List<Command> Commands { get; } = commands;
     public IProcessing Processing { get; } = processing;
-    public void ClearTechProcessCommands() => Processing.Commands = null;
 
     public bool TryGetCommandIndexByObjectId(ObjectId objectId, out int index) => objectIds.TryGetValue(objectId, out index);
 

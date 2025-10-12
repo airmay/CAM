@@ -27,7 +27,7 @@ namespace CAM.CncWorkCenter
 
         public virtual void Start()
         {
-            ProgramBuilder.ClearCommands();
+            ProgramBuilder.Commands.Clear();
             ToolpathBuilder = new ToolpathBuilder();
             Operation = null;
             Tool = null;
@@ -84,12 +84,12 @@ namespace CAM.CncWorkCenter
 
         public Program PartialProgram(int programPosition, int count, short operationNumber, ToolPosition toolPosition)
         {
-            var commands = ProgramBuilder.GetCommands().Skip(programPosition).ToArray();
+            var commands = ProgramBuilder.Commands.Skip(programPosition).ToArray();
             Start();
             Operation = Processing.GetOperation(operationNumber);
             StartOperation();
             MoveToPosition(toolPosition);
-            ProgramBuilder.GetCommands().AddRange(commands);
+            ProgramBuilder.Commands.AddRange(commands);
 
             return CreateProgram();
         }
