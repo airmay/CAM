@@ -10,10 +10,14 @@ public static class ProgramBuilder
     public static List<Command> DwgFileCommands { get; set; }
     public static List<Command> Commands { get; set; }
 
-    public static void AddCommand(short operationNumber, string text, ToolPosition toolPosition, double? duration = null, ObjectId? toolpath1 = null, ObjectId? toolpath2 = null)
+    public static void Init()
     {
         Commands ??= new List<Command>(100);
+        Commands.Clear();
+    }
 
+    public static void AddCommand(short operationNumber, string text, ToolPosition toolPosition, double? duration = null, ObjectId? toolpath1 = null, ObjectId? toolpath2 = null)
+    {
         var timeSpan = new TimeSpan(0, 0, 0, (int)Math.Round(duration.GetValueOrDefault()));
         var command = new Command(Commands.Count + 1, text, toolPosition, timeSpan, toolpath1, toolpath2, operationNumber);
         Commands.Add(command);

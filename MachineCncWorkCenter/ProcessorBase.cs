@@ -27,7 +27,7 @@ namespace CAM.CncWorkCenter
 
         public virtual void Start()
         {
-            ProgramBuilder.Commands.Clear();
+            ProgramBuilder.Init();
             ToolpathBuilder = new ToolpathBuilder();
             Operation = null;
             Tool = null;

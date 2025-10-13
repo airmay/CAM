@@ -56,14 +56,20 @@ public class Startup : IExtensionApplication
             document.LoadFromXrecord();
         }
 
-        var camData = document.GetUserData() as CamData;
-        _camView.SetCamData(camData);
+        var data = document.GetUserData();
+        var camData = data as CamData;
+        if (data is not null and not CamData) 
+            Acad.Alert("Данные обработки не могут быть загружены");
 
-        camData?.TechProcesses.ForEach(tp => tp.Operations.ForEach(op => op.SetProcessing(tp)));
-        ProgramBuilder.Commands = camData?.Commands;
+        if (camData != null)
+        {
+            camData.TechProcesses.ForEach(tp => tp.Operations.ForEach(op => op.SetProcessing(tp)));
+            ProgramBuilder.Commands = camData.Commands;
 #if DEBUG
-        ProgramBuilder.DwgFileCommands ??= camData?.Commands?.Clone();
+            ProgramBuilder.DwgFileCommands ??= camData.Commands?.Clone();
 #endif
+        }
+        _camView.SetCamData(camData);
     }
 
     private void Document_CommandWillStart(object sender, CommandEventArgs e)

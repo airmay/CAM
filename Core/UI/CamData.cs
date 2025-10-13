@@ -1,7 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace CAM;
 
+[Serializable]
 public class CamData
 {
     public IProcessing[] TechProcesses { get; set; }
