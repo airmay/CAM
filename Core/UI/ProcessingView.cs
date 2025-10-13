@@ -51,14 +51,14 @@ public partial class ProcessingView : UserControl
     #region CamData
     public void SetCamData(CamData camData)
     {
-        if (camData != null && camData.TechProcesses != null && camData.TechProcesses.Length > 0)
+        if (camData is { TechProcesses.Length: > 0 })
         {
             var nodes = camData.TechProcesses.ConvertAll(CreateTechProcessNode);
             treeView.Nodes.AddRange(nodes);
             treeView.ExpandAll();
             treeView.SelectedNode = treeView.Nodes[0];
 
-            if (camData.Commands != null && camData.Commands.Count > 0 && camData.Index.HasValue)
+            if (camData.Commands is { Count: > 0 } && camData.Index.HasValue)
                 _program = ProgramBuilder.CreateProgram(camData.TechProcesses[camData.Index.Value]);
         }
 

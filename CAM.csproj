@@ -116,6 +116,7 @@
     <Compile Include="Core\UI\ParamsControl.cs">
       <SubType>UserControl</SubType>
     </Compile>
+    <Compile Include="Core\ParamsValidator.cs" />
     <Compile Include="MachineCncWorkCenter\PostProcessorCnc.cs" />
     <Compile Include="MachineCncWorkCenter\ProcessorBase.cs" />
     <Compile Include="MachineCncWorkCenter\ToolLocationCnc.cs" />

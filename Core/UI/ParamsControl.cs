@@ -1,5 +1,6 @@
 ﻿using Autodesk.AutoCAD.DatabaseServices;
 using CAM.CncWorkCenter;
+using CAM.Core;
 using Dreambuild.AutoCAD;
 using System;
 using System.Collections.Generic;
@@ -154,7 +155,7 @@ namespace CAM
             return label;
         }
 
-        public TextBox AddTextBox(string paramName, string displayName = null, bool readOnly = false, string hint = null)
+        public TextBox AddTextBox(string paramName, string displayName = null, bool readOnly = false, string hint = null, bool required = false)
         {
             AddLabel(displayName ?? paramName, hint);
 
@@ -165,9 +166,11 @@ namespace CAM
             };
             AddControl(control, hint, paramName, "Text");
 
+            if (required)
+                ParamsValidator.AddRequiredParam(_type, paramName, displayName ?? GetDisplayName(paramName));
+
             return control;
         }
-
 
         public CheckBox AddCheckBox(string paramName, string displayName = null, string hint = null)
         {
@@ -181,7 +184,7 @@ namespace CAM
 
         #region AddComboBox
 
-        public ComboBox AddComboBox<T>(string paramName, string displayName = null, params T[] values) where T : struct
+        public ComboBox AddComboBox<T>(string paramName, string displayName = null, bool required = false, params T[] values) where T : struct
         {
             var comboBox = AddComboBox(paramName, displayName);
             comboBox.BindEnum(values);
@@ -204,7 +207,7 @@ namespace CAM
             return comboBox;
         }
 
-        private ComboBox AddComboBox(string paramName, string displayName = null, string hint = null)
+        private ComboBox AddComboBox(string paramName, string displayName = null, string hint = null, bool required = false)
         {
             AddLabel(displayName ?? paramName, hint);
 
@@ -214,19 +217,21 @@ namespace CAM
                 DropDownStyle = ComboBoxStyle.DropDownList, 
             };
             AddControl(comboBox, hint, paramName, "SelectedValue");
+            if (required)
+                ParamsValidator.AddRequiredParam(_type, paramName, displayName ?? GetDisplayName(paramName));
 
             return comboBox;
         }
 
-        public ComboBox AddMaterial() => AddComboBox<Material>("Material", "Материал");
+        public ComboBox AddMaterial() => AddComboBox<Material>("Material", "Материал", required: true);
 
-        public ComboBox AddMachine() => AddComboBox<Machine>("Machine", "Станок");
+        public ComboBox AddMachine() => AddComboBox<Machine>("Machine", "Станок", required: true);
 
         #endregion
 
         #region AddSelectorParam
 
-        public (TextBox, Button) CreateSelector(string paramName, string displayName, string buttonText = "Ξ", string hint = null)
+        public (TextBox, Button) CreateSelector(string paramName, string displayName, string buttonText = "Ξ", string hint = null, bool required = false)
         {
             AddLabel(displayName ?? paramName, hint);
 
@@ -258,13 +263,15 @@ namespace CAM
            };
             tableLayout.Controls.Add(button);
             _tablePanel.Controls.Add(tableLayout);
+            if (required)
+                ParamsValidator.AddRequiredParam(_type, paramName, displayName ?? GetDisplayName(paramName));
 
             return (textBox, button);
         }
 
         public (TextBox textbox, Button button) AddTool()
         {
-            var (textbox, button) = CreateSelector("Tool","Инструмент");
+            var (textbox, button) = CreateSelector("Tool","Инструмент", required: true);
 
             button.Click += (s, e) =>
             {
@@ -284,9 +291,9 @@ namespace CAM
 
         public (TextBox textbox, Button button) AddAcadObject(string paramName = "ProcessingArea",
             string displayName = null, string message = "Выбор объектов", string allowedTypes = "*",
-            Action<ObjectId[]> afterSelect = null, string hint = "Обрабатываемые объекты")
+            Action<ObjectId[]> afterSelect = null, string hint = "Обрабатываемые объекты", bool required = false)
         {
-            var (textbox, button) = CreateSelector(paramName, displayName, "۞", hint);
+            var (textbox, button) = CreateSelector(paramName, displayName, "۞", hint, required);
 
             var prop = _type.GetProperty(paramName);
             textbox.Enter += (s, e) => prop.GetValue(_bindingSource.DataSource).As<AcadObject>()?.Select();

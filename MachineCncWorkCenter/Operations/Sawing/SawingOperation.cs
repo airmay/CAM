@@ -25,22 +25,26 @@ namespace CAM.Operations.Sawing
 
         public static void ConfigureParamsView(ParamsControl view)
         {
-            var thicknessTextBox = view.AddTextBox(nameof(Thickness));
+            var thicknessTextBox = view.AddTextBox(nameof(Thickness), required: true);
             view.AddCheckBox(nameof(IsExactlyBegin), "Начало точно");
             view.AddCheckBox(nameof(IsExactlyEnd), "Конец точно");
             view.AddTextBox(nameof(Departure));
             view.AddIndent();
-            view.AddAcadObject(allowedTypes: $"{AcadObjectNames.Line},{AcadObjectNames.Arc},{AcadObjectNames.Lwpolyline}");
+            view.AddAcadObject(allowedTypes: $"{AcadObjectNames.Line},{AcadObjectNames.Arc},{AcadObjectNames.Lwpolyline}", required: true);
             view.AddCheckBox(nameof(ChangeSide), "Сменить сторону", "Поменять обрабатываемою сторону");
-            var depthTextBox = view.AddTextBox(nameof(Depth));
-            view.AddTextBox(nameof(Penetration), hint: "Шаг заглубления для прямой и если не заданы Режимы для криволинейных траекторий то для всех кривых");
+            var depthTextBox = view.AddTextBox(nameof(Depth), required: true);
+            view.AddTextBox(nameof(Penetration), hint: "Шаг заглубления для прямой и если не заданы Режимы для криволинейных траекторий то для всех кривых", required: true);
             view.AddText("Режимы для криволинейных траекторий", "Режимы применяются для дуги и полилинии");
             view.AddControl(new SawingModesView(), 6, nameof(SawingModesView.DataSource), nameof(SawingModes));
 
             thicknessTextBox.Validated += (sender, args) =>
             {
-                if (depthTextBox.Text == "0")
-                    depthTextBox.Text = (view.GetData<SawingOperation>().Thickness + 2).ToString();
+                if (view.GetData<SawingOperation>().Depth == 0)
+                {
+                    var depth = view.GetData<SawingOperation>().Thickness + 2;
+                    view.GetData<SawingOperation>().Depth = depth;
+                    depthTextBox.Text = depth.ToString();
+                }
             };
         }
 

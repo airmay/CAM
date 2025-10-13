@@ -21,8 +21,8 @@ namespace CAM.CncWorkCenter
             view.AddTool();
             view.AddTextBox(nameof(Frequency));
             view.AddIndent();
-            view.AddTextBox(nameof(CuttingFeed));
-            view.AddTextBox(nameof(PenetrationFeed));
+            view.AddTextBox(nameof(CuttingFeed), required: true);
+            view.AddTextBox(nameof(PenetrationFeed), required: true);
             view.AddIndent();
             view.AddOrigin();
             view.AddTextBox(nameof(ZSafety));

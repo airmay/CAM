@@ -44,7 +44,8 @@ namespace CAM
         public Program Execute()
         {
             var operations = Operations.Cast<OperationBase<TTechProcess, TProcessor>>().Where(p => p.Enabled).ToArray();
-            if (!Validate() || operations.Length == 0 || operations.Any(p => !p.Validate()))
+
+            if (!ParamsValidator.Validate(Caption, this) || operations.Length == 0 || operations.Any(p => !ParamsValidator.Validate(p.Caption, p)))
                 return null;
 
             Acad.Editor.UpdateScreen();
