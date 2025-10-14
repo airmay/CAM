@@ -82,11 +82,11 @@ namespace CAM.CncWorkCenter
 
         protected void AddCommands(string[] commands) => Array.ForEach(commands, p => AddCommand(p));
 
-        public Program PartialProgram(int programPosition, int count, short operationNumber, ToolPosition toolPosition)
+        public Program PartialProgram(int programPosition, IOperation operation, ToolPosition toolPosition)
         {
             var commands = ProgramBuilder.Commands.Skip(programPosition).ToArray();
             Start();
-            Operation = Processing.GetOperation(operationNumber);
+            Operation = operation;
             StartOperation();
             MoveToPosition(toolPosition);
             ProgramBuilder.Commands.AddRange(commands);

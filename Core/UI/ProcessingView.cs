@@ -86,16 +86,20 @@ public partial class ProcessingView : UserControl
 #if RELEASE
             toolStrip.Enabled = false;
 #endif
+        SelectNextControl(ActiveControl, true, true, true, true);
         processCommandBindingSource.DataSource = null;
         Acad.DocumentManager.DocumentActivationEnabled = false;
         Acad.DeleteProcessObjects();
         Acad.ClearHighlighted();
         ToolModel.Delete();
-        SelectNextControl(ActiveControl, true, true, true, true);
 
         var techProcessNode = SelectedTechProcessNode;
         var techProcess = GetTechProcess(techProcessNode);
+
+        Acad.CreateProgressor("Расчет обработки");
         _program = techProcess.Execute();
+        Acad.CloseProgressor();
+
         if (_program != null)
         {
             UpdateTechProcessNodesText(techProcessNode);
@@ -113,7 +117,7 @@ public partial class ProcessingView : UserControl
         {
             _program.Commands.Take(processCommandBindingSource.Position).SelectMany(p => new[] { p.ObjectId, p.ObjectId2 }).Delete();
             var command = (Command)processCommandBindingSource[processCommandBindingSource.Position - 1];
-            _program = _program.Processing.ExecutePartial(processCommandBindingSource.Position, _program.Commands.Count, command.OperationNumber, command.ToolPosition);
+            _program = _program.Processing.ExecutePartial(processCommandBindingSource.Position, _program.GetOperation(command.OperationNumber), command.ToolPosition);
             processCommandBindingSource.ResetBindings(false);
             processCommandBindingSource.Position = 0;
             UpdateTechProcessNodesText(GetProgramProcessingNode());
@@ -335,7 +339,7 @@ public partial class ProcessingView : UserControl
             Acad.SelectObjectIds(SelectedCommand.ObjectId.Value);
         }
 
-        ToolModel.Set(_program.Processing.GetOperation(SelectedCommand.OperationNumber)?.GetTool(), SelectedCommand.ToolPosition);
+        ToolModel.Set(_program.GetOperation(SelectedCommand.OperationNumber).GetTool(), SelectedCommand.ToolPosition);
 
         var node = GetProgramProcessingNode()?.Nodes.Cast<TreeNode>().FirstOrDefault(p => ((IOperation)p.Tag).Number == SelectedCommand.OperationNumber);
         if (node != null)

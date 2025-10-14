@@ -302,15 +302,15 @@ namespace CAM
 
         public ParamsView AddOrigin()
         {
-            var (textbox, button) = CreateSelector("Начало координат", "۞");
-            BindingSource.DataSourceChanged += (s, e) => textbox.Text = Processing.Origin.ToString();
-            textbox.Enter += (s, e) => Acad.SelectObjectIds(Processing.Origin.OriginObject?.ObjectIds);
-            button.Click += (s, e) =>
-            {
-                textbox.Text = @"{0, 0}";
-                Processing.Origin.CreateOriginObject();
-                textbox.Text = Processing.Origin.ToString();
-            };
+            //var (textbox, button) = CreateSelector("Начало координат", "۞");
+            //BindingSource.DataSourceChanged += (s, e) => textbox.Text = Processing.Origin.ToString();
+            //textbox.Enter += (s, e) => Acad.SelectObjectIds(Processing.Origin.OriginModel?.ObjectIds);
+            //button.Click += (s, e) =>
+            //{
+            //    textbox.Text = @"{0, 0}";
+            //    Processing.Origin.CreateOriginModel();
+            //    textbox.Text = Processing.Origin.ToString();
+            //};
             return this;
         }
         #endregion

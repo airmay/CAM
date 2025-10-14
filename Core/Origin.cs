@@ -9,14 +9,14 @@ namespace CAM.Core
     [Serializable]
     public class Origin
     {
-        public AcadObject OriginObject { get; set; }
+        public AcadObject OriginModel { get; set; }
         public double X { get; set; }
         public double Y { get; set; }
         public Point2d Point => new(X, Y);
         public string Description => $"{{{X.Round()}, {Y.Round()}}}";
         public override string ToString() => $"{{{X.Round()}, {Y.Round()}}}";
 
-        public void CreateOriginObject()
+        public void CreateOriginModel()
         {
             Interaction.SetActiveDocFocus();
             var point = Interaction.GetPoint("\nВыберите точку начала координат");
@@ -26,7 +26,7 @@ namespace CAM.Core
             X = point.X;
             Y = point.Y;
 
-            Acad.DeleteObjects(OriginObject?.ObjectIds);
+            Acad.DeleteObjects(OriginModel?.ObjectIds);
             point = new Point3d(X, Y, 0);
             const int length = 100;
             const int s = length / 10;
@@ -37,7 +37,7 @@ namespace CAM.Core
                 NoDraw.Line(point, point + Vector3d.YAxis * length),
                 NoDraw.Rectang(point - v, point + v)
             };
-            OriginObject = AcadObject.Create(curves.Add());
+            OriginModel = AcadObject.Create(curves.Add());
         }
     }
 }

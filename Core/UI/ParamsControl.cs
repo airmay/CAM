@@ -318,12 +318,13 @@ namespace CAM
 
         public (TextBox textbox, Button button) AddOrigin()
         {
-            var (textbox, button) = CreateSelector("Origin", "Начало координат", "۞");
-            
-            textbox.Enter += (s, e) => GetData<IProcessing>().Origin.OriginObject?.Select();
+            const string paramName = "Origin";
+            var (textbox, button) = CreateSelector(paramName, "Начало координат", "۞");
+            var prop = _type.GetProperty(paramName);
+            textbox.Enter += (s, e) => prop.GetValue(_bindingSource.DataSource).As<Origin>().OriginModel?.Select();
             button.Click += (s, e) =>
             {
-                GetData<IProcessing>().Origin.CreateOriginObject();
+                prop.GetValue(_bindingSource.DataSource).As<Origin>().CreateOriginModel();
                 textbox.DataBindings[0].ReadValue();
             };
 

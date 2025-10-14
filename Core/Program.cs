@@ -9,12 +9,15 @@ namespace CAM.Core;
 public class Program(
     List<Command> commands,
     IProcessing processing,
+    Dictionary<short, IOperation> operations,
     Dictionary<short, int> operationNumbers,
     Dictionary<ObjectId, int> objectIds,
     Dictionary<short, ObjectId> operationToolpath)
 {
     public List<Command> Commands { get; } = commands;
     public IProcessing Processing { get; } = processing;
+
+    public IOperation GetOperation(short number) => operations[number];
 
     public bool TryGetCommandIndexByObjectId(ObjectId objectId, out int index) => objectIds.TryGetValue(objectId, out index);
 

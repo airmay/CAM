@@ -24,7 +24,7 @@ namespace CAM.CncWorkCenter
             view.AddTextBox(nameof(S), "Угловая скорость", hint: "Z безопасности отсчитывается от верха выбранных объектов техпроцесса");
             
             view.AddIndent();
-            view.AddTextBox(nameof(ToolThickness), "Толщина троса");
+            view.AddTextBox(nameof(ToolThickness), "Толщина троса", required: true);
             view.AddTextBox(nameof(Approach), "Заезд");
             view.AddTextBox(nameof(Departure), "Выезд");
 
@@ -40,11 +40,6 @@ namespace CAM.CncWorkCenter
             Caption = "Обработка Тросовый станок";
             Machine = CAM.Machine.WireSawMachine;
             Tool = new Tool { Type = ToolType.WireSaw };
-        }
-
-        protected override bool Validate()
-        {
-            return Tool.Thickness.CheckNotNull("Толщина троса");
         }
     }
 }

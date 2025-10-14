@@ -51,16 +51,5 @@ namespace CAM.CncWorkCenter
                     throw new ArgumentOutOfRangeException();
             }
         }
-
-        protected override bool Validate()
-        {
-            return Machine.CheckNotNull("Станок") && Tool.CheckNotNull("Инструмент");
-        }
-
-        //public void RemoveAcadObjects()
-        //{
-        //    foreach (var operation in Operations)
-        //        operation.RemoveAcadObjects();
-        //}
     }
 }
