@@ -31,6 +31,7 @@ public abstract class ProcessingBase<TTechProcess, TProcessor> : IProcessing
 
     public Tool Tool { get; set; }
     public Origin Origin { get; set; } = new();
+    public double Delta { get; set; } = 5;
     public double ZSafety { get; set; } = 20;
 
     public Program Execute()

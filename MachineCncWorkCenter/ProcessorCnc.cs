@@ -2,6 +2,7 @@
 using Autodesk.AutoCAD.Geometry;
 using CAM.Core;
 using Dreambuild.AutoCAD;
+using System;
 
 namespace CAM.CncWorkCenter
 {
@@ -12,11 +13,25 @@ namespace CAM.CncWorkCenter
 
         public override void Start()
         {
-            _postProcessor = Processing.GetPostProcessor();
+            _postProcessor = CreatePostProcessor();
             base.Start();
 
             AngleA = 0;
             AngleC = 0;
+        }
+
+        private PostProcessorCnc CreatePostProcessor()
+        {
+            return Processing.Machine switch
+            {
+                Machine.Donatoni => new DonatoniPostProcessor(),
+                Machine.Krea => new DonatoniPostProcessor(),
+                Machine.CableSawing => new DonatoniPostProcessor(),
+                Machine.Forma => new DonatoniPostProcessor(),
+                Machine.Champion => new DonatoniPostProcessor(),
+                Machine.ScemaLogic => new DonatoniPostProcessor(),
+                _ => throw new ArgumentOutOfRangeException()
+            };
         }
 
         public override void StartOperation(double? zMax = null)

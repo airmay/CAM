@@ -15,20 +15,19 @@ public class ProcessingWireSaw : ProcessingBase<ProcessingWireSaw, ProcessorWire
     public int S { get; set; } = 100;
     public double Approach { get; set; } = 50;
     public double Departure { get; set; } = 50;
-    public double Delta { get; set; } = 5;
 
     public static void ConfigureParamsView(ParamsControl view)
     {
-        view.AddOrigin();
+        view.AddTextBox(nameof(ToolThickness), "Толщина троса", required: true);
         view.AddTextBox(nameof(CuttingFeed), required: true);
         view.AddTextBox(nameof(S), "Угловая скорость", required: true);
-            
+
         view.AddIndent();
-        view.AddTextBox(nameof(ToolThickness), "Толщина троса", required: true);
         view.AddTextBox(nameof(Approach), "Заезд");
         view.AddTextBox(nameof(Departure), "Выезд");
 
         view.AddIndent();
+        view.AddOrigin();
         view.AddTextBox(nameof(Delta));
         view.AddTextBox(nameof(ZSafety));
     }
