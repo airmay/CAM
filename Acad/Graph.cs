@@ -404,7 +404,7 @@ namespace CAM
             var index = i - 1;
             var extremum = i == 0
                 ? y[0]
-                : LinearInterpolate(x1, x[i - 1], x[i], y[i - 1], y[i]);
+                : GetY(x1);
 
             while (i < x.Length && x[i] < x2)
             {
@@ -413,11 +413,13 @@ namespace CAM
             }
 
             if (i < x.Length)
-                extremum = LinearInterpolate(x2, x[i - 1], x[i], y[i - 1], y[i]);
+                extremum = GetY(x2);
 
             return (extremum, index);
 
-            double LinearInterpolate(double x, double x0, double x1, double y0, double y1) => y0 + (y1 - y0) * (x - x0) / (x1 - x0);
+            double GetY(double p) => LinearInterpolate(p, x[i - 1], x[i], y[i - 1], y[i]);
         }
+
+        public static double LinearInterpolate(double x, double x0, double x1, double y0, double y1) => y0 + (y1 - y0) * (x - x0) / (x1 - x0);
     }
 }
