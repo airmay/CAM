@@ -17,7 +17,9 @@ public class Program(
     public List<Command> Commands { get; } = commands;
     public IProcessing Processing { get; } = processing;
 
-    public IOperation GetOperation(short number) => operations[number];
+    public IOperation GetOperation(short operationNumber) => operations[operationNumber];
+
+    public CAM.Tool GetTool(short operationNumber) => operations[operationNumber].GetTool() ?? processing.Tool;
 
     public bool TryGetCommandIndexByObjectId(ObjectId objectId, out int index) => objectIds.TryGetValue(objectId, out index);
 
@@ -25,7 +27,7 @@ public class Program(
 
     public void SetToolpathVisibility(bool value) => operationToolpath?.ForAll(p => p.Value.SetGroupVisibility(value));
 
-    public void ShowOperationToolpath(short operationNumber) => operationToolpath?.ForAll(p => p.Value.SetGroupVisibility(p.Key == operationNumber));
+    //public void ShowOperationToolpath(short operationNumber) => operationToolpath?.ForAll(p => p.Value.SetGroupVisibility(p.Key == operationNumber));
 
     public void Export()
     {

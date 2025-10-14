@@ -61,15 +61,11 @@ public class Startup : IExtensionApplication
         if (data is not null and not CamData) 
             Acad.Alert("Данные обработки не могут быть загружены");
 
-        if (camData != null)
-        {
-            camData.TechProcesses.ForEach(tp => tp.Operations.ForEach(op => op.SetProcessing(tp)));
-            ProgramBuilder.Commands = camData.Commands;
-#if DEBUG
-            ProgramBuilder.DwgFileCommands ??= camData.Commands?.Clone();
-#endif
-        }
+        ProgramBuilder.Commands = camData?.Commands;
         _camView.SetCamData(camData);
+#if DEBUG
+        ProgramBuilder.DwgFileCommands ??= camData?.Commands?.Clone();
+#endif
     }
 
     private void Document_CommandWillStart(object sender, CommandEventArgs e)

@@ -5,22 +5,22 @@ namespace CAM.Utils
 {
     public static class EngineSideCalculator
     {
-        public static Side Calculate(Curve curve, Machine machine)
+        public static Side Calculate(Curve curve)
         {
             switch (curve)
             {
                 case Arc arc:
-                    return CalcArc(arc, machine);
+                    return CalcArc(arc);
                 case Line line:
                     return CalcLine(line);
                 case Polyline polyline:
-                    return CalcPolyline(polyline, machine);
+                    return CalcPolyline(polyline);
                 default:
                     throw new InvalidOperationException($"Кривая типа {curve.GetType()} не может быть обработана.");
             }
         }
 
-        private static Side CalcArc(Arc arc, Machine machine)
+        private static Side CalcArc(Arc arc)
         {
             var startSide = arc.StartAngle.CosSign();
             var endSide = arc.EndAngle.CosSign();
@@ -47,7 +47,7 @@ namespace CAM.Utils
             return BuilderUtils.CalcEngineSide(line.Angle);
         }
 
-        private static Side CalcPolyline(Polyline polyline, Machine machine)
+        private static Side CalcPolyline(Polyline polyline)
         {
             var sign = 0;
             var engineSide = Side.None;
@@ -70,9 +70,6 @@ namespace CAM.Utils
 
                 if (s != sign)
                 {
-                    if (machine == Machine.ScemaLogic)
-                        throw new InvalidOperationException("Обработка полилинии на ScemaLogic невозможна - кривая пересекает углы 90 или 270 градусов.");
-
                     var sd = sign > 0 ^ bulge < 0 ? Side.Left : Side.Right;
                     if (engineSide != Side.None)
                     {

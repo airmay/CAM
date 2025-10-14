@@ -339,7 +339,7 @@ public partial class ProcessingView : UserControl
             Acad.SelectObjectIds(SelectedCommand.ObjectId.Value);
         }
 
-        ToolModel.Set(_program.GetOperation(SelectedCommand.OperationNumber).GetTool(), SelectedCommand.ToolPosition);
+        ToolModel.Set(_program.GetTool(SelectedCommand.OperationNumber), SelectedCommand.ToolPosition);
 
         var node = GetProgramProcessingNode()?.Nodes.Cast<TreeNode>().FirstOrDefault(p => ((IOperation)p.Tag).Number == SelectedCommand.OperationNumber);
         if (node != null)

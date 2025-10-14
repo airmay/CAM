@@ -120,7 +120,7 @@ namespace CAM.Operations.Sawing
             if (!isExactlyBegin || !isExactlyEnd)
                 AddGash(curve, isExactlyBegin, isExactlyEnd, outerSide, gashLength, indent);
 
-            var engineSide = EngineSideCalculator.Calculate(curve, Machine);
+            var engineSide = EngineSideCalculator.Calculate(curve);
             var compensation = 0D;
             var аngleA = 0D;
 
@@ -191,7 +191,7 @@ namespace CAM.Operations.Sawing
         {
             var modes = isArc && SawingModes.Any()
                 ? SawingModes.OrderByDescending(p => p.Depth.HasValue).ThenBy(p => p.Depth).ToList()
-                : new List<SawingMode> { new SawingMode { DepthStep = Penetration.Value, Feed = CuttingFeed } };
+                : new List<SawingMode> { new SawingMode { DepthStep = Penetration.Value, Feed = Processing.CuttingFeed } };
             var index = 0;
             var mode = modes[0];
             var depth = isArc ? -mode.DepthStep : 0;

@@ -2,10 +2,7 @@
 using CAM.CncWorkCenter;
 using CAM.MachineWireSaw;
 
-namespace CAM
-{
-    [Serializable]
-    public abstract class OperationWireSawBase : OperationBase<ProcessingWireSaw, ProcessorWireSaw>
-    {
-    }
-}
+namespace CAM;
+
+[Serializable]
+public abstract class OperationWireSawBase : OperationBase<ProcessingWireSaw, ProcessorWireSaw>;

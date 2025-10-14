@@ -47,15 +47,15 @@ public static class ProgramBuilder
             .Where(p => p.Item2.HasValue)
             .ToDictionary(p => p.Item2.Value, p => p.ind);
 
-        var operationToolpath = toolpathBuilder != null
-            ? operationCommands.Where(p => p.Any(c => c.ObjectId.HasValue))
-                .ToDictionary(p => p.Key,
-                    p => toolpathBuilder.CreateGroup(p.Key.ToString(),
-                        p.SelectMany(c => new[] { c.ObjectId, c.ObjectId2 }).Where(c => c.HasValue).Select(c => c.Value)
-                            .ToArray()))
-            : null;
+        //var operationToolpath = toolpathBuilder != null
+        //    ? operationCommands.Where(p => p.Any(c => c.ObjectId.HasValue))
+        //        .ToDictionary(p => p.Key,
+        //            p => toolpathBuilder.CreateGroup(p.Key.ToString(),
+        //                p.SelectMany(c => new[] { c.ObjectId, c.ObjectId2 }).Where(c => c.HasValue).Select(c => c.Value)
+        //                    .ToArray()))
+        //    : null;
 
-        return new Program(Commands, processing, operations, operationNumbers, objectIds, operationToolpath);
+        return new Program(Commands, processing, operations, operationNumbers, objectIds, null);
 
         static string GetCaption(string caption, TimeSpan duration) => $"{(caption.IndexOf('(') > 0 ? caption.Substring(0, caption.IndexOf('(')).Trim() : caption)} ({duration})";
     }

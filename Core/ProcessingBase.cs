@@ -12,6 +12,7 @@ public interface IProcessing
     IOperation[] Operations { get; set; }
     Machine? Machine { get; }
     short LastOperationNumber { get; set; }
+    public Tool Tool { get; set; }
     Program Execute();
     Program ExecutePartial(int position, IOperation operationNumber, ToolPosition toolPosition);
 }
@@ -28,8 +29,8 @@ public abstract class ProcessingBase<TTechProcess, TProcessor> : IProcessing
     public IOperation[] Operations { get; set; }
     public Machine? Machine { get; set; }
     public short LastOperationNumber { get; set; }
-
     public Tool Tool { get; set; }
+
     public Origin Origin { get; set; } = new();
     public double Delta { get; set; } = 5;
     public double ZSafety { get; set; } = 20;
@@ -49,6 +50,7 @@ public abstract class ProcessingBase<TTechProcess, TProcessor> : IProcessing
             foreach (var operation in operations)
             {
                 Acad.Write($"расчет операции {operation.Caption}");
+                operation.Processing = this as TTechProcess;
                 Processor.Operation = operation;
                 operation.Execute();
             }
