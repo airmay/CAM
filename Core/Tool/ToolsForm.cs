@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using System.Windows.Forms;
 
 namespace CAM
@@ -15,15 +14,7 @@ namespace CAM
 
             Type.DisplayMember = "Description";
             Type.ValueMember = "Value";
-            Type.DataSource = Enum.GetValues(typeof(ToolType))
-                .Cast<Enum>()
-                .Select(value => new
-                {
-                    Description = value.GetDescription(),
-                    value
-                })
-                .OrderBy(item => item.value)
-                .ToList();
+            Type.DataSource = Extensions.GetEnumValueDesc<ToolType>();
         }
 
         private void dataGridView1_DoubleClick(object sender, EventArgs e)

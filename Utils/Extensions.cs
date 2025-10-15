@@ -36,6 +36,7 @@ namespace CAM
         /// <param name="value"></param>
         /// <returns></returns>
         public static int GetSign(this double value) => value >= 0 ? 1 : -1;
+
         public static string ToParam(this double value) => value.ToString("0.####");
         public static string ToParam(this double? value) => value?.ToString("0.####");
 
@@ -45,7 +46,12 @@ namespace CAM
         {
             comboBox.DisplayMember = "Description";
             comboBox.ValueMember = "Value";
-            comboBox.DataSource = (values.Any() ? values : Enum.GetValues(typeof(T)))
+            comboBox.DataSource = GetEnumValueDesc(values);
+        }
+
+        public static Array GetEnumValueDesc<T>(params T[] values) where T : struct
+        {
+            return (values.Any() ? values : Enum.GetValues(typeof(T)))
                 .Cast<Enum>()
                 .Select(value => new
                 {
@@ -53,7 +59,7 @@ namespace CAM
                     value
                 })
                 .OrderBy(item => item.value)
-                .ToList();
+                .ToArray();
         }
 
         public static bool CheckNotNull(this object value, string field)

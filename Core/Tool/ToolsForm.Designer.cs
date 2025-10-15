@@ -30,6 +30,7 @@
         {
             this.components = new System.ComponentModel.Container();
             this.pButtons = new System.Windows.Forms.Panel();
+            this.bSave = new System.Windows.Forms.Button();
             this.bLoad = new System.Windows.Forms.Button();
             this.bClose = new System.Windows.Forms.Button();
             this.bSelect = new System.Windows.Forms.Button();
@@ -41,7 +42,6 @@
             this.Column1 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.ToolBindingSource = new System.Windows.Forms.BindingSource(this.components);
             this.dataGridViewComboBoxColumn1 = new System.Windows.Forms.DataGridViewComboBoxColumn();
-            this.bSave = new System.Windows.Forms.Button();
             this.pButtons.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.ToolBindingSource)).BeginInit();
@@ -61,6 +61,16 @@
             this.pButtons.Size = new System.Drawing.Size(562, 29);
             this.pButtons.TabIndex = 0;
             // 
+            // bSave
+            // 
+            this.bSave.Location = new System.Drawing.Point(84, 3);
+            this.bSave.Name = "bSave";
+            this.bSave.Size = new System.Drawing.Size(75, 23);
+            this.bSave.TabIndex = 3;
+            this.bSave.Text = "Сохранить";
+            this.bSave.UseVisualStyleBackColor = true;
+            this.bSave.Click += new System.EventHandler(this.bSave_Click);
+            // 
             // bLoad
             // 
             this.bLoad.Location = new System.Drawing.Point(3, 3);
@@ -69,6 +79,7 @@
             this.bLoad.TabIndex = 2;
             this.bLoad.Text = "Загрузить";
             this.bLoad.UseVisualStyleBackColor = true;
+            this.bLoad.Visible = false;
             this.bLoad.Click += new System.EventHandler(this.bLoad_Click);
             // 
             // bClose
@@ -156,16 +167,6 @@
             this.dataGridViewComboBoxColumn1.HeaderText = "Тип";
             this.dataGridViewComboBoxColumn1.Name = "dataGridViewComboBoxColumn1";
             this.dataGridViewComboBoxColumn1.Width = 260;
-            // 
-            // bSave
-            // 
-            this.bSave.Location = new System.Drawing.Point(84, 3);
-            this.bSave.Name = "bSave";
-            this.bSave.Size = new System.Drawing.Size(75, 23);
-            this.bSave.TabIndex = 3;
-            this.bSave.Text = "Сохранить";
-            this.bSave.UseVisualStyleBackColor = true;
-            this.bSave.Click += new System.EventHandler(this.bSave_Click);
             // 
             // ToolsForm
             // 
