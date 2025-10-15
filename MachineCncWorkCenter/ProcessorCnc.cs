@@ -100,7 +100,7 @@ public class ProcessorCnc : ProcessorBase<ProcessingCnc, ProcessorCnc>
 
     public void GCommand(int gCode, int? feed = null, Curve curve = null, Point3d? point = null, double? angleC = null, double? angleA = null, Point2d? arcCenter = null)
     {
-        var commandText = _postProcessor.GCommand(gCode, point, angleC?.ToRoundDeg(), angleA?.ToRoundDeg(), feed, arcCenter);
+        var commandText = _postProcessor.GCommand(point, angleC?.ToRoundDeg(), angleA?.ToRoundDeg(), feed, arcCenter);
         if (commandText == null)
             return;
 
@@ -114,6 +114,6 @@ public class ProcessorCnc : ProcessorBase<ProcessingCnc, ProcessorCnc>
             toolpath = ProcessingObjectBuilder.AddToolpath(curve, gCode);
         }
 
-        AddCommand(commandText, point, angleC, angleA, duration, toolpath);
+        AddCommand($"G{gCode} {commandText}", point, angleC, angleA, duration, toolpath);
     }
 }

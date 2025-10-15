@@ -25,6 +25,8 @@ public abstract class ProcessorBase<TTechProcess, TProcessor>
     public virtual void Start()
     {
         CreatePostProcessor();
+        PostProcessor.Origin = Processing.Origin.Point;
+
         ProgramBuilder.Init();
         ProcessingObjectBuilder.Start();
 

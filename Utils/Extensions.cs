@@ -36,7 +36,7 @@ namespace CAM
         /// <param name="value"></param>
         /// <returns></returns>
         public static int GetSign(this double value) => value >= 0 ? 1 : -1;
-        public static string ToStringParam(this double value) => value.ToString("0.####");
+        public static string ToParam(this double value) => value.ToString("0.####");
         public static string ToParam(this double? value) => value?.ToString("0.####");
 
         public static double Round(this double value, int digits = 0) => Math.Round(value, digits);
