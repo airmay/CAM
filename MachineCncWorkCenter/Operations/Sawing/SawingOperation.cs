@@ -59,7 +59,7 @@ namespace CAM.Operations.Sawing
                     ProcessCurve(curve, (Side)curveSide, points[curve.StartPoint], points[curve.EndPoint]);
             }
 
-            Graph.CreateHatch(curveSides.Keys.ToList().ToPolyline(), outerSide, p => Processor.AddEntity(p));
+            Graph.CreateHatch(curveSides.Keys.ToList().ToPolyline(), outerSide);
         }
 
         private (Dictionary<Curve, int>, Dictionary<Point3d, bool>, int) CalcСurveProcessingInfo(Curve[] curves)
@@ -232,7 +232,7 @@ namespace CAM.Operations.Sawing
                 var offsetVector = normal.GetPerpendicularVector() * ToolThickness * (int)side;
                 var gash = NoDraw.Pline(point, point2, point2 + offsetVector, point + offsetVector);
                 gash.Color = Color.FromColorIndex(ColorMethod.ByColor, 210);
-                Processor.AddEntity(gash);
+                ProcessingObjectBuilder.AddEntity(gash);
             }
         }
 

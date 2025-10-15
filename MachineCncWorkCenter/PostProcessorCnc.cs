@@ -6,6 +6,7 @@ namespace CAM.CncWorkCenter
     public abstract class PostProcessorCnc : PostProcessorBase
     {
         public abstract string[] SetTool(int toolNo, double angleA, double angleC, int originCellNumber);
+        public virtual string Cycle() => null;
 
         public bool WithThick { get; set; }
 

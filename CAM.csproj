@@ -134,7 +134,7 @@
     <Compile Include="Core\CableSawingProcessor.cs" />
     <Compile Include="Core\Settings\MachineSettings.cs" />
     <Compile Include="Core\ToolPosition.cs" />
-    <Compile Include="Core\ToolpathBuilder.cs" />
+    <Compile Include="Core\ProcessingObjectBuilder.cs" />
     <Compile Include="Core\Tool\ToolModel.cs" />
     <Compile Include="MachineWireSaw\CableSawingCommandGenerator.cs" />
     <Compile Include="Core\ProcessingBase.cs" />
@@ -215,7 +215,6 @@
     <Compile Include="Core\Enums\Machine.cs" />
     <Compile Include="Core\Enums\Material.cs" />
     <Compile Include="Program\Generator\PostProcessorBase.cs" />
-    <Compile Include="Program\Generator\ScemaLogicPostProcessor.cs" />
     <Compile Include="Program\OperationProcessor.cs" />
     <Compile Include="Program\Command.cs" />
     <Compile Include="Program\ProcessCommand.cs" />

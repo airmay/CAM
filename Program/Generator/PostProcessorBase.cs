@@ -45,7 +45,6 @@ namespace CAM
         }
         #endregion
 
-        public virtual string Cycle() => null;
         public abstract string[] StartMachine();
         public abstract string[] StopMachine();
         public abstract string[] StartEngine(int frequency, bool hasTool);

@@ -23,11 +23,8 @@ public static class ProgramBuilder
         Commands.Add(command);
     }
 
-    public static Program CreateProgram(IProcessing processing, ToolpathBuilder toolpathBuilder = null)
+    public static Program CreateProgram(IProcessing processing)
     {
-        if (DwgFileCommands != null && toolpathBuilder != null)
-            Acad.Write(Commands.SequenceEqual(DwgFileCommands, Command.Comparer) ? "Программа не изменилась" : "Внимание! Программа изменена!");
-
         if (Commands.Count == 0)
             return null;
 

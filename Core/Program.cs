@@ -19,7 +19,7 @@ public class Program(
 
     public IOperation GetOperation(short operationNumber) => operations[operationNumber];
 
-    public CAM.Tool GetTool(short operationNumber) => operations[operationNumber].GetTool() ?? processing.Tool;
+    public CAM.Tool GetTool(short operationNumber) => operations[operationNumber].GetTool() ?? Processing.Tool;
 
     public bool TryGetCommandIndexByObjectId(ObjectId objectId, out int index) => objectIds.TryGetValue(objectId, out index);
 

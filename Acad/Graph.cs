@@ -247,12 +247,12 @@ namespace CAM
             return polyline;
         }
 
-        public static ObjectId? CreateHatch(Polyline polyline, int side, Func<Entity, ObjectId> addEntity)
+        public static ObjectId? CreateHatch(Polyline polyline, int side)
         {
             const int hatchSize = 40;
             try
             {
-                addEntity(polyline);
+                ProcessingObjectBuilder.AddEntity(polyline);
                 var offsetPolyline = polyline.GetOffsetCurves(hatchSize * side)[0] as Polyline;
                 if (!polyline.Closed)
                 {
@@ -264,7 +264,7 @@ namespace CAM
                     offsetPolyline = null;
                 }
                 else
-                    addEntity(offsetPolyline);
+                    ProcessingObjectBuilder.AddEntity(offsetPolyline);
 
                 var hatch = new Hatch();
                 hatch.SetDatabaseDefaults();
@@ -279,7 +279,7 @@ namespace CAM
                 if (offsetPolyline != null)
                     hatch.AppendLoop(HatchLoopTypes.External, new ObjectIdCollection(new[] { offsetPolyline.ObjectId }));
                 hatch.EvaluateHatch(true);
-                addEntity(hatch);
+                ProcessingObjectBuilder.AddEntity(hatch);
 
                 polyline.Erase();
                 offsetPolyline?.Erase();
