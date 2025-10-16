@@ -1,4 +1,5 @@
-﻿using Autodesk.AutoCAD.DatabaseServices;
+﻿/*
+using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
 using Dreambuild.AutoCAD;
 using System;
@@ -86,7 +87,7 @@ namespace CAM.TechProcesses.Tactile
 
         public Polyline GetContour()
         {
-            var points = ProcessingArea.ObjectIds.SelectMany(p => Acad.OpenForRead(p).GetStartEndPoints());
+            var points = ProcessingArea.ObjectIds.SelectMany(p => p.QOpenForRead<Curve>().GetStartEndPoints());
             return NoDraw.Rectang(new Point3d(points.Min(p => p.X), points.Min(p => p.Y), 0), new Point3d(points.Max(p => p.X), points.Max(p => p.Y), 0));
         }
 
@@ -219,3 +220,4 @@ namespace CAM.TechProcesses.Tactile
         public override bool Validate() => Type.CheckNotNull("Тип плитки");
     }
 }
+*/

@@ -25,11 +25,11 @@ public static class ProcessingObjectBuilder
 
     public static void Start()
     {
-        _documentLock = Acad.ActiveDocument.LockDocument();
-        _transaction = Acad.Database.TransactionManager.StartTransaction();
+        _documentLock = Acad.LockDocument();
+        _transaction = Acad.StartTransaction();
         _currentSpace = (BlockTableRecord)_transaction.GetObject(Acad.Database.CurrentSpaceId, OpenMode.ForWrite, false);
 
-        _layerId = DbHelper.GetLayerId("Обработка");
+        _layerId = Acad.GetProcessLayer();
         //_groupDict = (DBDictionary)_transaction.GetObject(Acad.Database.GroupDictionaryId, OpenMode.ForWrite);
     }
 

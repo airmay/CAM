@@ -26,7 +26,7 @@ namespace CAM.Core
             X = point.X;
             Y = point.Y;
 
-            Acad.DeleteObjects(OriginModel?.ObjectIds);
+            Acad.Delete(OriginModel?.ObjectIds);
             point = new Point3d(X, Y, 0);
             const int length = 100;
             const int s = length / 10;
@@ -37,7 +37,7 @@ namespace CAM.Core
                 NoDraw.Line(point, point + Vector3d.YAxis * length),
                 NoDraw.Rectang(point - v, point + v)
             };
-            OriginModel = AcadObject.Create(curves.Add());
+            OriginModel = AcadObject.Create(curves.AddToDatabase());
         }
     }
 }

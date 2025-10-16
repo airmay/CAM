@@ -32,7 +32,7 @@ namespace CAM.TechProcesses.Tactile
 
         private void bCalculate_Click(object sender, EventArgs e)
         {
-            BindingSource.GetSource<BindingSource>().GetSource<BandsTechOperation>().CalcPassList();
+            //BindingSource.GetSource<BindingSource>().GetSource<CAM.Operations.Tactile.TactileBandsOperation>().CalcPassList();
             BindingSource.ResetBindings(false);
         }
     }

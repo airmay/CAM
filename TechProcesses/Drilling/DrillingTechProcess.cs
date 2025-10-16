@@ -1,6 +1,8 @@
-﻿using Autodesk.AutoCAD.DatabaseServices;
+﻿/*
+using Autodesk.AutoCAD.DatabaseServices;
 using System;
 using System.Linq;
+using Dreambuild.AutoCAD;
 
 namespace CAM.TechProcesses.Drilling
 {
@@ -43,7 +45,7 @@ namespace CAM.TechProcesses.Drilling
 
             ProcessingArea.ObjectIds.ToList().ForEach(p =>
             {
-                var arc = Acad.OpenForRead(p) as Circle;
+                var arc = p.QOpenForRead<Circle>();
                 Cutting(generator, arc.Center.X, arc.Center.Y);
             });
         }
@@ -77,3 +79,4 @@ namespace CAM.TechProcesses.Drilling
         }
     }
 }
+*/

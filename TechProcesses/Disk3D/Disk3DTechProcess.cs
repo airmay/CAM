@@ -1,4 +1,5 @@
-﻿using System;
+﻿/*
+using System;
 using System.Windows.Forms;
 
 namespace CAM.TechProcesses.Disk3D
@@ -56,3 +57,4 @@ namespace CAM.TechProcesses.Disk3D
                 originCellNumber: OriginCellNumber);
     }
 }
+*/

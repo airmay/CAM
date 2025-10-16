@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Dreambuild.AutoCAD;
 
 namespace CAM
 {
@@ -27,8 +28,8 @@ namespace CAM
                 .ToArray();
 
         public ObjectId ObjectId => ObjectIds[0];
-        public Curve GetCurve() => Acad.OpenForRead(ObjectId);
-        public Curve[] GetCurves() => Acad.OpenForRead(ObjectIds);
+        public Curve GetCurve() => ObjectId.QOpenForRead<Curve>();
+        public Curve[] GetCurves() => ObjectIds.QOpenForRead<Curve>();
 
         public string Description => ObjectIds.GetDesc();
 

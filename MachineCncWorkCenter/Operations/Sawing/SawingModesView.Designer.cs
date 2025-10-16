@@ -88,7 +88,7 @@
             // 
             // sawingModesBindingSource
             // 
-            this.sawingModesBindingSource.DataSource = typeof(CAM.TechProcesses.Sawing.SawingMode);
+            this.sawingModesBindingSource.DataSource = typeof(CAM.SawingMode);
             // 
             // SawingModesView
             // 

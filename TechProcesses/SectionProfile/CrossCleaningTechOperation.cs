@@ -1,4 +1,4 @@
-﻿using Autodesk.AutoCAD.Colors;
+﻿/*using Autodesk.AutoCAD.Colors;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
 using Dreambuild.AutoCAD;
@@ -247,4 +247,4 @@ namespace CAM.TechProcesses.SectionProfile
             }
         }
     }
-}
+}*/

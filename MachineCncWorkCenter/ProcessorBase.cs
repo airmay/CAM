@@ -62,6 +62,12 @@ public abstract class ProcessorBase<TTechProcess, TProcessor>
                 ? "Программа не изменилась"
                 : "Внимание! Программа изменена!");
 
+        for (var i = 0; i < ProgramBuilder.Commands.Count; i++)
+        {
+            if (!Command.Comparer.Equals(ProgramBuilder.Commands[i], ProgramBuilder.DwgFileCommands[i]))
+                Acad.Write($"Изменена строка {ProgramBuilder.Commands[i].Number}");
+        }
+
         return ProgramBuilder.CreateProgram(Processing);
     }
 

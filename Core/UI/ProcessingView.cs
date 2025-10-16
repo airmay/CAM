@@ -36,7 +36,7 @@ public partial class ProcessingView : UserControl
             control.Hide();
         processCommandBindingSource.DataSource = null;
         _program = null;
-        Acad.ClearHighlighted();
+        //Acad.ClearHighlighted();
         ToolModel.Delete();
     }
 
@@ -115,6 +115,7 @@ public partial class ProcessingView : UserControl
     {
         if (Acad.Confirm($"Сформировать программу со строки {SelectedCommand.Number}?"))
         {
+            Acad.ClearHighlighted();
             _program.Commands.Take(processCommandBindingSource.Position).SelectMany(p => new[] { p.ObjectId, p.ObjectId2 }).Delete();
             var command = (Command)processCommandBindingSource[processCommandBindingSource.Position - 1];
             _program = _program.Processing.ExecutePartial(processCommandBindingSource.Position, _program.GetOperation(command.OperationNumber), command.ToolPosition);
@@ -334,10 +335,7 @@ public partial class ProcessingView : UserControl
             return;
 
         if (SelectedCommand.ObjectId.HasValue)
-        {
-            Acad.Show(SelectedCommand.ObjectId.Value);
             Acad.SelectObjectIds(SelectedCommand.ObjectId.Value);
-        }
 
         ToolModel.Set(_program.GetTool(SelectedCommand.OperationNumber), SelectedCommand.ToolPosition);
 

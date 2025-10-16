@@ -1,4 +1,5 @@
-﻿using Autodesk.AutoCAD.DatabaseServices;
+﻿/*
+using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
 using Dreambuild.AutoCAD;
 using System;
@@ -44,6 +45,20 @@ namespace CAM.TechProcesses.Tactile
         {
             PointObjectIds = PointsX.SelectMany((p, i) => Acad.CreateMeasurementPoint(new Point3d(PointsX[i], PointsY[i], 0))).ToArray();
         }
+
+        public ObjectId[] CreateMeasurementPoint(Point3d point) => App.LockAndExecute(() =>
+        {
+            int radius = 10;
+            var curves = new Curve[]
+            {
+                NoDraw.Line(new Point3d(point.X - radius, point.Y, 0), new Point3d(point.X + radius, point.Y, 0)),
+                NoDraw.Line(new Point3d(point.X, point.Y - radius, 0), new Point3d(point.X, point.Y + radius, 0)),
+                NoDraw.Circle(point, radius)
+            };
+            var layerId = GetExtraObjectsLayerId();
+            curves.Select(p => { p.LayerId = layerId; return p; }).AddToCurrentSpace();
+            return Array.ConvertAll(curves, p => p.ObjectId);
+        });
 
         public static void ConfigureParamsView(ParamsView view)
         {
@@ -163,3 +178,4 @@ namespace CAM.TechProcesses.Tactile
         }
     }
 }
+*/

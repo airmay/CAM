@@ -1,4 +1,5 @@
-﻿using CAM.TechProcesses.Tactile;
+﻿/*
+using CAM.TechProcesses.Tactile;
 using System;
 using System.Collections.Generic;
 
@@ -67,3 +68,4 @@ namespace CAM.TechProcesses.Stolb
         }
     }
 }
+*/

@@ -1,4 +1,5 @@
-﻿using Autodesk.AutoCAD.DatabaseServices;
+﻿/*
+using Autodesk.AutoCAD.DatabaseServices;
 using Dreambuild.AutoCAD;
 using System;
 using System.Collections.Generic;
@@ -230,3 +231,4 @@ namespace CAM.TechProcesses.Disk3D
         }
     }
 }
+*/

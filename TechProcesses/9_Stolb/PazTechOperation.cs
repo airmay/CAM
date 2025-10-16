@@ -1,4 +1,5 @@
-﻿using Autodesk.AutoCAD.DatabaseServices;
+﻿/*
+using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
 using CAM.TechProcesses.Tactile;
 using Dreambuild.AutoCAD;
@@ -62,3 +63,4 @@ namespace CAM.TechProcesses.Stolb
         }
     }
 }
+*/

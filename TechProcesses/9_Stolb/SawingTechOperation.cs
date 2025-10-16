@@ -1,4 +1,5 @@
-﻿using Autodesk.AutoCAD.DatabaseServices;
+﻿/*
+using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
 using Dreambuild.AutoCAD;
 using System;
@@ -88,4 +89,5 @@ namespace CAM.TechProcesses.Stolb
         }
     }
 }
+*/
     

@@ -32,8 +32,8 @@ public static class ToolModel
         if (_curves == null || Acad.ActiveDocument == null)
             return;
 
-        using (Acad.ActiveDocument.LockDocument())
-        using (Acad.Database.TransactionManager.StartTransaction())
+        using (Acad.LockDocument())
+        using (Acad.StartTransaction())
             foreach (var item in _curves)
             {
                 TransientManager.CurrentTransientManager.EraseTransient(item, []);

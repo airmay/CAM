@@ -1,8 +1,10 @@
 ﻿using Autodesk.AutoCAD.DatabaseServices;
+using Autodesk.AutoCAD.Windows;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using static Autodesk.AutoCAD.Windows.SaveFileDialog;
 
 namespace CAM.Core;
 
@@ -37,10 +39,11 @@ public class Program(
             _ => "txt"
         };
 
-        var fileName = Acad.SaveFileDialog("program", extension, "Экспорт программы в файл");
-        if (fileName == null)
+        var dialog = new SaveFileDialog("Запись файла с программой", "program", extension, "Экспорт программы в файл", SaveFileDialogFlags.AllowAnyExtension);
+        if (dialog.ShowDialog() != System.Windows.Forms.DialogResult.OK)
             return;
 
+        var fileName = dialog.Filename;
         var contents = Commands.Select(p => $"N{p.Number} {p.Text}").ToArray();
         try
         {

@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography;
+using Autodesk.AutoCAD.Colors;
 
 namespace CAM
 {
@@ -170,6 +171,15 @@ namespace CAM
             return result;
         }
 
+        public static string GetSize(this AcadObject processingArea)
+        {
+            if (processingArea == null)
+                return "";
+            var bounds = processingArea.ObjectIds.GetExtents();
+            var vector = bounds.MaxPoint - bounds.MinPoint;
+            return $"{vector.X.Round()} x {vector.Y.Round()} x {vector.Z.Round()}";
+        }
+
         public static IEnumerable<Point3d> GetPoints(this Curve cv, int divs)
         {
             if (cv is Spline spline)
@@ -274,6 +284,7 @@ namespace CAM
                 hatch.PatternScale = 4;
                 hatch.SetHatchPattern(HatchPatternType.PreDefined, "ANSI31");
                 //hatch.PatternAngle = angle; // PatternAngle has to be after SetHatchPattern(). This is AutoCAD .NET SDK violating Framework Design Guidelines, which requires properties to be set in arbitrary order.
+                hatch.Transparency = new Transparency(255 * (100 - 70) / 100);
                 hatch.HatchStyle = HatchStyle.Outer;
                 hatch.AppendLoop(HatchLoopTypes.External, new ObjectIdCollection(new[] { polyline.ObjectId }));
                 if (offsetPolyline != null)

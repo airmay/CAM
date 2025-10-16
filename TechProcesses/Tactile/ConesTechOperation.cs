@@ -1,4 +1,4 @@
-﻿using Autodesk.AutoCAD.DatabaseServices;
+﻿/*using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
 using Dreambuild.AutoCAD;
 using System;
@@ -142,4 +142,4 @@ namespace CAM.TechProcesses.Tactile
             generator.WithThick = TechProcess.TechOperations.OfType<MeasurementTechOperation>().Any(p => p.Enabled);
         }
     }
-}
+}*/
