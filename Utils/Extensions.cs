@@ -6,13 +6,17 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
-using System.Text;
 using System.Windows.Forms;
-using static CAM.DataLoader;
 
 namespace CAM
 {
+    public sealed class MyBinder : SerializationBinder
+    {
+        public override Type BindToType(string assemblyName, string typeName) => Type.GetType(string.Format("{0}, {1}", typeName, assemblyName));
+    }
+
     public static class Extensions
     {
         public static string GetDescription(this Enum value)

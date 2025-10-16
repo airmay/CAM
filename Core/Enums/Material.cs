@@ -1,13 +1,12 @@
 ﻿using System.ComponentModel;
 
-namespace CAM
-{
-    public enum Material
-	{
-        [Description("Гранит")]
-		Granite, 
+namespace CAM;
 
-        [Description("Мрамор")]
-        Marble
-    }
+public enum Material
+{
+    [Description("Гранит")]
+    Granite, 
+
+    [Description("Мрамор")]
+    Marble
 }

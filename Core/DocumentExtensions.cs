@@ -2,7 +2,6 @@
 using Autodesk.AutoCAD.DatabaseServices;
 using System;
 using System.IO;
-using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
 
 namespace CAM;
@@ -10,12 +9,6 @@ namespace CAM;
 [Serializable]
 public static class DocumentExtensions
 {
-    // https://adn-cis.org/serilizacziya-klassa-.net-v-bazu-chertezha-autocad.html или  https://www.rsdn.org/forum/dotnet/2900485.all
-    private sealed class MyBinder : SerializationBinder
-    {
-        public override Type BindToType(string assemblyName, string typeName) => Type.GetType(string.Format("{0}, {1}", typeName, assemblyName));
-    }
-
     private const string DataKey = "CAM";
     private const string HashKey = "Hash";
 
@@ -25,6 +18,7 @@ public static class DocumentExtensions
 
     public static void SetUserData(this Document document, object data) => document.UserData[DataKey] = data;
 
+    // https://adn-cis.org/serilizacziya-klassa-.net-v-bazu-chertezha-autocad.html или  https://www.rsdn.org/forum/dotnet/2900485.all
     public static void LoadFromXrecord(this Document document)
     {
         object data = null;

@@ -22,7 +22,7 @@ public partial class ProcessingView : UserControl
         InitializeComponent();
 
         imageList.Images.AddRange([Properties.Resources.folder, Properties.Resources.drive_download]);
-        bCreateTechOperation.DropDownItems.AddRange(OperationItems.GetMenuItems(bCreateTechOperation_Click));
+        bCreateTechOperation.DropDownItems.AddRange(OperationMenuItems.GetMenuItems(bCreateTechOperation_Click));
 #if DEBUG
         bClose.Visible = true;
 #endif

@@ -1,19 +1,10 @@
-﻿namespace CAM
+﻿namespace CAM;
+
+public enum Machine
 {
-    public enum Machine
-	{
-		ScemaLogic,
-
-        Donatoni,
-
-        Krea,
-
-        CableSawing,
-
-        Forma,
-
-        Champion,
-
-        WireSawMachine
-    }
+    Donatoni,
+    Krea,
+    Forma,
+    Champion,
+    WireSawMachine
 }

@@ -3,13 +3,13 @@ using System.Windows.Forms;
 
 namespace CAM;
 
-public abstract class OperationItemBase(string caption)
+public abstract class OperationMenuItemBase(string caption)
 {
     protected readonly string Caption = caption;
     public abstract ToolStripItem GetMenuItem(Action<string, Type> onClick);
 } 
 
-public class OperationItem(string caption, Type type) : OperationItemBase(caption)
+public class OperationMenuMenuItem(string caption, Type type) : OperationMenuItemBase(caption)
 {
     public override ToolStripItem GetMenuItem(Action<string, Type> onClick)
     {
@@ -17,7 +17,7 @@ public class OperationItem(string caption, Type type) : OperationItemBase(captio
     }
 }
 
-public class OperationGroupItem(string caption, OperationItem[] items) : OperationItemBase(caption)
+public class OperationMenuGroupMenuItem(string caption, OperationMenuMenuItem[] items) : OperationMenuItemBase(caption)
 {
     public override ToolStripItem GetMenuItem(Action<string, Type> onClick)
     {

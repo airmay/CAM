@@ -5,12 +5,10 @@ using Dreambuild.AutoCAD;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Security.Cryptography;
 using Autodesk.AutoCAD.Colors;
 
 namespace CAM
 {
-    //
     public class Point3dComparer : IEqualityComparer<Point3d>
     {
         public bool Equals(Point3d point1, Point3d point2) => point1.IsEqualTo(point2);
@@ -70,7 +68,6 @@ namespace CAM
 
         public static Vector2d GetTangent(this Curve curve, double param) => curve.GetFirstDerivative(param).ToVector2d();
 
-        public static Vector2d GetTangent(this Curve curve, Corner corner) => curve.GetTangent(corner == Corner.Start ? curve.StartParam : curve.EndParam);
 
         public static IEnumerable<Point3d> GetStartEndPoints(this Curve curve)
         {
@@ -79,7 +76,6 @@ namespace CAM
         }
 
         public static Point3d GetPoint(this Curve curve, bool isStart) => isStart ? curve.StartPoint : curve.EndPoint;
-        public static Point3d GetPoint(this Curve curve, Corner corner) => corner == Corner.Start ? curve.StartPoint : curve.EndPoint;
 
         /// <summary>
         /// Получить точку с указанной координатой Z, расположенную на прямой заданной вектором
@@ -97,23 +93,12 @@ namespace CAM
             return new Point3d(x, y, z);
         }
 
-        public static Corner GetCorner(this Curve curve, Point3d point) =>
-            point == curve.StartPoint ? Corner.Start : (point == curve.EndPoint ? Corner.End : throw new ArgumentException($"Ошибка GetCorner: Точка {point} не принадлежит кривой {curve}"));
-
         public static bool HasPoint(this Curve curve, Point3d point) => point.IsEqualTo(curve.StartPoint) || point.IsEqualTo(curve.EndPoint);
         public static bool IsStartPoint(this Curve curve, Point3d point) => point.IsEqualTo(curve.StartPoint);
         public static int GetDirection(this Curve curve, Point3d point) => point.IsEqualTo(curve.StartPoint).GetSign();
 
         public static Point3d NextPoint(this Curve curve, Point3d point) =>
             point == curve.StartPoint ? curve.EndPoint : (point == curve.EndPoint ? curve.StartPoint : throw new ArgumentException($"Ошибка NextPoint: Точка {point} не принадлежит кривой {curve}"));
-
-        public static void SetPoint(this Curve curve, Corner corner, Point3d point)
-        {
-            if (corner == Corner.Start)
-                curve.StartPoint = point;
-            else
-                curve.EndPoint = point;
-        }
 
         public static Vector2d GetVector2d(this Line line) => new Vector2d(line.Delta.X, line.Delta.Y);
 

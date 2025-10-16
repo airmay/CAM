@@ -17,10 +17,8 @@ public class ProcessorCnc : ProcessorBase<ProcessingCnc, ProcessorCnc>
         {
             Machine.Donatoni => new DonatoniPostProcessor(),
             Machine.Krea => new DonatoniPostProcessor(),
-            Machine.CableSawing => new DonatoniPostProcessor(),
             Machine.Forma => new DonatoniPostProcessor(),
             Machine.Champion => new DonatoniPostProcessor(),
-            Machine.ScemaLogic => new DonatoniPostProcessor(),
             _ => throw new ArgumentOutOfRangeException()
         };
     }
