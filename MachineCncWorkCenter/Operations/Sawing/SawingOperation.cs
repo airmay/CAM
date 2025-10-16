@@ -59,7 +59,7 @@ namespace CAM.Operations.Sawing
                     ProcessCurve(curve, (Side)curveSide, points[curve.StartPoint], points[curve.EndPoint]);
             }
 
-            Graph.CreateHatch(curveSides.Keys.ToList().ToPolyline(), outerSide);
+            PolylineExtensions.CreateHatch(curveSides.Keys.ToList().ToPolyline(), outerSide);
         }
 
         private (Dictionary<Curve, int>, Dictionary<Point3d, bool>, int) CalcСurveProcessingInfo(Curve[] curves)
@@ -68,7 +68,7 @@ namespace CAM.Operations.Sawing
             var points = new Dictionary<Point3d, bool>(Graph.Point3dComparer);
 
             var pointCurveDict = curves
-                .SelectMany(p => p.GetStartEndPoints(), (cv, pt) => (cv, pt))
+                .SelectMany(p => p.Points(), (cv, pt) => (cv, pt))
                 .ToLookup(p => p.pt, p => p.cv, Graph.Point3dComparer);
             var corner = pointCurveDict.FirstOrDefault(p => p.Count() == 1);
             var (curve, point) = corner != null

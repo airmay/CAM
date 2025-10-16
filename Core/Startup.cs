@@ -1,15 +1,16 @@
 ﻿// test /b "C:\Catalina\CAM\bin\Debug\netload.scr"
 
-using System;
-using System.Drawing;
-using System.IO;
-using System.Reflection;
 using Autodesk.AutoCAD.ApplicationServices;
 using Autodesk.AutoCAD.Geometry;
 using Autodesk.AutoCAD.Runtime;
 using Autodesk.AutoCAD.Windows;
 using CAM.Core;
 using Dreambuild.AutoCAD;
+using System;
+using System.Drawing;
+using System.IO;
+using System.Linq;
+using System.Reflection;
 
 namespace CAM;
 
@@ -21,7 +22,7 @@ public class Startup : IExtensionApplication
     {
         Tolerance.Global = new Tolerance( Consts.Epsilon, Consts.Epsilon);
 
-        // Assembly.GetExecutingAssembly().GetProductVersion()
+        // GetProductVersion(Assembly.GetExecutingAssembly())
         Acad.Write($"Инициализация плагина. Версия сборки от {File.GetLastWriteTime(Assembly.GetExecutingAssembly().Location)}");
 
         var paletteSet = new PaletteSet("Технология")
@@ -64,7 +65,7 @@ public class Startup : IExtensionApplication
         ProgramBuilder.Commands = camData?.Commands;
         _camView.SetCamData(camData);
 #if DEBUG
-        ProgramBuilder.DwgFileCommands ??= camData?.Commands?.Clone();
+        ProgramBuilder.DwgFileCommands ??= camData?.Commands?.ToList();
 #endif
     }
 
@@ -84,4 +85,17 @@ public class Startup : IExtensionApplication
     }
 
     public void Terminate() { }
+
+    //public string GetProductVersion(Assembly assembly)
+    //{
+    //    var result = FileVersionInfo.GetVersionInfo(assembly.Location).ProductVersion;
+
+    //    var plusIndex = result.IndexOf('+');
+    //    if (plusIndex >= 0)
+    //    {
+    //        result = result.Substring(0, plusIndex);
+    //    }
+
+    //    return result;
+    //}
 }
