@@ -152,19 +152,4 @@ public static class Acad
     }
 
     #endregion
-
-    #region Progressor
-
-    private static Progressor _progressor;
-
-    public static void CreateProgressor(string caption) => _progressor = new Progressor(caption);
-
-    public static void SetLimitProgressor(int max) => _progressor.SetLimit(max);
-
-    public static bool ReportProgressor(bool throwException = true) => _progressor.Report(throwException);
-
-    public static void CloseProgressor() => _progressor.Stop();
-
-    #endregion
-
 }

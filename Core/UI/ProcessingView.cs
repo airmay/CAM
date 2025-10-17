@@ -96,9 +96,9 @@ public partial class ProcessingView : UserControl
         var techProcessNode = SelectedTechProcessNode;
         var techProcess = GetTechProcess(techProcessNode);
 
-        Acad.CreateProgressor("Расчет обработки");
+        Progressor.Start("Расчет обработки");
         _program = techProcess.Execute();
-        Acad.CloseProgressor();
+        Progressor.Stop();
 
         if (_program != null)
         {
@@ -314,16 +314,16 @@ public partial class ProcessingView : UserControl
     private void bPlay_Click(object sender, EventArgs e)
     {
         toolStrip.Enabled = false;
-        Acad.CreateProgressor("Проигрывание обработки");
-        Acad.SetLimitProgressor(processCommandBindingSource.Count - processCommandBindingSource.Position);
-        while (processCommandBindingSource.Position < processCommandBindingSource.Count - 1 && Acad.ReportProgressor(false))
+        Progressor.Start("Проигрывание обработки");
+        Progressor.SetLimit(processCommandBindingSource.Count - processCommandBindingSource.Position);
+        while (processCommandBindingSource.Position < processCommandBindingSource.Count - 1 && Progressor.Report(false))
         {
             processCommandBindingSource.MoveNext();
             System.Threading.Thread.Sleep(100);
             // System.Threading.Thread.Sleep((int)((Command)processCommandBindingSource.Current).Duration * 10);
         }
 
-        Acad.CloseProgressor();
+        Progressor.Stop();
         toolStrip.Enabled = true;
     }
 
