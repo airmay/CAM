@@ -13,7 +13,7 @@ namespace CAM.Core
         public double X { get; set; }
         public double Y { get; set; }
         public Point2d Point => new(X, Y);
-        public string Description => $"{{{X.Round()}, {Y.Round()}}}";
+        public string Description => ToString();
         public override string ToString() => $"{{{X.Round()}, {Y.Round()}}}";
 
         public void CreateOriginModel()
@@ -26,7 +26,7 @@ namespace CAM.Core
             X = point.X;
             Y = point.Y;
 
-            Acad.Delete(OriginModel?.ObjectIds);
+            OriginModel?.ObjectIds.Delete();
             point = new Point3d(X, Y, 0);
             const int length = 100;
             const int s = length / 10;

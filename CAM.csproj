@@ -114,35 +114,35 @@
     <Compile Include="Autocad\Curve2dExtensions.cs" />
     <Compile Include="Autocad\PolylineExtensions.cs" />
     <Compile Include="Utils\Helpers.cs" />
-    <Compile Include="Core\ProgramBuilder.cs" />
-    <Compile Include="Core\UI\CamData.cs" />
-    <Compile Include="Core\UI\ParamsControl.cs">
+    <Compile Include="Core\Processing\ProgramBuilder.cs" />
+    <Compile Include="Core\CamData.cs" />
+    <Compile Include="UI\ParamsControl.cs">
       <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="Core\ParamsValidator.cs" />
     <Compile Include="MachineCncWorkCenter\PostProcessorCnc.cs" />
-    <Compile Include="MachineCncWorkCenter\ProcessorBase.cs" />
+    <Compile Include="Core\Processing\ProcessorBase.cs" />
     <Compile Include="MachineCncWorkCenter\OperationCnc.cs" />
     <Compile Include="MachineCncWorkCenter\ProcessingCnc.cs" />
     <Compile Include="MachineCncWorkCenter\ProcessorCnc.cs" />
     <Compile Include="Core\Origin.cs" />
-    <Compile Include="Core\Program.cs" />
+    <Compile Include="Core\Processing\Program.cs" />
     <Compile Include="Core\OperationFactory.cs" />
-    <Compile Include="Core\DocumentExtensions.cs" />
-    <Compile Include="Core\ToolPosition.cs" />
-    <Compile Include="Core\ProcessingObjectBuilder.cs" />
+    <Compile Include="Autocad\DocumentExtensions.cs" />
+    <Compile Include="Core\Tools\ToolPosition.cs" />
+    <Compile Include="Core\Processing\ProcessingObjectBuilder.cs" />
     <Compile Include="Core\Tools\ToolModel.cs" />
     <Compile Include="Core\ProcessingBase.cs" />
     <Compile Include="Core\OperationBase.cs" />
-    <Compile Include="Core\UI\OperationMenuItems.cs" />
-    <Compile Include="Core\UI\ProcessingView.cs">
+    <Compile Include="UI\OperationMenuItems.cs" />
+    <Compile Include="UI\ProcessingView.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Core\UI\ProcessingView.Designer.cs">
+    <Compile Include="UI\ProcessingView.Designer.cs">
       <DependentUpon>ProcessingView.cs</DependentUpon>
     </Compile>
-    <Compile Include="Core\UI\Progressor.cs" />
-    <Compile Include="MachineWireSaw\PostProcessorWireSaw.cs" />
+    <Compile Include="Autocad\Progressor.cs" />
+    <Compile Include="MachineWireSaw\PostProcessors\PostProcessorWireSaw.cs" />
     <Compile Include="MachineWireSaw\Operations\WireSawOperation.cs" />
     <Compile Include="MachineWireSaw\OperationWireSawBase.cs" />
     <Compile Include="MachineWireSaw\PostProcessorWireSawBase.cs" />
@@ -159,11 +159,11 @@
     <Compile Include="MachineCncWorkCenter\Operations\Tactile\TactileBandsOperation.cs" />
     <Compile Include="MachineCncWorkCenter\Operations\Tactile\TactileChamfersOperation.cs" />
     <Compile Include="TechProcesses\SectionProfile\BuilderUtils.cs" />
-    <Compile Include="Program\CommandGenerator\ChampionCommandGenerator.cs" />
-    <Compile Include="Program\CommandGenerator\FormaiCommandGenerator.cs" />
-    <Compile Include="Program\CommandGenerator\KreaCommandGenerator.cs" />
-    <Compile Include="Program\Generator\DonatoniPostProcessor.cs" />
-    <Compile Include="Core\Startup.cs" />
+    <Compile Include="MachineCncWorkCenter\PostProcessors\ChampionCommandGenerator.cs" />
+    <Compile Include="MachineCncWorkCenter\PostProcessors\FormaiCommandGenerator.cs" />
+    <Compile Include="MachineCncWorkCenter\PostProcessors\KreaCommandGenerator.cs" />
+    <Compile Include="MachineCncWorkCenter\PostProcessors\DonatoniPostProcessor.cs" />
+    <Compile Include="Startup.cs" />
     <Compile Include="UtilViews\TrimmingView.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -179,8 +179,8 @@
     <Compile Include="Autocad\AcadObject.cs" />
     <Compile Include="Core\Enums\Machine.cs" />
     <Compile Include="Core\Enums\Material.cs" />
-    <Compile Include="Program\Generator\PostProcessorBase.cs" />
-    <Compile Include="Program\Command.cs" />
+    <Compile Include="Core\Processing\PostProcessorBase.cs" />
+    <Compile Include="Core\Processing\Command.cs" />
     <Compile Include="TechProcesses\9_Stolb\SawingTechOperation.cs" />
     <Compile Include="TechProcesses\Disk3D\CombTechOperation.cs" />
     <Compile Include="TechProcesses\Disk3D\CrossCleaningTechOperation.cs" />
@@ -210,7 +210,7 @@
     </Compile>
     <Compile Include="TechProcesses\Tactile\TactileTechProcess.cs" />
     <Compile Include="TechProcesses\Tactile\TactileTechProcessParams.cs" />
-    <Compile Include="Program\CommandNames.cs" />
+    <Compile Include="Core\Processing\CommandNames.cs" />
     <Compile Include="Core\Tools\Tool.cs" />
     <Compile Include="Core\Tools\ToolService.cs" />
     <Compile Include="Core\Tools\ToolsForm.cs">
@@ -221,7 +221,7 @@
     </Compile>
     <Compile Include="Core\Tools\ToolType.cs" />
     <Compile Include="Autocad\Graph.cs" />
-    <Compile Include="Utils\EngineSideHelpers.cs" />
+    <Compile Include="MachineCncWorkCenter\EngineSideHelpers.cs" />
     <Compile Include="Utils\Extensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
@@ -240,7 +240,7 @@
     <Compile Include="Utils\PassIterator.cs" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Core\UI\ProcessingView.resx">
+    <EmbeddedResource Include="UI\ProcessingView.resx">
       <DependentUpon>ProcessingView.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
