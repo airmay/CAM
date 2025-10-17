@@ -8,7 +8,7 @@ public sealed class MyBinder : SerializationBinder
     public override Type BindToType(string assemblyName, string typeName) => Type.GetType(string.Format("{0}, {1}", typeName, assemblyName));
 }
 
-public static class Util
+public static class Helpers
 {
     public static (double, int) FindExtremum(double[] x, double[] y, double x1, double x2, Func<double, double, double> extremumFunc, int startIndex = 0)
     {

@@ -113,7 +113,7 @@
     <Compile Include="Autocad\AutoCADCommands\SymbolPack.cs" />
     <Compile Include="Autocad\Curve2dExtensions.cs" />
     <Compile Include="Autocad\PolylineExtensions.cs" />
-    <Compile Include="Utils\Util.cs" />
+    <Compile Include="Utils\Helpers.cs" />
     <Compile Include="Core\ProgramBuilder.cs" />
     <Compile Include="Core\UI\CamData.cs" />
     <Compile Include="Core\UI\ParamsControl.cs">
