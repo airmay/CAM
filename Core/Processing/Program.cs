@@ -10,18 +10,18 @@ namespace CAM.Core;
 
 public class Program(
     List<Command> commands,
-    IProcessing processing,
+    ITechProcess techProcess,
     Dictionary<short, IOperation> operations,
     Dictionary<short, int> operationNumbers,
     Dictionary<ObjectId, int> objectIds,
     Dictionary<short, ObjectId> operationToolpath)
 {
     public List<Command> Commands { get; } = commands;
-    public IProcessing Processing { get; } = processing;
+    public ITechProcess TechProcess { get; } = techProcess;
 
     public IOperation GetOperation(short operationNumber) => operations[operationNumber];
 
-    public CAM.Tool GetTool(short operationNumber) => operations[operationNumber].GetTool() ?? Processing.Tool;
+    public CAM.Tool GetTool(short operationNumber) => operations[operationNumber].GetTool() ?? TechProcess.Tool;
 
     public bool TryGetCommandIndexByObjectId(ObjectId objectId, out int index) => objectIds.TryGetValue(objectId, out index);
 
@@ -33,7 +33,7 @@ public class Program(
 
     public void Export()
     {
-        var extension = Processing.Machine switch
+        var extension = TechProcess.Machine switch
         {
             Machine.Donatoni => "pgm",
             _ => "txt"

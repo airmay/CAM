@@ -25,7 +25,7 @@ namespace CAM
         //public bool IsExtraMove { get; set; }
         //public bool IsExtraRotate { get; set; }
 
-        public double Offset => Processing.Offset * IsReverseOffset.GetSign(-1);
+        public double Offset => TechProcess.Offset * IsReverseOffset.GetSign(-1);
 
         public static void ConfigureParamsView(ParamsControl view)
         {
@@ -170,7 +170,7 @@ namespace CAM
                 angle += Math.PI;
 
             var extents = new Extents3d();
-            var matrix = Matrix3d.Rotation(-angle, Vector3d.ZAxis, Processing.Origin.Point.ToPoint3d());
+            var matrix = Matrix3d.Rotation(-angle, Vector3d.ZAxis, TechProcess.Origin.Point.ToPoint3d());
             ProcessingArea.ObjectIds.ForEach<Entity>(p => extents.AddExtents(p.GetTransformedCopy(matrix).GeometricExtents));
             matrix = matrix.Inverse();
             var startPoint = extents.MaxPoint.TransformBy(matrix) + Offset * Vector3d.ZAxis;
@@ -178,10 +178,10 @@ namespace CAM
             var direction = -Vector3d.XAxis.RotateBy(angle, Vector3d.ZAxis);
             var toolDirection = direction.GetPerpendicularVector();
 
-            Processor.Move(startPoint - Processing.Approach * direction, toolDirection, IsReverseAngle, IsReverseU);
+            Processor.Move(startPoint - TechProcess.Approach * direction, toolDirection, IsReverseAngle, IsReverseU);
             Processor.Cutting(startPoint, toolDirection);
             Processor.Cutting(endPoint, toolDirection);
-            Processor.Cutting(endPoint + Processing.Departure * direction, toolDirection);
+            Processor.Cutting(endPoint + TechProcess.Departure * direction, toolDirection);
         }
 
         private void PlaneCutting(Extents3d extents, Vector3d normal, Point3d point)
@@ -202,14 +202,14 @@ namespace CAM
             endPoint = point.GetPoint(direction, endPoint.Z);
 
             var toolDirection = direction.GetPerpendicularVector();
-            var approachPoint = startPoint - Processing.Approach * direction;
+            var approachPoint = startPoint - TechProcess.Approach * direction;
             if (approachPoint.Z > Processor.UpperZ)
                 approachPoint = point.GetPoint(direction, Processor.UpperZ);
 
             Processor.Move(approachPoint, toolDirection, IsReverseAngle, IsReverseU);
             Processor.Cutting(startPoint, toolDirection);
             Processor.Cutting(endPoint, toolDirection);
-            Processor.Cutting(endPoint + Processing.Departure * direction, toolDirection);
+            Processor.Cutting(endPoint + TechProcess.Departure * direction, toolDirection);
         }
 
         private void SurfaceCutting(List<Curve> railCurves)
@@ -224,7 +224,7 @@ namespace CAM
 
             var approachPoints = points.ConvertAll(p =>
             {
-                var pt = p[0] - Processing.Approach * directions[0];
+                var pt = p[0] - TechProcess.Approach * directions[0];
                 return pt.Z > Processor.UpperZ
                     ? p[0].GetPoint(directions[0], Processor.UpperZ)
                     : pt;
@@ -234,7 +234,7 @@ namespace CAM
                 Processor.Cutting(points[0][i], points[1][i]);
 
             var last = points[0].Count - 1;
-            var departure = Processing.Departure * directions[last];
+            var departure = TechProcess.Departure * directions[last];
             Processor.Cutting(points[0][last] + departure, points[1][last] + departure);
         }
     }

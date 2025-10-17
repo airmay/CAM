@@ -36,7 +36,7 @@ public partial class ProcessingView : UserControl
             control.Hide();
         processCommandBindingSource.DataSource = null;
         _program = null;
-        //Acad.ClearHighlighted();
+        Acad.ClearHighlighted();
         ToolModel.Delete();
     }
 
@@ -74,7 +74,7 @@ public partial class ProcessingView : UserControl
         {
             TechProcesses = techProcesses,
             Commands = ProgramBuilder.Commands,
-            Index = _program != null ? Array.IndexOf(techProcesses, _program.Processing) : null
+            Index = _program != null ? Array.IndexOf(techProcesses, _program.TechProcess) : null
         };
     }
     #endregion
@@ -90,7 +90,7 @@ public partial class ProcessingView : UserControl
         processCommandBindingSource.DataSource = null;
         Acad.DocumentManager.DocumentActivationEnabled = false;
         Acad.DeleteProcessObjects();
-        Acad.ClearHighlighted();
+        Acad.UnhighlightObjects();
         ToolModel.Delete();
 
         var techProcessNode = SelectedTechProcessNode;
@@ -115,10 +115,10 @@ public partial class ProcessingView : UserControl
     {
         if (Acad.Confirm($"Сформировать программу со строки {SelectedCommand.Number}?"))
         {
-            Acad.ClearHighlighted();
+            Acad.UnhighlightObjects();
             _program.Commands.Take(processCommandBindingSource.Position).SelectMany(p => new[] { p.ObjectId, p.ObjectId2 }).Delete();
             var command = (Command)processCommandBindingSource[processCommandBindingSource.Position - 1];
-            _program = _program.Processing.ExecutePartial(processCommandBindingSource.Position, _program.GetOperation(command.OperationNumber), command.ToolPosition);
+            _program = _program.TechProcess.ExecutePartial(processCommandBindingSource.Position, _program.GetOperation(command.OperationNumber), command.ToolPosition);
             processCommandBindingSource.ResetBindings(false);
             processCommandBindingSource.Position = 0;
             UpdateTechProcessNodesText(GetProgramProcessingNode());
@@ -127,7 +127,7 @@ public partial class ProcessingView : UserControl
 
     private static void UpdateTechProcessNodesText(TreeNode techProcessNode)
     {
-        techProcessNode.Text = techProcessNode.Tag.As<IProcessing>().Caption;
+        techProcessNode.Text = techProcessNode.Tag.As<ITechProcess>().Caption;
         techProcessNode.Nodes.Cast<TreeNode>().ForAll(p => p.Text = p.Tag.As<IOperation>().Caption);
     }
 
@@ -135,11 +135,11 @@ public partial class ProcessingView : UserControl
 
     #region TechProcess
 
-    private TreeNode GetProgramProcessingNode() => treeView.Nodes.Cast<TreeNode>().FirstOrDefault(p => p.Tag == _program?.Processing);
+    private TreeNode GetProgramProcessingNode() => treeView.Nodes.Cast<TreeNode>().FirstOrDefault(p => p.Tag == _program?.TechProcess);
 
-    private static IProcessing GetTechProcess(TreeNode node)
+    private static ITechProcess GetTechProcess(TreeNode node)
     {
-        var techProcess = (IProcessing)node.Tag;
+        var techProcess = (ITechProcess)node.Tag;
         techProcess.Caption = node.Text;
         techProcess.Operations = node.Nodes.Cast<TreeNode>()
             .Select(p =>
@@ -156,26 +156,26 @@ public partial class ProcessingView : UserControl
 
     private void bCreateProcessing_Click(object sender, EventArgs e)
     {
-        treeView.SelectedNode = AddTechProcessNode(typeof(ProcessingCnc));
+        treeView.SelectedNode = AddTechProcessNode(typeof(TechProcessCnc));
         RefreshToolButtonsState();
     }
 
     private TreeNode AddTechProcessNode(Type techProcessType)
     {
-        var processing = (IProcessing)Activator.CreateInstance(techProcessType);
+        var processing = (ITechProcess)Activator.CreateInstance(techProcessType);
         var node = CreateTechProcessNode(processing);
         treeView.Nodes.Add(node);
         return node;
     }
 
-    private TreeNode CreateTechProcessNode(IProcessing processing)
+    private TreeNode CreateTechProcessNode(ITechProcess techProcess)
     {
-        var children = processing.Operations?.ConvertAll(CreateOperationNode) ?? [];
-        return new TreeNode(processing.Caption, 0, 0, children)
+        var children = techProcess.Operations?.ConvertAll(CreateOperationNode) ?? [];
+        return new TreeNode(techProcess.Caption, 0, 0, children)
         {
             Checked = true,
             NodeFont = new System.Drawing.Font(Font, FontStyle.Bold),
-            Tag = processing
+            Tag = techProcess
         };
     }
 
@@ -188,7 +188,7 @@ public partial class ProcessingView : UserControl
         var techProcessNode = SelectedTechProcessNode;
         if (techProcessNode == null || techProcessNode.Tag.GetType() != techProcessType)
             techProcessNode = AddTechProcessNode(techProcessType);
-        var operation = OperationFactory.CreateOperation(caption, operationType, techProcessNode.Tag.As<IProcessing>(), SelectedNode?.Tag);
+        var operation = OperationFactory.CreateOperation(caption, operationType, techProcessNode.Tag.As<ITechProcess>(), SelectedNode?.Tag);
 
         var node = CreateOperationNode(operation);
         techProcessNode.Nodes.Add(node);

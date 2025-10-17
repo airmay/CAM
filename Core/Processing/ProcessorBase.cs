@@ -7,11 +7,11 @@ using System.Linq;
 namespace CAM.CncWorkCenter;
 
 public abstract class ProcessorBase<TTechProcess, TProcessor>
-    where TTechProcess : ProcessingBase<TTechProcess, TProcessor>
+    where TTechProcess : TechProcessBase<TTechProcess, TProcessor>
     where TProcessor : ProcessorBase<TTechProcess, TProcessor>, new()
 {
     protected abstract PostProcessorBase PostProcessor { get; }
-    public TTechProcess Processing { get; set; }
+    public TTechProcess TechProcess { get; set; }
     public IOperation Operation { get; set; }
     protected Tool Tool;
     protected bool IsEngineStarted;
@@ -25,7 +25,7 @@ public abstract class ProcessorBase<TTechProcess, TProcessor>
     public virtual void Start()
     {
         CreatePostProcessor();
-        PostProcessor.Origin = Processing.Origin.Point;
+        PostProcessor.Origin = TechProcess.Origin.Point;
 
         ProgramBuilder.Init();
         ProcessingObjectBuilder.Start();
@@ -42,8 +42,8 @@ public abstract class ProcessorBase<TTechProcess, TProcessor>
         if (!IsEngineStarted)
         {
             if (zMax.HasValue)
-                UpperZ = zMax.Value + Processing.ZSafety;
-            ToolPoint = Processing.Origin.Point.WithZ(UpperZ + Processing.ZSafety * 5);
+                UpperZ = zMax.Value + TechProcess.ZSafety;
+            ToolPoint = TechProcess.Origin.Point.WithZ(UpperZ + TechProcess.ZSafety * 5);
             AddCommands(PostProcessor.StartMachine());
         }
     }
@@ -68,7 +68,7 @@ public abstract class ProcessorBase<TTechProcess, TProcessor>
         //        Acad.Write($"Изменена строка {ProgramBuilder.Commands[i].Number}");
         //}
 
-        return ProgramBuilder.CreateProgram(Processing);
+        return ProgramBuilder.CreateProgram(TechProcess);
     }
 
     public void Pause(double duration) => AddCommand(PostProcessor.Pause(duration));

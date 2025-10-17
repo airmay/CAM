@@ -275,7 +275,7 @@ public class ParamsControl : UserControl
 
         button.Click += (s, e) =>
         {
-            var techProcess = GetData<ProcessingCnc>();
+            var techProcess = GetData<TechProcessCnc>();
             if (!techProcess.Machine.CheckNotNull("Станок") || !techProcess.Material.CheckNotNull("Материал"))
                 return;
 

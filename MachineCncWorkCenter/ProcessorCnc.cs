@@ -7,14 +7,14 @@ using CAM.Utils;
 
 namespace CAM.CncWorkCenter;
 
-public class ProcessorCnc : ProcessorBase<ProcessingCnc, ProcessorCnc>
+public class ProcessorCnc : ProcessorBase<TechProcessCnc, ProcessorCnc>
 {
     private PostProcessorCnc _postProcessor;
     protected override PostProcessorBase PostProcessor => _postProcessor;
 
     protected override void CreatePostProcessor()
     {
-        _postProcessor = Processing.Machine switch
+        _postProcessor = TechProcess.Machine switch
         {
             Machine.Donatoni => new DonatoniPostProcessor(),
             Machine.Krea => new DonatoniPostProcessor(),
@@ -49,7 +49,7 @@ public class ProcessorCnc : ProcessorBase<ProcessingCnc, ProcessorCnc>
         Cutting(endPoint);
     }
 
-    public void Cutting(Point3d point) => GCommandTo(1, point, Processing.CuttingFeed);
+    public void Cutting(Point3d point) => GCommandTo(1, point, TechProcess.CuttingFeed);
 
     /// <summary>
     /// Быстрое перемещение по верху к точке над заданной
@@ -69,7 +69,7 @@ public class ProcessorCnc : ProcessorBase<ProcessingCnc, ProcessorCnc>
 
         if (!IsEngineStarted)
         {
-            AddCommands(_postProcessor.StartEngine(Processing.Frequency, true));
+            AddCommands(_postProcessor.StartEngine(TechProcess.Frequency, true));
             IsEngineStarted = true;
         }
     }
@@ -86,7 +86,7 @@ public class ProcessorCnc : ProcessorBase<ProcessingCnc, ProcessorCnc>
 
     public void Uplifting() => GCommandTo(0, ToolPoint.WithZ(UpperZ));
 
-    public void Penetration(Point3d point) => GCommandTo(1, point, Processing.PenetrationFeed);
+    public void Penetration(Point3d point) => GCommandTo(1, point, TechProcess.PenetrationFeed);
 
     public void GCommandTo(int gCode, Point3d point, int? feed = null)
     {

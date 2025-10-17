@@ -101,7 +101,9 @@ public static class Acad
 
     private static ObjectId[] _highlightedObjects = [];
 
-    public static void ClearHighlighted() => SelectObjectIds();
+    public static void ClearHighlighted() => _highlightedObjects = [];
+
+    public static void UnhighlightObjects() => SelectObjectIds();
 
     public static void SelectObjectIds(params ObjectId[] objectIds)
     {

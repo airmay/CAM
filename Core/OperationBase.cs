@@ -3,22 +3,13 @@ using CAM.CncWorkCenter;
 
 namespace CAM;
 
-public interface IOperation
-{
-    string Caption { get; set; }
-    bool Enabled { get; set; }
-    short Number { get; set; }
-    Tool GetTool();
-    AcadObject ProcessingArea { get; }
-}
-
 [Serializable]
 public abstract class OperationBase<TTechProcess, TProcessor> : IOperation
-    where TTechProcess : ProcessingBase<TTechProcess, TProcessor>
+    where TTechProcess : TechProcessBase<TTechProcess, TProcessor>
     where TProcessor : ProcessorBase<TTechProcess, TProcessor>, new()
 {
-    [NonSerialized] public TTechProcess Processing;
-    protected TProcessor Processor => Processing.Processor;
+    [NonSerialized] public TTechProcess TechProcess;
+    protected TProcessor Processor => TechProcess.Processor;
 
     public string Caption { get; set; }
     public bool Enabled { get; set; }
@@ -26,7 +17,7 @@ public abstract class OperationBase<TTechProcess, TProcessor> : IOperation
     public AcadObject ProcessingArea { get; set; }
 
     public Tool Tool { get; set; }
-    public Tool GetTool() => Tool ?? Processing?.Tool;
+    public Tool GetTool() => Tool ?? TechProcess?.Tool;
     public double ToolDiameter => GetTool().Diameter;
     public double ToolThickness => GetTool().Thickness.Value;
 

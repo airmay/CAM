@@ -7,14 +7,14 @@ using CAM.Core;
 
 namespace CAM.MachineWireSaw;
 
-public class ProcessorWireSaw : ProcessorBase<ProcessingWireSaw, ProcessorWireSaw>
+public class ProcessorWireSaw : ProcessorBase<TechProcessWireSaw, ProcessorWireSaw>
 {
     private PostProcessorWireSaw _postProcessor;
     protected override PostProcessorBase PostProcessor => _postProcessor;
 
     private Vector2d _uAxis;
     private double _u, _v;
-    private Point2d Center => Processing.Origin.Point;
+    private Point2d Center => TechProcess.Origin.Point;
 
     protected override void CreatePostProcessor()
     {
@@ -115,8 +115,8 @@ public class ProcessorWireSaw : ProcessorBase<ProcessingWireSaw, ProcessorWireSa
 
         var daRad = da.ToRad();
         var toolVector = Vector3d.XAxis.RotateBy(AngleC, Vector3d.ZAxis) * ToolModel.WireSawLength;
-        var duration = Math.Abs(da) / Processing.S * 60;
-        AddCommand($"G05 A{da} S{Processing.S}", angleC: newToolAngle, duration: duration, toolpath1: CreateToolpath(toolVector), toolpath2: CreateToolpath(-toolVector));
+        var duration = Math.Abs(da) / TechProcess.S * 60;
+        AddCommand($"G05 A{da} S{TechProcess.S}", angleC: newToolAngle, duration: duration, toolpath1: CreateToolpath(toolVector), toolpath2: CreateToolpath(-toolVector));
 
         _uAxis = _uAxis.RotateBy(daRad);
 
@@ -140,14 +140,14 @@ public class ProcessorWireSaw : ProcessorBase<ProcessingWireSaw, ProcessorWireSa
 
         var commandText = $"G0{gCode} U{du} V{dv}";
         if (gCode == 1)
-            commandText += $" F{Processing.CuttingFeed}";
+            commandText += $" F{TechProcess.CuttingFeed}";
 
         var toolVector = Vector3d.XAxis.RotateBy(AngleC, Vector3d.ZAxis) * ToolModel.WireSawLength;
         var newToolPoint = point.WithZ(v);
         var toolpath1 = CreateToolpath(toolVector);
         var toolpath2 = CreateToolpath(-toolVector);
 
-        var duration = Math.Sqrt(du * du + dv * dv) / (gCode == 0 ? 500 : Processing.CuttingFeed) * 60;
+        var duration = Math.Sqrt(du * du + dv * dv) / (gCode == 0 ? 500 : TechProcess.CuttingFeed) * 60;
         AddCommand(commandText, point: newToolPoint, duration: duration, toolpath1: toolpath1, toolpath2: toolpath2);
             
         return;

@@ -21,7 +21,7 @@ namespace CAM.Operations.Sawing
 
         public double Depth { get; set; }
         public double? Penetration { get; set; }
-        public List<SawingMode> SawingModes { get; set; } = new List<SawingMode>();
+        public List<SawingMode> SawingModes { get; set; } = [];
 
         public static void ConfigureParamsView(ParamsControl view)
         {
@@ -191,7 +191,7 @@ namespace CAM.Operations.Sawing
         {
             var modes = isArc && SawingModes.Any()
                 ? SawingModes.OrderByDescending(p => p.Depth.HasValue).ThenBy(p => p.Depth).ToList()
-                : [new SawingMode(Penetration.Value, Processing.CuttingFeed)];
+                : [new SawingMode(Penetration.Value, TechProcess.CuttingFeed)];
             var index = 0;
             var mode = modes[0];
             var depth = isArc ? -mode.DepthStep : 0;

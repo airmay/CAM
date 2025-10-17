@@ -23,17 +23,17 @@ public static class ProgramBuilder
         Commands.Add(command);
     }
 
-    public static Program CreateProgram(IProcessing processing)
+    public static Program CreateProgram(ITechProcess techProcess)
     {
         if (Commands.Count == 0)
             return null;
 
         var operationCommands = Commands.ToLookup(p => p.OperationNumber);
         var operationDurations = operationCommands.ToDictionary(p => p.Key, v => v.Aggregate(TimeSpan.Zero, (current, command) => current.Add(command.Duration)));
-        processing.Operations.ForEach(p => p.Caption = GetCaption(p.Caption, operationDurations.TryGetAndReturn(p.Number)));
-        processing.Caption = GetCaption(processing.Caption, operationDurations.Aggregate(TimeSpan.Zero, (current, p) => current.Add(p.Value)));
+        techProcess.Operations.ForEach(p => p.Caption = GetCaption(p.Caption, operationDurations.TryGetAndReturn(p.Number)));
+        techProcess.Caption = GetCaption(techProcess.Caption, operationDurations.Aggregate(TimeSpan.Zero, (current, p) => current.Add(p.Value)));
 
-        var operations = operationCommands.ToDictionary(p => p.Key, p => processing.Operations.Single(op => op.Number == p.Key));
+        var operations = operationCommands.ToDictionary(p => p.Key, p => techProcess.Operations.Single(op => op.Number == p.Key));
 
         var operationNumbers = Commands.Select((p, index) => new { p.OperationNumber, index })
             .GroupBy(x => x.OperationNumber)
@@ -52,7 +52,7 @@ public static class ProgramBuilder
         //                    .ToArray()))
         //    : null;
 
-        return new Program(Commands, processing, operations, operationNumbers, objectIds, null);
+        return new Program(Commands, techProcess, operations, operationNumbers, objectIds, null);
 
         static string GetCaption(string caption, TimeSpan duration) => $"{(caption.IndexOf('(') > 0 ? caption.Substring(0, caption.IndexOf('(')).Trim() : caption)} ({duration})";
     }

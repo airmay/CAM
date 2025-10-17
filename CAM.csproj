@@ -113,6 +113,8 @@
     <Compile Include="Autocad\AutoCADCommands\SymbolPack.cs" />
     <Compile Include="Autocad\Curve2dExtensions.cs" />
     <Compile Include="Autocad\PolylineExtensions.cs" />
+    <Compile Include="Core\IOperation.cs" />
+    <Compile Include="Core\ITechProcess.cs" />
     <Compile Include="Utils\Helpers.cs" />
     <Compile Include="Core\Processing\ProgramBuilder.cs" />
     <Compile Include="Core\CamData.cs" />
@@ -123,7 +125,7 @@
     <Compile Include="MachineCncWorkCenter\PostProcessorCnc.cs" />
     <Compile Include="Core\Processing\ProcessorBase.cs" />
     <Compile Include="MachineCncWorkCenter\OperationCnc.cs" />
-    <Compile Include="MachineCncWorkCenter\ProcessingCnc.cs" />
+    <Compile Include="MachineCncWorkCenter\TechProcessCnc.cs" />
     <Compile Include="MachineCncWorkCenter\ProcessorCnc.cs" />
     <Compile Include="Core\Origin.cs" />
     <Compile Include="Core\Processing\Program.cs" />
@@ -132,7 +134,7 @@
     <Compile Include="Core\Tools\ToolPosition.cs" />
     <Compile Include="Core\Processing\ProcessingObjectBuilder.cs" />
     <Compile Include="Core\Tools\ToolModel.cs" />
-    <Compile Include="Core\ProcessingBase.cs" />
+    <Compile Include="Core\TechProcessBase.cs" />
     <Compile Include="Core\OperationBase.cs" />
     <Compile Include="UI\OperationMenuItems.cs" />
     <Compile Include="UI\ProcessingView.cs">
@@ -146,7 +148,7 @@
     <Compile Include="MachineWireSaw\Operations\WireSawOperation.cs" />
     <Compile Include="MachineWireSaw\OperationWireSawBase.cs" />
     <Compile Include="MachineWireSaw\PostProcessorWireSawBase.cs" />
-    <Compile Include="MachineWireSaw\ProcessingWireSaw.cs" />
+    <Compile Include="MachineWireSaw\TechProcessWireSaw.cs" />
     <Compile Include="MachineWireSaw\ProcessorWireSaw.cs" />
     <Compile Include="MachineCncWorkCenter\Operations\Sawing\SawingModesView.cs">
       <SubType>UserControl</SubType>

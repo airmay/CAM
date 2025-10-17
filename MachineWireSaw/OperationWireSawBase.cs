@@ -5,4 +5,4 @@ using CAM.MachineWireSaw;
 namespace CAM;
 
 [Serializable]
-public abstract class OperationWireSawBase : OperationBase<ProcessingWireSaw, ProcessorWireSaw>;
+public abstract class OperationWireSawBase : OperationBase<TechProcessWireSaw, ProcessorWireSaw>;

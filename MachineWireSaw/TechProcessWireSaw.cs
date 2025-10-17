@@ -4,7 +4,7 @@ using CAM.MachineWireSaw;
 namespace CAM.CncWorkCenter;
 
 [Serializable]
-public class ProcessingWireSaw : ProcessingBase<ProcessingWireSaw, ProcessorWireSaw>
+public class TechProcessWireSaw : TechProcessBase<TechProcessWireSaw, ProcessorWireSaw>
 {
     public double ToolThickness
     {
@@ -34,7 +34,7 @@ public class ProcessingWireSaw : ProcessingBase<ProcessingWireSaw, ProcessorWire
 
     public double Offset => ToolThickness / 2 + Delta;
 
-    public ProcessingWireSaw()
+    public TechProcessWireSaw()
     {
         Caption = "Обработка Тросовый станок";
         Machine = CAM.Machine.WireSawMachine;

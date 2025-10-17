@@ -3,7 +3,7 @@
 namespace CAM.CncWorkCenter;
 
 [Serializable]
-public class ProcessingCnc : ProcessingBase<ProcessingCnc, ProcessorCnc>
+public class TechProcessCnc : TechProcessBase<TechProcessCnc, ProcessorCnc>
 {
     public Material? Material { get; set; }
     public int Frequency { get; set; }
@@ -27,7 +27,7 @@ public class ProcessingCnc : ProcessingBase<ProcessingCnc, ProcessorCnc>
         view.AddTextBox(nameof(ZSafety));
     }
 
-    public ProcessingCnc()
+    public TechProcessCnc()
     {
         Caption = "Обработка ЧПУ";
     }

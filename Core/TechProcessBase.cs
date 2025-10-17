@@ -6,24 +6,13 @@ using System.Linq;
 
 namespace CAM;
 
-public interface IProcessing
-{
-    string Caption { get; set; }
-    IOperation[] Operations { get; set; }
-    Machine? Machine { get; }
-    short LastOperationNumber { get; set; }
-    public Tool Tool { get; set; }
-    Program Execute();
-    Program ExecutePartial(int position, IOperation operationNumber, ToolPosition toolPosition);
-}
-
 [Serializable]
-public abstract class ProcessingBase<TTechProcess, TProcessor> : IProcessing
-    where TTechProcess : ProcessingBase<TTechProcess, TProcessor>
+public abstract class TechProcessBase<TTechProcess, TProcessor> : ITechProcess
+    where TTechProcess : TechProcessBase<TTechProcess, TProcessor>
     where TProcessor : ProcessorBase<TTechProcess, TProcessor>, new()
 {
     [NonSerialized] private TProcessor _processor;
-    public TProcessor Processor => _processor ??= new TProcessor { Processing = this as TTechProcess };
+    public TProcessor Processor => _processor ??= new TProcessor { TechProcess = this as TTechProcess };
 
     public string Caption { get; set; }
     public IOperation[] Operations { get; set; }
@@ -50,7 +39,7 @@ public abstract class ProcessingBase<TTechProcess, TProcessor> : IProcessing
             foreach (var operation in operations)
             {
                 Acad.Write($"расчет операции {operation.Caption}");
-                operation.Processing = this as TTechProcess;
+                operation.TechProcess = this as TTechProcess;
                 Processor.Operation = operation;
                 operation.Execute();
             }
