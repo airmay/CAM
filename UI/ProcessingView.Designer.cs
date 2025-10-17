@@ -38,7 +38,6 @@ namespace CAM.UI
             this.tabPageParams = new System.Windows.Forms.TabPage();
             this.tabPageCommands = new System.Windows.Forms.TabPage();
             this.dataGridViewCommand = new System.Windows.Forms.DataGridView();
-            this.Duration = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.panel1 = new System.Windows.Forms.Panel();
             this.toolStrip = new System.Windows.Forms.ToolStrip();
             this.bCreateTechOperation = new System.Windows.Forms.ToolStripDropDownButton();
@@ -55,9 +54,10 @@ namespace CAM.UI
             this.bSendProgramm = new System.Windows.Forms.ToolStripButton();
             this.bClose = new System.Windows.Forms.ToolStripButton();
             this.panel2 = new System.Windows.Forms.Panel();
-            this.dataGridViewTextBoxColumn1 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.dataGridViewTextBoxColumn3 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.processCommandBindingSource = new System.Windows.Forms.BindingSource(this.components);
+            this.Number = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.CommandText = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Duration = new System.Windows.Forms.DataGridViewTextBoxColumn();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
@@ -158,8 +158,8 @@ namespace CAM.UI
             this.dataGridViewCommand.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dataGridViewCommand.ColumnHeadersVisible = false;
             this.dataGridViewCommand.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
-            this.dataGridViewTextBoxColumn1,
-            this.dataGridViewTextBoxColumn3,
+            this.Number,
+            this.CommandText,
             this.Duration});
             this.dataGridViewCommand.DataSource = this.processCommandBindingSource;
             this.dataGridViewCommand.Dock = System.Windows.Forms.DockStyle.Fill;
@@ -171,15 +171,6 @@ namespace CAM.UI
             this.dataGridViewCommand.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
             this.dataGridViewCommand.Size = new System.Drawing.Size(322, 486);
             this.dataGridViewCommand.TabIndex = 0;
-            // 
-            // Duration
-            // 
-            this.Duration.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells;
-            this.Duration.DataPropertyName = "Duration";
-            this.Duration.HeaderText = "Duration";
-            this.Duration.Name = "Duration";
-            this.Duration.ReadOnly = true;
-            this.Duration.Width = 5;
             // 
             // panel1
             // 
@@ -354,26 +345,35 @@ namespace CAM.UI
             this.panel2.Size = new System.Drawing.Size(336, 673);
             this.panel2.TabIndex = 3;
             // 
-            // dataGridViewTextBoxColumn1
-            // 
-            this.dataGridViewTextBoxColumn1.DataPropertyName = "Number";
-            this.dataGridViewTextBoxColumn1.HeaderText = "Number";
-            this.dataGridViewTextBoxColumn1.Name = "dataGridViewTextBoxColumn1";
-            this.dataGridViewTextBoxColumn1.ReadOnly = true;
-            this.dataGridViewTextBoxColumn1.Width = 5;
-            // 
-            // dataGridViewTextBoxColumn3
-            // 
-            this.dataGridViewTextBoxColumn3.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
-            this.dataGridViewTextBoxColumn3.DataPropertyName = "Text";
-            this.dataGridViewTextBoxColumn3.HeaderText = "Text";
-            this.dataGridViewTextBoxColumn3.Name = "dataGridViewTextBoxColumn3";
-            this.dataGridViewTextBoxColumn3.ReadOnly = true;
-            // 
             // processCommandBindingSource
             // 
-            this.processCommandBindingSource.DataSource = typeof(Command);
+            this.processCommandBindingSource.DataSource = typeof(CAM.Core.Processing.Command);
             this.processCommandBindingSource.CurrentChanged += new System.EventHandler(this.processCommandBindingSource_CurrentChanged);
+            // 
+            // Number
+            // 
+            this.Number.DataPropertyName = "Number";
+            this.Number.HeaderText = "Number";
+            this.Number.Name = "Number";
+            this.Number.ReadOnly = true;
+            this.Number.Width = 5;
+            // 
+            // CommandText
+            // 
+            this.CommandText.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
+            this.CommandText.DataPropertyName = "Text";
+            this.CommandText.HeaderText = "Text";
+            this.CommandText.Name = "CommandText";
+            this.CommandText.ReadOnly = true;
+            // 
+            // Duration
+            // 
+            this.Duration.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells;
+            this.Duration.DataPropertyName = "Duration";
+            this.Duration.HeaderText = "Duration";
+            this.Duration.Name = "Duration";
+            this.Duration.ReadOnly = true;
+            this.Duration.Width = 5;
             // 
             // ProcessingView
             // 
@@ -418,12 +418,6 @@ namespace CAM.UI
         private System.Windows.Forms.TabPage tabPageCommands;
         private System.Windows.Forms.DataGridView dataGridViewCommand;
         private System.Windows.Forms.BindingSource processCommandBindingSource;
-        private System.Windows.Forms.DataGridViewTextBoxColumn codeDataGridViewTextBoxColumn;
-        private System.Windows.Forms.DataGridViewTextBoxColumn param1DataGridViewTextBoxColumn;
-        private System.Windows.Forms.DataGridViewTextBoxColumn param2DataGridViewTextBoxColumn;
-        private System.Windows.Forms.DataGridViewTextBoxColumn param3DataGridViewTextBoxColumn;
-        private System.Windows.Forms.DataGridViewTextBoxColumn param4DataGridViewTextBoxColumn;
-        private System.Windows.Forms.DataGridViewTextBoxColumn param5DataGridViewTextBoxColumn;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
         private System.Windows.Forms.ToolStripButton bSendProgramm;
         private System.Windows.Forms.ToolStripButton bClose;
@@ -432,23 +426,9 @@ namespace CAM.UI
         private System.Windows.Forms.ToolStripButton bVisibility;
         private System.Windows.Forms.ToolStripSplitButton bBuildProcessing;
         private System.Windows.Forms.ToolStripMenuItem bPartialProcessing;
-        private System.Windows.Forms.DataGridViewTextBoxColumn numberDataGridViewTextBoxColumn;
-        private System.Windows.Forms.DataGridViewTextBoxColumn nameDataGridViewTextBoxColumn;
-        private System.Windows.Forms.DataGridViewTextBoxColumn textDataGridViewTextBoxColumn;
         private System.Windows.Forms.ToolStripButton bCreateProcessing;
-        private System.Windows.Forms.DataGridViewTextBoxColumn operationDataGridViewTextBoxColumn;
-        private System.Windows.Forms.DataGridViewTextBoxColumn positionDataGridViewTextBoxColumn;
-        private System.Windows.Forms.DataGridViewTextBoxColumn angleCDataGridViewTextBoxColumn;
-        private System.Windows.Forms.DataGridViewTextBoxColumn angleADataGridViewTextBoxColumn;
-        private System.Windows.Forms.DataGridViewCheckBoxColumn hasToolDataGridViewCheckBoxColumn;
-        private System.Windows.Forms.DataGridViewTextBoxColumn toolpathObjectIdDataGridViewTextBoxColumn;
-        private System.Windows.Forms.DataGridViewTextBoxColumn durationDataGridViewTextBoxColumn;
-        private System.Windows.Forms.DataGridViewTextBoxColumn ownerDataGridViewTextBoxColumn;
-        private System.Windows.Forms.DataGridViewTextBoxColumn uDataGridViewTextBoxColumn;
-        private System.Windows.Forms.DataGridViewTextBoxColumn vDataGridViewTextBoxColumn;
-        private System.Windows.Forms.DataGridViewTextBoxColumn aDataGridViewTextBoxColumn;
-        private System.Windows.Forms.DataGridViewTextBoxColumn dataGridViewTextBoxColumn1;
-        private System.Windows.Forms.DataGridViewTextBoxColumn dataGridViewTextBoxColumn3;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Number;
+        private System.Windows.Forms.DataGridViewTextBoxColumn CommandText;
         private System.Windows.Forms.DataGridViewTextBoxColumn Duration;
     }
 }

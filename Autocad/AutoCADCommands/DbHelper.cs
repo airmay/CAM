@@ -600,7 +600,7 @@ namespace CAM.Autocad.AutoCADCommands
         {
             var buffer = dbo.GetXDataForApplication(Consts.AppNameForTags);
             return buffer.AsArray().Any(typedValue => typedValue.TypeCode == (int)DxfCode.ExtendedDataAsciiString
-                && typedValue.Value == tag);
+                && (string)typedValue.Value == tag);
         }
 
         [Obsolete("Legacy data store mechanism. Use FlexDataStore instead.")]
@@ -637,7 +637,7 @@ namespace CAM.Autocad.AutoCADCommands
         {
             var buffer = dbo.GetXDataForApplication(Consts.AppNameForTags);
             var data = buffer.AsArray().Where(typedValue => typedValue.TypeCode == (int)DxfCode.ExtendedDataAsciiString
-                && typedValue.Value != tag).ToArray();
+                && (string)typedValue.Value != tag).ToArray();
             dbo.XData = new ResultBuffer(data);
         }
 

@@ -1356,22 +1356,6 @@ namespace CAM.Autocad.AutoCADCommands
         }
 
         /// <summary>
-        /// Cleans up a polyline by removing extra collinear points. 
-        /// </summary>
-        /// <param name="poly">The polyline.</param>
-        public static void PolyClean_RemoveColinearPoints(Polyline poly)
-        {
-            var points = poly.GetPolyPoints().ToArray();
-            var cleanList = new List<int>();
-            int j = 0;
-            for (int i = 1; i < points.Length; i++)
-            {
-                // TODO: implement this.
-                throw new NotImplementedException();
-            }
-        }
-
-        /// <summary>
         /// Cleans up a polyline by setting topo direction.
         /// </summary>
         /// <param name="poly">The polyline.</param>
