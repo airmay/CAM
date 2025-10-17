@@ -5,7 +5,7 @@ namespace CAM;
 
 public sealed class MyBinder : SerializationBinder
 {
-    public override Type BindToType(string assemblyName, string typeName) => Type.GetType(string.Format("{0}, {1}", typeName, assemblyName));
+    public override Type BindToType(string assemblyName, string typeName) => Type.GetType($"{typeName}, {assemblyName}");
 }
 
 public static class Helpers

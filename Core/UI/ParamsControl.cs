@@ -7,342 +7,341 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
 
-namespace CAM
+namespace CAM;
+
+public class ParamsControl : UserControl
 {
-    public class ParamsControl : UserControl
+    private string GetDisplayName(string paramName) => _displayNames.TryGetValue(paramName, out var value) ? value : paramName;
+
+    private readonly Dictionary<string, string> _displayNames = new()
     {
-        private string GetDisplayName(string paramName) => _displayNames.TryGetValue(paramName, out var value) ? value : paramName;
+        ["Frequency"] = "Шпиндель",
+        ["Feed"] = "Подача",
+        ["CuttingFeed"] = "Подача",
+        ["PenetrationFeed"] = "Скор.малая",
+        ["TransitionFeed"] = "Переход",
 
-        private readonly Dictionary<string, string> _displayNames = new()
+        ["ProcessingArea"] = "Объекты",
+        ["Rail"] = "Направляющая",
+        ["Profile"] = "Профиль",
+
+        ["Step"] = "Шаг",
+        ["StepX"] = "Шаг по X",
+        ["StepY"] = "Шаг по Y",
+        ["StepPass"] = "Шаг межстрочный",
+        ["StepLong"] = "Шаг продольный",
+        ["StartPass"] = "Первый проход",
+        ["EndPass"] = "Последний проход",
+
+        ["Thickness"] = "Толщина",
+        ["Depth"] = "Глубина",
+        ["Penetration"] = "Заглубление",
+        ["Departure"] = "Выезд",
+        ["IsUplifting"] = "Подъем",
+        ["Delta"] = "Припуск",
+        ["ZMax"] = "Z максимум",
+        ["ZSafety"] = "Z безопасности",
+        ["ZEntry"] = "Z входа",
+        ["AngleA"] = "Угол вертикальный",
+    };
+
+    private TableLayoutPanel _tablePanel;
+    private BindingSource _bindingSource;
+    private ToolTip _toolTip;
+    private readonly Type _type;
+    public T GetData<T>() => (T)_bindingSource.DataSource;
+
+    public ParamsControl(Type type)
+    {
+        InitializeComponent();
+        _type = type;
+        _bindingSource.DataSource = type;
+
+        type.GetMethod("ConfigureParamsView")?.Invoke(null, [this]);
+    }
+
+    private void InitializeComponent()
+    {
+        SuspendLayout();
+
+        _bindingSource = new BindingSource();
+        _toolTip = new ToolTip();
+        _tablePanel = new TableLayoutPanel
         {
-            ["Frequency"] = "Шпиндель",
-            ["Feed"] = "Подача",
-            ["CuttingFeed"] = "Подача",
-            ["PenetrationFeed"] = "Скор.малая",
-            ["TransitionFeed"] = "Переход",
+            Dock = DockStyle.Fill,
+            AutoScroll = true,
+            ColumnCount = 2,
+            //CellBorderStyle = TableLayoutPanelCellBorderStyle.Single
+        };
+        _tablePanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50));
+        _tablePanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50));
+        Controls.Add(_tablePanel);
 
-            ["ProcessingArea"] = "Объекты",
-            ["Rail"] = "Направляющая",
-            ["Profile"] = "Профиль",
+        ResumeLayout(false);
+    }
 
-            ["Step"] = "Шаг",
-            ["StepX"] = "Шаг по X",
-            ["StepY"] = "Шаг по Y",
-            ["StepPass"] = "Шаг межстрочный",
-            ["StepLong"] = "Шаг продольный",
-            ["StartPass"] = "Первый проход",
-            ["EndPass"] = "Последний проход",
+    public void SetData(object data) => _bindingSource.DataSource = data;
 
-            ["Thickness"] = "Толщина",
-            ["Depth"] = "Глубина",
-            ["Penetration"] = "Заглубление",
-            ["Departure"] = "Выезд",
-            ["IsUplifting"] = "Подъем",
-            ["Delta"] = "Припуск",
-            ["ZMax"] = "Z максимум",
-            ["ZSafety"] = "Z безопасности",
-            ["ZEntry"] = "Z входа",
-            ["AngleA"] = "Угол вертикальный",
+    public void ResetControls() => _bindingSource.ResetBindings(false);
+
+    private int RowHeight => (int)(Font.Height * 1.8);
+
+    private void AddRow(int height = 1)
+    {
+        _tablePanel.RowStyles.Add(new RowStyle(SizeType.Absolute, RowHeight * height));
+        _tablePanel.Height += RowHeight * height / 2;
+    }
+
+    private void AddRowH(int height)
+    {
+        var rowStyle = new RowStyle(SizeType.Absolute, height + Font.Size * 2);
+        //tablePanel.RowStyles.Add(rowStyle);
+        _tablePanel.Height += (int)rowStyle.Height;
+    }
+
+    private void AddControl(Control control, string hint, string paramName = null, string propertyName = null)
+    {
+        if (paramName != null)
+            control.DataBindings.Add(propertyName, _bindingSource, paramName, true);
+
+        control.Margin = new Padding(1);
+        if (hint != null)
+            _toolTip.SetToolTip(control, hint);
+        _tablePanel.Controls.Add(control);
+    }
+
+    public Panel AddIndent()
+    {
+        var panel = new Panel
+        {
+            Height = (int)(Font.Height / 1.5)
+        };
+        _tablePanel.SetColumnSpan(panel, 2);
+        _tablePanel.Controls.Add(panel);
+
+        return panel;
+    }
+
+    private Label AddLabel(string displayName, string hint = null)
+    {
+        var label = new Label
+        {
+            Text = GetDisplayName(displayName),
+            Dock = DockStyle.Top,
+            //Height = RowHeight,
+            TextAlign = ContentAlignment.MiddleRight,
+            AutoEllipsis = true,
+            //BorderStyle = BorderStyle.FixedSingle
+        };
+        AddControl(label, hint);
+
+        return label;
+    }
+
+    public Label AddLabelText(string label, string text = "", string hint = null)
+    {
+        AddLabel(label, hint);
+        var control = AddLabel(text);
+
+        return control;
+    }
+
+    public Label AddText(string text, string hint = null)
+    {
+        var label = AddLabel(text, hint);
+        label.TextAlign = ContentAlignment.MiddleLeft;
+        _tablePanel.SetColumnSpan(label, 2);
+
+        return label;
+    }
+
+    public TextBox AddTextBox(string paramName, string displayName = null, bool readOnly = false, string hint = null, bool required = false)
+    {
+        AddLabel(displayName ?? paramName, hint);
+
+        var control = new TextBox
+        {
+            ReadOnly = readOnly,
+            Dock = DockStyle.Top,
+        };
+        AddControl(control, hint, paramName, "Text");
+
+        if (required)
+            ParamsValidator.AddRequiredParam(_type, paramName, displayName ?? GetDisplayName(paramName));
+
+        return control;
+    }
+
+    public CheckBox AddCheckBox(string paramName, string displayName = null, string hint = null)
+    {
+        AddLabel(displayName ?? paramName, hint);
+
+        var control = new CheckBox();
+        AddControl(control, hint, paramName, "Checked");
+
+        return control;
+    }
+
+    #region AddComboBox
+
+    public ComboBox AddComboBox<T>(string paramName, string displayName = null, bool required = false, params T[] values) where T : struct
+    {
+        var comboBox = AddComboBox(paramName, displayName);
+        comboBox.BindEnum(values);
+
+        return comboBox;
+    }
+
+    public ComboBox AddComboBox(string displayName, object[] items, Action<int> selectedIndexChanged, string hint = null)
+    {
+        var comboBox = AddComboBox(displayName, hint);
+
+        comboBox.Items.AddRange(items);
+        comboBox.SelectedIndexChanged += (s, e) => selectedIndexChanged(comboBox.SelectedIndex);
+        _bindingSource.DataSourceChanged += (s, e) =>
+        {
+            comboBox.SelectedIndex = 0;
+            selectedIndexChanged.Invoke(0);
         };
 
-        private TableLayoutPanel _tablePanel;
-        private BindingSource _bindingSource;
-        private ToolTip _toolTip;
-        private readonly Type _type;
-        public T GetData<T>() => (T)_bindingSource.DataSource;
+        return comboBox;
+    }
 
-        public ParamsControl(Type type)
+    private ComboBox AddComboBox(string paramName, string displayName = null, string hint = null, bool required = false)
+    {
+        AddLabel(displayName ?? paramName, hint);
+
+        var comboBox = new ComboBox
         {
-            InitializeComponent();
-            _type = type;
-            _bindingSource.DataSource = type;
+            Dock = DockStyle.Fill,
+            DropDownStyle = ComboBoxStyle.DropDownList, 
+        };
+        AddControl(comboBox, hint, paramName, "SelectedValue");
+        if (required)
+            ParamsValidator.AddRequiredParam(_type, paramName, displayName ?? GetDisplayName(paramName));
 
-            type.GetMethod("ConfigureParamsView")?.Invoke(null, [this]);
-        }
+        return comboBox;
+    }
 
-        private void InitializeComponent()
+    public ComboBox AddMaterial() => AddComboBox<Material>("Material", "Материал", required: true);
+
+    public ComboBox AddMachine() => AddComboBox<Machine>("Machine", "Станок", required: true);
+
+    #endregion
+
+    #region AddSelectorParam
+
+    public (TextBox, Button) CreateSelector(string paramName, string displayName, string buttonText = "Ξ", string hint = null, bool required = false)
+    {
+        AddLabel(displayName ?? paramName, hint);
+
+        var tableLayout = new TableLayoutPanel();
+        tableLayout.Dock = DockStyle.Fill;
+        tableLayout.ColumnCount = 2;
+        tableLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
+        tableLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 25F));
+        tableLayout.Height = 0;
+        tableLayout.Margin = new Padding(0);
+
+        var textBox = new TextBox
         {
-            SuspendLayout();
+            Dock = DockStyle.Fill,
+            ReadOnly = true,
+            Margin = new Padding(1),
+        };
+        if (hint != null)
+            _toolTip.SetToolTip(textBox, hint);
+        textBox.DataBindings.Add("Text", _bindingSource, $"{paramName}.Description");
+        tableLayout.Controls.Add(textBox);
 
-            _bindingSource = new BindingSource();
-            _toolTip = new ToolTip();
-            _tablePanel = new TableLayoutPanel
+        var button = new Button
+        {
+            Dock = DockStyle.Fill,
+            Text = buttonText,
+            Margin = new Padding(0),
+            TabStop = false
+        };
+        tableLayout.Controls.Add(button);
+        _tablePanel.Controls.Add(tableLayout);
+        if (required)
+            ParamsValidator.AddRequiredParam(_type, paramName, displayName ?? GetDisplayName(paramName));
+
+        return (textBox, button);
+    }
+
+    public (TextBox textbox, Button button) AddTool()
+    {
+        var (textbox, button) = CreateSelector("Tool","Инструмент", required: true);
+
+        button.Click += (s, e) =>
+        {
+            var techProcess = GetData<ProcessingCnc>();
+            if (!techProcess.Machine.CheckNotNull("Станок") || !techProcess.Material.CheckNotNull("Материал"))
+                return;
+
+            if (ToolService.SelectTool(techProcess.Machine!.Value) is { } tool)
             {
-                Dock = DockStyle.Fill,
-                AutoScroll = true,
-                ColumnCount = 2,
-                //CellBorderStyle = TableLayoutPanelCellBorderStyle.Single
-            };
-            _tablePanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50));
-            _tablePanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50));
-            Controls.Add(_tablePanel);
+                techProcess.Tool = tool;
+                techProcess.Frequency = ToolService.CalcFrequency(tool, techProcess.Machine.Value, techProcess.Material!.Value);
+                _bindingSource.ResetBindings(false);
+            }
+        };
+        return (textbox, button);
+    }
 
-            ResumeLayout(false);
-        }
+    public (TextBox textbox, Button button) AddAcadObject(string paramName = "ProcessingArea",
+        string displayName = null, string message = "Выбор объектов", string allowedTypes = "*",
+        Action<ObjectId[]> afterSelect = null, string hint = "Обрабатываемые объекты", bool required = false)
+    {
+        var (textbox, button) = CreateSelector(paramName, displayName, "۞", hint, required);
 
-        public void SetData(object data) => _bindingSource.DataSource = data;
-
-        public void ResetControls() => _bindingSource.ResetBindings(false);
-
-        private int RowHeight => (int)(Font.Height * 1.8);
-
-        private void AddRow(int height = 1)
+        var prop = _type.GetProperty(paramName);
+        textbox.Enter += (s, e) => prop.GetValue(_bindingSource.DataSource).As<AcadObject>()?.Select();
+        button.Click += (s, e) =>
         {
-            _tablePanel.RowStyles.Add(new RowStyle(SizeType.Absolute, RowHeight * height));
-            _tablePanel.Height += RowHeight * height / 2;
-        }
+            Interaction.SetActiveDocFocus();
+            Acad.SelectObjectIds();
+            var ids = Interaction.GetSelection($"\n{message}", allowedTypes);
+            if (ids.Length == 0)
+                return;
 
-        private void AddRowH(int height)
+            var acadObject = AcadObject.Create(ids);
+            prop.SetValue(_bindingSource.DataSource, acadObject);
+            textbox.Text = acadObject.Description;
+
+            afterSelect?.Invoke(ids);
+            Acad.SelectObjectIds(ids);
+        };
+
+        return (textbox, button);
+    }
+
+    public (TextBox textbox, Button button) AddOrigin()
+    {
+        const string paramName = "Origin";
+        var (textbox, button) = CreateSelector(paramName, "Начало координат", "۞");
+        var prop = _type.GetProperty(paramName);
+        textbox.Enter += (s, e) => prop.GetValue(_bindingSource.DataSource).As<Origin>().OriginModel?.Select();
+        button.Click += (s, e) =>
         {
-            var rowStyle = new RowStyle(SizeType.Absolute, height + Font.Size * 2);
-            //tablePanel.RowStyles.Add(rowStyle);
-            _tablePanel.Height += (int)rowStyle.Height;
-        }
+            prop.GetValue(_bindingSource.DataSource).As<Origin>().CreateOriginModel();
+            textbox.DataBindings[0].ReadValue();
+        };
 
-        private void AddControl(Control control, string hint, string paramName = null, string propertyName = null)
-        {
-            if (paramName != null)
-                control.DataBindings.Add(propertyName, _bindingSource, paramName, true);
+        return (textbox, button);
+    }
+    #endregion
 
-            control.Margin = new Padding(1);
-            if (hint != null)
-                _toolTip.SetToolTip(control, hint);
-            _tablePanel.Controls.Add(control);
-        }
+    public Control AddControl(Control control, int rows = 1, string propertyName = null, string dataMember = null)
+    {
+        control.Height = rows * RowHeight;
+        _tablePanel.SetColumnSpan(control, 2);
+        _tablePanel.Controls.Add(control);
 
-        public Panel AddIndent()
-        {
-            var panel = new Panel
-            {
-                Height = (int)(Font.Height / 1.5)
-            };
-            _tablePanel.SetColumnSpan(panel, 2);
-            _tablePanel.Controls.Add(panel);
+        control.Dock = DockStyle.Fill;
+        if (propertyName != null)
+            control.DataBindings.Add(propertyName, _bindingSource, dataMember);
 
-            return panel;
-        }
-
-        private Label AddLabel(string displayName, string hint = null)
-        {
-            var label = new Label
-            {
-                Text = GetDisplayName(displayName),
-                Dock = DockStyle.Top,
-                //Height = RowHeight,
-                TextAlign = ContentAlignment.MiddleRight,
-                AutoEllipsis = true,
-                //BorderStyle = BorderStyle.FixedSingle
-            };
-            AddControl(label, hint);
-
-            return label;
-        }
-
-        public Label AddLabelText(string label, string text = "", string hint = null)
-        {
-            AddLabel(label, hint);
-            var control = AddLabel(text);
-
-            return control;
-        }
-
-        public Label AddText(string text, string hint = null)
-        {
-            var label = AddLabel(text, hint);
-            label.TextAlign = ContentAlignment.MiddleLeft;
-            _tablePanel.SetColumnSpan(label, 2);
-
-            return label;
-        }
-
-        public TextBox AddTextBox(string paramName, string displayName = null, bool readOnly = false, string hint = null, bool required = false)
-        {
-            AddLabel(displayName ?? paramName, hint);
-
-            var control = new TextBox
-            {
-                ReadOnly = readOnly,
-                Dock = DockStyle.Top,
-            };
-            AddControl(control, hint, paramName, "Text");
-
-            if (required)
-                ParamsValidator.AddRequiredParam(_type, paramName, displayName ?? GetDisplayName(paramName));
-
-            return control;
-        }
-
-        public CheckBox AddCheckBox(string paramName, string displayName = null, string hint = null)
-        {
-            AddLabel(displayName ?? paramName, hint);
-
-            var control = new CheckBox();
-            AddControl(control, hint, paramName, "Checked");
-
-            return control;
-        }
-
-        #region AddComboBox
-
-        public ComboBox AddComboBox<T>(string paramName, string displayName = null, bool required = false, params T[] values) where T : struct
-        {
-            var comboBox = AddComboBox(paramName, displayName);
-            comboBox.BindEnum(values);
-
-            return comboBox;
-        }
-
-        public ComboBox AddComboBox(string displayName, object[] items, Action<int> selectedIndexChanged, string hint = null)
-        {
-            var comboBox = AddComboBox(displayName, hint);
-
-            comboBox.Items.AddRange(items);
-            comboBox.SelectedIndexChanged += (s, e) => selectedIndexChanged(comboBox.SelectedIndex);
-            _bindingSource.DataSourceChanged += (s, e) =>
-            {
-                comboBox.SelectedIndex = 0;
-                selectedIndexChanged.Invoke(0);
-            };
-
-            return comboBox;
-        }
-
-        private ComboBox AddComboBox(string paramName, string displayName = null, string hint = null, bool required = false)
-        {
-            AddLabel(displayName ?? paramName, hint);
-
-            var comboBox = new ComboBox
-            {
-                Dock = DockStyle.Fill,
-                DropDownStyle = ComboBoxStyle.DropDownList, 
-            };
-            AddControl(comboBox, hint, paramName, "SelectedValue");
-            if (required)
-                ParamsValidator.AddRequiredParam(_type, paramName, displayName ?? GetDisplayName(paramName));
-
-            return comboBox;
-        }
-
-        public ComboBox AddMaterial() => AddComboBox<Material>("Material", "Материал", required: true);
-
-        public ComboBox AddMachine() => AddComboBox<Machine>("Machine", "Станок", required: true);
-
-        #endregion
-
-        #region AddSelectorParam
-
-        public (TextBox, Button) CreateSelector(string paramName, string displayName, string buttonText = "Ξ", string hint = null, bool required = false)
-        {
-            AddLabel(displayName ?? paramName, hint);
-
-            var tableLayout = new TableLayoutPanel();
-            tableLayout.Dock = DockStyle.Fill;
-            tableLayout.ColumnCount = 2;
-            tableLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
-            tableLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 25F));
-            tableLayout.Height = 0;
-            tableLayout.Margin = new Padding(0);
-
-            var textBox = new TextBox
-            {
-                Dock = DockStyle.Fill,
-                ReadOnly = true,
-                Margin = new Padding(1),
-            };
-            if (hint != null)
-                _toolTip.SetToolTip(textBox, hint);
-            textBox.DataBindings.Add("Text", _bindingSource, $"{paramName}.Description");
-            tableLayout.Controls.Add(textBox);
-
-            var button = new Button
-            {
-                Dock = DockStyle.Fill,
-                Text = buttonText,
-                Margin = new Padding(0),
-                TabStop = false
-           };
-            tableLayout.Controls.Add(button);
-            _tablePanel.Controls.Add(tableLayout);
-            if (required)
-                ParamsValidator.AddRequiredParam(_type, paramName, displayName ?? GetDisplayName(paramName));
-
-            return (textBox, button);
-        }
-
-        public (TextBox textbox, Button button) AddTool()
-        {
-            var (textbox, button) = CreateSelector("Tool","Инструмент", required: true);
-
-            button.Click += (s, e) =>
-            {
-                var techProcess = GetData<ProcessingCnc>();
-                if (!techProcess.Machine.CheckNotNull("Станок") || !techProcess.Material.CheckNotNull("Материал"))
-                    return;
-
-                if (ToolService.SelectTool(techProcess.Machine!.Value) is { } tool)
-                {
-                    techProcess.Tool = tool;
-                    techProcess.Frequency = ToolService.CalcFrequency(tool, techProcess.Machine.Value, techProcess.Material!.Value);
-                    _bindingSource.ResetBindings(false);
-                }
-            };
-            return (textbox, button);
-        }
-
-        public (TextBox textbox, Button button) AddAcadObject(string paramName = "ProcessingArea",
-            string displayName = null, string message = "Выбор объектов", string allowedTypes = "*",
-            Action<ObjectId[]> afterSelect = null, string hint = "Обрабатываемые объекты", bool required = false)
-        {
-            var (textbox, button) = CreateSelector(paramName, displayName, "۞", hint, required);
-
-            var prop = _type.GetProperty(paramName);
-            textbox.Enter += (s, e) => prop.GetValue(_bindingSource.DataSource).As<AcadObject>()?.Select();
-            button.Click += (s, e) =>
-            {
-                Interaction.SetActiveDocFocus();
-                Acad.SelectObjectIds();
-                var ids = Interaction.GetSelection($"\n{message}", allowedTypes);
-                if (ids.Length == 0)
-                    return;
-
-                var acadObject = AcadObject.Create(ids);
-                prop.SetValue(_bindingSource.DataSource, acadObject);
-                textbox.Text = acadObject.ToString();
-
-                afterSelect?.Invoke(ids);
-                Acad.SelectObjectIds(ids);
-            };
-
-            return (textbox, button);
-        }
-
-        public (TextBox textbox, Button button) AddOrigin()
-        {
-            const string paramName = "Origin";
-            var (textbox, button) = CreateSelector(paramName, "Начало координат", "۞");
-            var prop = _type.GetProperty(paramName);
-            textbox.Enter += (s, e) => prop.GetValue(_bindingSource.DataSource).As<Origin>().OriginModel?.Select();
-            button.Click += (s, e) =>
-            {
-                prop.GetValue(_bindingSource.DataSource).As<Origin>().CreateOriginModel();
-                textbox.DataBindings[0].ReadValue();
-            };
-
-            return (textbox, button);
-        }
-        #endregion
-
-        public Control AddControl(Control control, int rows = 1, string propertyName = null, string dataMember = null)
-        {
-            control.Height = rows * RowHeight;
-            _tablePanel.SetColumnSpan(control, 2);
-            _tablePanel.Controls.Add(control);
-
-            control.Dock = DockStyle.Fill;
-            if (propertyName != null)
-                control.DataBindings.Add(propertyName, _bindingSource, dataMember);
-
-            return control;
-        }
+        return control;
     }
 }
