@@ -161,9 +161,9 @@
     <Compile Include="MachineCncWorkCenter\Operations\Tactile\TactileBandsOperation.cs" />
     <Compile Include="MachineCncWorkCenter\Operations\Tactile\TactileChamfersOperation.cs" />
     <Compile Include="TechProcesses\SectionProfile\BuilderUtils.cs" />
-    <Compile Include="MachineCncWorkCenter\PostProcessors\ChampionCommandGenerator.cs" />
-    <Compile Include="MachineCncWorkCenter\PostProcessors\FormaiCommandGenerator.cs" />
-    <Compile Include="MachineCncWorkCenter\PostProcessors\KreaCommandGenerator.cs" />
+    <Compile Include="MachineCncWorkCenter\PostProcessors\ChampionPostProcessor.cs" />
+    <Compile Include="MachineCncWorkCenter\PostProcessors\FormaPostProcessor.cs" />
+    <Compile Include="MachineCncWorkCenter\PostProcessors\KreaPostProcessor.cs" />
     <Compile Include="MachineCncWorkCenter\PostProcessors\DonatoniPostProcessor.cs" />
     <Compile Include="Startup.cs" />
     <Compile Include="UtilViews\TrimmingView.cs">

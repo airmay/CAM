@@ -11,13 +11,15 @@ public abstract class PostProcessorCnc : PostProcessorBase
     
     public abstract string[] StartEngine(int frequency, bool hasTool);
 
+    public override string Pause(double duration) => $"G4 F{duration}";
+
     public string GCommand(Point3d? point, double? angleC, double? angleA, int? feed, Point2d? arcCenter)
     {
         var @params = GetParams(point, angleC, angleA, feed, arcCenter);
         return GetGCommand(@params);
     }
 
-    protected List<CommandParam> GetParams(Point3d? point, double? angleC, double? angleA, int? feed, Point2d? arcCenter)
+    protected virtual List<CommandParam> GetParams(Point3d? point, double? angleC, double? angleA, int? feed, Point2d? arcCenter)
     {
         var commandParams = new List<CommandParam>
         {

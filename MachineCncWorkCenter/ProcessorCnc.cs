@@ -17,9 +17,9 @@ public class ProcessorCnc : ProcessorBase<TechProcessCnc, ProcessorCnc>
         _postProcessor = TechProcess.Machine switch
         {
             Machine.Donatoni => new DonatoniPostProcessor(),
-            Machine.Krea => new DonatoniPostProcessor(),
-            Machine.Forma => new DonatoniPostProcessor(),
-            Machine.Champion => new DonatoniPostProcessor(),
+            Machine.Krea => new KreaPostProcessor(),
+            Machine.Forma => new FormaPostProcessor(),
+            Machine.Champion => new ChampionPostProcessor(),
             _ => throw new ArgumentOutOfRangeException()
         };
     }

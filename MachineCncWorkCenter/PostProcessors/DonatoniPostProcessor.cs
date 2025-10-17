@@ -63,6 +63,4 @@ public class DonatoniPostProcessor : PostProcessorCnc
             "SETMSP=1",
         ];
     }
-
-    public override string Pause(double duration) => $"G4 F{duration}";
 }
