@@ -138,6 +138,19 @@ public static class Acad
         ids.Delete();
     }
 
+    public static void SetProcessLayerVisibility(bool isOff)
+    {
+        using var _ = LockDocument();
+        using var tr = StartTransaction();
+        var layerTable = (LayerTable)tr.GetObject(Database.LayerTableId, OpenMode.ForWrite);
+        if (!layerTable.Has(ProcessLayerName))
+            return;
+
+        var layerTableRecord = (LayerTableRecord)tr.GetObject(layerTable[ProcessLayerName], OpenMode.ForWrite);
+        layerTableRecord.IsOff = isOff;
+        tr.Commit();
+    }
+
     #endregion
 
     #region Progressor

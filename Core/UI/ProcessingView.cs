@@ -303,8 +303,12 @@ public partial class ProcessingView : UserControl
     #region Program
     private void bVisibility_Click(object sender, EventArgs e)
     {
-        _program.SetToolpathVisibility(false);
+        //_program.SetToolpathVisibility(false);
+        Acad.SetProcessLayerVisibility(bVisibility.Checked); 
+        ToolModel.Delete();
         Acad.Editor.UpdateScreen();
+        if (bVisibility.Checked)
+            ToolModel.Delete();
     }
 
     private void bPlay_Click(object sender, EventArgs e)
