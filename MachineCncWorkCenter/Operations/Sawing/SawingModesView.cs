@@ -1,23 +1,22 @@
 ﻿using System.Windows.Forms;
 
-namespace CAM.MachineCncWorkCenter.Operations.Sawing
+namespace CAM.MachineCncWorkCenter.Operations.Sawing;
+
+public partial class SawingModesView : UserControl
 {
-    public partial class SawingModesView : UserControl
+    public SawingModesView()
     {
-        public SawingModesView()
-        {
-            InitializeComponent();
-        }
+        InitializeComponent();
+    }
 
-        public object DataSource
-        {
-            get => sawingModesBindingSource.DataSource;
-            set => sawingModesBindingSource.DataSource = value;
-        }
+    public object DataSource
+    {
+        get => sawingModesBindingSource.DataSource;
+        set => sawingModesBindingSource.DataSource = value;
+    }
 
-        private void gvSawingModes_DataError(object sender, DataGridViewDataErrorEventArgs e)
-        {
-            MessageBox.Show("Введите корректное числовое значение", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
-        }
+    private void gvSawingModes_DataError(object sender, DataGridViewDataErrorEventArgs e)
+    {
+        MessageBox.Show("Введите корректное числовое значение", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
     }
 }

@@ -1,12 +1,11 @@
 ﻿using System.Windows.Forms;
 
-namespace CAM.UtilViews
+namespace CAM.UtilViews;
+
+public partial class UtilsView : UserControl
 {
-    public partial class UtilsView : UserControl
+    public UtilsView()
     {
-        public UtilsView()
-        {
-            InitializeComponent();
-        }
+        InitializeComponent();
     }
 }

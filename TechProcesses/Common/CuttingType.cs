@@ -1,15 +1,14 @@
-﻿namespace CAM.TechProcesses.Common
-{
-    public static class CuttingType
-    {
-        /// <summary>
-        /// Гребенка
-        /// </summary>
-        public static string Roughing { get; } = "Гребенка";
+﻿namespace CAM.TechProcesses.Common;
 
-        /// <summary>
-        /// Чистка
-        /// </summary>
-        public static string Finishing { get; } = "Чистка";
-    }
+public static class CuttingType
+{
+    /// <summary>
+    /// Гребенка
+    /// </summary>
+    public static string Roughing { get; } = "Гребенка";
+
+    /// <summary>
+    /// Чистка
+    /// </summary>
+    public static string Finishing { get; } = "Чистка";
 }

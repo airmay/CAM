@@ -2,37 +2,36 @@
 using System.Windows.Forms;
 using CAM.Utils;
 
-namespace CAM.Core.Tools
+namespace CAM.Core.Tools;
+
+public partial class ToolsForm : Form
 {
-    public partial class ToolsForm : Form
+    public event EventHandler LoadTools;
+    public event EventHandler SaveTools;
+
+    public ToolsForm()
     {
-        public event EventHandler LoadTools;
-        public event EventHandler SaveTools;
+        InitializeComponent();
 
-        public ToolsForm()
-        {
-            InitializeComponent();
+        Type.DisplayMember = "Description";
+        Type.ValueMember = "Value";
+        Type.DataSource = Extensions.GetEnumValueDesc<ToolType>();
+    }
 
-            Type.DisplayMember = "Description";
-            Type.ValueMember = "Value";
-            Type.DataSource = Extensions.GetEnumValueDesc<ToolType>();
-        }
+    private void dataGridView1_DoubleClick(object sender, EventArgs e)
+    {
+        dataGridView.EndEdit();
+        DialogResult = DialogResult.OK;
+        Close();
+    }
 
-        private void dataGridView1_DoubleClick(object sender, EventArgs e)
-        {
-            dataGridView.EndEdit();
-            DialogResult = DialogResult.OK;
-            Close();
-        }
+    private void bLoad_Click(object sender, EventArgs e)
+    {
+        LoadTools?.Invoke(this, EventArgs.Empty);
+    }
 
-        private void bLoad_Click(object sender, EventArgs e)
-        {
-            LoadTools?.Invoke(this, EventArgs.Empty);
-        }
-
-        private void bSave_Click(object sender, EventArgs e)
-        {
-            SaveTools?.Invoke(this, EventArgs.Empty);
-        }
+    private void bSave_Click(object sender, EventArgs e)
+    {
+        SaveTools?.Invoke(this, EventArgs.Empty);
     }
 }

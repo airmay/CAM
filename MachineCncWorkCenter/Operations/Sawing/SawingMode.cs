@@ -1,35 +1,34 @@
 ﻿using System;
 
-namespace CAM.MachineCncWorkCenter.Operations.Sawing
+namespace CAM.MachineCncWorkCenter.Operations.Sawing;
+
+[Serializable]
+public class SawingMode
 {
-    [Serializable]
-    public class SawingMode
+    public SawingMode()
     {
-        public SawingMode()
-        {
-        }
-
-        public SawingMode(double depthStep, int feed)
-        {
-            DepthStep = depthStep;
-            Feed = feed;
-        }
-
-        /// <summary>
-        /// Глубина до которой действуют параметры шага и подачи
-        /// </summary>
-        public double? Depth { get; set; }
-
-        /// <summary>
-        /// Шаг по глубине
-        /// </summary>
-        public double DepthStep { get; set; }
-
-        /// <summary>
-        /// Подача
-        /// </summary>
-        public int Feed { get; set; }
-
-        //public SawingMode Clone() => (SawingMode)MemberwiseClone();
     }
+
+    public SawingMode(double depthStep, int feed)
+    {
+        DepthStep = depthStep;
+        Feed = feed;
+    }
+
+    /// <summary>
+    /// Глубина до которой действуют параметры шага и подачи
+    /// </summary>
+    public double? Depth { get; set; }
+
+    /// <summary>
+    /// Шаг по глубине
+    /// </summary>
+    public double DepthStep { get; set; }
+
+    /// <summary>
+    /// Подача
+    /// </summary>
+    public int Feed { get; set; }
+
+    //public SawingMode Clone() => (SawingMode)MemberwiseClone();
 }

@@ -1,16 +1,15 @@
 ﻿using System.ComponentModel;
 
-namespace CAM.Core.Tools
+namespace CAM.Core.Tools;
+
+public enum ToolType
 {
-    public enum ToolType
-    {
-        [Description("Диск")]
-        Disk,
+    [Description("Диск")]
+    Disk,
 
-        [Description("Фреза")]
-        Mill,
+    [Description("Фреза")]
+    Mill,
 
-        [Description("Трос")]
-        WireSaw
-    }
+    [Description("Трос")]
+    WireSaw
 }
