@@ -1,13 +1,13 @@
-﻿using Autodesk.AutoCAD.DatabaseServices;
-using Autodesk.AutoCAD.Geometry;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using Autodesk.AutoCAD.DatabaseServices;
+using Autodesk.AutoCAD.Geometry;
 
-namespace Dreambuild.AutoCAD
+namespace CAM.Autocad.AutoCADCommands
 {
     using IniData = Dictionary<string, Dictionary<string, string>>;
 

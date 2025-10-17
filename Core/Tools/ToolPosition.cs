@@ -1,7 +1,7 @@
-﻿using Autodesk.AutoCAD.Geometry;
-using System;
+﻿using System;
+using Autodesk.AutoCAD.Geometry;
 
-namespace CAM.Core
+namespace CAM.Core.Tools
 {
     [Serializable]
     public struct ToolPosition

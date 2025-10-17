@@ -1,10 +1,10 @@
-﻿using Autodesk.AutoCAD.DatabaseServices;
-using Autodesk.AutoCAD.Geometry;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Autodesk.AutoCAD.DatabaseServices;
+using Autodesk.AutoCAD.Geometry;
 
-namespace Dreambuild.AutoCAD
+namespace CAM.Autocad.AutoCADCommands
 {
     /// <summary>
     /// Database operation helpers.

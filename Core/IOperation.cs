@@ -1,4 +1,7 @@
-﻿namespace CAM;
+﻿using CAM.Autocad;
+using CAM.Core.Tools;
+
+namespace CAM.Core;
 
 public interface IOperation
 {

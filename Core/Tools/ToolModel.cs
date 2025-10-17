@@ -2,9 +2,10 @@
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
 using Autodesk.AutoCAD.GraphicsInterface;
-using CAM.Core;
+using CAM.Autocad;
+using CAM.Utils;
 
-namespace CAM;
+namespace CAM.Core.Tools;
 
 public static class ToolModel
 {

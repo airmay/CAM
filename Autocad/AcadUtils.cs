@@ -1,12 +1,12 @@
-﻿using Autodesk.AutoCAD.DatabaseServices;
-using Autodesk.AutoCAD.Geometry;
-using Dreambuild.AutoCAD;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Autodesk.AutoCAD.DatabaseServices;
+using Autodesk.AutoCAD.Geometry;
+using CAM.Autocad.AutoCADCommands;
 using DbSurface = Autodesk.AutoCAD.DatabaseServices.Surface;
 
-namespace CAM
+namespace CAM.Autocad
 {
     public static class AcadUtils
     {

@@ -1,9 +1,11 @@
-﻿using CAM.Operations.Sawing;
-using CAM.Operations.Tactile;
-using System;
+﻿using System;
 using System.Windows.Forms;
+using CAM.MachineCncWorkCenter.Operations.Sawing;
+using CAM.MachineCncWorkCenter.Operations.Tactile;
+using CAM.MachineWireSaw.Operations;
+using CAM.Utils;
 
-namespace CAM;
+namespace CAM.UI;
 
 public static class OperationMenuItems
 {

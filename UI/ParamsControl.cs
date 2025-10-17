@@ -1,13 +1,18 @@
-﻿using Autodesk.AutoCAD.DatabaseServices;
-using CAM.CncWorkCenter;
-using CAM.Core;
-using Dreambuild.AutoCAD;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
+using Autodesk.AutoCAD.DatabaseServices;
+using CAM.Autocad;
+using CAM.Autocad.AutoCADCommands;
+using CAM.Core;
+using CAM.Core.Enums;
+using CAM.Core.Tools;
+using CAM.MachineCncWorkCenter;
+using CAM.Utils;
+using Material = CAM.Core.Enums.Material;
 
-namespace CAM;
+namespace CAM.UI;
 
 public class ParamsControl : UserControl
 {

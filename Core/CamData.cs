@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using CAM.Core.Processing;
 
-namespace CAM;
+namespace CAM.Core;
 
 [Serializable]
 public class CamData

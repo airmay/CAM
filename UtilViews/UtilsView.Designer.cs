@@ -1,4 +1,4 @@
-﻿namespace CAM
+﻿namespace CAM.UtilViews
 {
     partial class UtilsView
     {
@@ -28,8 +28,8 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.pullingView1 = new CAM.UI.PullingView();
-            this.trimmingView1 = new CAM.TrimmingView();
+            this.pullingView1 = new PullingView();
+            this.trimmingView1 = new TrimmingView();
             this.SuspendLayout();
             // 
             // pullingView1
@@ -63,7 +63,7 @@
 
         #endregion
 
-        private UI.PullingView pullingView1;
+        private PullingView pullingView1;
         private TrimmingView trimmingView1;
     }
 }

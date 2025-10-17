@@ -1,6 +1,7 @@
 ﻿using System;
+using CAM.Utils;
 
-namespace CAM;
+namespace CAM.Core.Tools;
 
 /// <summary>
 /// Инструмент

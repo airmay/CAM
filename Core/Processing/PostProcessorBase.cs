@@ -1,7 +1,7 @@
-﻿using Autodesk.AutoCAD.Geometry;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using Autodesk.AutoCAD.Geometry;
 
-namespace CAM;
+namespace CAM.Core.Processing;
 
 public abstract class PostProcessorBase
 {

@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using Autodesk.AutoCAD.DatabaseServices;
-using CAM.Core;
+using CAM.Core.Tools;
 
-namespace CAM
+namespace CAM.Core.Processing
 {
     [Serializable]
     public readonly struct Command(

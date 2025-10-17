@@ -1,14 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Linq;
 using System.Windows.Forms;
-using Dreambuild.AutoCAD;
 using Autodesk.AutoCAD.DatabaseServices;
-using Autodesk.AutoCAD.Geometry;
 using Autodesk.AutoCAD.EditorInput;
+using Autodesk.AutoCAD.Geometry;
+using CAM.Autocad;
+using CAM.Autocad.AutoCADCommands;
+using Graph = CAM.Autocad.Graph;
 
-namespace CAM
+namespace CAM.UtilViews
 {
     public partial class TrimmingView : UserControl
     {

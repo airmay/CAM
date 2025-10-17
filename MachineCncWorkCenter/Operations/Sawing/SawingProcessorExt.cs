@@ -1,9 +1,9 @@
 ﻿using Autodesk.AutoCAD.DatabaseServices;
-using CAM.CncWorkCenter;
-using CAM.Utils;
-using Dreambuild.AutoCAD;
+using CAM.Autocad;
+using CAM.Autocad.AutoCADCommands;
+using CAM.Core.Enums;
 
-namespace CAM.Operations.Sawing
+namespace CAM.MachineCncWorkCenter.Operations.Sawing
 {
     public static class SawingProcessorExt
     {

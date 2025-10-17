@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace CAM
+namespace CAM.MachineCncWorkCenter.Operations.Sawing
 {
     [Serializable]
     public class SawingMode

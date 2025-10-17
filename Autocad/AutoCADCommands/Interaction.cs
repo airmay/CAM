@@ -1,19 +1,18 @@
-﻿using Autodesk.AutoCAD.Colors;
-using Autodesk.AutoCAD.DatabaseServices;
-using Autodesk.AutoCAD.EditorInput;
-using Autodesk.AutoCAD.Geometry;
-using Autodesk.AutoCAD.GraphicsInterface;
-using Autodesk.Windows;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
+using Autodesk.AutoCAD.Colors;
+using Autodesk.AutoCAD.DatabaseServices;
+using Autodesk.AutoCAD.EditorInput;
+using Autodesk.AutoCAD.Geometry;
+using Autodesk.Windows;
 using Application = Autodesk.AutoCAD.ApplicationServices.Application;
 using ColorDialog = Autodesk.AutoCAD.Windows.ColorDialog;
 using Polyline = Autodesk.AutoCAD.DatabaseServices.Polyline;
 
-namespace Dreambuild.AutoCAD
+namespace CAM.Autocad.AutoCADCommands
 {
     /// <summary>
     /// Command-line user interactions.

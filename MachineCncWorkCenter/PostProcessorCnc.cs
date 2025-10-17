@@ -1,7 +1,9 @@
-﻿using Autodesk.AutoCAD.Geometry;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using Autodesk.AutoCAD.Geometry;
+using CAM.Core.Processing;
+using CAM.Utils;
 
-namespace CAM.CncWorkCenter;
+namespace CAM.MachineCncWorkCenter;
 
 public abstract class PostProcessorCnc : PostProcessorBase
 {

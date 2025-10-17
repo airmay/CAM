@@ -1,10 +1,10 @@
-﻿using Autodesk.AutoCAD.ApplicationServices;
-using Autodesk.AutoCAD.DatabaseServices;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using Autodesk.AutoCAD.ApplicationServices;
 using Autodesk.AutoCAD.Colors;
-using Dreambuild.AutoCAD;
+using Autodesk.AutoCAD.DatabaseServices;
+using CAM.Autocad;
 
-namespace CAM;
+namespace CAM.Core.Processing;
 
 public static class ProcessingObjectBuilder
 {

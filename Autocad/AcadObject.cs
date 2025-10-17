@@ -1,10 +1,11 @@
-﻿using Autodesk.AutoCAD.DatabaseServices;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Dreambuild.AutoCAD;
+using Autodesk.AutoCAD.DatabaseServices;
+using CAM.Autocad.AutoCADCommands;
+using CAM.Utils;
 
-namespace CAM;
+namespace CAM.Autocad;
 
 [Serializable]
 public class AcadObject

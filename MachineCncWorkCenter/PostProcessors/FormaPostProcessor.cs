@@ -1,6 +1,4 @@
-﻿using CAM.CncWorkCenter;
-
-namespace CAM;
+﻿namespace CAM.MachineCncWorkCenter.PostProcessors;
 
 public class FormaPostProcessor : PostProcessorCnc
 {

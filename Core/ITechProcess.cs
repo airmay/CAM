@@ -1,6 +1,8 @@
-﻿using CAM.Core;
+﻿using CAM.Core.Enums;
+using CAM.Core.Processing;
+using CAM.Core.Tools;
 
-namespace CAM;
+namespace CAM.Core;
 
 public interface ITechProcess
 {

@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Windows.Forms;
+using CAM.Utils;
 
-namespace CAM
+namespace CAM.Core.Tools
 {
     public partial class ToolsForm : Form
     {

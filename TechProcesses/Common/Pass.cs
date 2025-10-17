@@ -1,6 +1,7 @@
 ﻿using System;
+using CAM.Utils;
 
-namespace CAM.TechProcesses.Tactile
+namespace CAM.TechProcesses.Common
 {
     [Serializable]
     public class Pass

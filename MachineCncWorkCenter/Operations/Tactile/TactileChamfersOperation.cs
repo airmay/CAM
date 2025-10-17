@@ -1,15 +1,7 @@
-﻿using Autodesk.AutoCAD.DatabaseServices;
-using Autodesk.AutoCAD.Geometry;
-using CAM.TechProcesses.Tactile;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using CAM.CncWorkCenter;
-using Dreambuild.AutoCAD;
+﻿using System;
+using CAM.UI;
 
-namespace CAM.Operations.Tactile
+namespace CAM.MachineCncWorkCenter.Operations.Tactile
 {
     [Serializable]
     public class TactileChamfersOperation : OperationCnc

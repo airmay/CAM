@@ -1,8 +1,11 @@
-﻿using Autodesk.AutoCAD.DatabaseServices;
-using System;
+﻿using System;
+using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
+using CAM.Autocad;
+using CAM.Core.Enums;
+using CAM.Utils;
 
-namespace CAM.Utils;
+namespace CAM.MachineCncWorkCenter;
 
 public static class EngineSideHelpers
 {

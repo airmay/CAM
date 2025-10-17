@@ -1,9 +1,13 @@
 ﻿using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
-using CAM.CncWorkCenter;
-using Dreambuild.AutoCAD;
 using System;
+using CAM.Autocad;
+using CAM.Autocad.AutoCADCommands;
 using CAM.Core;
+using CAM.Core.Processing;
+using CAM.Core.Tools;
+using CAM.MachineWireSaw.PostProcessors;
+using CAM.Utils;
 
 namespace CAM.MachineWireSaw;
 

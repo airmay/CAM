@@ -1,4 +1,4 @@
-﻿namespace CAM;
+﻿namespace CAM.Core.Enums;
 
 public enum Side
 {

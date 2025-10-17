@@ -1,12 +1,13 @@
-﻿using Autodesk.AutoCAD.DatabaseServices;
-using Autodesk.AutoCAD.Geometry;
-using Autodesk.AutoCAD.Internal.PropertyInspector;
-using Dreambuild.AutoCAD;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Autodesk.AutoCAD.DatabaseServices;
+using Autodesk.AutoCAD.Geometry;
+using Autodesk.AutoCAD.Internal.PropertyInspector;
+using CAM.Autocad.AutoCADCommands;
+using CAM.Utils;
 
-namespace CAM;
+namespace CAM.Autocad;
 
 public class Point3dComparer : IEqualityComparer<Point3d>
 {

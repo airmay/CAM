@@ -1,10 +1,11 @@
-﻿using Autodesk.AutoCAD.DatabaseServices;
-using Autodesk.AutoCAD.Geometry;
-using CAM.Core;
-using System;
+﻿using System;
 using System.Linq;
+using Autodesk.AutoCAD.DatabaseServices;
+using Autodesk.AutoCAD.Geometry;
+using CAM.Autocad;
+using CAM.Core.Tools;
 
-namespace CAM.CncWorkCenter;
+namespace CAM.Core.Processing;
 
 public abstract class ProcessorBase<TTechProcess, TProcessor>
     where TTechProcess : TechProcessBase<TTechProcess, TProcessor>

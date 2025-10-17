@@ -1,4 +1,4 @@
-﻿namespace CAM
+﻿namespace CAM.Core.Processing
 {
     public static class CommandNames
     {

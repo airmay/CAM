@@ -1,5 +1,4 @@
-﻿using Autodesk.AutoCAD.Geometry;
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -8,8 +7,9 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Windows.Forms;
+using Autodesk.AutoCAD.Geometry;
 
-namespace CAM;
+namespace CAM.Utils;
 
 public static class Extensions
 {

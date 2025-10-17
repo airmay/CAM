@@ -1,13 +1,13 @@
-﻿using Autodesk.AutoCAD.ApplicationServices;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using Autodesk.AutoCAD.ApplicationServices;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
 using Autodesk.AutoCAD.GraphicsInterface;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using Polyline = Autodesk.AutoCAD.DatabaseServices.Polyline;
 
-namespace Dreambuild.AutoCAD
+namespace CAM.Autocad.AutoCADCommands
 {
     /// <summary>
     /// The "Draw" module: directly draw entities (with AutoCAD-command-like functions)

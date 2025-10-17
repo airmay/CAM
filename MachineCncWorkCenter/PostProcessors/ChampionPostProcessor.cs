@@ -1,8 +1,7 @@
-﻿using Autodesk.AutoCAD.Geometry;
-using CAM.CncWorkCenter;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using Autodesk.AutoCAD.Geometry;
 
-namespace CAM;
+namespace CAM.MachineCncWorkCenter.PostProcessors;
 
 public class ChampionPostProcessor : PostProcessorCnc
 {

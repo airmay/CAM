@@ -1,15 +1,15 @@
-﻿using Autodesk.AutoCAD.ApplicationServices;
-using Autodesk.AutoCAD.DatabaseServices;
-using Autodesk.AutoCAD.EditorInput;
-using CAM.Core;
-using Dreambuild.AutoCAD;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
+using Autodesk.AutoCAD.ApplicationServices;
+using Autodesk.AutoCAD.DatabaseServices;
+using Autodesk.AutoCAD.EditorInput;
+using CAM.Autocad.AutoCADCommands;
+using CAM.Utils;
 using Application = Autodesk.AutoCAD.ApplicationServices.Core.Application;
 
-namespace CAM;
+namespace CAM.Autocad;
 
 /// <summary>
 /// Класс осуществляющий взаимодействие с автокадом

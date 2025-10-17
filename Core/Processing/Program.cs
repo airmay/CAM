@@ -1,12 +1,16 @@
-﻿using Autodesk.AutoCAD.DatabaseServices;
-using Autodesk.AutoCAD.Windows;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Autodesk.AutoCAD.DatabaseServices;
+using Autodesk.AutoCAD.Windows;
+using CAM.Autocad;
+using CAM.Core.Enums;
+using CAM.Core.Tools;
+using CAM.Utils;
 using static Autodesk.AutoCAD.Windows.SaveFileDialog;
 
-namespace CAM.Core;
+namespace CAM.Core.Processing;
 
 public class Program(
     List<Command> commands,
@@ -21,13 +25,13 @@ public class Program(
 
     public IOperation GetOperation(short operationNumber) => operations[operationNumber];
 
-    public CAM.Tool GetTool(short operationNumber) => operations[operationNumber].GetTool() ?? TechProcess.Tool;
+    public Tool GetTool(short operationNumber) => operations[operationNumber].GetTool() ?? TechProcess.Tool;
 
     public bool TryGetCommandIndexByObjectId(ObjectId objectId, out int index) => objectIds.TryGetValue(objectId, out index);
 
     public bool TryGetCommandIndexByOperationNumber(short operationNumber, out int index) => operationNumbers.TryGetValue(operationNumber, out index);
 
-    public void SetToolpathVisibility(bool value) => operationToolpath?.ForAll(p => p.Value.SetGroupVisibility(value));
+    public void SetToolpathVisibility(bool value) => operationToolpath?.ForAll(p => Acad.SetGroupVisibility(p.Value, value));
 
     //public void ShowOperationToolpath(short operationNumber) => operationToolpath?.ForAll(p => p.Value.SetGroupVisibility(p.Key == operationNumber));
 

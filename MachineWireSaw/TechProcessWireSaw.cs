@@ -1,7 +1,9 @@
 ﻿using System;
-using CAM.MachineWireSaw;
+using CAM.Core;
+using CAM.Core.Tools;
+using CAM.UI;
 
-namespace CAM.CncWorkCenter;
+namespace CAM.MachineWireSaw;
 
 [Serializable]
 public class TechProcessWireSaw : TechProcessBase<TechProcessWireSaw, ProcessorWireSaw>
@@ -37,7 +39,7 @@ public class TechProcessWireSaw : TechProcessBase<TechProcessWireSaw, ProcessorW
     public TechProcessWireSaw()
     {
         Caption = "Обработка Тросовый станок";
-        Machine = CAM.Machine.WireSawMachine;
+        Machine = Core.Enums.Machine.WireSawMachine;
         Tool = new Tool { Type = ToolType.WireSaw };
     }
 }

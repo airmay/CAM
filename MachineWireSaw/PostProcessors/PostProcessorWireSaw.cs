@@ -1,6 +1,4 @@
-﻿using CAM.CncWorkCenter;
-
-namespace CAM;
+﻿namespace CAM.MachineWireSaw.PostProcessors;
 
 public class PostProcessorWireSaw : PostProcessorWireSawBase
 {

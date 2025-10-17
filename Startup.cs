@@ -5,12 +5,17 @@ using Autodesk.AutoCAD.Geometry;
 using Autodesk.AutoCAD.Runtime;
 using Autodesk.AutoCAD.Windows;
 using CAM.Core;
-using Dreambuild.AutoCAD;
 using System;
 using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using CAM.Autocad;
+using CAM.Autocad.AutoCADCommands;
+using CAM.Core.Processing;
+using CAM.UI;
+using CAM.Utils;
+using CAM.UtilViews;
 
 namespace CAM;
 

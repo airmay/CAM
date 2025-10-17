@@ -1,4 +1,6 @@
-﻿namespace CAM
+﻿using CAM.Core.Processing;
+
+namespace CAM.UI
 {
     partial class ProcessingView
     {
@@ -370,7 +372,7 @@
             // 
             // processCommandBindingSource
             // 
-            this.processCommandBindingSource.DataSource = typeof(CAM.Command);
+            this.processCommandBindingSource.DataSource = typeof(Command);
             this.processCommandBindingSource.CurrentChanged += new System.EventHandler(this.processCommandBindingSource_CurrentChanged);
             // 
             // ProcessingView

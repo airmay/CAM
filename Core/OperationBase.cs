@@ -1,7 +1,9 @@
 ﻿using System;
-using CAM.CncWorkCenter;
+using CAM.Autocad;
+using CAM.Core.Processing;
+using CAM.Core.Tools;
 
-namespace CAM;
+namespace CAM.Core;
 
 [Serializable]
 public abstract class OperationBase<TTechProcess, TProcessor> : IOperation

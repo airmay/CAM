@@ -1,9 +1,11 @@
-﻿using Autodesk.AutoCAD.DatabaseServices;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Autodesk.AutoCAD.DatabaseServices;
+using CAM.Core.Tools;
+using CAM.Utils;
 
-namespace CAM.Core;
+namespace CAM.Core.Processing;
 
 public static class ProgramBuilder
 {

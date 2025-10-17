@@ -1,9 +1,9 @@
-﻿using Autodesk.AutoCAD.DatabaseServices;
-using Autodesk.AutoCAD.Geometry;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using Autodesk.AutoCAD.DatabaseServices;
+using Autodesk.AutoCAD.Geometry;
 
-namespace Dreambuild.AutoCAD
+namespace CAM.Autocad.AutoCADCommands
 {
     /// <summary>
     /// Layout operations.

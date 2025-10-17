@@ -3,8 +3,11 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Windows.Forms;
+using CAM.Autocad;
+using CAM.Core.Enums;
+using CAM.Utils;
 
-namespace CAM;
+namespace CAM.Core.Tools;
 
 public static class ToolService
 {

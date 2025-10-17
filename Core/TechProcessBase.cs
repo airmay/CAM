@@ -1,10 +1,12 @@
-﻿using CAM.CncWorkCenter;
-using CAM.Core;
-using System;
+﻿using System;
 using System.Diagnostics;
 using System.Linq;
+using CAM.Autocad;
+using CAM.Core.Enums;
+using CAM.Core.Processing;
+using CAM.Core.Tools;
 
-namespace CAM;
+namespace CAM.Core;
 
 [Serializable]
 public abstract class TechProcessBase<TTechProcess, TProcessor> : ITechProcess

@@ -1,6 +1,9 @@
 ﻿using System;
+using CAM.Core;
+using CAM.Core.Enums;
+using CAM.UI;
 
-namespace CAM.CncWorkCenter;
+namespace CAM.MachineCncWorkCenter;
 
 [Serializable]
 public class TechProcessCnc : TechProcessBase<TechProcessCnc, ProcessorCnc>

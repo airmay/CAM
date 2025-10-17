@@ -1,14 +1,17 @@
-﻿using Autodesk.AutoCAD.DatabaseServices;
-using Autodesk.AutoCAD.Geometry;
-using Autodesk.AutoCAD.Runtime;
-using Dreambuild.AutoCAD;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Autodesk.AutoCAD.DatabaseServices;
+using Autodesk.AutoCAD.Geometry;
+using Autodesk.AutoCAD.Runtime;
+using CAM.Autocad;
+using CAM.Autocad.AutoCADCommands;
+using CAM.UI;
+using CAM.Utils;
 using DbSurface = Autodesk.AutoCAD.DatabaseServices.Surface;
 using Exception = Autodesk.AutoCAD.Runtime.Exception;
 
-namespace CAM
+namespace CAM.MachineWireSaw.Operations
 {
     [Serializable]
     public class WireSawOperation : OperationWireSawBase

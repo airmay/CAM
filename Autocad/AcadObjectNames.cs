@@ -1,4 +1,4 @@
-﻿namespace CAM
+﻿namespace CAM.Autocad
 {
     public static class AcadObjectNames
     {

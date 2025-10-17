@@ -1,14 +1,18 @@
-﻿using Autodesk.AutoCAD.DatabaseServices;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Autodesk.AutoCAD.Geometry;
-using CAM.CncWorkCenter;
-using Dreambuild.AutoCAD;
-using CAM.Utils;
 using Autodesk.AutoCAD.Colors;
+using Autodesk.AutoCAD.DatabaseServices;
+using Autodesk.AutoCAD.Geometry;
+using CAM.Autocad;
+using CAM.Autocad.AutoCADCommands;
+using CAM.Core.Enums;
+using CAM.Core.Processing;
+using CAM.UI;
+using CAM.Utils;
+using Graph = CAM.Autocad.Graph;
 
-namespace CAM.Operations.Sawing
+namespace CAM.MachineCncWorkCenter.Operations.Sawing
 {
     [Serializable]
     public class SawingOperation : OperationCnc

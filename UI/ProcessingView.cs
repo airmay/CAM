@@ -4,10 +4,14 @@ using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
 using Autodesk.AutoCAD.DatabaseServices;
-using CAM.CncWorkCenter;
+using CAM.Autocad;
 using CAM.Core;
+using CAM.Core.Processing;
+using CAM.Core.Tools;
+using CAM.MachineCncWorkCenter;
+using CAM.Utils;
 
-namespace CAM;
+namespace CAM.UI;
 
 public partial class ProcessingView : UserControl
 {

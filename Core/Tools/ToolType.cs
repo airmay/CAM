@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel;
 
-namespace CAM
+namespace CAM.Core.Tools
 {
     public enum ToolType
     {

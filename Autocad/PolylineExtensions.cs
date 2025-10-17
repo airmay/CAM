@@ -3,9 +3,10 @@ using System.Collections.Generic;
 using Autodesk.AutoCAD.Colors;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
-using Dreambuild.AutoCAD;
+using CAM.Autocad.AutoCADCommands;
+using CAM.Core.Processing;
 
-namespace CAM;
+namespace CAM.Autocad;
 
 public static class PolylineExtensions
 {

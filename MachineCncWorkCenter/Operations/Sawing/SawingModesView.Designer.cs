@@ -1,4 +1,4 @@
-﻿namespace CAM.Operations.Sawing
+﻿namespace CAM.MachineCncWorkCenter.Operations.Sawing
 {
     partial class SawingModesView
     {
@@ -88,7 +88,7 @@
             // 
             // sawingModesBindingSource
             // 
-            this.sawingModesBindingSource.DataSource = typeof(CAM.SawingMode);
+            this.sawingModesBindingSource.DataSource = typeof(SawingMode);
             // 
             // SawingModesView
             // 

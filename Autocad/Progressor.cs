@@ -1,9 +1,9 @@
-﻿using Autodesk.AutoCAD.Runtime;
-using System;
+﻿using System;
 using System.Diagnostics;
 using System.Windows.Forms;
+using Autodesk.AutoCAD.Runtime;
 
-namespace CAM.Core;
+namespace CAM.Autocad;
 
 public static class Progressor
 {

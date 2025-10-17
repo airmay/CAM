@@ -3,7 +3,7 @@ using System.Linq;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
 
-namespace CAM;
+namespace CAM.Autocad;
 
 public static class Curve2dExtensions
 {

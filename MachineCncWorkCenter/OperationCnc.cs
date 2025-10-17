@@ -1,7 +1,7 @@
 ﻿using System;
-using CAM.CncWorkCenter;
+using CAM.Core;
 
-namespace CAM;
+namespace CAM.MachineCncWorkCenter;
 
 [Serializable]
 public abstract class OperationCnc : OperationBase<TechProcessCnc, ProcessorCnc>;

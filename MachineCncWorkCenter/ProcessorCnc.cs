@@ -1,11 +1,15 @@
-﻿using Autodesk.AutoCAD.DatabaseServices;
+﻿using System;
+using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
-using CAM.Core;
-using Dreambuild.AutoCAD;
-using System;
+using CAM.Autocad;
+using CAM.Autocad.AutoCADCommands;
+using CAM.Core.Enums;
+using CAM.Core.Processing;
+using CAM.Core.Tools;
+using CAM.MachineCncWorkCenter.PostProcessors;
 using CAM.Utils;
 
-namespace CAM.CncWorkCenter;
+namespace CAM.MachineCncWorkCenter;
 
 public class ProcessorCnc : ProcessorBase<TechProcessCnc, ProcessorCnc>
 {

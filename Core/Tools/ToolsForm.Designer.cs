@@ -1,4 +1,4 @@
-﻿namespace CAM
+﻿namespace CAM.Core.Tools
 {
     partial class ToolsForm
     {
@@ -159,7 +159,7 @@
             // 
             // ToolBindingSource
             // 
-            this.ToolBindingSource.DataSource = typeof(CAM.Tool);
+            this.ToolBindingSource.DataSource = typeof(Tool);
             // 
             // dataGridViewComboBoxColumn1
             // 

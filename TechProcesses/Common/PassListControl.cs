@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Windows.Forms;
+using CAM.Utils;
 
-namespace CAM.TechProcesses.Tactile
+namespace CAM.TechProcesses.Common
 {
     public partial class PassListControl : UserControl
     {

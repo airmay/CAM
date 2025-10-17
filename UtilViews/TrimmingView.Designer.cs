@@ -1,4 +1,4 @@
-﻿namespace CAM
+﻿namespace CAM.UtilViews
 {
     partial class TrimmingView
     {

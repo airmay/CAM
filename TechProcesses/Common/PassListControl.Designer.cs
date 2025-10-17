@@ -1,4 +1,6 @@
-﻿namespace CAM.TechProcesses.Tactile
+﻿using CAM.MachineCncWorkCenter.Operations.Tactile;
+
+namespace CAM.TechProcesses.Common
 {
     partial class PassListControl
     {
@@ -127,7 +129,7 @@
             // BindingSource
             // 
             this.BindingSource.DataMember = "PassList";
-            this.BindingSource.DataSource = typeof(CAM.Operations.Tactile.TactileBandsOperation);
+            this.BindingSource.DataSource = typeof(TactileBandsOperation);
             // 
             // PassListControl
             // 

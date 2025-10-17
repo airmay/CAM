@@ -1,8 +1,9 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Globalization;
+using CAM.Autocad;
 
-namespace CAM;
+namespace CAM.Utils;
 
 /// <summary>
 /// Extension methods for all objects.

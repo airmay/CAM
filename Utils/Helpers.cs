@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Runtime.Serialization;
 
-namespace CAM;
+namespace CAM.Utils;
 
 public sealed class MyBinder : SerializationBinder
 {

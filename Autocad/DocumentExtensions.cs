@@ -1,10 +1,11 @@
-﻿using Autodesk.AutoCAD.ApplicationServices;
-using Autodesk.AutoCAD.DatabaseServices;
-using System;
+﻿using System;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
+using Autodesk.AutoCAD.ApplicationServices;
+using Autodesk.AutoCAD.DatabaseServices;
+using CAM.Utils;
 
-namespace CAM;
+namespace CAM.Autocad;
 
 [Serializable]
 public static class DocumentExtensions
