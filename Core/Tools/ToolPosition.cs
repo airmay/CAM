@@ -4,21 +4,13 @@ using Autodesk.AutoCAD.Geometry;
 namespace CAM.Core.Tools;
 
 [Serializable]
-public struct ToolPosition
+public readonly struct ToolPosition(Point3d point, double angleC, double angleA = 0)
 {
-    public ToolPosition(Point3d point, double angleC, double angleA = 0)
-    {
-        X = point.X;
-        Y = point.Y;
-        Z = point.Z;
-        AngleC = angleC;
-        AngleA = angleA;
-    }
+    public double X { get; } = point.X;
+    public double Y { get; } = point.Y;
+    public double Z { get; } = point.Z;
+    public double AngleC { get; } = angleC;
+    public double AngleA { get; } = angleA;
 
-    public double X { get; }
-    public double Y { get; }
-    public double Z { get; }
-    public Point3d Point => new Point3d(X, Y, Z);
-    public double AngleC { get; }
-    public double AngleA { get; }
+    public Point3d Point => new(X, Y, Z);
 }
