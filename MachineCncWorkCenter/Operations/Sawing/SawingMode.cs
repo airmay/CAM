@@ -5,6 +5,16 @@ namespace CAM
     [Serializable]
     public class SawingMode
     {
+        public SawingMode()
+        {
+        }
+
+        public SawingMode(double depthStep, int feed)
+        {
+            DepthStep = depthStep;
+            Feed = feed;
+        }
+
         /// <summary>
         /// Глубина до которой действуют параметры шага и подачи
         /// </summary>

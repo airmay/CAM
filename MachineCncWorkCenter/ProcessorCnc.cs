@@ -3,6 +3,7 @@ using Autodesk.AutoCAD.Geometry;
 using CAM.Core;
 using Dreambuild.AutoCAD;
 using System;
+using CAM.Utils;
 
 namespace CAM.CncWorkCenter;
 
@@ -40,7 +41,7 @@ public class ProcessorCnc : ProcessorBase<ProcessingCnc, ProcessorCnc>
     {
         if (IsUpperTool)
         {
-            var angleC = BuilderUtils.CalcToolAngle((endPoint - startPoint).ToVector2d().Angle);
+            var angleC = (endPoint - startPoint).ToVector2d().Angle.GetToolAngle();
             Move(startPoint, angleC);
         }
 

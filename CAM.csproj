@@ -100,19 +100,19 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Acad\Acad.cs" />
-    <Compile Include="Acad\AcadObjectNames.cs" />
-    <Compile Include="Acad\AcadUtils.cs" />
-    <Compile Include="Acad\AutoCADCommands\Algorithms.cs" />
-    <Compile Include="Acad\AutoCADCommands\App.cs" />
-    <Compile Include="Acad\AutoCADCommands\Commands.cs" />
-    <Compile Include="Acad\AutoCADCommands\DbHelper.cs" />
-    <Compile Include="Acad\AutoCADCommands\Interaction.cs" />
-    <Compile Include="Acad\AutoCADCommands\Layouts.cs" />
-    <Compile Include="Acad\AutoCADCommands\QuickSelection.cs" />
-    <Compile Include="Acad\AutoCADCommands\SymbolPack.cs" />
-    <Compile Include="Acad\Curve2dExtensions.cs" />
-    <Compile Include="Acad\PolylineExtensions.cs" />
+    <Compile Include="Autocad\Acad.cs" />
+    <Compile Include="Autocad\AcadObjectNames.cs" />
+    <Compile Include="Autocad\AcadUtils.cs" />
+    <Compile Include="Autocad\AutoCADCommands\Algorithms.cs" />
+    <Compile Include="Autocad\AutoCADCommands\App.cs" />
+    <Compile Include="Autocad\AutoCADCommands\Commands.cs" />
+    <Compile Include="Autocad\AutoCADCommands\DbHelper.cs" />
+    <Compile Include="Autocad\AutoCADCommands\Interaction.cs" />
+    <Compile Include="Autocad\AutoCADCommands\Layouts.cs" />
+    <Compile Include="Autocad\AutoCADCommands\QuickSelection.cs" />
+    <Compile Include="Autocad\AutoCADCommands\SymbolPack.cs" />
+    <Compile Include="Autocad\Curve2dExtensions.cs" />
+    <Compile Include="Autocad\PolylineExtensions.cs" />
     <Compile Include="Utils\Util.cs" />
     <Compile Include="Core\ProgramBuilder.cs" />
     <Compile Include="Core\UI\CamData.cs" />
@@ -158,7 +158,7 @@
     <Compile Include="MachineCncWorkCenter\Operations\Sawing\SawingProcessorExt.cs" />
     <Compile Include="MachineCncWorkCenter\Operations\Tactile\TactileBandsOperation.cs" />
     <Compile Include="MachineCncWorkCenter\Operations\Tactile\TactileChamfersOperation.cs" />
-    <Compile Include="Utils\BuilderUtils.cs" />
+    <Compile Include="TechProcesses\SectionProfile\BuilderUtils.cs" />
     <Compile Include="Program\CommandGenerator\ChampionCommandGenerator.cs" />
     <Compile Include="Program\CommandGenerator\FormaiCommandGenerator.cs" />
     <Compile Include="Program\CommandGenerator\KreaCommandGenerator.cs" />
@@ -176,7 +176,7 @@
     <Compile Include="UtilViews\UtilsView.Designer.cs">
       <DependentUpon>UtilsView.cs</DependentUpon>
     </Compile>
-    <Compile Include="Acad\AcadObject.cs" />
+    <Compile Include="Autocad\AcadObject.cs" />
     <Compile Include="Core\Enums\Machine.cs" />
     <Compile Include="Core\Enums\Material.cs" />
     <Compile Include="Program\Generator\PostProcessorBase.cs" />
@@ -220,8 +220,8 @@
       <DependentUpon>ToolsForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Core\Tools\ToolType.cs" />
-    <Compile Include="Acad\Graph.cs" />
-    <Compile Include="Utils\EngineSideCalculator.cs" />
+    <Compile Include="Autocad\Graph.cs" />
+    <Compile Include="Utils\EngineSideHelpers.cs" />
     <Compile Include="Utils\Extensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Resources.Designer.cs">

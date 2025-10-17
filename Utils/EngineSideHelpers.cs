@@ -1,16 +1,27 @@
 ﻿using Autodesk.AutoCAD.DatabaseServices;
 using System;
+using Autodesk.AutoCAD.Geometry;
 
 namespace CAM.Utils;
 
-public static class EngineSideCalculator
+public static class EngineSideHelpers
 {
-    public static Side Calculate(Curve curve)
+    public static Side GetEngineSide(this double angle) => angle.ToRoundDeg() is > 0 and <= 180 ? Side.Right : Side.Left;
+
+    public static double GetToolAngle(this Curve curve, Point3d point, Side? engineSide = null) => curve.GetTangent(point).Angle.GetToolAngle(engineSide);
+
+    public static double GetToolAngle(this double angle, Side? engineSide = null)
+    {
+        engineSide ??= angle.GetEngineSide();
+        return ((engineSide == Side.Right ? 1 : 2) * Math.PI + 2 * Math.PI - angle) % (2 * Math.PI);
+    }
+
+    public static Side GetEngineSide(this Curve curve)
     {
         return curve switch
         {
             Arc arc => CalcArc(arc),
-            Line line => CalcLine(line),
+            Line line => line.Angle.GetEngineSide(),
             Polyline polyline => CalcPolyline(polyline),
             _ => throw new InvalidOperationException($"Кривая типа {curve.GetType()} не может быть обработана.")
         };
@@ -34,15 +45,10 @@ public static class EngineSideCalculator
         return startSide + endSide > 0 ? Side.Right : Side.Left;
     }
 
-    private static Side CalcLine(Line line)
-    {
-        return BuilderUtils.CalcEngineSide(line.Angle);
-    }
-
     private static Side CalcPolyline(Polyline polyline)
     {
         var sign = 0;
-        var engineSide = Side.None;
+        Side? engineSide = null;
 
         for (var i = 0; i < polyline.NumberOfVertices; i++)
         {
@@ -63,7 +69,7 @@ public static class EngineSideCalculator
             if (s != sign)
             {
                 var sd = sign > 0 ^ bulge < 0 ? Side.Left : Side.Right;
-                if (engineSide != Side.None)
+                if (engineSide != null)
                 {
                     if (engineSide != sd)
                         throw new InvalidOperationException("Обработка полилинии невозможна.");
@@ -77,8 +83,6 @@ public static class EngineSideCalculator
                 throw new InvalidOperationException("Обработка невозможна - дуга полилинии пересекает углы 90 и 270 градусов.");
         }
 
-        return engineSide != Side.None
-            ? engineSide
-            : BuilderUtils.CalcEngineSide(polyline.GetTangent(polyline.StartPoint).Angle);
+        return engineSide ?? polyline.GetTangent(polyline.StartPoint).Angle.GetEngineSide();
     }
 }

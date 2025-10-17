@@ -1,5 +1,6 @@
 ﻿using Autodesk.AutoCAD.DatabaseServices;
 using CAM.CncWorkCenter;
+using CAM.Utils;
 using Dreambuild.AutoCAD;
 
 namespace CAM.Operations.Sawing
@@ -11,7 +12,7 @@ namespace CAM.Operations.Sawing
             var point = curve.GetPoint(fromStart);
             if (processor.IsUpperTool)
             {
-                var angleC = BuilderUtils.CalcToolAngle(curve, point, engineSide);
+                var angleC = curve.GetToolAngle(point, engineSide);
                 processor.Move(point, angleC, angleA);
                 //processor.Cycle();
             }
@@ -24,7 +25,7 @@ namespace CAM.Operations.Sawing
             var point = line.GetPoint(fromStart);
             if (processor.IsUpperTool)
             {
-                var angleC = BuilderUtils.CalcToolAngle(line.Angle, engineSide);
+                var angleC = line.Angle.GetToolAngle(engineSide);
                 processor.Move(point, angleC);
                 //Cycle();
             }
@@ -37,7 +38,7 @@ namespace CAM.Operations.Sawing
             processor.Approach(arc, fromStart, engineSide, angleA);
 
             var point = arc.GetPoint(!fromStart);
-            var angleC = BuilderUtils.CalcToolAngle(arc, point, engineSide);
+            var angleC = arc.GetToolAngle(point, engineSide);
             var gCode = point == arc.StartPoint ? 3 : 2;
             processor.GCommand(gCode, feed, arc, point, angleC: angleC, arcCenter: arc.Center.ToPoint2d());
         }
@@ -59,7 +60,7 @@ namespace CAM.Operations.Sawing
                 {
                     var arcSeg = polyline.GetArcSegment2dAt(i);
                     var gCode = arcSeg.IsClockWise ? 2 : 3;
-                    var angleC = BuilderUtils.CalcToolAngle(polyline, point, engineSide);
+                    var angleC = polyline.GetToolAngle(point, engineSide);
                     processor.GCommand(gCode, feed, polyline, point, angleC: angleC, arcCenter: arcSeg.Center);
                 }
                 else
