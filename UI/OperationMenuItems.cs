@@ -1,9 +1,10 @@
-﻿using System;
-using System.Windows.Forms;
-using CAM.MachineCncWorkCenter.Operations.Sawing;
+﻿using CAM.MachineCncWorkCenter.Operations.Sawing;
+using CAM.MachineCncWorkCenter.Operations.SectionProfile;
 using CAM.MachineCncWorkCenter.Operations.Tactile;
 using CAM.MachineWireSaw.Operations;
 using CAM.Utils;
+using System;
+using System.Windows.Forms;
 
 namespace CAM.UI;
 
@@ -17,6 +18,10 @@ public static class OperationMenuItems
     private static readonly OperationMenuItemBase[] Items =
     [
         new OperationMenuMenuItem("Распиловка", typeof(SawingOperation)),
+        new OperationMenuGroupMenuItem("Профиль по сечению",
+        [
+            new OperationMenuMenuItem("Продольная обработка", typeof(MachineCncWorkCenter.Operations.SectionProfile.LongProcessing)),
+        ]),
         new OperationMenuGroupMenuItem("Тактилка", 
         [
             new OperationMenuMenuItem("Полосы", typeof(TactileBandsOperation)),

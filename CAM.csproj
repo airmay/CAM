@@ -21,7 +21,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <PlatformTarget>AnyCPU</PlatformTarget>
+    <PlatformTarget>x64</PlatformTarget>
     <LangVersion>latest</LangVersion>
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
@@ -115,6 +115,7 @@
     <Compile Include="Autocad\PolylineExtensions.cs" />
     <Compile Include="Core\IOperation.cs" />
     <Compile Include="Core\ITechProcess.cs" />
+    <Compile Include="MachineCncWorkCenter\Operations\SectionProfile\LongProcessing.cs" />
     <Compile Include="Utils\Helpers.cs" />
     <Compile Include="Core\Processing\ProgramBuilder.cs" />
     <Compile Include="Core\CamData.cs" />
@@ -160,7 +161,7 @@
     <Compile Include="MachineCncWorkCenter\Operations\Sawing\SawingProcessorExt.cs" />
     <Compile Include="MachineCncWorkCenter\Operations\Tactile\TactileBandsOperation.cs" />
     <Compile Include="MachineCncWorkCenter\Operations\Tactile\TactileChamfersOperation.cs" />
-    <Compile Include="TechProcesses\SectionProfile\BuilderUtils.cs" />
+    <Compile Include="MachineCncWorkCenter\BuilderUtils.cs" />
     <Compile Include="MachineCncWorkCenter\PostProcessors\ChampionPostProcessor.cs" />
     <Compile Include="MachineCncWorkCenter\PostProcessors\FormaPostProcessor.cs" />
     <Compile Include="MachineCncWorkCenter\PostProcessors\KreaPostProcessor.cs" />

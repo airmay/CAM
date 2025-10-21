@@ -16,19 +16,18 @@ public static class Helpers
         while (x[i] < x1)
             i++;
 
-        var index = i - 1;
-        var extremum = i == 0
-            ? y[0]
-            : GetY(x1);
+        var (extremum, index) = i == 0
+            ? (y[0], 0)
+            : (GetY(x1), i - 1);
 
-        while (i < x.Length && x[i] < x2)
+        while (i < x.Length && x[i] <= x2)
         {
             extremum = extremumFunc(y[i], extremum);
             i++;
         }
 
         if (i < x.Length)
-            extremum = GetY(x2);
+            extremum = extremumFunc(GetY(x2), extremum);
 
         return (extremum, index);
 

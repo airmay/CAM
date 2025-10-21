@@ -56,7 +56,7 @@ public static class ToolModel
         var displacement = Matrix3d.Displacement(_position.Point.GetVectorTo(to.Point));
         var rotationC = Matrix3d.Rotation((to.AngleC - _position.AngleC) * signAngleC, Vector3d.ZAxis, to.Point);
         // todo ToRad()
-        var rotationA = Matrix3d.Rotation((_position.AngleA - to.AngleA).ToRad(), Vector3d.XAxis.RotateBy(-to.AngleC.ToRad(), Vector3d.ZAxis), to.Point);
+        var rotationA = Matrix3d.Rotation((to.AngleA - _position.AngleA).ToRad(), Vector3d.XAxis.RotateBy(-to.AngleC, Vector3d.ZAxis), to.Point);
         var matrix = rotationA * rotationC * displacement;
 
         foreach (var item in _curves)

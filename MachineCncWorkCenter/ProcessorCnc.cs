@@ -103,7 +103,7 @@ public class ProcessorCnc : ProcessorBase<TechProcessCnc, ProcessorCnc>
 
     public void GCommand(int gCode, int? feed = null, Curve curve = null, Point3d? point = null, double? angleC = null, double? angleA = null, Point2d? arcCenter = null)
     {
-        var commandText = _postProcessor.GCommand(point, angleC?.ToRoundDeg(), angleA?.ToRoundDeg(), feed, arcCenter);
+        var commandText = _postProcessor.GCommand(point, angleC?.ToRoundDeg(), angleA, feed, arcCenter);
         if (commandText == null)
             return;
 

@@ -1,8 +1,9 @@
-﻿/*using Autodesk.AutoCAD.DatabaseServices;
+﻿using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using CAM.Autocad;
 
 namespace CAM;
 
@@ -160,4 +161,4 @@ public class Interval
     {
         return Start.Y + _koeff * (x - Start.X);
     }
-}*/
+}
