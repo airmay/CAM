@@ -22,6 +22,7 @@ public abstract class OperationBase<TTechProcess, TProcessor> : IOperation
     public Tool GetTool() => Tool ?? TechProcess?.Tool;
     public double ToolDiameter => GetTool().Diameter;
     public double ToolThickness => GetTool().Thickness.Value;
+    public double Delta => TechProcess.Delta;
 
     public abstract void Execute();
 }

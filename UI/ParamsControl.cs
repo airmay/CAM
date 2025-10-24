@@ -301,6 +301,12 @@ public class ParamsControl : UserControl
         var (textbox, button) = CreateSelector(paramName, displayName, "۞", hint, required);
 
         var prop = _type.GetProperty(paramName);
+        textbox.ReadOnly = false;
+        textbox.Validated += (sender, args) =>
+        {
+            if (string.IsNullOrEmpty(textbox.Text))
+                prop.SetValue(_bindingSource.DataSource, null);
+        };
         textbox.Enter += (s, e) => prop.GetValue(_bindingSource.DataSource).As<AcadObject>()?.Select();
         button.Click += (s, e) =>
         {

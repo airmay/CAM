@@ -10,26 +10,26 @@ public sealed class MyBinder : SerializationBinder
 
 public static class Helpers
 {
-    public static (double, int) FindExtremum(double[] x, double[] y, double x1, double x2, Func<double, double, double> extremumFunc, int startIndex = 0)
+    public static (double, int) FindMax(double[] x, double[] y, double x1, double x2, int startIndex = 0)
     {
         var i = startIndex;
         while (x[i] < x1)
             i++;
 
-        var (extremum, index) = i == 0
+        var (max, index) = i == 0
             ? (y[0], 0)
             : (GetY(x1), i - 1);
 
         while (i < x.Length && x[i] <= x2)
         {
-            extremum = extremumFunc(y[i], extremum);
+            max = Math.Max(y[i], max);
             i++;
         }
 
         if (i < x.Length)
-            extremum = extremumFunc(GetY(x2), extremum);
+            max = Math.Max(GetY(x2), max);
 
-        return (extremum, index);
+        return (max, index);
 
         double GetY(double p) => LinearInterpolate(p, x[i - 1], x[i], y[i - 1], y[i]);
     }

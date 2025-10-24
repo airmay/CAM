@@ -1,12 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Windows.Forms;
-using Autodesk.AutoCAD.ApplicationServices;
+﻿using Autodesk.AutoCAD.ApplicationServices;
+using Autodesk.AutoCAD.Colors;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.EditorInput;
 using CAM.Autocad.AutoCADCommands;
 using CAM.Utils;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Windows.Forms;
 using Application = Autodesk.AutoCAD.ApplicationServices.Core.Application;
 
 namespace CAM.Autocad;
@@ -154,4 +155,6 @@ public static class Acad
     }
 
     #endregion
+
+    public static Transparency GetSemitransparent() => new Transparency(255 * (100 - 70) / 100);
 }

@@ -29,6 +29,7 @@ public class AcadObject
             .ToArray();
 
     public ObjectId ObjectId => ObjectIds[0];
+    public T Get<T>() where T : DBObject => ObjectId.QOpenForRead<T>();
     public Curve GetCurve() => ObjectId.QOpenForRead<Curve>();
     public Curve[] GetCurves() => ObjectIds.QOpenForRead<Curve>();
 
