@@ -7,8 +7,6 @@ using CAM.Core.Processing;
 using CAM.UI;
 using CAM.Utils;
 using System;
-using System.Collections.Generic;
-using System.Drawing.Drawing2D;
 using System.Linq;
 
 namespace CAM.MachineCncWorkCenter.Operations.SectionProfile;
@@ -90,8 +88,8 @@ public class LongProcessing: OperationCnc
         if (railBase.IsNewObject)
             railBase.Dispose();
 
-        var xIndex = IsA90 ? 1 : 0;
-        if (profile.StartPoint[xIndex] < profile.EndPoint[xIndex])
+        var (argIndex, fnIndex) = IsA90 ? (1, 0) : (0, 1);
+        if (profile.StartPoint[argIndex] < profile.EndPoint[argIndex])
             profile.ReverseCurve();
 
             //var side = (int)rail.GetFirstDerivative(0).GetAngleTo(Vector3d.XAxis).GetEngineSide() * ChangeEngineSide.GetSign(-1);
@@ -110,28 +108,28 @@ public class LongProcessing: OperationCnc
         //}
         //var angleA = IsA90 ? 90 : 0;
 
-        var sign = IsA90 ? -1 : 1;
-        var dist = profile.StartPoint[xIndex] - profile.EndPoint[xIndex];
-        var step = StepPass.Value;
-        var x = FirstPass.HasValue ? dist - FirstPass.Value : step;
-        var end = LastPass.HasValue ? dist - LastPass.Value : dist - ToolThickness;
+        var dist = profile.StartPoint[argIndex] - profile.EndPoint[argIndex];
+        var argStep = StepPass.Value;
+        var arg = FirstPass.HasValue ? dist - FirstPass.Value : argStep;
+        var argEnd = LastPass.HasValue ? dist - LastPass.Value : dist;
 
         var points = profile.GetPolylineFitPoints(1D).ToArray();
-
-        var xArray = points.ConvertAll(p => profile.StartPoint[xIndex] - p[xIndex]);
-        var yArray = points.ConvertAll(p => sign * (p[1 - xIndex] - profile.EndPoint[1 - xIndex]));
-        var index = 0;
+        var argArray = points.ConvertAll(p => profile.StartPoint[argIndex] - p[argIndex]);
+        var fnArray = points.ConvertAll(p => IsA90.GetSign(-1) * (p[fnIndex] - profile.EndPoint[fnIndex]));       
         var offsetVector = profile.EndPoint - profilePoint;
+        var index = 0; 
+
         do
         {
-            (var y, index) = Helpers.FindMax(xArray, yArray, x - ToolThickness, x, index);
+            (var fn, index) = Helpers.FindMax(argArray, fnArray, arg - ToolThickness, arg, index);
 
-            //var allPenetration = PenetrationBegin.Value - end;
-            //count = (int)Math.Ceiling(allPenetration / PenetrationStep.Value);
-            //penetrationStepCalc = allPenetration / count;
+            var allPenetration = PenetrationBegin.Value - end;
+            count = (int)Math.Ceiling(allPenetration / PenetrationStep.Value);
+            penetrationStepCalc = allPenetration / count;
 
-            var (offset, dz) = IsA90 ? (y, dist - x) : (dist - x, y);
-            var toolpath = CreateCopy(rail, sign * offset + offsetVector.X, dz + offsetVector.Y);
+            var (offset, dz) = IsA90 ? (-fn, dist - arg) : (dist - arg, fn);
+            var toolpath = CreateCopy(rail, offset + offsetVector.X, dz + offsetVector.Y);
+
             // ProcessingObjectBuilder.AddEntity(toolpath);
             // ProcessingObjectBuilder.AddEntity(NoDraw.Line(toolpath.StartPoint, toolpath.StartPoint + Vector3d.ZAxis * 100));
             // ProcessingObjectBuilder.AddEntity(NoDraw.Line(toolpath.StartPoint, toolpath.StartPoint + Vector3d.YAxis * ToolThickness));
@@ -143,9 +141,9 @@ public class LongProcessing: OperationCnc
             //}
 
             //tp.ForEach(p => Cutting(p, fromStart = !fromStart, (Side)side));
-            x += step;
+            arg += argStep;
         } 
-        while (x < end);
+        while (arg < argEnd);
 
 /*
         //var points = BuilderUtils.GetProcessPoints(profile, index, StepPass, ToolThickness, isMinToolCoord, FirstPass, LastPass, IsExactlyBegin, IsExactlyEnd, IsProfileStep);
