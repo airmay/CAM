@@ -85,6 +85,8 @@ public static class Graph
     public static Point3d[] Points(this Curve curve) => [curve.StartPoint, curve.EndPoint];
 
     public static Point3d GetPoint(this Curve curve, bool isStart) => isStart ? curve.StartPoint : curve.EndPoint;
+    public static Point3d GetPoint(this Curve curve, int tip) => tip == 0 ? curve.StartPoint : curve.EndPoint;
+    public static int GetTip(this Curve curve, Point3d point) => curve.IsStartPoint(point) ? 0 : 1;
 
     public static bool HasPoint(this Curve curve, Point3d point) => point.IsEqualTo(curve.StartPoint) || point.IsEqualTo(curve.EndPoint);
 
@@ -114,6 +116,15 @@ public static class Graph
         {
             yield return cv.GetPointAtParam(cv.StartParam + i * div);
         }
+    }
+
+    public static Curve CreateCopy(this Curve curve, double offset = 0, double dz = 0)
+    {
+        var copy = curve.GetOffsetCurves(offset)[0] as Curve;
+        if (dz != 0)
+            copy.TransformBy(Matrix3d.Displacement(Vector3d.ZAxis * dz));
+
+        return copy;
     }
     #endregion
 

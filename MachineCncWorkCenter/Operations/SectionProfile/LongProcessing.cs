@@ -1,4 +1,5 @@
-﻿using Autodesk.AutoCAD.DatabaseServices;
+﻿using Autodesk.AutoCAD.Colors;
+using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
 using CAM.Autocad;
 using CAM.Autocad.AutoCADCommands;
@@ -8,8 +9,8 @@ using CAM.UI;
 using CAM.Utils;
 using System;
 using System.Collections.Generic;
-using System.Drawing.Drawing2D;
 using System.Linq;
+using System.Security.Cryptography;
 
 namespace CAM.MachineCncWorkCenter.Operations.SectionProfile;
 
@@ -18,7 +19,8 @@ public class LongProcessing: OperationCnc
 {
     public AcadObject Rail { get; set; }
     public double? Length { get; set; }
-    public double? StepPass { get; set; }
+
+    public double Crest { get; set; } = 4;
     // public bool IsProfileStep { get; set; }
     public double? FirstPass { get; set; }
     public double? LastPass { get; set; }
@@ -44,21 +46,21 @@ public class LongProcessing: OperationCnc
         view.AddTextBox(nameof(Length), "Длина направляющей", hint: "Длина направляющей на оси Х");
         view.AddIndent();
         view.AddCheckBox(nameof(IsA90), "A=90", "Признак обработки горизонтально расположенным диском");
-        view.AddTextBox(nameof(StepPass), required: true);
+        view.AddTextBox(nameof(Crest), "Толщина гребня минимум", hint: "Минимальная толщина материала между соседними пропилами", required: true);
         view.AddTextBox(nameof(FirstPass), "Начало профиля", hint: "Расстояние от начала профиля с которого начинается обработка");
         //view.AddCheckBox(nameof(IsExactlyBegin), "Начало точно", "Начало обработки с координаты при которой диск не выходит за границы профиля");
         view.AddTextBox(nameof(LastPass), "Конец профиля", hint: "Расстояние от начала профиля на котором заканчивается обработка");
         //view.AddCheckBox(nameof(IsExactlyEnd), "Конец точно", "Завершение обработки с координатой при которой диск не выходит за границы профиля");
         //view.AddTextBox(nameof(IsProfileStep), "Шаг по профилю");
         view.AddIndent();
-        view.AddTextBox(nameof(PenetrationStep), "Заглубление: шаг", required: true);
-        view.AddTextBox(nameof(PenetrationBegin), "Заглубление: начало", hint: "Расстояние края заготовки до ближайшей точки профиля");
+        view.AddTextBox(nameof(PenetrationStep), "Шаг заглубления макс.", required: true, hint: "Наибольший шаг заглубления");
+        view.AddTextBox(nameof(PenetrationBegin), "Заглубление: начало", hint: "Расстояние от края заготовки до ближайшего конца профиля");
         view.AddTextBox(nameof(PenetrationMax), "Заглубление максимум", hint: "Максимально возможное заглубление");
         view.AddIndent();
         //view.AddCheckBox(nameof(IsOutlet), "Отвод");
         view.AddTextBox(nameof(Departure));
         //view.AddTextBox(nameof(Delta));
-        view.AddCheckBox(nameof(ChangeProcessSide), "Сторона обработки");
+        view.AddCheckBox(nameof(ChangeProcessSide), "Другая сторона", hint: "Сменить сторону обработки");
         //view.AddCheckBox(nameof(ChangeEngineSide), "Разворот двигателя на 180");
         //view.AddTextBox(nameof(DzBillet), "dZ заготовки");
     }
@@ -73,134 +75,186 @@ public class LongProcessing: OperationCnc
         Processor.StartOperation(Math.Abs(profile.EndPoint.Y - profile.StartPoint.Y));
         var baseRailPoint = profile.StartPoint.Y <= profile.EndPoint.Y ? profile.StartPoint : profile.EndPoint;
 
-        var processSide = ChangeProcessSide ? -1 : 1;
         CreateProfile3D(profile, baseRailPoint, railBase, railBase.StartPoint);
         CreateProfile3D(profile, baseRailPoint, railBase, railBase.EndPoint);
 
-        var rail = CreateDepartureRail(railBase, Departure);
-
-        profile = (Polyline)profile.GetOffsetCurves(-Delta)[0];
+        profile = (Polyline)profile.GetOffsetCurves(Delta * (baseRailPoint == profile.StartPoint ? -1 : 1))[0];
         if (Delta != 0)
         {
             CreateProfile3D(profile, baseRailPoint, railBase, railBase.StartPoint);
             CreateProfile3D(profile, baseRailPoint, railBase, railBase.EndPoint);
         }
+        var rail = CreateDepartureRail(railBase, Departure);
 
         //if (!(railBase is Line))
         //    processSide *= -1;
         if (railBase.IsNewObject)
             railBase.Dispose();
 
-        var profileWidth = Math.Abs(profile.EndPoint.X - profile.StartPoint.X);
-        var profileHeight = Math.Abs(profile.EndPoint.Y - profile.StartPoint.Y);
         var railPoint = profile.StartPoint.Y <= profile.EndPoint.Y ? profile.StartPoint : profile.EndPoint;
         var offsetVector = railPoint - baseRailPoint;
+
+        if (IsA90)
+            profile.TransformBy(Matrix3d.Rotation(-Math.PI / 2, Vector3d.ZAxis, railPoint));
         var points = profile.GetPolylineFitPoints(1D).ToArray();
-
-        if (!IsA90)
-        {
-            if (points.First().X < points.Last().X)
-                points = points.Reverse().ToArray();
-
-            var width = points.First().X - points.Last().X;
-            var height = points.First().Y - points.Last().Y + PenetrationBegin.GetValueOrDefault();
-            var step = StepPass.Value;
-
-            var x = FirstPass.HasValue ? width - FirstPass.Value : step;
-            var xEnd = LastPass.HasValue ? width - LastPass.Value : width - ToolThickness;
-
-            var xArray = points.ConvertAll(p => points.First().X - p.X);
-            var yArray = points.ConvertAll(p => p.Y - railPoint.Y);
-            var index = 0;
-            var yMax = Math.Abs(profile.StartPoint.Y - profile.EndPoint.Y);
-            //var allPenetration = PenetrationBegin.GetValueOrDefault() + yMax;
-            //ProcessingObjectBuilder.AddEntity(profile);
-            do
+        if (points.First().X > points.Last().X)
+            points = points.Reverse().ToArray();
+        
+        var xArray = points.ConvertAll(p => p.X - railPoint.X);
+        var yArray = points.ConvertAll(p => p.Y - railPoint.Y);
+        var dist = (LastPass.HasValue ? LastPass.Value - ToolThickness : xArray.Last()) - (FirstPass ?? -ToolThickness);
+        var xStep = dist / (int)Math.Round(dist / (Crest + ToolThickness));
+        var xStart = FirstPass ?? (xStep - ToolThickness);
+        var xEnd = LastPass.HasValue ? LastPass.Value - ToolThickness : xArray.Last() - xStep;
+        var index = 0;
+        var yStart = (yArray.Last() > yArray.First() ? yArray.Last() - yArray.First() : 0) + PenetrationBegin.GetValueOrDefault();
+        var cuts = Enumerable.Range(0, (int)Math.Round((xEnd - xStart) / xStep + 1))
+            .Select(p => xStart + p * xStep)
+            .Select(x =>
             {
-                (var y, index) = Helpers.FindMax(xArray, yArray, x - ToolThickness, x, index);
-                // ProcessingObjectBuilder.AddEntity(new Circle(new Point3d(profile.StartPoint.X - x, profile.EndPoint.Y + y, 0), Vector3d.ZAxis, 1));
-                // ProcessingObjectBuilder.AddEntity(new Circle(new Point3d(profile.StartPoint.X - (x-ToolThickness), profile.EndPoint.Y + y, 0), Vector3d.ZAxis, 1));
-                var penetration = height - y;
-                var count = (int)Math.Ceiling(penetration / PenetrationStep.Value);
-                var penetrationStepCalc = penetration / count;
+                (var y, index) = Helpers.FindMax(xArray, yArray, x, x + ToolThickness, index);
+                var penetrations = GetPenetrations(y);
+                var curves = penetrations.ys.Select(p => GetCuttingCurve(x, p)).ToList();
+                return new { x, curves, penetrations.penetrationAll };
+            })
+            .Reverse()
+            .ToList();
 
-                for (var i = count - 1; i >= 0; i--)
-                {
-                    var offset = width - x;
-                    var dz = y + i * penetrationStepCalc;
-                    var toolpath = CreateCopy(rail, offset + offsetVector.X, dz + offsetVector.Y);
-                    ProcessingObjectBuilder.AddEntity(toolpath);
-                    ProcessingObjectBuilder.AddEntity(NoDraw.Line(toolpath.StartPoint,
-                        toolpath.StartPoint + (IsA90 ? Vector3d.ZAxis : Vector3d.YAxis) * ToolThickness));
-                    ProcessingObjectBuilder.AddEntity(new Circle(toolpath.StartPoint, Vector3d.XAxis, 1));
-                }
-                //ProcessingObjectBuilder.AddEntity(NoDraw.Line(toolpath.StartPoint, toolpath.StartPoint + (IsA90 ? -Vector3d.YAxis : Vector3d.ZAxis) * 100));
-                //if (Processor.IsUpperTool)
-                //{
-                //    var angleC = rail.GetToolAngle(rail.StartPoint, (Side)side);
-                //    Processor.Move(tp[0].StartPoint, angleC, 90);
-                //}
-
-                //tp.ForEach(p => Cutting(p, fromStart = !fromStart, (Side)side));
-                x += step;
-            } while (x < xEnd);
-        }
-        else
+        var side = ChangeProcessSide.GetSign(-1);
+        foreach (var propyl in cuts)
         {
-            if (points.First().Y < points.Last().Y)
-                points = points.Reverse().ToArray();
-
-            var step = StepPass.Value;
-            var y = FirstPass.HasValue ? profileHeight - FirstPass.Value : step;
-            var yEnd = LastPass.HasValue ? profileHeight - LastPass.Value : profileHeight - ToolThickness;
-
-            var xArray = points.ConvertAll(p => points.First().Y - p.Y);
-            var yArray = points.ConvertAll(p => railPoint.X - p.X);
-            var index = 0;
-            var yMax = Math.Abs(profile.StartPoint.Y - profile.EndPoint.Y);
-            var allPenetration = PenetrationBegin.GetValueOrDefault() + (points.First().X < railPoint.X ? profileWidth : 0);
-            //ProcessingObjectBuilder.AddEntity(profile);
-            do
-            {
-                (var fn, index) = Helpers.FindMax(xArray, yArray, y - ToolThickness, y, index);
-                // ProcessingObjectBuilder.AddEntity(new Circle(new Point3d(profile.StartPoint.X - x, profile.EndPoint.Y + y, 0), Vector3d.ZAxis, 1));
-                // ProcessingObjectBuilder.AddEntity(new Circle(new Point3d(profile.StartPoint.X - (x-ToolThickness), profile.EndPoint.Y + y, 0), Vector3d.ZAxis, 1));
-                var penetration = allPenetration - fn;
-                var count = (int)Math.Ceiling(penetration / PenetrationStep.Value);
-                var penetrationStepCalc = penetration / count;
-
-                for (var i = count - 1; i >= 0; i--)
-                {
-                    var offset = fn + i * penetrationStepCalc;
-                    var dz = profileHeight - y;
-                    var toolpath = CreateCopy(rail, -offset + offsetVector.X, dz + offsetVector.Y);
-                    ProcessingObjectBuilder.AddEntity(toolpath);
-                    ProcessingObjectBuilder.AddEntity(NoDraw.Line(toolpath.StartPoint,
-                        toolpath.StartPoint + (IsA90 ? Vector3d.ZAxis : Vector3d.YAxis) * ToolThickness));
-                    ProcessingObjectBuilder.AddEntity(new Circle(toolpath.StartPoint, Vector3d.XAxis, 1));
-                }
-                //ProcessingObjectBuilder.AddEntity(NoDraw.Line(toolpath.StartPoint, toolpath.StartPoint + (IsA90 ? -Vector3d.YAxis : Vector3d.ZAxis) * 100));
-                //if (Processor.IsUpperTool)
-                //{
-                //    var angleC = rail.GetToolAngle(rail.StartPoint, (Side)side);
-                //    Processor.Move(tp[0].StartPoint, angleC, 90);
-                //}
-
-                //tp.ForEach(p => Cutting(p, fromStart = !fromStart, (Side)side));
-                y += step;
-            } while (y < yEnd);
+            Cutting(propyl.curves, side, IsA90 ? 90 : 0);
         }
+
+        Processor.Uplifting();
+
+        return;
+
+        (double penetrationAll, IEnumerable<double> ys) GetPenetrations(double y)
+        {
+            var penetrationAll = yStart - y;
+            if (penetrationAll > PenetrationMax)
+                penetrationAll = PenetrationMax.Value;
+            var count = (int)Math.Ceiling(penetrationAll / PenetrationStep.Value);
+            var step = penetrationAll / count;
+            return (penetrationAll, Enumerable.Range(1, count).Select(p => yStart - p * step));
+        }
+
+        Curve GetCuttingCurve(double x, double penetration)
+        {
+            var (offset, dz) = IsA90 ? (-penetration, x) : (x, penetration);
+            var toolpath = rail.CreateCopy((offset + offsetVector.X) * ChangeProcessSide.GetSign(-1), dz + offsetVector.Y);
+            //ProcessingObjectBuilder.AddEntity(toolpath);
+            //ProcessingObjectBuilder.AddEntity(NoDraw.Line(toolpath.StartPoint,
+            //    toolpath.StartPoint + (IsA90 ? Vector3d.ZAxis : Vector3d.YAxis) * ToolThickness));
+            //ProcessingObjectBuilder.AddEntity(new Circle(toolpath.StartPoint, Vector3d.XAxis, 1));
+            return toolpath;
+        }
+
+        //if (!IsA90)
+        //{
+        //    if (points.First().X < points.Last().X)
+        //        points = points.Reverse().ToArray();
+
+        //    var width = points.First().X - points.Last().X;
+        //    var height = points.First().Y - points.Last().Y + PenetrationBegin.GetValueOrDefault();
+        //    var step = StepPass.Value;
+
+        //    var x = FirstPass.HasValue ? width - FirstPass.Value : step;
+        //    var xEnd = LastPass.HasValue ? width - LastPass.Value : width - ToolThickness;
+
+        //    var xArray = points.ConvertAll(p => points.First().X - p.X);
+        //    var yArray = points.ConvertAll(p => p.Y - railPoint.Y);
+        //    var index = 0;
+        //    var yMax = Math.Abs(profile.StartPoint.Y - profile.EndPoint.Y);
+        //    //var allPenetration = PenetrationBegin.GetValueOrDefault() + yMax;
+        //    //ProcessingObjectBuilder.AddEntity(profile);
+        //    do
+        //    {
+        //        (var y, index) = Helpers.FindMax(xArray, yArray, x - ToolThickness, x, index);
+        //        // ProcessingObjectBuilder.AddEntity(new Circle(new Point3d(profile.StartPoint.X - x, profile.EndPoint.Y + y, 0), Vector3d.ZAxis, 1));
+        //        // ProcessingObjectBuilder.AddEntity(new Circle(new Point3d(profile.StartPoint.X - (x-ToolThickness), profile.EndPoint.Y + y, 0), Vector3d.ZAxis, 1));
+        //        var penetration = height - y;
+        //        var count = (int)Math.Ceiling(penetration / PenetrationStep.Value);
+        //        var penetrationStepCalc = penetration / count;
+
+        //        for (var i = count - 1; i >= 0; i--)
+        //        {
+        //            var offset = width - x;
+        //            var dz = y + i * penetrationStepCalc;
+        //            var toolpath = CreateCopy(rail, offset + offsetVector.X, dz + offsetVector.Y);
+        //            ProcessingObjectBuilder.AddEntity(toolpath);
+        //            ProcessingObjectBuilder.AddEntity(NoDraw.Line(toolpath.StartPoint,
+        //                toolpath.StartPoint + (IsA90 ? Vector3d.ZAxis : Vector3d.YAxis) * ToolThickness));
+        //            ProcessingObjectBuilder.AddEntity(new Circle(toolpath.StartPoint, Vector3d.XAxis, 1));
+        //        }
+        //        //ProcessingObjectBuilder.AddEntity(NoDraw.Line(toolpath.StartPoint, toolpath.StartPoint + (IsA90 ? -Vector3d.YAxis : Vector3d.ZAxis) * 100));
+        //        //if (Processor.IsUpperTool)
+        //        //{
+        //        //    var angleC = rail.GetToolAngle(rail.StartPoint, (Side)side);
+        //        //    Processor.Move(tp[0].StartPoint, angleC, 90);
+        //        //}
+
+        //        //tp.ForEach(p => Cutting(p, fromStart = !fromStart, (Side)side));
+        //        x += step;
+        //    } while (x < xEnd);
+        //}
+        //else
+        //{
+        //    if (points.First().Y < points.Last().Y)
+        //        points = points.Reverse().ToArray();
+
+        //    var step = StepPass.Value;
+        //    var y = FirstPass.HasValue ? profileHeight - FirstPass.Value : step;
+        //    var yEnd = LastPass.HasValue ? profileHeight - LastPass.Value : profileHeight - ToolThickness;
+
+        //    var xArray = points.ConvertAll(p => points.First().Y - p.Y);
+        //    var yArray = points.ConvertAll(p => railPoint.X - p.X);
+        //    var index = 0;
+        //    var yMax = Math.Abs(profile.StartPoint.Y - profile.EndPoint.Y);
+        //    var allPenetration = PenetrationBegin.GetValueOrDefault() + (points.First().X < railPoint.X ? profileWidth : 0);
+        //    //ProcessingObjectBuilder.AddEntity(profile);
+        //    do
+        //    {
+        //        (var fn, index) = Helpers.FindMax(xArray, yArray, y - ToolThickness, y, index);
+        //        // ProcessingObjectBuilder.AddEntity(new Circle(new Point3d(profile.StartPoint.X - x, profile.EndPoint.Y + y, 0), Vector3d.ZAxis, 1));
+        //        // ProcessingObjectBuilder.AddEntity(new Circle(new Point3d(profile.StartPoint.X - (x-ToolThickness), profile.EndPoint.Y + y, 0), Vector3d.ZAxis, 1));
+        //        var penetration = allPenetration - fn;
+        //        var count = (int)Math.Ceiling(penetration / PenetrationStep.Value);
+        //        var penetrationStepCalc = penetration / count;
+
+        //        for (var i = count - 1; i >= 0; i--)
+        //        {
+        //            var offset = fn + i * penetrationStepCalc;
+        //            var dz = profileHeight - y;
+        //            var toolpath = CreateCopy(rail, -offset + offsetVector.X, dz + offsetVector.Y);
+        //            ProcessingObjectBuilder.AddEntity(toolpath);
+        //            ProcessingObjectBuilder.AddEntity(NoDraw.Line(toolpath.StartPoint,
+        //                toolpath.StartPoint + (IsA90 ? Vector3d.ZAxis : Vector3d.YAxis) * ToolThickness));
+        //            ProcessingObjectBuilder.AddEntity(new Circle(toolpath.StartPoint, Vector3d.XAxis, 1));
+        //        }
+        //        //ProcessingObjectBuilder.AddEntity(NoDraw.Line(toolpath.StartPoint, toolpath.StartPoint + (IsA90 ? -Vector3d.YAxis : Vector3d.ZAxis) * 100));
+        //        //if (Processor.IsUpperTool)
+        //        //{
+        //        //    var angleC = rail.GetToolAngle(rail.StartPoint, (Side)side);
+        //        //    Processor.Move(tp[0].StartPoint, angleC, 90);
+        //        //}
+
+        //        //tp.ForEach(p => Cutting(p, fromStart = !fromStart, (Side)side));
+        //        y += step;
+        //    } while (y < yEnd);
+        //}
 
 
         //var xIndex = IsA90 ? 1 : 0;
         //if (profile.StartPoint[xIndex] < profile.EndPoint[xIndex])
         //    profile.ReverseCurve();
 
-            //var side = (int)rail.GetFirstDerivative(0).GetAngleTo(Vector3d.XAxis).GetEngineSide() * ChangeEngineSide.GetSign(-1);
-            //var isMinToolCoord = IsA90
-            //    ? true
-            //    : side == 1 ^ false ^ ChangeProcessSide;
-         
+        //var side = (int)rail.GetFirstDerivative(0).GetAngleTo(Vector3d.XAxis).GetEngineSide() * ChangeEngineSide.GetSign(-1);
+        //var isMinToolCoord = IsA90
+        //    ? true
+        //    : side == 1 ^ false ^ ChangeProcessSide;
+
 
         //Curve outletCurve = null;
         //if (IsA90 && IsOutlet)
@@ -247,100 +301,97 @@ public class LongProcessing: OperationCnc
         //} 
         //while (x < end);
 
-/*
-        //var points = BuilderUtils.GetProcessPoints(profile, index, StepPass, ToolThickness, isMinToolCoord, FirstPass, LastPass, IsExactlyBegin, IsExactlyEnd, IsProfileStep);
+        /*
+                //var points = BuilderUtils.GetProcessPoints(profile, index, StepPass, ToolThickness, isMinToolCoord, FirstPass, LastPass, IsExactlyBegin, IsExactlyEnd, IsProfileStep);
 
-            foreach (var point in points)
-        {
-            var end = Math.Max(point[1 - index], PenetrationEnd ?? double.MinValue);
-            var count = 1;
-            var penetrationStepCalc = 0D;
-            if (DzBillet != 0)
-            {
-                count = (int)Math.Ceiling(DzBillet / PenetrationStep.Value);
-                penetrationStepCalc = DzBillet / count;
-            }
-            else if (PenetrationStep.GetValueOrDefault() > 0 && PenetrationBegin.GetValueOrDefault() > end)
-            {
-                var allPenetration = PenetrationBegin.Value - end;
-                count = (int)Math.Ceiling(allPenetration / PenetrationStep.Value);
-                penetrationStepCalc = allPenetration / count;
-            }
-            //if (IsA90 && IsOutlet && Processor._isEngineStarted)
-            //    Processor.Transition(z: point[index]);
+                    foreach (var point in points)
+                {
+                    var end = Math.Max(point[1 - index], PenetrationEnd ?? double.MinValue);
+                    var count = 1;
+                    var penetrationStepCalc = 0D;
+                    if (DzBillet != 0)
+                    {
+                        count = (int)Math.Ceiling(DzBillet / PenetrationStep.Value);
+                        penetrationStepCalc = DzBillet / count;
+                    }
+                    else if (PenetrationStep.GetValueOrDefault() > 0 && PenetrationBegin.GetValueOrDefault() > end)
+                    {
+                        var allPenetration = PenetrationBegin.Value - end;
+                        count = (int)Math.Ceiling(allPenetration / PenetrationStep.Value);
+                        penetrationStepCalc = allPenetration / count;
+                    }
+                    //if (IsA90 && IsOutlet && Processor._isEngineStarted)
+                    //    Processor.Transition(z: point[index]);
 
-            //var point = curve.GetPoint(fromStart);
-            //if (processor.IsUpperTool)
-            //{
-            //    var angleC = curve.GetToolAngle(point, engineSide);
-            //    processor.Move(point, angleC, angleA);
-            //    //processor.Cycle();
-            //}
+                    //var point = curve.GetPoint(fromStart);
+                    //if (processor.IsUpperTool)
+                    //{
+                    //    var angleC = curve.GetToolAngle(point, engineSide);
+                    //    processor.Move(point, angleC, angleA);
+                    //    //processor.Cycle();
+                    //}
 
-            //processor.Penetration(point);
+                    //processor.Penetration(point);
 
-            var fromStart = true;
+                    var fromStart = true;
 
-            var coords = Enumerable.Range(1, count).Select(p => end + (count - p) * penetrationStepCalc).ToList();
-            var tp = coords.ConvertAll(p => CreateCopy(rail, -p, point[index]));
-            if (Processor.IsUpperTool)
-            {
-                var angleC = rail.GetToolAngle(rail.StartPoint, (Side)side);
-                Processor.Move(tp[0].StartPoint, angleC, 90);
-            }
+                    var coords = Enumerable.Range(1, count).Select(p => end + (count - p) * penetrationStepCalc).ToList();
+                    var tp = coords.ConvertAll(p => CreateCopy(rail, -p, point[index]));
+                    if (Processor.IsUpperTool)
+                    {
+                        var angleC = rail.GetToolAngle(rail.StartPoint, (Side)side);
+                        Processor.Move(tp[0].StartPoint, angleC, 90);
+                    }
 
-            tp.ForEach(p => Cutting(p, fromStart = !fromStart, (Side)side));
-            //if (IsA90)
-            //    coords.ForEach(p => Cutting(rail, processSide * p, point[index], fromStart = !fromStart, (Side)side));
-            //else
-            //    coords.ForEach(p => Cutting(rail, processSide * point[index], p, fromStart = !fromStart, (Side)side));
+                    tp.ForEach(p => Cutting(p, fromStart = !fromStart, (Side)side));
+                    //if (IsA90)
+                    //    coords.ForEach(p => Cutting(rail, processSide * p, point[index], fromStart = !fromStart, (Side)side));
+                    //else
+                    //    coords.ForEach(p => Cutting(rail, processSide * point[index], p, fromStart = !fromStart, (Side)side));
 
-            //if (IsOutlet)
-            //    if (IsA90)
-            //    {
-            //        var pt = outletCurve.GetClosestPoint(Processor.ToolPosition.Point);
-            //        Processor.Move(pt.X, pt.Y);
-            //    }
-            //    else
-        }
-        rail.Dispose();
-        Processor.Uplifting();
-    */
+                    //if (IsOutlet)
+                    //    if (IsA90)
+                    //    {
+                    //        var pt = outletCurve.GetClosestPoint(Processor.ToolPosition.Point);
+                    //        Processor.Move(pt.X, pt.Y);
+                    //    }
+                    //    else
+                }
+                rail.Dispose();
+                Processor.Uplifting();
+            */
     }
 
-    public Curve CreateCopy(Curve curve, double offset = 0, double dz = 0)
+    private void Cutting(List<Curve> curves, int side, double angleA)
     {
-        Curve copy = null;
-        if (offset != 0)
-            copy = curve.GetOffsetCurves(offset)[0] as Curve;
-
-        if (dz != 0)
+        var curve = curves[0];
+        var angles = new[]
         {
-            var matrix = Matrix3d.Displacement(Vector3d.ZAxis * dz);
-            if (copy == null)
-                copy = curve.GetTransformedCopy(matrix) as Curve;
-            else
-                copy.TransformBy(matrix);
-        }
+            curve.GetToolAngle(curve.StartPoint, (Side)side),
+            curve.GetToolAngle(curve.EndPoint, (Side)side)
+        };
+        var point = curve.GetClosestPoint(Processor.ToolPoint);
+        var tip = curve.GetTip(point);
+        if (Processor.IsUpperTool)
+            Processor.Move(point, angles[0], angleA);
 
-        return copy;
+        curves.ForEach(p => Cutting(p, angles[tip], ref tip));
     }
 
-    public void Cutting(Curve curve, bool fromStart, Side engineSide)
+    public void Cutting(Curve curve, double angleC, ref int tip)
     {
-        var pt = curve.GetPoint(fromStart);
-        Processor.Penetration(pt);
+        Processor.Penetration(curve.GetPoint(tip));
+        tip = 1 - tip;
+        var point = curve.GetPoint(tip);
         switch (curve)
         {
             case Line line:
-                Processor.GCommand(1, curve: line, point: curve.GetPoint(!fromStart));
+                Processor.GCommand(1, curve: line, point: point, feed: TechProcess.CuttingFeed);
                 break;
 
             case Arc arc:
-                var point = arc.GetPoint(fromStart);
-                var angleC = arc.GetToolAngle(point, engineSide);
                 var gCode = point == arc.StartPoint ? 3 : 2;
-                Processor.GCommand(gCode, curve: arc, point: point, angleC: angleC, arcCenter: arc.Center.ToPoint2d());
+                Processor.GCommand(gCode, curve: arc, point: point, angleC: angleC, arcCenter: arc.Center.ToPoint2d(), feed: TechProcess.CuttingFeed);
                 break;
 
             //case Polyline polyline:
@@ -357,7 +408,7 @@ public class LongProcessing: OperationCnc
     {
             var angle = Math.PI - rail.GetTangent(railPoint).MinusPiToPiAngleTo(Vector2d.YAxis);
             var matrix = Matrix3d.Displacement(railPoint - profilePoint) *
-                Matrix3d.Rotation(angle, Vector3d.ZAxis, profilePoint) *
+                Matrix3d.Rotation(angle * ChangeProcessSide.GetSign(-1), Vector3d.ZAxis, profilePoint) *
                 Matrix3d.Rotation(Math.PI / 2, Vector3d.XAxis, profilePoint);
             var p = profile.GetTransformedCopy(matrix);
             p.Transparency = Acad.GetSemitransparent();
@@ -372,23 +423,25 @@ public class LongProcessing: OperationCnc
             return new Line(line.StartPoint - vector, line.EndPoint + vector);
         }
         var polyline = new Polyline();
-
         var startPoint = curve.StartPoint - curve.GetFirstDerivative(curve.StartPoint).GetNormal() * departure;
         polyline.AddVertexAt(0, startPoint.ToPoint2d(), 0, 0, 0);
 
-        if (curve is Polyline poly)
-            polyline.JoinPolyline(poly);
-        else if (curve is Arc arc)
+        switch (curve)
         {
-            var bulge = Algorithms.GetArcBulge(arc, curve.StartPoint);
-            polyline.AddVertexAt(1, curve.StartPoint.ToPoint2d(), bulge, 0, 0);
-            polyline.AddVertexAt(2, curve.EndPoint.ToPoint2d(), 0, 0, 0);
+            case Polyline poly:
+                polyline.JoinPolyline(poly);
+                break;
+            case Arc arc:
+                var bulge = arc.GetArcBulge(curve.StartPoint);
+                polyline.AddVertexAt(1, curve.StartPoint.ToPoint2d(), bulge, 0, 0);
+                polyline.AddVertexAt(2, curve.EndPoint.ToPoint2d(), 0, 0, 0);
+                break;
+            default:
+                throw new Exception($"Тип кривой {curve.GetType().Name} не поддерживается");
         }
-        else
-            throw new Exception($"Тип кривой {curve.GetType().Name} не поддерживается");
 
-        var endtPoint = curve.EndPoint + curve.GetFirstDerivative(curve.EndPoint).GetNormal() * departure;
-        polyline.AddVertexAt(polyline.GetPolyPoints().Count(), endtPoint.ToPoint2d(), 0, 0, 0);
+        var endPoint = curve.EndPoint + curve.GetFirstDerivative(curve.EndPoint).GetNormal() * departure;
+        polyline.AddVertexAt(polyline.GetPolyPoints().Count(), endPoint.ToPoint2d(), 0, 0, 0);
 
         return polyline;
     }
