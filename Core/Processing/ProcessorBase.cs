@@ -1,9 +1,10 @@
-﻿using System;
-using System.Linq;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
 using CAM.Autocad;
 using CAM.Core.Tools;
+using System;
+using System.Diagnostics;
+using System.Linq;
 
 namespace CAM.Core.Processing;
 
@@ -19,6 +20,7 @@ public abstract class ProcessorBase<TTechProcess, TProcessor>
     public double UpperZ;
     public bool IsUpperTool => ToolPoint.Z + 0.1 > UpperZ;
     public Point3d ToolPoint;
+    public Point3d GetClosestToolPoint(Curve curve) => curve.GetClosestPoint(ToolPoint);
     public double AngleC, AngleA;
 
     protected abstract void CreatePostProcessor();
