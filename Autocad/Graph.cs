@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Autodesk.AutoCAD.DatabaseServices;
@@ -118,13 +118,18 @@ public static class Graph
         }
     }
 
-    public static Curve CreateCopy(this Curve curve, double offset = 0, double dz = 0)
+    public static T CreateCopy<T>(this T curve, double offset = 0, double dz = 0) where T: Curve
     {
-        var copy = curve.GetOffsetCurves(offset)[0] as Curve;
+        var copy = (T)curve.GetOffsetCurves(offset * (curve is Line).GetSign())[0];
         if (dz != 0)
             copy.TransformBy(Matrix3d.Displacement(Vector3d.ZAxis * dz));
 
         return copy;
+    }
+
+    public static Point3d GetOffsetPoint(this Curve curve, Point3d point, double offset)
+    {
+        return point + curve.GetFirstDerivative(point).GetNormal().RotateBy(Math.PI / 2, Vector3d.ZAxis) * offset;
     }
     #endregion
 
