@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Autodesk.AutoCAD.DatabaseServices;
@@ -44,6 +44,7 @@ public static class ProgramBuilder
         var objectIds = Commands.Take(100)
             .SelectMany((p, ind) => new[] { (ind, p.ObjectId), (ind, p.ObjectId2) })
             .Where(p => p.Item2.HasValue)
+            .GroupBy(p => p.Item2.Value, (key, group) => group.First())
             .ToDictionary(p => p.Item2.Value, p => p.ind);
 
         //var operationToolpath = toolpathBuilder != null
