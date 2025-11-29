@@ -19,6 +19,16 @@ public class Point3dComparer : IEqualityComparer<Point3d>
         return (Math.Round(point.X / epsilon), Math.Round(point.X / epsilon), Math.Round(point.X / epsilon)).GetHashCode();
     }
 }
+public class Point2dComparer : IEqualityComparer<Point2d>
+{
+    public bool Equals(Point2d point1, Point2d point2) => point1.IsEqualTo(point2);
+
+    public int GetHashCode(Point2d point)
+    {
+        var epsilon = Tolerance.Global.EqualVector;
+        return (Math.Round(point.X / epsilon), Math.Round(point.X / epsilon), Math.Round(point.X / epsilon)).GetHashCode();
+    }
+}
 
 /// <summary>
 /// Методы для работы с графикой
@@ -48,6 +58,7 @@ public static class Graph
     #region Point3d
 
     public static readonly IEqualityComparer<Point3d> Point3dComparer = new Point3dComparer();
+    public static readonly IEqualityComparer<Point2d> Point2dComparer = new Point2dComparer();
 
     public static Point3d WithZ(this Point3d point, double z) => new(point.X, point.Y, z);
     public static Point3d WithZ(this Point2d point, double z) => new(point.X, point.Y, z);
@@ -118,13 +129,18 @@ public static class Graph
         }
     }
 
-    public static Curve CreateCopy(this Curve curve, double offset = 0, double dz = 0)
+    public static T CreateCopy<T>(this T curve, double offset = 0, double dz = 0) where T: Curve
     {
-        var copy = curve.GetOffsetCurves(offset)[0] as Curve;
+        var copy = (T)curve.GetOffsetCurves(offset * (curve is Line).GetSign())[0];
         if (dz != 0)
             copy.TransformBy(Matrix3d.Displacement(Vector3d.ZAxis * dz));
 
         return copy;
+    }
+
+    public static Point3d GetOffsetPoint(this Curve curve, Point3d point, double offset)
+    {
+        return point + curve.GetFirstDerivative(point).GetNormal().RotateBy(Math.PI / 2, Vector3d.ZAxis) * offset;
     }
     #endregion
 

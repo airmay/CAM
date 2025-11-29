@@ -8,7 +8,7 @@ using CAM.Utils;
 namespace CAM.Autocad;
 
 [Serializable]
-public class AcadObject
+public class AcadObject : ICloneable
 {
     public long[] Handles { get; set; }
     [NonSerialized] private ObjectId[] _objectIds;
@@ -18,7 +18,7 @@ public class AcadObject
         _objectIds = objectIds;
         Handles = objectIds.ConvertAll(p => p.Handle.Value);
     }
-
+    public object Clone() => new AcadObject(_objectIds);
     public static AcadObject Create(ObjectId id) => new([id]);
     public static AcadObject Create(IEnumerable<ObjectId> ids) => new(ids.ToArray());
 
@@ -35,6 +35,5 @@ public class AcadObject
 
     public string Description => ToString();
     public override string ToString() => ObjectIds.GetDesc();
-
     public void Select() => Acad.SelectObjectIds(ObjectIds);
 }

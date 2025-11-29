@@ -1,5 +1,4 @@
 ﻿using CAM.MachineCncWorkCenter.Operations.Sawing;
-using CAM.MachineCncWorkCenter.Operations.SectionProfile;
 using CAM.MachineCncWorkCenter.Operations.Tactile;
 using CAM.MachineWireSaw.Operations;
 using CAM.Utils;
@@ -21,6 +20,7 @@ public static class OperationMenuItems
         new OperationMenuGroupMenuItem("Профиль по сечению",
         [
             new OperationMenuMenuItem("Продольная обработка", typeof(MachineCncWorkCenter.Operations.SectionProfile.LongProcessing)),
+            new OperationMenuMenuItem("Продольная чистка", typeof(MachineCncWorkCenter.Operations.SectionProfile.LongCleaning)),
         ]),
         new OperationMenuGroupMenuItem("Тактилка", 
         [

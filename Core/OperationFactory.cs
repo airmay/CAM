@@ -24,7 +24,9 @@ public static class OperationFactory
     {
         var sourceProps = source.GetType()
             .GetProperties(BindingFlags.Public | BindingFlags.Instance)
-            .Where(x => x.PropertyType.IsSimpleType() || (x.PropertyType.IsGenericType && x.PropertyType.GetGenericTypeDefinition() == typeof(List<>)))
+            .Where(x => x.PropertyType.IsSimpleType() || 
+                        (x.PropertyType.IsGenericType && x.PropertyType.GetGenericTypeDefinition() == typeof(List<>)) ||
+                        x.PropertyType is ICloneable)
             .ToList();
         var destProps = dest.GetType()
             .GetProperties()
@@ -40,6 +42,8 @@ public static class OperationFactory
                     ? cloneables.DeepClone()
                     : value.DeepClone();
             }
+            if (value is ICloneable cloneable)
+                value = cloneable.Clone();
 
             dp.SetValue(dest, value, null);
         }

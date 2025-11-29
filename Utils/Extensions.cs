@@ -15,6 +15,7 @@ public static class Extensions
 {
     public static bool IsZero(this double value) => Math.Abs(value) < Tolerance.Global.EqualPoint;
     public static bool IsEqual(this double value1, double value2) => IsZero(value1 - value2);
+    public static bool IsNotEqual(this double value1, double value2) => !IsEqual(value1, value2);
     public static bool InRange(this double value, double v1, double v2) => value >= v1 && value <= v2;
     
     /// <summary>

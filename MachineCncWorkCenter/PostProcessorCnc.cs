@@ -7,7 +7,14 @@ namespace CAM.MachineCncWorkCenter;
 
 public abstract class PostProcessorCnc : PostProcessorBase
 {
-    public abstract string[] SetTool(int toolNo, double angleA, double angleC, int originCellNumber);
+    public virtual string[] SetTool(int toolNo, double angleA, double angleC, int originCellNumber)
+    {
+        Params['C'] = angleC.ToParam();
+        Params['A'] = angleA.ToParam();
+
+        return null;
+    }
+
     public virtual string Cycle() => null;
     public bool WithThick { get; set; }
     
@@ -23,12 +30,7 @@ public abstract class PostProcessorCnc : PostProcessorBase
 
     protected virtual List<CommandParam> GetParams(Point3d? point, double? angleC, double? angleA, int? feed, Point2d? arcCenter)
     {
-        var commandParams = new List<CommandParam>
-        {
-            new('F', feed?.ToString()),
-            new('A', angleA.ToParam()),
-            new('C', angleC.ToParam())
-        };
+        var commandParams = new List<CommandParam>();
 
         if (point.HasValue)
         {
@@ -45,6 +47,10 @@ public abstract class PostProcessorCnc : PostProcessorBase
             commandParams.Add(new('I', (arcCenter.Value.X - Origin.X).ToParam()));
             commandParams.Add(new('J', (arcCenter.Value.Y - Origin.Y).ToParam()));
         }
+
+        commandParams.Add(new CommandParam('C', angleC.ToParam()));
+        commandParams.Add(new CommandParam('A', angleA.ToParam()));
+        commandParams.Add(new CommandParam('F', feed?.ToString()));
 
         return commandParams;
     }

@@ -26,6 +26,8 @@ public class DonatoniPostProcessor : PostProcessorCnc
 
     public override string[] SetTool(int toolNo, double angleA, double angleC, int originCellNumber)
     {
+        base.SetTool(toolNo, angleA, angleC, originCellNumber);
+
         return
         [
             "G0 G53 Z0",
