@@ -22,8 +22,11 @@ public static class Helpers
     public static double FindMax(Point2d[] points, double x1, double x2, ref int startIndex)
     {
         var i = startIndex;
-        while (points[i].X < x1 || points[i].X.IsEqual(x1))
+        while (i < points.Length && (points[i].X < x1 || points[i].X.IsEqual(x1)))
             i++;
+
+        if (i >= points.Length)
+            return points[points.Length - 1].X.IsEqual(x1) ? points[points.Length - 1].Y : double.MinValue;
 
         var max = i == 0
             ? points[0].Y

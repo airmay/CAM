@@ -8,6 +8,7 @@ using CAM.Core.Tools;
 using CAM.MachineCncWorkCenter.PostProcessors;
 using CAM.Utils;
 using System;
+using System.Collections.Generic;
 
 namespace CAM.MachineCncWorkCenter;
 
@@ -121,6 +122,17 @@ public class ProcessorCnc : ProcessorBase<TechProcessCnc, ProcessorCnc>
     }
 
     #region Cutting
+
+    public void Cutting(List<Curve> curves, int engineSide, Point3d? pt = null, double? angleC = null, double? angleA = null)
+    {
+        var point = pt ?? GetClosestToolPoint(curves[0]);
+        var tip = curves[0].GetTip(point);
+        foreach (var curve in curves)
+        {
+            Cutting(curve, engineSide, curve.GetPoint(tip), angleC, angleA);
+            tip = 1 - tip;
+        }
+    }
 
     public void Cutting(Curve curve, int engineSide, Point3d? pt = null, double? angleC = null, double? angleA = null)
     {

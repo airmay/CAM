@@ -13,6 +13,8 @@ using System.Linq;
 
 namespace CAM.MachineCncWorkCenter.Operations.SectionProfile;
 
+public record struct Cut(List<Point2d> Points);
+
 [Serializable]
 public class LongProcessing: OperationCnc
 {
@@ -21,10 +23,12 @@ public class LongProcessing: OperationCnc
     public double Departure { get; set; }
 
     public bool IsA90 { get; set; }
+    public double AngleA { get; set; }
+
     public double Crest { get; set; } = 4;
     // public bool IsProfileStep { get; set; }
-    public double? FirstPass { get; set; }
-    public double? LastPass { get; set; }
+    public double? ProfileStart { get; set; }
+    public double? ProfileEnd { get; set; }
     public bool IsReverse { get; set; }
     public double? PenetrationStep { get; set; }
     public double? PenetrationBegin { get; set; }
@@ -44,11 +48,12 @@ public class LongProcessing: OperationCnc
         view.AddTextBox(nameof(Departure));
         view.AddIndent();
         view.AddAcadObject(nameof(ProcessingArea), "Профиль");
-        var checkBoxIsA90 = view.AddCheckBox(nameof(IsA90), "A=90", "Признак обработки горизонтально расположенным диском");
+        // var checkBoxIsA90 = view.AddCheckBox(nameof(IsA90), "A=90", "Признак обработки горизонтально расположенным диском");
+        var angleATextBox = view.AddTextBox(nameof(AngleA), "Угол A", hint: "Вертикальный угол");
         view.AddTextBox(nameof(Crest), "Толщина гребня минимум", hint: "Минимальная толщина материала между соседними пропилами", required: true);
-        view.AddTextBox(nameof(FirstPass), "Начало профиля", hint: "Расстояние от начала профиля с которого начинается обработка");
+        view.AddTextBox(nameof(ProfileStart), "Начало профиля", hint: "Расстояние от начала профиля с которого начинается обработка");
         //view.AddCheckBox(nameof(IsExactlyBegin), "Начало точно", "Начало обработки с координаты при которой диск не выходит за границы профиля");
-        view.AddTextBox(nameof(LastPass), "Конец профиля", hint: "Расстояние от начала профиля на котором заканчивается обработка");
+        view.AddTextBox(nameof(ProfileEnd), "Конец профиля", hint: "Расстояние от начала профиля на котором заканчивается обработка");
         view.AddCheckBox(nameof(IsReverse), "Обратно", hint: "Обратное направление обработки профиля");
         //view.AddCheckBox(nameof(IsExactlyEnd), "Конец точно", "Завершение обработки с координатой при которой диск не выходит за границы профиля");
         //view.AddTextBox(nameof(IsProfileStep), "Шаг по профилю");
@@ -61,15 +66,15 @@ public class LongProcessing: OperationCnc
         view.AddCheckBox(nameof(ChangeProcessSide), "Другая сторона", hint: "Сменить сторону обработки");
         var checkBoxChangeEngineSide = view.AddCheckBox(nameof(ChangeEngineSide), "Разворот двигателя на 180");
 
-        checkBoxIsA90.CheckedChanged += (object sender, EventArgs e) =>
-        {
-            checkBoxChangeEngineSide.Enabled = !checkBoxIsA90.Checked;
-            if (checkBoxIsA90.Checked)
-            {
-                checkBoxChangeEngineSide.Checked = false;
-                view.GetData<LongProcessing>().ChangeEngineSide = false;
-            }
-        };
+        //checkBoxIsA90.CheckedChanged += (object sender, EventArgs e) =>
+        //{
+        //    checkBoxChangeEngineSide.Enabled = !checkBoxIsA90.Checked;
+        //    if (checkBoxIsA90.Checked)
+        //    {
+        //        checkBoxChangeEngineSide.Checked = false;
+        //        view.GetData<LongProcessing>().ChangeEngineSide = false;
+        //    }
+        //};
     }
 
     public override void Execute()
@@ -92,73 +97,67 @@ public class LongProcessing: OperationCnc
 
         if (profile.StartPoint.Y > profile.EndPoint.Y)
             profile.ReverseCurve();
-        var offsetVector = profile.StartPoint - railPoint;
-        if (IsA90)
-            profile.TransformBy(Matrix3d.Rotation(-Math.PI / 2, Vector3d.ZAxis, profile.StartPoint));
-        var points = profile.GetPolylineFitPoints(1D).Select(p => Point2d.Origin + (p - profile.StartPoint).ToVector2d()).ToArray();
-        var (first, last) = (points.First(), points.Last());
-        var distX = (LastPass.HasValue ? LastPass.Value - ToolThickness : last.X) - (FirstPass ?? -ToolThickness);
-        var xStep = distX / (int)Math.Round(distX / (Crest + ToolThickness));
-        var xStart = FirstPass ?? (xStep - ToolThickness);
-        var xEnd = LastPass.HasValue ? LastPass.Value - ToolThickness : last.X - xStep;
-        var yStart = (last.Y > first.Y ? last.Y - first.Y : 0) + PenetrationBegin.GetValueOrDefault();
-        var index = 0;
-        var cuts = Enumerable.Range(0, (int)Math.Round((xEnd - xStart) / xStep + 1))
-            .Select(p =>
-            {
-                var x = xStart + p * xStep;
-                var y = Helpers.FindMax(points, x, x + ToolThickness, ref index);
-                return GetPenetrations(y).Select(y => CreateCuttingCurve(x + (ChangeEngineSide ? ToolThickness : 0), y)).ToList();
-            });
+        var offsetVector = (profile.StartPoint - railPoint).ToVector2d();
+        profile.TransformBy(Matrix3d.Displacement(Point3d.Origin - profile.StartPoint));
+        if (AngleA > 0)
+            profile.TransformBy(Matrix3d.Rotation(-AngleA.ToRad(), Vector3d.ZAxis, profile.StartPoint));
+        var polylinePoints = profile.GetPolylineFitPoints(1D).Select(p => p.ToPoint2d()).ToArray();
+        var xs = GetX(profile.EndPoint.X);
+        var yStart = (profile.EndPoint.Y > 0 ? profile.EndPoint.Y : 0) +
+                     (AngleA > 0 ? PenetrationBegin.GetValueOrDefault() : 0);
+        var xShift = ChangeEngineSide ? ToolThickness : 0;
+        var cuts = xs.FindMax(polylinePoints, ToolThickness)
+            .Select(p => CreateCut(p, yStart, xShift));
+        if (AngleA > 0)
+            cuts = cuts.Select(c => new Cut(c.Points.ConvertAll(p => p.TransformBy(Matrix2d.Rotation(AngleA.ToRad(), Point2d.Origin)))));
         if (!IsReverse)
             cuts = cuts.Reverse();
+        var engineSide = outside * ChangeEngineSide.GetSign(); // по-умолчанию двигатель со стороны заготовки, обратно наружней стороне
 
-        var outletCurve = (IsA90 && IsOutlet) ? rail.CreateCopy((yStart + TechProcess.ZSafety) * outside) : null;
-        var engineSide = outside * ChangeEngineSide.GetSign();
-        var angleA = IsA90 ? 90 : 0;
-        foreach (var curves in cuts)
+        foreach (var cut in cuts)
         {
-            if (IsA90 && IsOutlet)
+            var curves = cut.Points.ConvertAll(p => p + offsetVector)
+                .ConvertAll(p => rail.CreateCopy(-outside * p.X, p.Y));
+            var first = curves[0];
+            if (IsOutlet)
             {
-                var point = Processor.GetClosestToolPoint(outletCurve);
+                var point = Processor.GetClosestToolPoint(first);
                 if (Processor.IsUpperTool)
-                    Processor.Move(point, outletCurve.GetToolAngle(point, (Side)engineSide), angleA);
-                Processor.Penetration(point.WithZ(curves[0].StartPoint.Z));
+                    Processor.Move(point, first.GetToolAngle(point, (Side)engineSide), AngleA);
+                Processor.Penetration(point);
+                curves.RemoveAt(0);
+            }
 
-                curves.ForEach(p => Processor.Cutting(p, engineSide));
-                Processor.Penetration(Processor.GetClosestToolPoint(outletCurve).WithZ(Processor.ToolPoint.Z));
-            }
-            else
-            {
-                curves.ForEach(p => Processor.Cutting(p, engineSide, angleA: angleA));
-                if (IsOutlet)
-                    Processor.Uplifting();
-            }
+            Processor.Cutting(curves, engineSide, angleA: AngleA);
+
+            if (IsOutlet)
+                Processor.Penetration(Processor.GetClosestToolPoint(first));
         }
+
         Processor.Uplifting();
+    }
 
-        return;
+    private Cut CreateCut(Point2d point, double yStart, double xShift)
+    {
+        var penetrationAll = yStart - point.Y;
+        if (penetrationAll > PenetrationMax)
+            penetrationAll = PenetrationMax.Value;
+        var count = (int)Math.Ceiling(penetrationAll / PenetrationStep.Value);
+        var step = penetrationAll / count;
+        var ys = Enumerable.Range(1, count).Select(p => yStart - p * step).ToList();
+        if (IsOutlet)
+            ys.Insert(0, yStart + TechProcess.ZSafety);
+        return new Cut(ys.ConvertAll(y => new Point2d(point.X + xShift, y)));
+    }
 
-        IEnumerable<double> GetPenetrations(double y)
-        {
-            var penetrationAll = yStart - y;
-            if (penetrationAll > PenetrationMax)
-                penetrationAll = PenetrationMax.Value;
-            var count = (int)Math.Ceiling(penetrationAll / PenetrationStep.Value);
-            var step = penetrationAll / count;
-            return Enumerable.Range(1, count).Select(p => yStart - p * step);
-        }
-
-        Curve CreateCuttingCurve(double x, double penetration)
-        {
-            var (offset, dz) = IsA90 ? (-penetration, x) : (x, penetration);
-            var toolpath = rail.CreateCopy((offset + offsetVector.X) * -outside, dz + offsetVector.Y);
-            //ProcessingObjectBuilder.AddEntity(toolpath);
-            //ProcessingObjectBuilder.AddEntity(NoDraw.Line(toolpath.StartPoint,
-            //    toolpath.StartPoint + (IsA90 ? Vector3d.ZAxis : Vector3d.YAxis) * ToolThickness));
-            //ProcessingObjectBuilder.AddEntity(new Circle(toolpath.StartPoint, Vector3d.XAxis, 1));
-            return toolpath;
-        }
+    private IEnumerable<double> GetX(double profileEnd)
+    {
+        var distX = (ProfileEnd.HasValue ? ProfileEnd.Value - ToolThickness : profileEnd) - (ProfileStart ?? -ToolThickness);
+        var xStep = distX / (int)Math.Round(distX / (Crest + ToolThickness));
+        var xStart = ProfileStart ?? (xStep - ToolThickness);
+        var xEnd = ProfileEnd.HasValue ? ProfileEnd.Value - ToolThickness : profileEnd - xStep;
+        var count = (int)Math.Round((xEnd - xStart) / xStep);
+        return Enumerable.Range(0, count + 1).Select(p => xStart + p * xStep);
     }
 
     private void CreateProfile3D(Curve profile, Point3d profilePoint, Curve rail, int sign)
