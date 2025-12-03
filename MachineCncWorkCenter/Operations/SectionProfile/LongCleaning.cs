@@ -22,9 +22,9 @@ public class LongCleaning : OperationCnc
     public bool IsProfileStep { get; set; }
     public bool IsCalcAngleA { get; set; }
     public double Step { get; set; } = 1;
-    public double? FirstPass { get; set; }
+    public double? ProfileStart { get; set; }
     public bool IsExactlyBegin { get; set; }
-    public double? LastPass { get; set; }
+    public double? ProfileEnd { get; set; }
     public bool IsExactlyEnd { get; set; }
     public bool IsReverse { get; set; }
     public bool ChangeProcessSide { get; set; }
@@ -41,12 +41,12 @@ public class LongCleaning : OperationCnc
         view.AddCheckBox(nameof(ChangeProcessSide), "Другая сторона", hint: "Сменить сторону обработки");
         var checkBoxChangeEngineSide = view.AddCheckBox(nameof(ChangeEngineSide), "Разворот двигателя на 180");
         view.AddIndent();
-        view.AddTextBox(nameof(FirstPass), "Начало профиля",
-            hint: "Расстояние от начала профиля с которого начинается обработка");
+        view.AddTextBox(nameof(ProfileStart), "Начало профиля",
+            hint: "Расстояние от начала профиля до начала обрабатываемого участка профиля");
         view.AddCheckBox(nameof(IsExactlyBegin), "Начало точно",
             "Начало обработки с координаты при которой диск не выходит за границы профиля");
-        view.AddTextBox(nameof(LastPass), "Конец профиля",
-            hint: "Расстояние от начала профиля на котором заканчивается обработка");
+        view.AddTextBox(nameof(ProfileEnd), "Конец профиля",
+            hint: "Расстояние от начала профиля до конца обрабатываемого участка профиля");
         view.AddCheckBox(nameof(IsExactlyEnd), "Конец точно",
             "Завершение обработки с координатой при которой диск не выходит за границы профиля");
         view.AddCheckBox(nameof(IsReverse), "Обратно", hint: "Обратное направление обработки профиля");
@@ -92,8 +92,15 @@ public class LongCleaning : OperationCnc
             profile.ReverseCurve();
         var offsetVector = (profile.StartPoint - railPoint).ToVector2d();
         profile.TransformBy(Matrix3d.Displacement(Point3d.Origin - profile.StartPoint));
+        if (AngleA > 0)
+            profile.TransformBy(Matrix3d.Rotation(-AngleA.ToRad(), Vector3d.ZAxis, profile.StartPoint));
 
         var (toolPoints, angles) = IsCalcAngleA ? GetToolPointsCalcA(profile) : (GetToolPoints(profile), null);
+        if (ProfileStart.HasValue)
+            toolPoints = toolPoints.Where(p => p.X > ProfileStart || p.X.IsEqual(ProfileStart.Value));
+        if (ProfileEnd.HasValue)
+            toolPoints = toolPoints.Where(p => p.X < ProfileEnd || p.X.IsEqual(ProfileEnd.Value));
+
         if (!IsReverse)
             toolPoints = toolPoints.Reverse();
         var curves = toolPoints.Select(p => p + offsetVector)
@@ -106,8 +113,6 @@ public class LongCleaning : OperationCnc
 
     private IEnumerable<Point2d> GetToolPoints(Polyline profile)
     {
-        if (AngleA > 0)
-            profile.TransformBy(Matrix3d.Rotation(-AngleA.ToRad(), Vector3d.ZAxis, profile.StartPoint));
         var polylinePoints = profile.GetPolylineFitPoints(1D).Select(p => p.ToPoint2d()).ToArray();
         var xs = IsProfileStep
             ? profile.GetPointsByDist(Step).Select(p => p.X - (profile.StartPoint.Y <= profile.EndPoint.Y ? ToolThickness : 0))
@@ -122,10 +127,10 @@ public class LongCleaning : OperationCnc
 
     private IEnumerable<double> GetXsByAxis(double profileEnd)
     {
-        var xStart = FirstPass ?? 0;
+        var xStart = ProfileStart ?? 0;
         if (!IsExactlyBegin)
             xStart -= ToolThickness - Step;
-        var xEnd = (LastPass ?? profileEnd) - ToolThickness;
+        var xEnd = (ProfileEnd ?? profileEnd) - ToolThickness;
         if (!IsExactlyEnd)
             xEnd += ToolThickness - Step;
         var distX = xEnd - xStart;

@@ -107,7 +107,7 @@ public class ParamsControl : UserControl
     private void AddControl(Control control, string hint, string paramName = null, string propertyName = null)
     {
         if (paramName != null)
-            control.DataBindings.Add(propertyName, _bindingSource, paramName, true);
+            control.DataBindings.Add(propertyName, _bindingSource, paramName, true, DataSourceUpdateMode.OnValidation, "");
 
         control.Margin = new Padding(1);
         if (hint != null)
@@ -133,7 +133,7 @@ public class ParamsControl : UserControl
         {
             Text = GetDisplayName(displayName),
             Dock = DockStyle.Top,
-            //Height = RowHeight,
+            Height = RowHeight,
             TextAlign = ContentAlignment.MiddleRight,
             AutoEllipsis = true,
             //BorderStyle = BorderStyle.FixedSingle
