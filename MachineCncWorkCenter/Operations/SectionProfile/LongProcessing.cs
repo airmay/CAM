@@ -1,5 +1,4 @@
 ﻿using Autodesk.AutoCAD.DatabaseServices;
-using Autodesk.AutoCAD.EditorInput;
 using Autodesk.AutoCAD.Geometry;
 using CAM.Autocad;
 using CAM.Autocad.AutoCADCommands;
@@ -13,29 +12,31 @@ using System.Linq;
 
 namespace CAM.MachineCncWorkCenter.Operations.SectionProfile;
 
-public record struct Cut(List<Point2d> Points);
-
 [Serializable]
-public class LongProcessing: OperationCnc
+public class LongProcessing: SectionProfileBase
 {
-    public AcadObject Rail { get; set; }
-    public double? Length { get; set; }
-    public double Departure { get; set; }
+    //public AcadObject Rail { get; set; }
+    //public double? Length { get; set; }
+    //public double Departure { get; set; }
 
-    public bool IsA90 { get; set; }
-    public double AngleA { get; set; }
+    //public bool IsA90 { get; set; }
+    //public double AngleA { get; set; }
 
     public double Crest { get; set; } = 4;
     // public bool IsProfileStep { get; set; }
-    public double? ProfileStart { get; set; }
-    public double? ProfileEnd { get; set; }
-    public bool IsReverse { get; set; }
+    //public double? ProfileStart { get; set; }
+    //public double? ProfileEnd { get; set; }
+    //public bool IsReverse { get; set; }
     public double? PenetrationStep { get; set; }
     public double? PenetrationBegin { get; set; }
     public double? PenetrationMax { get; set; }
     public bool IsOutlet { get; set; } = true;
-    public bool ChangeProcessSide { get; set; }
-    public bool ChangeEngineSide { get; set; }
+    //public bool ChangeProcessSide { get; set; }
+    //public bool ChangeEngineSide { get; set; }
+
+    // public bool IsExactlyBegin { get; set; }
+    // public bool IsExactlyEnd { get; set; }
+    // public double DzBillet { get; set; }
 
     // public bool IsExactlyBegin { get; set; }
     // public bool IsExactlyEnd { get; set; }
@@ -79,65 +80,83 @@ public class LongProcessing: OperationCnc
 
     public override void Execute()
     {
-        if (Rail == null && Length == null)
-            Length = 1000;
+        base.Execute();
 
-        var rail = Rail?.GetCurve() ?? new Line(Point3d.Origin, Point3d.Origin + Vector3d.XAxis * Length.Value);
-        var profile = ProcessingArea.Get<Polyline>();       
-        var railPoint = profile.StartPoint.Y <= profile.EndPoint.Y ? profile.StartPoint : profile.EndPoint;
-        Processor.StartOperation(Math.Abs(profile.EndPoint.Y - profile.StartPoint.Y));
+        //if (Rail == null && Length == null)
+        //    Length = 1000;
 
-        var outside = ChangeProcessSide.GetSign();
-        CreateProfile3D(profile, railPoint, rail, -outside);
-        profile = profile.CreateCopy(Delta * (railPoint == profile.StartPoint).GetSign());
-        if (Delta != 0)
-            CreateProfile3D(profile, railPoint, rail, -outside);
-        if (Departure != 0)
-            rail = CreateDepartureRail(rail, Departure);
+        //var rail = Rail?.GetCurve() ?? new Line(Point3d.Origin, Point3d.Origin + Vector3d.XAxis * Length.Value);
+        //var profile = ProcessingArea.Get<Polyline>();
+        //var railPoint = profile.StartPoint.Y <= profile.EndPoint.Y ? profile.StartPoint : profile.EndPoint;
+        //Processor.StartOperation(Math.Abs(profile.EndPoint.Y - profile.StartPoint.Y));
 
-        if (profile.StartPoint.Y > profile.EndPoint.Y)
-            profile.ReverseCurve();
-        var offsetVector = (profile.StartPoint - railPoint).ToVector2d();
-        profile.TransformBy(Matrix3d.Displacement(Point3d.Origin - profile.StartPoint));
-        if (AngleA > 0)
-            profile.TransformBy(Matrix3d.Rotation(-AngleA.ToRad(), Vector3d.ZAxis, profile.StartPoint));
+        //var outside = ChangeProcessSide.GetSign();
+        //var engineSide =
+        //    outside * ChangeEngineSide
+        //        .GetSign(); // по-умолчанию двигатель со стороны заготовки, обратно наружней стороне
+        //CreateProfile3D(profile, railPoint, rail, -outside);
+        //profile = profile.CreateCopy(Delta * (railPoint == profile.StartPoint).GetSign());
+        //if (Delta != 0)
+        //    CreateProfile3D(profile, railPoint, rail, -outside);
+        //if (Departure != 0)
+        //    rail = CreateDepartureRail(rail, Departure);
+
+        //if (profile.StartPoint.Y > profile.EndPoint.Y)
+        //    profile.ReverseCurve();
+        //var offsetVector = (profile.StartPoint - railPoint).ToVector2d();
+        //profile.TransformBy(Matrix3d.Displacement(Point3d.Origin - profile.StartPoint));
+        //if (AngleA > 0)
+        //    profile.TransformBy(Matrix3d.Rotation(-AngleA.ToRad(), Vector3d.ZAxis, profile.StartPoint));
         var polylinePoints = profile.GetPolylineFitPoints(1D).Select(p => p.ToPoint2d()).ToArray();
         var xs = GetX(profile.EndPoint.X);
         var yStart = (profile.EndPoint.Y > 0 ? profile.EndPoint.Y : 0) +
                      (AngleA > 0 ? PenetrationBegin.GetValueOrDefault() : 0);
         var xShift = ChangeEngineSide ? ToolThickness : 0;
         var cuts = xs.FindMax(polylinePoints, ToolThickness)
-            .Select(p => CreateCut(p, yStart, xShift));
-        if (AngleA > 0)
-            cuts = cuts.Select(c => new Cut(c.Points.ConvertAll(p => p.TransformBy(Matrix2d.Rotation(AngleA.ToRad(), Point2d.Origin)))));
-        if (!IsReverse)
-            cuts = cuts.Reverse();
-        var engineSide = outside * ChangeEngineSide.GetSign(); // по-умолчанию двигатель со стороны заготовки, обратно наружней стороне
+            .Select(p => GetToolPointsList(p, yStart, xShift))
+            .If(!IsReverse, p => p.Reverse())
+            .Select(p => CreateCurves(p).ToList());
+        //if (AngleA > 0)
+        //    cuts = cuts.Select(c =>
+        //        c.ConvertAll(p => p.TransformBy(Matrix2d.Rotation(AngleA.ToRad(), Point2d.Origin))));
+        //if (!IsReverse)
+        //    cuts = cuts.Reverse();
 
-        foreach (var cut in cuts)
+        foreach (var curves in cuts)
         {
-            var curves = cut.Points.ConvertAll(p => p + offsetVector)
-                .ConvertAll(p => rail.CreateCopy(-outside * p.X, p.Y));
+            //var curves = CreateCurves(cut).ToList();
+                //cut.Points.ConvertAll(p => p + offsetVector)
+                //.ConvertAll(p => rail.CreateCopy(-outside * p.X, p.Y));
             var first = curves[0];
             if (IsOutlet)
             {
                 var point = Processor.GetClosestToolPoint(first);
                 if (Processor.IsUpperTool)
-                    Processor.Move(point, first.GetToolAngle(point, (Side)engineSide), AngleA);
+                    Processor.Move(point, first.GetToolAngle(point, (Side)_engineSide), AngleA);
                 Processor.Penetration(point);
                 curves.RemoveAt(0);
             }
 
-            Processor.Cutting(curves, engineSide, angleA: AngleA);
+            Processor.Cutting(curves, _engineSide, angleA: AngleA);
 
             if (IsOutlet)
                 Processor.Penetration(Processor.GetClosestToolPoint(first));
         }
 
         Processor.Uplifting();
+
+
+        //IEnumerable<Curve> CreateCurves(IEnumerable<Point2d> points)
+        //{
+        //    return points.If(AngleA > 0,
+        //            p => p.Select(p => p.TransformBy(Matrix2d.Rotation(AngleA.ToRad(), Point2d.Origin))))
+        //        .Select(p => p + offsetVector)
+        //        .Select(p => rail.CreateCopy(-outside * p.X, p.Y));
+        //}
     }
 
-    private Cut CreateCut(Point2d point, double yStart, double xShift)
+
+    private List<Point2d> GetToolPointsList(Point2d point, double yStart, double xShift)
     {
         var penetrationAll = yStart - point.Y;
         if (penetrationAll > PenetrationMax)
@@ -147,7 +166,7 @@ public class LongProcessing: OperationCnc
         var ys = Enumerable.Range(1, count).Select(p => yStart - p * step).ToList();
         if (IsOutlet)
             ys.Insert(0, yStart + TechProcess.ZSafety);
-        return new Cut(ys.ConvertAll(y => new Point2d(point.X + xShift, y)));
+        return ys.ConvertAll(y => new Point2d(point.X + xShift, y));
     }
 
     private IEnumerable<double> GetX(double profileEnd)
@@ -160,49 +179,49 @@ public class LongProcessing: OperationCnc
         return Enumerable.Range(0, count + 1).Select(p => xStart + p * xStep);
     }
 
-    private void CreateProfile3D(Curve profile, Point3d profilePoint, Curve rail, int sign)
-    {
-        CreateProfileAtPoint(rail.StartPoint);
-        CreateProfileAtPoint(rail.EndPoint);
+    //private void CreateProfile3D(Curve profile, Point3d profilePoint, Curve rail, int sign)
+    //{
+    //    CreateProfileAtPoint(rail.StartPoint);
+    //    CreateProfileAtPoint(rail.EndPoint);
 
-        void CreateProfileAtPoint(Point3d railPoint)
-        {
-            var angle = rail.GetTangent(railPoint).Angle + Math.PI / 2 * sign;
-            var matrix = Matrix3d.Displacement(railPoint - profilePoint) *
-                Matrix3d.Rotation(angle, Vector3d.ZAxis, profilePoint) *
-                Matrix3d.Rotation(Math.PI / 2, Vector3d.XAxis, profilePoint);
-            var p = profile.GetTransformedCopy(matrix);
-            p.Transparency = Acad.GetSemitransparent();
-            ProcessingObjectBuilder.AddEntity(p);
-        }
-    }
+    //    void CreateProfileAtPoint(Point3d railPoint)
+    //    {
+    //        var angle = rail.GetTangent(railPoint).Angle + Math.PI / 2 * sign;
+    //        var matrix = Matrix3d.Displacement(railPoint - profilePoint) *
+    //            Matrix3d.Rotation(angle, Vector3d.ZAxis, profilePoint) *
+    //            Matrix3d.Rotation(Math.PI / 2, Vector3d.XAxis, profilePoint);
+    //        var p = profile.GetTransformedCopy(matrix);
+    //        p.Transparency = Acad.GetSemitransparent();
+    //        ProcessingObjectBuilder.AddEntity(p);
+    //    }
+    //}
 
-    private Curve CreateDepartureRail(Curve curve, double departure)
-    {
-        if (curve is Line line)
-            return new Line(line.ExpandStart(departure), line.ExpandEnd(departure));
+    //private Curve CreateDepartureRail(Curve curve, double departure)
+    //{
+    //    if (curve is Line line)
+    //        return new Line(line.ExpandStart(departure), line.ExpandEnd(departure));
         
-        var polyline = new Polyline();
-        var startPoint = curve.StartPoint - curve.GetFirstDerivative(curve.StartPoint).GetNormal() * departure;
-        polyline.AddVertexAt(0, startPoint.ToPoint2d(), 0, 0, 0);
+    //    var polyline = new Polyline();
+    //    var startPoint = curve.StartPoint - curve.GetFirstDerivative(curve.StartPoint).GetNormal() * departure;
+    //    polyline.AddVertexAt(0, startPoint.ToPoint2d(), 0, 0, 0);
 
-        switch (curve)
-        {
-            case Polyline poly:
-                polyline.JoinPolyline(poly);
-                break;
-            case Arc arc:
-                var bulge = arc.GetArcBulge(curve.StartPoint);
-                polyline.AddVertexAt(1, curve.StartPoint.ToPoint2d(), bulge, 0, 0);
-                polyline.AddVertexAt(2, curve.EndPoint.ToPoint2d(), 0, 0, 0);
-                break;
-            default:
-                throw new Exception($"Тип кривой {curve.GetType().Name} не поддерживается");
-        }
+    //    switch (curve)
+    //    {
+    //        case Polyline poly:
+    //            polyline.JoinPolyline(poly);
+    //            break;
+    //        case Arc arc:
+    //            var bulge = arc.GetArcBulge(curve.StartPoint);
+    //            polyline.AddVertexAt(1, curve.StartPoint.ToPoint2d(), bulge, 0, 0);
+    //            polyline.AddVertexAt(2, curve.EndPoint.ToPoint2d(), 0, 0, 0);
+    //            break;
+    //        default:
+    //            throw new Exception($"Тип кривой {curve.GetType().Name} не поддерживается");
+    //    }
 
-        var endPoint = curve.EndPoint + curve.GetFirstDerivative(curve.EndPoint).GetNormal() * departure;
-        polyline.AddVertexAt(polyline.GetPolyPoints().Count(), endPoint.ToPoint2d(), 0, 0, 0);
+    //    var endPoint = curve.EndPoint + curve.GetFirstDerivative(curve.EndPoint).GetNormal() * departure;
+    //    polyline.AddVertexAt(polyline.GetPolyPoints().Count(), endPoint.ToPoint2d(), 0, 0, 0);
 
-        return polyline;
-    }
+    //    return polyline;
+    //}
 }

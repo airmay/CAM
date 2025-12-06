@@ -171,6 +171,34 @@ public static class Graph
 
     public static Point3d GetExtendedPoint(this Point3d point, Point3d basePoint, double value) => point + (point - basePoint).GetNormal() * value;
 
+    public static Curve ExtendLines(this Curve curve, double value)
+    {
+        if (curve is Line line)
+            return new Line(line.ExpandStart(value), line.ExpandEnd(value));
+
+        var polyline = new Polyline();
+        var startPoint = curve.StartPoint - curve.GetFirstDerivative(curve.StartPoint).GetNormal() * value;
+        polyline.AddVertexAt(0, startPoint.ToPoint2d(), 0, 0, 0);
+
+        switch (curve)
+        {
+            case Polyline poly:
+                polyline.JoinPolyline(poly);
+                break;
+            case Arc arc:
+                var bulge = arc.GetArcBulge(curve.StartPoint);
+                polyline.AddVertexAt(1, curve.StartPoint.ToPoint2d(), bulge, 0, 0);
+                polyline.AddVertexAt(2, curve.EndPoint.ToPoint2d(), 0, 0, 0);
+                break;
+            default:
+                throw new Exception($"Тип кривой {curve.GetType().Name} не поддерживается");
+        }
+
+        var endPoint = curve.EndPoint + curve.GetFirstDerivative(curve.EndPoint).GetNormal() * value;
+        polyline.AddVertexAt(polyline.GetPolyPoints().Count(), endPoint.ToPoint2d(), 0, 0, 0);
+
+        return polyline;
+    }
     #endregion
 
     #region GetSide

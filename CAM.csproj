@@ -116,6 +116,7 @@
     <Compile Include="Core\IOperation.cs" />
     <Compile Include="Core\ITechProcess.cs" />
     <Compile Include="MachineCncWorkCenter\Operations\SectionProfile\LongCleaning.cs" />
+    <Compile Include="MachineCncWorkCenter\Operations\SectionProfile\SectionProfileBase.cs" />
     <Compile Include="MachineCncWorkCenter\Operations\SectionProfile\LongProcessing.cs" />
     <Compile Include="Utils\Helpers.cs" />
     <Compile Include="Core\Processing\ProgramBuilder.cs" />
