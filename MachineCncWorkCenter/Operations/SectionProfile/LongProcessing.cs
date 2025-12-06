@@ -64,7 +64,7 @@ public class LongProcessing: SectionProfileBase
         }
 
         Processor.Uplifting();
-        _profile.Dispose();
+        DisposeCurves();
     }
 
     private IEnumerable<double> GetXs(double profileEnd)

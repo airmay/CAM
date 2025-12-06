@@ -106,4 +106,11 @@ public abstract class SectionProfileBase : OperationCnc
             .Select(p => p + _offsetVector)
             .Select(p => _rail.CreateCopy(-_outside * p.X, p.Y));
     }
+
+    protected void DisposeCurves()
+    {
+        _profile.Dispose();
+        if (_rail.IsNewObject)
+            _rail.Dispose();
+    }
 }

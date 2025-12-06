@@ -48,7 +48,7 @@ public class LongCleaning : SectionProfileBase
             .Select((p, i) => new { Curve = p, AngleA = _anglesA != null ? _anglesA[i] : AngleA })
             .ForEach(p => Processor.Cutting(p.Curve, _engineSide, angleA: p.AngleA));
         Processor.Uplifting();
-        _profile.Dispose();
+        DisposeCurves();
     }
 
     private IEnumerable<Point2d> GetToolPoints()
