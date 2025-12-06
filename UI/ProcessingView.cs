@@ -188,7 +188,10 @@ public partial class ProcessingView : UserControl
     #region Operation
     private void bCreateTechOperation_Click(string caption, Type operationType)
     {
-        var techProcessType = operationType.BaseType.BaseType.GetGenericArguments()[0];
+        var baseType = operationType.BaseType;
+        while (baseType.GetGenericArguments().Length == 0)
+            baseType = baseType.BaseType;
+        var techProcessType = baseType.GetGenericArguments()[0];
         var techProcessNode = SelectedTechProcessNode;
         if (techProcessNode == null || techProcessNode.Tag.GetType() != techProcessType)
             techProcessNode = AddTechProcessNode(techProcessType);
@@ -205,9 +208,11 @@ public partial class ProcessingView : UserControl
         return new TreeNode(operation.Caption, 1, 1)
         {
             Checked = operation.Enabled,
-            Tag = operation
+            Tag = operation,
+            ForeColor = operation.Enabled ? Color.Black : Color.Gray
         };
     }
+
     #endregion
 
     #region Tree nodes

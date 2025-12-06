@@ -19,17 +19,17 @@ public static class OperationMenuItems
         new OperationMenuMenuItem("Распиловка", typeof(SawingOperation)),
         new OperationMenuGroupMenuItem("Профиль по сечению",
         [
-            new OperationMenuMenuItem("Гребенка", typeof(MachineCncWorkCenter.Operations.SectionProfile.LongProcessing)),
-            new OperationMenuMenuItem("Чистка", typeof(MachineCncWorkCenter.Operations.SectionProfile.LongCleaning)),
+            new OperationMenuMenuItem("Профиль по сечению - Гребенка", typeof(MachineCncWorkCenter.Operations.SectionProfile.LongProcessing)),
+            new OperationMenuMenuItem("Профиль по сечению - Чистка", typeof(MachineCncWorkCenter.Operations.SectionProfile.LongCleaning)),
         ]),
         new OperationMenuGroupMenuItem("Тактилка", 
         [
-            new OperationMenuMenuItem("Полосы", typeof(TactileBandsOperation)),
-            new OperationMenuMenuItem("Фаска", typeof(TactileChamfersOperation)),
+            new OperationMenuMenuItem("Тактилка - Полосы", typeof(TactileBandsOperation)),
+            new OperationMenuMenuItem("Тактилка - Фаска", typeof(TactileChamfersOperation)),
         ]),
         new OperationMenuGroupMenuItem("Трос", 
         [
-            new OperationMenuMenuItem("Распиловка", typeof(WireSawOperation)),
+            new OperationMenuMenuItem("Трос - Распиловка", typeof(WireSawOperation)),
         ]),
     ];
 

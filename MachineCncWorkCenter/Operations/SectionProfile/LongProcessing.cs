@@ -21,7 +21,7 @@ public class LongProcessing: SectionProfileBase
 
     public static void ConfigureParamsView(ParamsControl view)
     {
-        SectionProfileBase.ConfigureParamsView(view);
+        ConfigureParamsViewBase(view);
 
         view.AddIndent();
         view.AddTextBox(nameof(PenetrationBegin), "Заглубление: начало", hint: "Расстояние от края заготовки до ближайшего конца профиля");
@@ -35,11 +35,11 @@ public class LongProcessing: SectionProfileBase
     {
         base.Execute();
 
-        var polylinePoints = profile.GetPolylineFitPoints(1D).Select(p => p.ToPoint2d()).ToArray();
-        var xs = GetX(profile.EndPoint.X);
-        var yStart = (profile.EndPoint.Y > 0 ? profile.EndPoint.Y : 0) + (AngleA > 0 ? PenetrationBegin.GetValueOrDefault() : 0);
+        var polylinePoints = _profile.GetPolylineFitPoints(1D).Select(p => p.ToPoint2d()).ToArray();
+        var xs = GetXs(_profile.EndPoint.X);
+        var yStart = (_profile.EndPoint.Y > 0 ? _profile.EndPoint.Y : 0) + (AngleA > 0 ? PenetrationBegin.GetValueOrDefault() : 0);
         var xShift = ChangeEngineSide ? ToolThickness : 0;
-        
+
         var cuts = xs.FindMax(polylinePoints, ToolThickness)
             .Select(p => GetToolPointsList(p, yStart, xShift))
             .If(!IsReverse, p => p.Reverse())
@@ -64,9 +64,10 @@ public class LongProcessing: SectionProfileBase
         }
 
         Processor.Uplifting();
+        _profile.Dispose();
     }
 
-    private IEnumerable<double> GetX(double profileEnd)
+    private IEnumerable<double> GetXs(double profileEnd)
     {
         var distX = (ProfileEnd.HasValue ? ProfileEnd.Value - ToolThickness : profileEnd) - (ProfileStart ?? -ToolThickness);
         var xStep = distX / (int)Math.Round(distX / (Crest + ToolThickness));

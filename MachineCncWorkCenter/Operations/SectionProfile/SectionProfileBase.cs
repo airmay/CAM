@@ -8,6 +8,7 @@ using CAM.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Windows.Forms;
 
 namespace CAM.MachineCncWorkCenter.Operations.SectionProfile;
 
@@ -15,10 +16,11 @@ namespace CAM.MachineCncWorkCenter.Operations.SectionProfile;
 public abstract class SectionProfileBase : OperationCnc
 {
     [NonSerialized] private Curve _rail;
-    [NonSerialized] protected Polyline profile;
+    [NonSerialized] protected Polyline _profile;
     [NonSerialized] private int _outside;
     [NonSerialized] protected int _engineSide;
     [NonSerialized] private Vector2d _offsetVector;
+    protected static TextBox AngleATextBox;
 
     public AcadObject Rail { get; set; }
     public double? Length { get; set; }
@@ -30,29 +32,30 @@ public abstract class SectionProfileBase : OperationCnc
     public bool ChangeProcessSide { get; set; }
     public bool ChangeEngineSide { get; set; }
 
-    public static void ConfigureParamsView(ParamsControl view)
+    public static void ConfigureParamsViewBase(ParamsControl view)
     {
         view.AddAcadObject(nameof(Rail), "Направляющая");
         view.AddTextBox(nameof(Length), "Длина направляющей", hint: "Длина направляющей на оси Х");
         view.AddTextBox(nameof(Departure));
-        var angleATextBox = view.AddTextBox(nameof(AngleA), "Угол A", hint: "Вертикальный угол");
+        AngleATextBox = view.AddTextBox(nameof(AngleA), "Угол A", hint: "Вертикальный угол");
         view.AddAcadObject(nameof(ProcessingArea), "Профиль");
         view.AddTextBox(nameof(ProfileStart), "Начало профиля", hint: "Расстояние от начала профиля до начала обрабатываемого участка профиля");
         view.AddTextBox(nameof(ProfileEnd), "Конец профиля", hint: "Расстояние от начала профиля до конца обрабатываемого участка профиля");
         view.AddCheckBox(nameof(IsReverse), "Обратно", hint: "Обратное направление обработки профиля");
-        //view.AddIndent();
         view.AddCheckBox(nameof(ChangeProcessSide), "Другая сторона", hint: "Сменить сторону обработки");
         var checkBoxChangeEngineSide = view.AddCheckBox(nameof(ChangeEngineSide), "Разворот двигателя на 180");
 
-        //checkBoxIsA90.CheckedChanged += (object sender, EventArgs e) =>
-        //{
-        //    checkBoxChangeEngineSide.Enabled = !checkBoxIsA90.Checked;
-        //    if (checkBoxIsA90.Checked)
-        //    {
-        //        checkBoxChangeEngineSide.Checked = false;
-        //        view.GetData<LongProcessing>().ChangeEngineSide = false;
-        //    }
-        //};
+        AngleATextBox.Validated += (_, _) => UpdateCheckBoxEnable(checkBoxChangeEngineSide);
+    }
+
+    protected static void UpdateCheckBoxEnable(CheckBox checkBox)
+    {
+        checkBox.Enabled = AngleATextBox.Text == @"0";
+        if (!checkBox.Enabled)
+        {
+            checkBox.Checked = false;
+            checkBox.DataBindings[0].WriteValue();
+        }
     }
 
     public override void Execute()
@@ -62,24 +65,24 @@ public abstract class SectionProfileBase : OperationCnc
         _rail = Rail?.GetCurve() ?? new Line(Point3d.Origin, Point3d.Origin + Vector3d.XAxis * Length.GetValueOrDefault(1000));
         var profileDb = ProcessingArea.Get<Polyline>();
         var railPoint = profileDb.StartPoint.Y <= profileDb.EndPoint.Y ? profileDb.StartPoint : profileDb.EndPoint;
-        profile = profileDb.CreateCopy(Delta * (railPoint == profileDb.StartPoint).GetSign());
+        _profile = profileDb.CreateCopy(Delta * (railPoint == profileDb.StartPoint).GetSign());
 
         AddProfile3D(profileDb, _rail.StartPoint);
         AddProfile3D(profileDb, _rail.EndPoint);
         if (Delta != 0)
         {
-            AddProfile3D(profile, _rail.StartPoint);
-            AddProfile3D(profile, _rail.EndPoint);
+            AddProfile3D(_profile, _rail.StartPoint);
+            AddProfile3D(_profile, _rail.EndPoint);
         }
 
         if (Departure != 0)
             _rail = _rail.ExtendLines(Departure);
-        if (profile.StartPoint.Y > profile.EndPoint.Y)
-            profile.ReverseCurve();
-        _offsetVector = (profile.StartPoint - railPoint).ToVector2d();
-        profile.TransformBy(Matrix3d.Displacement(Point3d.Origin - profile.StartPoint));
+        if (_profile.StartPoint.Y > _profile.EndPoint.Y)
+            _profile.ReverseCurve();
+        _offsetVector = (_profile.StartPoint - railPoint).ToVector2d();
+        _profile.TransformBy(Matrix3d.Displacement(Point3d.Origin - _profile.StartPoint));
         if (AngleA > 0)
-            profile.TransformBy(Matrix3d.Rotation(-AngleA.ToRad(), Vector3d.ZAxis, profile.StartPoint));
+            _profile.TransformBy(Matrix3d.Rotation(-AngleA.ToRad(), Vector3d.ZAxis, _profile.StartPoint));
 
         Processor.StartOperation(Math.Abs(profileDb.EndPoint.Y - profileDb.StartPoint.Y));
         return;
