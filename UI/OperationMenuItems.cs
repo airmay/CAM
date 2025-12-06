@@ -19,8 +19,8 @@ public static class OperationMenuItems
         new OperationMenuMenuItem("Распиловка", typeof(SawingOperation)),
         new OperationMenuGroupMenuItem("Профиль по сечению",
         [
-            new OperationMenuMenuItem("Продольная обработка", typeof(MachineCncWorkCenter.Operations.SectionProfile.LongProcessing)),
-            new OperationMenuMenuItem("Продольная чистка", typeof(MachineCncWorkCenter.Operations.SectionProfile.LongCleaning)),
+            new OperationMenuMenuItem("Гребенка", typeof(MachineCncWorkCenter.Operations.SectionProfile.LongProcessing)),
+            new OperationMenuMenuItem("Чистка", typeof(MachineCncWorkCenter.Operations.SectionProfile.LongCleaning)),
         ]),
         new OperationMenuGroupMenuItem("Тактилка", 
         [
