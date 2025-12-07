@@ -60,7 +60,10 @@ public class LongProcessing: SectionProfileBase
             Processor.Cutting(curves, _engineSide, angleA: AngleA);
 
             if (IsOutlet)
-                Processor.Penetration(Processor.GetClosestToolPoint(first));
+            {
+                Processor.GCommandTo(0, Processor.GetClosestToolPoint(first));
+                first.Dispose();
+            }
         }
 
         Processor.Uplifting();

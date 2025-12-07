@@ -39,7 +39,10 @@ public static class ProcessingObjectBuilder
             return curve.ObjectId;
             
         if (curve.Length() < 1)
+        {
+            curve.Dispose(); 
             return null;
+        }
 
         curve.Color = gCode.HasValue
             ? Colors[gCode == 0 ? CommandNames.Fast : CommandNames.Cutting]
