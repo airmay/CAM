@@ -19,17 +19,17 @@ public static class OperationMenuItems
         new OperationMenuMenuItem("Распиловка", typeof(SawingOperation)),
         new OperationMenuGroupMenuItem("Профиль по сечению",
         [
-            new OperationMenuMenuItem("Профиль по сечению - Гребенка", typeof(MachineCncWorkCenter.Operations.SectionProfile.LongProcessing)),
-            new OperationMenuMenuItem("Профиль по сечению - Чистка", typeof(MachineCncWorkCenter.Operations.SectionProfile.LongCleaning)),
+            new OperationMenuMenuItem("Гребенка", typeof(MachineCncWorkCenter.Operations.SectionProfile.LongProcessing)),
+            new OperationMenuMenuItem("Чистка", typeof(MachineCncWorkCenter.Operations.SectionProfile.LongCleaning)),
         ]),
         new OperationMenuGroupMenuItem("Тактилка", 
         [
-            new OperationMenuMenuItem("Тактилка - Полосы", typeof(TactileBandsOperation)),
-            new OperationMenuMenuItem("Тактилка - Фаска", typeof(TactileChamfersOperation)),
+            new OperationMenuMenuItem("Полосы", typeof(TactileBandsOperation)),
+            new OperationMenuMenuItem("Фаска", typeof(TactileChamfersOperation)),
         ]),
         new OperationMenuGroupMenuItem("Трос", 
         [
-            new OperationMenuMenuItem("Трос - Распиловка", typeof(WireSawOperation)),
+            new OperationMenuMenuItem("Распиловка", typeof(WireSawOperation)),
         ]),
     ];
 
@@ -43,12 +43,17 @@ public static class OperationMenuItems
     {
         public override ToolStripItem GetMenuItem(Action<string, Type> onClick)
         {
-            return new ToolStripMenuItem(Caption, null, (_, _) => onClick(Caption, type));
+            return new ToolStripMenuItem(Caption, null, (sender, _) =>
+            {
+                var owner = sender.As<ToolStripMenuItem>().OwnerItem;
+                onClick($"{owner.Text} - {Caption}", type);
+            });
         }
     }
 
     private class OperationMenuGroupMenuItem(string caption, OperationMenuMenuItem[] items) : OperationMenuItemBase(caption)
     {
+
         public override ToolStripItem GetMenuItem(Action<string, Type> onClick)
         {
             return new ToolStripMenuItem(Caption, null, items.ConvertAll(p => p.GetMenuItem(onClick)));
