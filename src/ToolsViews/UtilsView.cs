@@ -1,6 +1,6 @@
 ﻿using System.Windows.Forms;
 
-namespace CAM.UtilViews;
+namespace CAM.ToolsViews;
 
 public partial class UtilsView : UserControl
 {

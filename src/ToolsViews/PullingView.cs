@@ -7,7 +7,7 @@ using Autodesk.AutoCAD.Geometry;
 using CAM.Autocad;
 using CAM.Autocad.AutoCADCommands;
 
-namespace CAM.UtilViews;
+namespace CAM.ToolsViews;
 
 public partial class PullingView : UserControl
 {

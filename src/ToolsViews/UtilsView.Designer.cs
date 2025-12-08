@@ -1,4 +1,4 @@
-﻿namespace CAM.UtilViews
+﻿namespace CAM.ToolsViews
 {
     partial class UtilsView
     {

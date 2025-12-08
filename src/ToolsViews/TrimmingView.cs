@@ -9,7 +9,7 @@ using CAM.Autocad;
 using CAM.Autocad.AutoCADCommands;
 using Graph = CAM.Autocad.Graph;
 
-namespace CAM.UtilViews;
+namespace CAM.ToolsViews;
 
 public partial class TrimmingView : UserControl
 {

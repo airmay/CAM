@@ -13,9 +13,9 @@ using System.Reflection;
 using CAM.Autocad;
 using CAM.Autocad.AutoCADCommands;
 using CAM.Core.Processing;
+using CAM.ToolsViews;
 using CAM.UI;
 using CAM.Utils;
-using CAM.UtilViews;
 
 namespace CAM;
 

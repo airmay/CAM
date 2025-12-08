@@ -169,16 +169,16 @@
     <Compile Include="MachineCncWorkCenter\PostProcessors\KreaPostProcessor.cs" />
     <Compile Include="MachineCncWorkCenter\PostProcessors\DonatoniPostProcessor.cs" />
     <Compile Include="Startup.cs" />
-    <Compile Include="UtilViews\TrimmingView.cs">
+    <Compile Include="ToolsViews\TrimmingView.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="UtilViews\TrimmingView.Designer.cs">
+    <Compile Include="ToolsViews\TrimmingView.Designer.cs">
       <DependentUpon>TrimmingView.cs</DependentUpon>
     </Compile>
-    <Compile Include="UtilViews\UtilsView.cs">
+    <Compile Include="ToolsViews\UtilsView.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="UtilViews\UtilsView.Designer.cs">
+    <Compile Include="ToolsViews\UtilsView.Designer.cs">
       <DependentUpon>UtilsView.cs</DependentUpon>
     </Compile>
     <Compile Include="Autocad\AcadObject.cs" />
@@ -235,10 +235,10 @@
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <Compile Include="Core\Enums\Side.cs" />
-    <Compile Include="UtilViews\PullingView.cs">
+    <Compile Include="ToolsViews\PullingView.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="UtilViews\PullingView.Designer.cs">
+    <Compile Include="ToolsViews\PullingView.Designer.cs">
       <DependentUpon>PullingView.cs</DependentUpon>
     </Compile>
     <Compile Include="Utils\ObjectExtensions.cs" />
@@ -252,10 +252,10 @@
     <EmbeddedResource Include="MachineCncWorkCenter\Operations\Sawing\SawingModesView.resx">
       <DependentUpon>SawingModesView.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="UtilViews\TrimmingView.resx">
+    <EmbeddedResource Include="ToolsViews\TrimmingView.resx">
       <DependentUpon>TrimmingView.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="UtilViews\UtilsView.resx">
+    <EmbeddedResource Include="ToolsViews\UtilsView.resx">
       <DependentUpon>UtilsView.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
@@ -263,7 +263,7 @@
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="UtilViews\PullingView.resx">
+    <EmbeddedResource Include="ToolsViews\PullingView.resx">
       <DependentUpon>PullingView.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="TechProcesses\Common\PassListControl.resx">
